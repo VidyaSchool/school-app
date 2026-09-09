@@ -171,39 +171,7 @@ export default function Home() {
         </InViewRender>
         <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
 
-          {/* Separator — Our Sponsors */}
-          <div className="w-full flex flex-col items-center justify-center pt-16 pb-2 select-none overflow-hidden gap-2">
-            {/* Top: two separators side by side */}
-            <div className="flex flex-row w-full max-w-5xl">
-              <div
-                className="flex-1 h-7 opacity-80 dark:opacity-90 pointer-events-none dark:invert dark:hue-rotate-180"
-                style={{
-                  backgroundImage: "url('/assets/illustrations/separator.svg')",
-                  backgroundSize: "200% 100%",
-                  backgroundPosition: "left center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-              <div
-                className="flex-1 h-7 opacity-80 dark:opacity-90 pointer-events-none dark:invert dark:hue-rotate-180"
-                style={{
-                  backgroundImage: "url('/assets/illustrations/separator.svg')",
-                  backgroundSize: "200% 100%",
-                  backgroundPosition: "right center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-            </div>
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-foreground/80 py-1">
-              Our Sponsors
-            </span>
-            {/* Bottom separator — centered */}
-            <img
-              src="/assets/illustrations/separator.svg"
-              alt="Bottom separator"
-              className="w-full max-w-xs h-7 object-contain dark:invert dark:hue-rotate-180 opacity-80 dark:opacity-90 pointer-events-none rotate-180"
-            />
-          </div>
+          
 
 
           {/* Mobile App Section - Viewport Partial Rendered */}
