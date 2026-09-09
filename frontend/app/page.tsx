@@ -205,13 +205,6 @@ export default function Home() {
             />
           </div>
 
-          {/* Partners Section - Viewport Partial Rendered */}
-          <InViewRender minHeight="200px" rootMargin="300px 0px">
-            <section id="partners" className="w-full py-6 overflow-hidden">
-              <AnimatedPartners partners={partners} />
-            </section>
-          </InViewRender>
-
 
           {/* Mobile App Section - Viewport Partial Rendered */}
           <InViewRender minHeight="450px" rootMargin="250px 0px">
