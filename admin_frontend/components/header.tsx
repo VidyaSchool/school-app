@@ -126,8 +126,20 @@ export function Header() {
                     <ListItem href="/sponsors" title="Sponsors & Partners">
                       Organizations backing and empowering our digital classrooms.
                     </ListItem>
+                    <ListItem href="/mandatory-public-disclosure" title="Mandatory Public Disclosure">
+                      CBSE SARAS compliance, school affiliation credentials, and governance disclosures.
+                    </ListItem>
                   </ul>
                 </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Mandatory Public Disclosure */}
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                  <Link href="/mandatory-public-disclosure" className="text-foreground/80 hover:text-foreground text-sm font-medium whitespace-nowrap">
+                    Mandatory Public Disclosure
+                  </Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
 
               {/* Direct Links */}
@@ -249,11 +261,17 @@ export function Header() {
               <Link href="/sponsors" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Sponsors & Partners
               </Link>
+              <Link href="/mandatory-public-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Mandatory Public Disclosure
+              </Link>
             </div>
           </div>
 
           {/* Direct Links Panel */}
           <div className="border-t border-border pt-3 space-y-1">
+            <Link href="/mandatory-public-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              Mandatory Public Disclosure
+            </Link>
             <Link href="/downloads" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
               Mobile App Download
             </Link>
