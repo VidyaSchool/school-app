@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import dynamic from "next/dynamic"
-import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
@@ -10,48 +9,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils"
 
 const LiquidMetalHero = dynamic(() => import("@/components/liquid-metal-hero"), {
-  loading: () => (
-    <div className="absolute inset-0 translate-y-4 sm:translate-y-6" aria-hidden>
-      <Image
-        src="/assets/vidyaschool/Logo/restored_no_bg_with_title.png"
-        alt=""
-        fill
-        className="object-contain scale-[0.40] grayscale opacity-50"
-        priority
-        sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 40vw"
-      />
-      {/* Shimmer masked to logo shape via PNG alpha channel */}
-      <div
-        className="absolute inset-0 scale-[0.40] overflow-hidden"
-        style={{
-          maskImage: "url('/assets/vidyaschool/Logo/restored_no_bg_with_title.png')",
-          WebkitMaskImage: "url('/assets/vidyaschool/Logo/restored_no_bg_with_title.png')",
-          maskSize: "contain",
-          WebkitMaskSize: "contain",
-          maskRepeat: "no-repeat",
-          WebkitMaskRepeat: "no-repeat",
-          maskPosition: "center",
-          WebkitMaskPosition: "center",
-        }}
-      >
-        <div
-          className="logo-shimmer-sweep absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.75) 50%, transparent 75%)",
-          }}
-        />
-      </div>
-    </div>
-  ),
+  ssr: false,
 })
 
 const sections = [
   { id: "hero", name: "Home", num: "01" },
   { id: "about", name: "About Us", num: "02" },
   { id: "students", name: "Our School", num: "03" },
-  { id: "partners", name: "Sponsors & Partners", num: "04" },
-  { id: "mobile-app", name: "Mobile App", num: "05" },
+  { id: "mobile-app", name: "Mobile App", num: "04" },
 ]
 
 export function HeroSection() {

@@ -58,9 +58,10 @@ export function InViewRender({
   return (
     <div
       ref={ref}
-      className={`content-visibility-auto ${className}`}
+      className={`${isInView ? "" : "content-visibility-auto"} ${className}`.trim()}
       style={{
         minHeight: !isInView && minHeight ? minHeight : undefined,
+        contain: isInView ? "none" : undefined,
       }}
     >
       {isInView ? children : fallback}

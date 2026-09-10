@@ -17,23 +17,7 @@ const VideoModal = dynamic(() => import("@/components/video-modal"), {
   loading: () => <div className="w-full aspect-video rounded-2xl bg-muted/20 animate-pulse" />
 })
 const ImageLightbox = dynamic(() => import("@/components/image-lightbox"))
-const AnimatedPartners = dynamic(() => import("@/components/animated-partners"))
-const CollageGallery = dynamic(() => import("@/components/collage-gallery"))
-
-const partners = [
-  { name: "WIAUK", logo: "/assets/logos/wiaauk.jpg", width: 32, height: 32 },
-  { name: "Mastercard", logo: "/assets/logos/mastercard.svg", width: 32, height: 32 },
-  { name: "IIT Delhi", logo: "/assets/logos/iitd.png", width: 32, height: 32 },
-  { name: "ICA", logo: "/assets/logos/india-for-collective-india.png", width: 32, height: 32 },
-  { name: "RBS", logo: "/assets/logos/rbs.png", width: 32, height: 32 },
-  { name: "Bird Group", logo: "/assets/logos/bird.png", width: 80, height: 16 },
-  { name: "Fidelity", logo: "/assets/logos/fidelity.svg", width: 32, height: 32 },
-  { name: "Verint", logo: "/assets/logos/verint.jpg", width: 32, height: 32 },
-  { name: "KPMG", logo: "/assets/logos/kpmg.png", width: 72, height: 32 },
-  { name: "ReNew Power", logo: "/assets/logos/renew.svg", width: 80, height: 32 },
-  { name: "IndiGo", logo: "/assets/logos/indigo.svg", width: 40, height: 32 },
-  { name: "ICRA", logo: "/assets/logos/icra.png", width: 80, height: 32 }
-] as const
+const SchoolGallery = dynamic(() => import("@/components/school-gallery"))
 
 export default function Home() {
   return (
@@ -71,9 +55,9 @@ export default function Home() {
           </InViewRender>
 
           {/* Principal Section */}
-          <InViewRender minHeight="380px" rootMargin="200px 0px">
-            <section id="principal" className="w-full mt-28 md:mt-40 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pt-16 md:pt-24">
+          <InViewRender minHeight="380px" rootMargin="200px 0px" className="overflow-visible">
+            <section id="principal" className="w-full mt-24 md:mt-36 py-8 overflow-visible">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pt-16 md:pt-24 lg:pt-36">
 
                 {/* Left — text content */}
                 <div className="lg:col-span-5 flex flex-col justify-center space-y-5 order-2 lg:order-1">
@@ -91,9 +75,9 @@ export default function Home() {
                 </div>
 
                 {/* Right — principal placeholder */}
-                <div className="lg:col-span-7 order-1 lg:order-2 mt-16 sm:mt-20 lg:mt-0">
+                <div className="lg:col-span-7 order-1 lg:order-2 mt-16 sm:mt-20 lg:mt-6">
                   <div
-                    className="relative rounded-3xl border border-border/80 shadow-lg h-48 sm:h-64 md:h-80 lg:h-96 overflow-visible"
+                    className="relative rounded-3xl border border-border/80 h-48 sm:h-64 md:h-80 lg:h-96 overflow-visible"
                   >
                     {/* Clipped bg layer — gradient + grain stay within rounded corners */}
                     <div
@@ -117,7 +101,7 @@ export default function Home() {
                     <BlurImg
                       src="/assets/illustrations/principle.png"
                       alt="VidyaSchool Principal"
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[300px] sm:h-[400px] md:h-[480px] lg:h-[530px] w-auto max-w-none object-contain drop-shadow-2xl"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[300px] sm:h-[400px] md:h-[480px] lg:h-[530px] w-auto max-w-none object-contain"
                     />
                   </div>
                 </div>
@@ -127,7 +111,7 @@ export default function Home() {
           </InViewRender>
 
           {/* Separator — Our School */}
-          <div className="w-full flex flex-col items-center justify-center pt-16 sm:pt-28 pb-6 select-none overflow-hidden my-4 gap-2">
+          <div className="w-full flex flex-col items-center justify-center pt-16 sm:pt-24 pb-6 select-none overflow-hidden my-4 gap-2">
             {/* Top: two separators side by side — cropped via background-position */}
             <div className="flex flex-row w-full max-w-5xl">
               {/* Left: shows left half of SVG (line + left ornament) */}
@@ -162,158 +146,16 @@ export default function Home() {
             />
           </div>
 
-        {/* Collage Gallery Section — full viewport width, outside the constrained wrapper */}
-        </div>
-        <InViewRender minHeight="580px" rootMargin="250px 0px">
-          <section id="students" className="w-full mt-10 py-6">
-            <CollageGallery />
-          </section>
-        </InViewRender>
-        <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
-
-          {/* Separator — Our Sponsors */}
-          <div className="w-full flex flex-col items-center justify-center pt-16 pb-2 select-none overflow-hidden gap-2">
-            {/* Top: two separators side by side */}
-            <div className="flex flex-row w-full max-w-5xl">
-              <div
-                className="flex-1 h-7 opacity-80 dark:opacity-90 pointer-events-none dark:invert dark:hue-rotate-180"
-                style={{
-                  backgroundImage: "url('/assets/illustrations/separator.svg')",
-                  backgroundSize: "200% 100%",
-                  backgroundPosition: "left center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-              <div
-                className="flex-1 h-7 opacity-80 dark:opacity-90 pointer-events-none dark:invert dark:hue-rotate-180"
-                style={{
-                  backgroundImage: "url('/assets/illustrations/separator.svg')",
-                  backgroundSize: "200% 100%",
-                  backgroundPosition: "right center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
-            </div>
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-foreground/80 py-1">
-              Our Sponsors
-            </span>
-            {/* Bottom separator — centered */}
-            <img
-              src="/assets/illustrations/separator.svg"
-              alt="Bottom separator"
-              className="w-full max-w-xs h-7 object-contain dark:invert dark:hue-rotate-180 opacity-80 dark:opacity-90 pointer-events-none rotate-180"
-            />
-          </div>
-
-          {/* Partners Section - Viewport Partial Rendered */}
-          <InViewRender minHeight="200px" rootMargin="300px 0px">
-            <section id="partners" className="w-full py-6 overflow-hidden">
-              <AnimatedPartners partners={partners} />
+          {/* School Gallery Section */}
+          <InViewRender minHeight="540px" rootMargin="250px 0px">
+            <section id="students" className="w-full py-6 md:py-10">
+              <SchoolGallery />
             </section>
           </InViewRender>
 
-          {/* Become a Sponsor Card */}
-          <div className="w-full flex justify-center mt-8 mb-2 px-4">
-            <div
-              className="relative w-full overflow-hidden flex flex-col items-center justify-center rounded-[28px] sm:rounded-[67px]"
-              style={{
-                maxWidth: "1300px",
-                height: "411px",
-                background: "linear-gradient(to right, #5400CC 0%, #26308C 50%, #0D0D26 100%)",
-              }}
-            >
-              {/* Grainy Noise Overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none opacity-50 mix-blend-overlay z-0"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "repeat",
-                }}
-              />
-
-              {/* Subtle radial glow top-center */}
-              <div
-                className="absolute pointer-events-none"
-                style={{
-                  top: "-80px", left: "50%", transform: "translateX(-50%)",
-                  width: "500px", height: "500px",
-                  background: "radial-gradient(circle, rgba(140,80,255,0.3) 0%, transparent 70%)",
-                }}
-              />
-
-              {/* Circle illustration — half visible at bottom */}
-              <img
-                src="/assets/illustrations/circle.svg"
-                alt=""
-                aria-hidden="true"
-                className="absolute pointer-events-none select-none sponsor-circle-spin"
-                style={{
-                  bottom: "-350px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  transformOrigin: "center center",
-                  width: "700px",
-                  opacity: 0.8,
-                }}
-              />
-
-              {/* Content */}
-              <div className="relative z-10 flex flex-col items-center gap-5 text-center">
-                <div>
-                  <p className="text-white/60 text-sm font-medium uppercase tracking-widest mb-2">Partnership</p>
-                  <h3 className="text-white text-3xl sm:text-4xl font-bold leading-tight">
-                    Become a Sponsor
-                  </h3>
-                  <p className="mt-3 text-white/70 text-sm sm:text-base max-w-md leading-relaxed">
-                    Partner with VidyaSchool and invest in the next generation.<br />Your brand, our mission — together we grow.
-                  </p>
-                </div>
-
-                <a
-                  href="https://pages.razorpay.com/pl_CFFRr3HwNiFEwo/view"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="sponsor-join-btn"
-                >
-                  Join as Sponsor →
-                </a>
-                <style>{`
-                  @keyframes spin-slow {
-                    from { transform: translateX(-50%) rotate(0deg); }
-                    to   { transform: translateX(-50%) rotate(360deg); }
-                  }
-                  .sponsor-circle-spin {
-                    animation: spin-slow 80s linear infinite;
-                  }
-                  .sponsor-join-btn {
-                    background: rgba(255,255,255,0.1);
-                    backdrop-filter: blur(4px);
-                    border-radius: 25px;
-                    padding: 16px 46px;
-                    color: white;
-                    font: 600 15px Inter, sans-serif;
-                    display: inline-block;
-                    border: 1px solid rgba(255,255,255,0.15);
-                    text-decoration: none;
-                    transition: background 0.2s;
-                  }
-                  .sponsor-join-btn:hover {
-                    background: rgba(255,255,255,0.18);
-                  }
-                  @media (max-width: 639px) {
-                    .sponsor-circle-spin {
-                      width: 360px !important;
-                      bottom: -160px !important;
-                    }
-                  }
-                `}</style>
-              </div>
-            </div>
-          </div>
-
           {/* Mobile App Section - Viewport Partial Rendered */}
           <InViewRender minHeight="450px" rootMargin="250px 0px">
-            <section id="mobile-app" className="w-full mt-20 md:mt-28 pt-10 pb-20 md:pb-32 mb-8">
+            <section id="mobile-app" className="w-full mt-16 md:mt-24 pt-8 pb-16 md:pb-24 mb-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
                 {/* Left — mockup cluster */}

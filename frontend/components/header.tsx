@@ -47,33 +47,9 @@ const ThemeToggle = React.memo(function ThemeToggle() {
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
-  const [isScrolled, setIsScrolled] = React.useState(false)
-
-  React.useEffect(() => {
-    let ticking = false
-    const handleScroll = () => {
-      // RAF-throttle: at most one setIsScrolled per animation frame
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 20)
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-    // passive: true — browser never waits for preventDefault, cuts input delay
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   return (
-    <header className={cn(
-      "sticky top-0 z-50 w-full transition-all duration-300 ease-in-out",
-      isScrolled
-        ? "bg-background/95 backdrop-blur-md border-b border-border shadow-xs"
-        : "bg-transparent border-b border-transparent"
-    )}>
+    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border shadow-xs">
       <div className="mx-auto flex h-14 w-full max-w-[1380px] items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* Brand/Logo */}

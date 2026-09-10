@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useTransition, useCallback } from "react"
 import dynamic from "next/dynamic"
-import Image from "next/image"
 import { BlurImage } from "@/components/blur-image"
 import { Button } from "@/components/ui/button"
 import { Play, Pause } from "lucide-react"
@@ -20,8 +19,7 @@ export default function LiquidMetalHero() {
   const [isInView, setIsInView] = useState(true)
   const [isTabVisible, setIsTabVisible] = useState(true)
   const [reducedMotion, setReducedMotion] = useState(false)
-  const [isReady, setIsReady] = useState(false)
-  const [showPlaceholder, setShowPlaceholder] = useState(true)
+  const [isReady, setIsReady] = useState(true)
   const [logoScale, setLogoScale] = useState(0.40)
 
   // Non-urgent transitions: these state updates are deprioritised so React
@@ -59,12 +57,8 @@ export default function LiquidMetalHero() {
       : null
     if (el && observer) observer.observe(el)
 
-    // Mount shader on first frame, then hide placeholder only after WebGL
-    // has had enough time to paint (avoids the blank flash between the two)
     const frame = requestAnimationFrame(() => {
       setIsReady(true)
-      const timer = setTimeout(() => setShowPlaceholder(false), 150)
-      return () => clearTimeout(timer)
     })
 
     const updateScale = () => setLogoScale(window.innerWidth < 640 ? 0.30 : 0.40)
@@ -108,50 +102,7 @@ export default function LiquidMetalHero() {
         />
       </div>
 
-      {/* Shimmer placeholder — stays mounted until shader paints its first frame */}
-      {showPlaceholder && (
-        <div className="absolute inset-0 z-10 translate-y-0 sm:translate-y-4 lg:translate-y-6" aria-hidden>
-          {/* Grayscale logo at same scale as the shader */}
-          <Image
-            src={LOGO_SRC}
-            alt=""
-            fill
-            className="object-contain grayscale opacity-50"
-            style={{ transform: `scale(${logoScale})` }}
-            priority
-            sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 40vw"
-          />
-          {/*
-            Outer div: scale + mask (logo alpha channel as stencil).
-            Inner div: only the translateX animation.
-            Kept separate so transforms never conflict.
-          */}
-          <div
-            className="absolute inset-0 overflow-hidden"
-            style={{
-              transform: `scale(${logoScale})`,
-              maskImage: `url('${LOGO_SRC}')`,
-              WebkitMaskImage: `url('${LOGO_SRC}')`,
-              maskSize: "contain",
-              WebkitMaskSize: "contain",
-              maskRepeat: "no-repeat",
-              WebkitMaskRepeat: "no-repeat",
-              maskPosition: "center",
-              WebkitMaskPosition: "center",
-            }}
-          >
-            <div
-              className="logo-shimmer-sweep absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.75) 50%, transparent 75%)",
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Animated shader — mounted at isReady, overlaps placeholder for ~150ms */}
+      {/* Animated shader — mounted at isReady */}
       {isReady && (
         <div className="absolute inset-0 z-10 translate-y-0 sm:translate-y-4 lg:translate-y-6">
           <LiquidMetal
