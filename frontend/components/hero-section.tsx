@@ -87,7 +87,7 @@ export function HeroSection() {
       {/* Right Side Floating Page Content Scroller (Horizontal Lines) */}
       <nav
         aria-label="Page content navigation"
-        className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-end gap-3.5 p-3.5 rounded-2xl border border-border/40 bg-background/65 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:border-border/70"
+        className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-end gap-3 px-2.5 py-3 rounded-2xl border border-border/40 bg-background/65 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:border-border/70"
       >
         {sections.map((sec) => {
           const isActive = activeSection === sec.id
@@ -102,8 +102,8 @@ export function HeroSection() {
                     className={cn(
                       "rounded-full transition-all duration-300",
                       isActive
-                        ? "h-[7px] w-8 bg-foreground shadow-sm"
-                        : "h-[3px] w-4 bg-muted-foreground/30 group-hover:h-[4.5px] group-hover:w-6 group-hover:bg-foreground/70"
+                        ? "h-[6px] w-6 bg-foreground shadow-sm"
+                        : "h-[3px] w-3.5 bg-muted-foreground/30 group-hover:h-[4px] group-hover:w-5 group-hover:bg-foreground/70"
                     )}
                   />
                 </a>
