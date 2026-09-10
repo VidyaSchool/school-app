@@ -224,12 +224,13 @@ export async function middleware(request: NextRequest) {
   // If logged in and visiting /login
   if (pathname === '/login' && session?.user) {
     const user = session.user as any
+    // If already authenticated as admin, go to admin dashboard
     if (user.role === 'admin') {
       const dest = await resolveAdminDestination(user)
       return applySecurityHeaders(NextResponse.redirect(new URL(dest, request.url)))
-    } else {
-      return applySecurityHeaders(NextResponse.redirect(new URL('/unauthorized', request.url)))
     }
+    // If logged in with another role (e.g. student, teacher), allow visiting /login to switch to admin
+    return applySecurityHeaders(NextResponse.next())
   }
 
   // Allow public routes without authentication
