@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
+import React from "react"
 
 interface InViewRenderProps {
   children: React.ReactNode
@@ -25,46 +25,11 @@ interface InViewRenderProps {
  */
 export function InViewRender({
   children,
-  fallback = null,
-  rootMargin = "250px 0px",
-  minHeight = "200px",
   className = "",
-  once = true,
 }: InViewRenderProps) {
-  const [isInView, setIsInView] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const target = ref.current
-    if (!target) return
-    if (isInView && once) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true)
-          if (once) observer.unobserve(target)
-        } else if (!once) {
-          setIsInView(false)
-        }
-      },
-      { rootMargin }
-    )
-
-    observer.observe(target)
-    return () => observer.disconnect()
-  }, [rootMargin, once, isInView])
-
   return (
-    <div
-      ref={ref}
-      className={`${isInView ? "" : "content-visibility-auto"} ${className}`.trim()}
-      style={{
-        minHeight: !isInView && minHeight ? minHeight : undefined,
-        contain: isInView ? "none" : undefined,
-      }}
-    >
-      {isInView ? children : fallback}
+    <div className={className}>
+      {children}
     </div>
   )
 }

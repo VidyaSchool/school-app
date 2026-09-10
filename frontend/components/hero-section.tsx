@@ -23,6 +23,8 @@ export function HeroSection() {
   const [activeSection, setActiveSection] = useState("hero")
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) return
+
     const observerOptions = {
       root: null,
       rootMargin: "-20% 0px -60% 0px", // triggers when section is in the middle of the viewport
@@ -49,7 +51,7 @@ export function HeroSection() {
     <section
       id="hero"
       aria-label="Welcome to VidyaSchool"
-      className="relative flex h-[95dvh] min-h-[95dvh] w-full items-center overflow-x-clip py-6 sm:py-0"
+      className="relative flex h-[95svh] min-h-[95svh] lg:h-[95dvh] lg:min-h-[95dvh] w-full items-center overflow-x-clip py-6 sm:py-0"
     >
       {/* Hero Content */}
       <div className="relative z-10 mx-auto max-w-[1380px] w-full px-4 sm:px-6 lg:px-8">
