@@ -108,7 +108,7 @@ export function Footer() {
                 <Link href="/student/fees" className="hover:text-foreground transition-colors">Fees Desk</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-foreground transition-colors font-medium text-foreground/90">Contact Us</Link>
+                <Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link>
               </li>
             </ul>
           </div>
