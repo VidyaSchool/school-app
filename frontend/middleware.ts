@@ -6,6 +6,8 @@ import { user as userTable, session as sessionTable, userProfile } from './lib/s
 import { eq } from 'drizzle-orm'
 import { checkRateLimit } from './lib/rate-limit'
 
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"
+
 // Public routes - accessible without authentication
 const publicRoutes = ['/', '/login', '/signup', '/unauthorized', '/downloads']
 
@@ -13,7 +15,6 @@ const publicRoutes = ['/', '/login', '/signup', '/unauthorized', '/downloads']
 const roleDashboardMap: Record<string, string> = {
   teacher: '/teacher',
   librarian: '/librarian',
-  admin: '/admin',
   account: '/accounts',
   student: '/student',
 }
@@ -24,7 +25,6 @@ const protectedRoutes = {
   '/student': ['student'],
   '/teacher': ['teacher', 'admin', 'librarian'],
   '/librarian': ['librarian', 'admin'],
-  '/admin': ['admin'],
   '/accounts': ['admin', 'account'],
   '/login-accounts': ['student', 'teacher', 'admin', 'account', 'librarian'],
 }
@@ -36,6 +36,10 @@ async function resolveUserDestination(user: any): Promise<string> {
       .from(userProfile)
       .where(eq(userProfile.userId, user.id))
       .then(res => res[0])
+
+    if (user.role === 'admin') {
+      return profile?.username ? `${ADMIN_URL}/admin/${profile.username}` : `${ADMIN_URL}/admin`
+    }
 
     if (profile?.username && profile?.onboardingCompleted) {
       const rolePrefix = roleDashboardMap[user.role as string] ?? '/student'
@@ -77,6 +81,11 @@ export async function middleware(request: NextRequest) {
     return applySecurityHeaders(
       new NextResponse('Bad Request: Malicious or invalid pattern detected.', { status: 400 })
     )
+  }
+
+  // Redirect all admin UI routes to dedicated admin_frontend
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, ADMIN_URL)))
   }
 
   // 2. CSRF & ORIGIN INTEGRITY CHECK (State-changing API operations)

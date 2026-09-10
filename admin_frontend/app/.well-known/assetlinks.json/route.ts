@@ -1,0 +1,24 @@
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  const assetlinks = [
+    {
+      relation: ['delegate_permission/common.handle_all_urls'],
+      target: {
+        namespace: 'android_app',
+        package_name: 'com.vidyaschool.app',
+        sha256_cert_fingerprints: [
+          '10:14:CE:00:DA:E5:60:5F:AE:D6:B1:8A:4D:2C:9E:B7:C5:16:D7:E9:98:C8:84:48:ED:9A:86:14:1A:05:BF:EA',
+          'FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C'
+        ]
+      }
+    }
+  ]
+
+  return NextResponse.json(assetlinks, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, max-age=86400, s-maxage=86400'
+    }
+  })
+}

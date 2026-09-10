@@ -14,6 +14,7 @@ import { QRCodeSVG } from "qrcode.react"
 import { io, Socket } from "socket.io-client"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000"
+const ADMIN_FRONTEND_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3001"
 const QR_TTL = 180 // seconds
 
 type QRStatus = "idle" | "generating" | "active" | "scanned" | "confirmed" | "expired"
@@ -38,9 +39,12 @@ export default function LoginPage() {
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data) {
+          if (data.role === 'admin') {
+            window.location.href = data.username ? `${ADMIN_FRONTEND_URL}/admin/${data.username}` : `${ADMIN_FRONTEND_URL}/admin`
+            return
+          }
           const roleDestMap: Record<string, string> = {
             teacher: '/teacher',
-            admin: '/admin',
             librarian: '/librarian',
             account: '/accounts',
             student: '/student',
@@ -150,9 +154,12 @@ export default function LoginPage() {
         const res = await fetch('/api/profile/username')
         if (res.ok) {
           const data = await res.json()
+          if (data.role === 'admin') {
+            window.location.href = data.username ? `${ADMIN_FRONTEND_URL}/admin/${data.username}` : `${ADMIN_FRONTEND_URL}/admin`
+            return
+          }
           const roleDestMap: Record<string, string> = {
             teacher: '/teacher',
-            admin: '/admin',
             librarian: '/librarian',
             account: '/accounts',
             student: '/student',
@@ -207,9 +214,12 @@ export default function LoginPage() {
           const res = await fetch('/api/profile/username')
           if (res.ok) {
             const data = await res.json()
+            if (data.role === 'admin') {
+              window.location.href = data.username ? `${ADMIN_FRONTEND_URL}/admin/${data.username}` : `${ADMIN_FRONTEND_URL}/admin`
+              return
+            }
             const roleDestMap: Record<string, string> = {
               teacher: '/teacher',
-              admin: '/admin',
               librarian: '/librarian',
               account: '/accounts',
               student: '/student',
@@ -396,12 +406,24 @@ export default function LoginPage() {
                     </Button>
                   </div>
 
-                  <FieldDescription className="text-center text-xs">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="underline underline-offset-4 text-foreground font-medium">
-                      Sign up
-                    </Link>
-                  </FieldDescription>
+                  <div className="space-y-3">
+                    <FieldDescription className="text-center text-xs">
+                      Don&apos;t have an account?{" "}
+                      <Link href="/signup" className="underline underline-offset-4 text-foreground font-medium">
+                        Sign up
+                      </Link>
+                    </FieldDescription>
+
+                    <div className="rounded-lg border border-border/60 bg-muted/40 p-2.5 text-center text-xs text-muted-foreground">
+                      School Administrator?{" "}
+                      <a
+                        href={`${ADMIN_FRONTEND_URL}/login`}
+                        className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors inline-flex items-center gap-0.5"
+                      >
+                        Admin Portal &rarr;
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (

@@ -53,7 +53,7 @@ engine = create_engine(
 )
 
 # Set up Socket.IO server
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins=['http://localhost:3000', 'https://vidyaschool.vercel.app'])
+sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins=['http://localhost:3000', 'http://localhost:3001', 'https://vidyaschool.vercel.app'])
 
 active_users = {}
 
@@ -389,6 +389,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
+        "http://localhost:3001",
         "http://localhost:8000",
         "https://vidyaschool.vercel.app",
         "https://blazeneuro.com",
