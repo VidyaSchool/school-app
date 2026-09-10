@@ -17,7 +17,9 @@ The platform features a web application (Next.js 16), a backend REST & WebSocket
          │                  │                      │                  │
   ┌──────▼──────┐    ┌──────▼──────┐        ┌──────▼──────┐    ┌──────▼──────┐
   │ Next.js 16  │    │  FastAPI    │        │  C++ GTK+   │    │ Mobile Apps │
-  │ Web Portal  │    │  Backend    │        │ Desktop App │    │ Expo/Kotlin │
+  │ Web Portals │    │  Backend    │        │ Desktop App │    │ Expo/Kotlin │
+  │ Port 3000   │    │  REST & WS  │        │             │    │             │
+  │ Port 3001   │    │             │        │             │    │             │
   └──────┬──────┘    └──────┬──────┘        └──────┬──────┘    └──────┬──────┘
          │                  │                      │                  │
          └──────────────────┼──────────────────────┴──────────────────┘
@@ -32,12 +34,16 @@ The platform features a web application (Next.js 16), a backend REST & WebSocket
 
 ## 💻 Sub-System Breakdown
 
-### 1. 🌐 Web Frontend (`/frontend`)
-- **Framework**: Next.js 16 (App Router) + React 19 + TypeScript
-- **Styling**: Tailwind CSS v4 + Motion / Framer Motion + Radix UI + Lucide Icons + Paper Design Shaders
-- **Authentication**: Better-Auth (OAuth with Google, GitHub, Credentials, Session Management)
-- **Database & ORM**: Drizzle ORM + PostgreSQL (Neon Database)
-- **State & Integration**: TanStack Table, Recharts, KaTeX, Monaco Editor, Socket.io Client, Resend (Emails), AWS S3 SDK.
+### 1. 🌐 Web Portals
+- **Main Portal (`/frontend` - Port 3000)**:
+  - **Audience**: Students, Teachers, Librarians, Accountants, and Public Visitors.
+  - **Stack**: Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4.
+  - **Auth & Routing**: Better-Auth authentication, role-based edge middleware redirecting `/admin` requests to Port 3001.
+  - **Integrations**: Drizzle ORM (Neon DB), TanStack Table, Recharts, KaTeX, Monaco Editor, Socket.IO Client, Resend, AWS S3.
+- **Admin Portal (`/admin_frontend` - Port 3001)**:
+  - **Audience**: School Administrators and Governance.
+  - **Features**: Student & Teacher Management, Fee Control, School Slider CMS, Broadcast Notices, AI Page Builder.
+  - **Isolation**: Strict administrative role guard, dedicated Admin Login experience, and isolated UI workspace.
 
 ### 2. ⚡ Backend Service (`/backend`)
 - **Framework**: Python FastAPI + Uvicorn + SQLModel / SQLAlchemy
@@ -93,6 +99,12 @@ The platform features a web application (Next.js 16), a backend REST & WebSocket
 
 ```
 vidyaschool/
+├── admin_frontend/                 # Next.js Dedicated Admin Portal (Port 3001)
+│   ├── app/                        # Admin Dashboard, Slider, Notices, Page Builder
+│   ├── components/                 # Administrative UI & widgets
+│   ├── lib/                        # Better Auth, DB schema & helpers
+│   ├── middleware.ts               # Strict admin role guard & route protection
+│   └── package.json                # Admin Portal Dependencies
 ├── backend/                        # FastAPI Python Backend Service
 │   ├── app/
 │   │   ├── core/                   # Security, DB session, config
@@ -107,12 +119,12 @@ vidyaschool/
 │   ├── CMakeLists.txt              # CMake Build Configuration
 │   ├── Makefile                    # Linux Build Makefile
 │   └── run.sh                      # Quick Linux Build & Run Script
-├── frontend/                       # Next.js Web Portal
+├── frontend/                       # Next.js Main Web Portal (Port 3000)
 │   ├── app/                        # Next.js App Router (Pages & API routes)
 │   ├── components/                 # React UI Components (Shadcn / Radix)
 │   ├── drizzle/ & migrations/      # Drizzle ORM Schemas & Database Migrations
 │   ├── lib/                        # Auth, DB, S3 & API Helper Utilities
-│   ├── middleware.ts               # Next.js Route Guard Middleware
+│   ├── middleware.ts               # Next.js Route Guard & Admin Port Redirection
 │   ├── package.json                # Frontend Dependencies
 │   └── drizzle.config.ts           # Drizzle Kit Configuration
 ├── mobile-app/                     # Dual Mobile Client Infrastructure
@@ -125,7 +137,6 @@ vidyaschool/
 │       ├── build.sh                # Dockerized Zero-Setup APK Build Script
 │       └── Dockerfile              # Android Build Container Specification
 ├── .gitignore                      # Git Ignore Rules
-├── read.md                         # Complete System Documentation
 └── README.md                       # Repository Overview
 ```
 
@@ -133,7 +144,7 @@ vidyaschool/
 
 ## ⚙️ Environment Variables Setup
 
-### 1. Frontend (`frontend/.env.local`)
+### 1. Main Frontend (`frontend/.env.local`)
 Create `frontend/.env.local` with the following key variables:
 
 ```env
@@ -141,6 +152,7 @@ DATABASE_URL=postgresql://user:password@ep-host.neon.tech/neondb?sslmode=require
 BETTER_AUTH_SECRET=your_better_auth_secret_key
 BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_ADMIN_URL=http://localhost:3001
 BACKEND_URL=http://localhost:8000
 NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 
@@ -161,7 +173,31 @@ AWS_SECRET_ACCESS_KEY=your_aws_secret_key
 AWS_S3_BUCKET_NAME=vidyaschool-uploads
 ```
 
-### 2. Backend (`backend/.env`)
+### 2. Admin Frontend (`admin_frontend/.env.local`)
+Create `admin_frontend/.env.local` with matching database credentials pointing to port 3001:
+
+```env
+DATABASE_URL=postgresql://user:password@ep-host.neon.tech/neondb?sslmode=require
+BETTER_AUTH_SECRET=your_better_auth_secret_key
+BETTER_AUTH_URL=http://localhost:3001
+NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_MAIN_URL=http://localhost:3000
+BACKEND_URL=http://localhost:8000
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+
+RESEND_API_KEY=re_your_resend_api_key
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_S3_BUCKET_NAME=vidyaschool-uploads
+```
+
+### 3. Backend (`backend/.env`)
 Create `backend/.env` with the following variables:
 
 ```env
@@ -212,21 +248,22 @@ pip install -r requirements.txt
 
 ---
 
-### 2. Launching Frontend Web Portal 🌐
+### 2. Launching Web Portals 🌐
 
+#### Main Portal (Students, Teachers, Staff - Port 3000):
 ```bash
-# Navigate to frontend
 cd frontend
-
-# Install packages
 npm install
-
-# Run database migrations
-npm run db:push
-
-# Start development server
 npm run dev
 # Web Portal runs at http://localhost:3000
+```
+
+#### Dedicated Admin Portal (School Administrators - Port 3001):
+```bash
+cd admin_frontend
+npm install
+npm run dev
+# Admin Portal runs at http://localhost:3001
 ```
 
 ---
