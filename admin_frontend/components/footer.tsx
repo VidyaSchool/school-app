@@ -9,77 +9,16 @@ export function Footer() {
       <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           
-          {/* Column 1: Brand Info */}
+          {/* Column 1: Brand Info & Connect */}
           <div className="space-y-4">
             <Link id="footer-brand-logo" href="/" className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground hover:opacity-90">
               <span className="font-semibold text-sm">VidyaSchool</span>
             </Link>
             <p className="text-sm font-semibold text-foreground">Be the Guiding Star</p>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
-              Modern learning environment focused on academic excellence, creative arts, STEM innovation, and holistic development.
+              Affiliated with CBSE. Dedicated to academic excellence, creative exploration, STEM innovation, and holistic student development.
             </p>
-          </div>
-
-          {/* Column 2: Portals */}
-          <div>
-            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Portals</h3>
-            <ul className="space-y-2.5 text-xs text-muted-foreground">
-              <li>
-                <Link href="/student" className="hover:text-foreground transition-colors">Student Portal</Link>
-              </li>
-              <li>
-                <Link href="/teacher" className="hover:text-foreground transition-colors">Teacher Portal</Link>
-              </li>
-              <li>
-                <Link href="/student/library" className="hover:text-foreground transition-colors">Library Catalog</Link>
-              </li>
-              <li>
-                <Link href="/student/fees" className="hover:text-foreground transition-colors">Fees Desk</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Academics */}
-          <div>
-            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Academics</h3>
-            <ul className="space-y-2.5 text-xs text-muted-foreground">
-              <li>
-                <Link href="/student/notice" className="hover:text-foreground transition-colors">Circulars & Notices</Link>
-              </li>
-              <li>
-                <Link href="/student/marks" className="hover:text-foreground transition-colors">Curriculum & Exams</Link>
-              </li>
-              <li>
-                <Link href="/docs/admissions" className="hover:text-foreground transition-colors">Admissions Guide</Link>
-              </li>
-              <li>
-                <Link href="/docs/co-curriculars" className="hover:text-foreground transition-colors">Co-Curriculars</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4: Help & Support */}
-          <div className="flex flex-col justify-between h-full min-h-[140px]">
-            <div>
-              <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Support & Contact</h3>
-              <ul className="space-y-2.5 text-xs text-muted-foreground mb-4">
-                <li>
-                  <Link href="/student/notice" className="hover:text-foreground transition-colors">Notices & Circulars</Link>
-                </li>
-                <li>
-                  <Link href="/docs" className="hover:text-foreground transition-colors">Help & Support</Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link>
-                </li>
-                <li>
-                  <Link href="/student/notice" className="hover:text-foreground transition-colors">Academic Calendar</Link>
-                </li>
-              </ul>
-            </div>
-            
-            {/* Social Media Buttons */}
-            <div className="space-y-2">
+            <div className="pt-2 space-y-2">
               <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Connect With Us</h4>
               <div className="flex items-center gap-2">
                 <Link href="https://www.facebook.com/VIDYAEducationAndEmpowerment/" target="_blank" rel="noopener noreferrer" className="h-7 w-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-200" aria-label="Facebook">
@@ -109,6 +48,69 @@ export function Footer() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Column 2: About School */}
+          <div>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">About School</h3>
+            <ul className="space-y-2.5 text-xs text-muted-foreground">
+              <li>
+                <Link href="/about" className="hover:text-foreground transition-colors">About VidyaSchool</Link>
+              </li>
+              <li>
+                <Link href="/principal-message" className="hover:text-foreground transition-colors">Principal&apos;s Message</Link>
+              </li>
+              <li>
+                <Link href="/infrastructure" className="hover:text-foreground transition-colors">Infrastructure</Link>
+              </li>
+              <li>
+                <Link href="/faculty-and-staff" className="hover:text-foreground transition-colors">Faculty &amp; Staff</Link>
+              </li>
+              <li>
+                <Link href="/management-committee" className="hover:text-foreground transition-colors">School Management Committee</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Academics & Disclosures */}
+          <div>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Academics &amp; Info</h3>
+            <ul className="space-y-2.5 text-xs text-muted-foreground">
+              <li>
+                <Link href="/curriculum" className="hover:text-foreground transition-colors">Curriculum</Link>
+              </li>
+              <li>
+                <Link href="/academic-calendar" className="hover:text-foreground transition-colors">Academic Calendar</Link>
+              </li>
+              <li>
+                <Link href="/mandatory-public-disclosure" className="hover:text-foreground transition-colors">Mandatory Public Disclosure</Link>
+              </li>
+              <li>
+                <Link href="/annual-report" className="hover:text-foreground transition-colors">Annual Report</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Portals & Contact */}
+          <div>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Portals &amp; Contact</h3>
+            <ul className="space-y-2.5 text-xs text-muted-foreground">
+              <li>
+                <Link href="/student" className="hover:text-foreground transition-colors">Student Portal</Link>
+              </li>
+              <li>
+                <Link href="/teacher" className="hover:text-foreground transition-colors">Teacher Portal</Link>
+              </li>
+              <li>
+                <Link href="/student/library" className="hover:text-foreground transition-colors">Library Catalog</Link>
+              </li>
+              <li>
+                <Link href="/student/fees" className="hover:text-foreground transition-colors">Fees Desk</Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-foreground transition-colors font-medium text-foreground/90">Contact Us</Link>
+              </li>
+            </ul>
           </div>
 
         </div>
