@@ -68,6 +68,21 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const search = request.nextUrl.search
 
+  // 0. CORS PREFLIGHT (OPTIONS) HANDLER
+  if (request.method === 'OPTIONS') {
+    const origin = request.headers.get('origin') || '*'
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': request.headers.get('access-control-request-headers') || 'Content-Type, Authorization, X-Requested-With, Accept, Origin',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+      },
+    })
+  }
+
   // 1. INJECTION & PATH TRAVERSAL FILTER
   if (
     pathname.includes('..') ||
@@ -165,21 +180,27 @@ export async function middleware(request: NextRequest) {
     return applySecurityHeaders(NextResponse.next())
   }
 
-  // Get session
-  let session: any = null
-  try {
-    session = await auth.api.getSession({
-      headers: request.headers
-    })
-  } catch (err) {
-    console.error('[admin middleware] getSession error:', err)
+  const rawCookie = request.cookies.get('better-auth.session_token')?.value || 
+                    request.cookies.get('__Secure-better-auth.session_token')?.value
+
+  // Fast path: allow unauthenticated public routes without DB lookup
+  if (!rawCookie && publicRoutes.includes(pathname)) {
+    return applySecurityHeaders(NextResponse.next())
   }
 
-  // Fallback cookie check
-  if (!session?.user) {
-    const rawCookie = request.cookies.get('better-auth.session_token')?.value || 
-                      request.cookies.get('__Secure-better-auth.session_token')?.value
-    if (rawCookie) {
+  // Get session (only when cookie is present)
+  let session: any = null
+  if (rawCookie) {
+    try {
+      session = await auth.api.getSession({
+        headers: request.headers
+      })
+    } catch (err) {
+      console.error('[admin middleware] getSession error:', err)
+    }
+
+    // Fallback cookie check
+    if (!session?.user) {
       const cleanToken = rawCookie.split('.')[0]
       try {
         const dbSession = await db

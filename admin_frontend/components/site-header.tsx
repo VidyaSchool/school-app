@@ -59,7 +59,6 @@ export function SiteHeader({ title, children, actions }: SiteHeaderProps) {
       books: "Manage Books",
       borrowings: "Book Issues",
       community: "Community Chat",
-      downloads: "Mobile App Downloads",
       notes: "Notes",
     }
 

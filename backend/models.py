@@ -58,6 +58,9 @@ class UserProfile(SQLModel, table=True):
     class_section_changes: Optional[str] = Field(default=None, alias="class_section_changes")
     secondary_role: Optional[str] = Field(default=None, alias="secondary_role")
     transport_mode: Optional[str] = Field(default=None, alias="transport_mode")
+    teacher_category: Optional[str] = Field(default=None, alias="teacher_category")  # 'PRT', 'TGT', 'PGT'
+    activity_skills: Optional[str] = Field(default=None, alias="activity_skills")  # JSON list string e.g. ["Games / Sports", "Computer"]
+    is_available_for_substitution: bool = Field(default=True, alias="is_available_for_substitution")
     onboarding_completed: bool = Field(default=False, alias="onboarding_completed")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -319,3 +322,61 @@ class WeatherCache(SQLModel, table=True):
     raw_response: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+
+class TeacherAbsence(SQLModel, table=True):
+    __tablename__ = "teacher_absence"
+    id: str = Field(primary_key=True)
+    teacher_id: str = Field(alias="teacher_id", foreign_key="user.id", index=True)
+    date: str = Field(index=True)  # YYYY-MM-DD
+    status: str = Field(default="absent")  # 'absent', 'half_day', 'on_leave'
+    reason: str = Field(default="Sick Leave")  # 'Sick Leave', 'Casual Leave', 'Emergency Leave', 'Official Duty'
+    duration: str = Field(default="Full Day")
+    remarks: Optional[str] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class SubstitutionRecord(SQLModel, table=True):
+    __tablename__ = "substitution_record"
+    id: str = Field(primary_key=True)
+    date: str = Field(index=True)  # YYYY-MM-DD
+    absence_id: Optional[str] = Field(default=None, alias="absence_id", foreign_key="teacher_absence.id", index=True)
+    timetable_id: Optional[str] = Field(default=None, alias="timetable_id", foreign_key="timetable.id", index=True)
+    period_name: str = Field(default="Period 1")
+    start_time: str = Field(alias="start_time")
+    end_time: str = Field(alias="end_time")
+    class_: str = Field(alias="class", sa_column_kwargs={"name": "class"})
+    section: str
+    subject: str
+    room: Optional[str] = Field(default=None)
+    original_teacher_id: str = Field(alias="original_teacher_id", foreign_key="user.id", index=True)
+    substitute_teacher_id: Optional[str] = Field(default=None, alias="substitute_teacher_id", foreign_key="user.id", index=True)
+    status: str = Field(default="assigned")  # 'assigned', 'activity_fallback', 'unassigned', 'manual_override'
+    is_activity_fallback: bool = Field(default=False)
+    activity_name: Optional[str] = Field(default=None)
+    suitability_score: Optional[float] = Field(default=None)
+    score_breakdown: Optional[str] = Field(default=None)  # JSON string
+    notes: Optional[str] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class SubstitutionSettings(SQLModel, table=True):
+    __tablename__ = "substitution_settings"
+    id: str = Field(primary_key=True, default="default")
+    same_subject_score: float = Field(default=100.0)
+    same_category_score: float = Field(default=50.0)
+    same_class_score: float = Field(default=40.0)
+    same_section_score: float = Field(default=30.0)
+    matching_activity_skill_score: float = Field(default=25.0)
+    low_workload_bonus: float = Field(default=10.0)
+    workload_penalty_per_sub: float = Field(default=15.0)
+    high_workload_penalty: float = Field(default=20.0)
+    high_workload_threshold: int = Field(default=2)
+    activity_fallback_threshold: float = Field(default=35.0)
+    enabled_activities: str = Field(default='["Games / Sports", "Arts", "Music", "Library", "Computer"]')
+    allow_cross_category: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+

@@ -33,21 +33,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, MessageSquare, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail, Terminal } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, MessageSquare, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail } from "lucide-react"
 import { useSession, signOut, logoutUser } from "@/lib/auth-client"
 import { io } from "socket.io-client"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 
 const MAIN_PORTAL_URL = process.env.NEXT_PUBLIC_MAIN_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://vidyaschool.com' : 'http://localhost:3000')
 import { Button } from "@/components/ui/button"
-import { Smartphone, Download, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
 
@@ -124,7 +117,6 @@ function buildAdminUrls(username: string | null) {
     dashboard: base, students: `${base}/students`, teachers: `${base}/teacher`,
     requests: `${base}/requests`, feeManagement: `${base}/fee-management`,
     notices: `${base}/notice`, slider: `${base}/slider`, pageBuilder: `${base}/page-builder`,
-    developer: `${base}/developer`,
   }
 }
 function buildAccountUrls(username: string | null) {
@@ -295,11 +287,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session, isPending } = useSession()
   const { isMobile, setOpenMobile } = useSidebar()
   const [profileLoading, setProfileLoading] = React.useState(true)
-  const [isQrOpen, setIsQrOpen] = React.useState(false)
-  const [appVersion, setAppVersion] = React.useState<string>("v1.0.52")
-  const [downloadUrl, setDownloadUrl] = React.useState<string>(
-    "https://github.com/VidyaSchool/school-app/releases"
-  )
 
   const [fetchedUser, setFetchedUser] = React.useState<any>(null)
 
@@ -316,25 +303,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     fetch('/api/profile/username')
       .then(() => setProfileLoading(false))
       .catch(() => setProfileLoading(false))
-
-    fetch('https://api.github.com/repos/VidyaSchool/school-app/releases')
-      .then(res => {
-        if (!res.ok) return []
-        return res.json()
-      })
-      .then(data => {
-        const latest = Array.isArray(data) && data.length > 0 ? data[0] : null
-        if (latest?.tag_name) {
-          setAppVersion(latest.tag_name)
-          const apkAsset = latest.assets?.find((asset: any) => asset.name?.endsWith('.apk'))
-          if (apkAsset?.browser_download_url) {
-            setDownloadUrl(apkAsset.browser_download_url)
-          } else {
-            setDownloadUrl(`https://github.com/VidyaSchool/school-app/releases/download/${latest.tag_name}/app-debug.apk`)
-          }
-        }
-      })
-      .catch(() => {})
   }, [])
 
   const userToDisplay = session?.user || fetchedUser
@@ -765,11 +733,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: adminUrls.pageBuilder,
           icon: <LayoutDashboardIcon />,
         },
-        {
-          title: "Developer Console",
-          url: adminUrls.developer,
-          icon: <Terminal />,
-        },
       ]
     : [
         {
@@ -805,14 +768,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
       ]
 
-  const navMain = [
-    ...baseNavMain,
-    {
-      title: "Mobile App",
-      url: `${MAIN_PORTAL_URL}/downloads`,
-      icon: <Smartphone />,
-    }
-  ]
+  const navMain = baseNavMain
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -990,7 +946,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {isLoading ? (
           <SidebarGroup>
             <SidebarGroupContent className="flex flex-col gap-1">
-              {/* 6 main nav items: Dashboard / Fees / Library / Marks / Notices / Mobile App */}
+              {/* 5 main nav items: Dashboard / Fees / Library / Marks / Notices */}
               <SidebarMenu>
                 {[
                   { w: "w-20" }, // Dashboard
@@ -998,7 +954,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   { w: "w-14" }, // Library
                   { w: "w-11" }, // Marks
                   { w: "w-14" }, // Notices
-                  { w: "w-20" }, // Mobile App
                 ].map(({ w }, i) => (
                   <SidebarMenuItem key={i} className="pointer-events-none">
                     <SidebarMenuButton className="gap-2">
@@ -1082,43 +1037,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <a href="/docs/privacy-policy" className="hover:text-foreground hover:underline transition-colors">Privacy</a>
         </div>
       </SidebarFooter>
-
-      {/* Dialog: Android App QR Code */}
-      <Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
-        <DialogContent className="sm:max-w-md text-center flex flex-col items-center p-6">
-          <DialogHeader className="items-center">
-            <DialogTitle className="flex items-center gap-2 text-lg font-bold">
-              <Smartphone className="size-5 text-primary animate-bounce" />
-              Download VidyaSchool App
-            </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Scan the QR code below on your Android device to download and install the latest version ({appVersion}).
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="my-6 p-4 bg-white rounded-xl shadow-inner border border-muted/55">
-            <img 
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(downloadUrl)}`} 
-              alt="Download QR Code" 
-              width={200}
-              height={200}
-              className="rounded-lg object-contain mx-auto"
-            />
-          </div>
-          
-          <div className="flex flex-col gap-2 w-full">
-            <Button asChild variant="default" className="w-full gap-2">
-              <a href={downloadUrl} download>
-                <Download className="size-4" />
-                Direct Download (APK)
-              </a>
-            </Button>
-            <Button variant="outline" className="w-full" onClick={() => setIsQrOpen(false)}>
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </Sidebar>
   )
 }

@@ -26,6 +26,10 @@ from app.core.rate_limit import RateLimitMiddleware
 from app.core.database import init_db, get_db
 from app.core.fees import build_default_fee_installments
 from app.routes.fees import router as fees_router
+from app.routes.admin import router as admin_router
+from app.routes.profile import router as profile_router
+from app.routes.student import router as student_router
+from app.routes.substitution import router as substitution_router
 from app.routes.teacher import router as teacher_router
 from app.routes.slider import router as slider_router
 from app.routes.library import router as library_router
@@ -448,6 +452,10 @@ async def custom_http_exception_handler(request, exc):
     )
 
 app.include_router(fees_router)
+app.include_router(admin_router)
+app.include_router(profile_router)
+app.include_router(student_router)
+app.include_router(substitution_router)
 app.include_router(teacher_router)
 app.include_router(slider_router)
 app.include_router(library_router)

@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 from typing import List, Dict, Any, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from pydantic import BaseModel, Field
 
 from app.core.auth import get_current_user, require_role
 from app.core.database import get_db
-from models import User, UserProfile, FeeInstallment, SubjectClassRequest, SubjectClassAssignment, Exam, StudentSubjectMarks, TeacherNote, Timetable
+from models import User, UserProfile, FeeInstallment, SubjectClassRequest, SubjectClassAssignment, Exam, StudentSubjectMarks, TeacherNote, Timetable, TeacherAbsence, SubstitutionRecord
 
 router = APIRouter(prefix="/teacher", tags=["teacher"])
 
@@ -741,6 +741,60 @@ def get_teacher_calendar(
         Timetable.day_of_week == tomorrow_day
     ).order_by(Timetable.start_time).all()
 
+    today_iso = now.strftime("%Y-%m-%d")
+    tomorrow_iso = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    # Check if this teacher is absent today or tomorrow
+    is_absent_today = db.query(TeacherAbsence).filter(
+        TeacherAbsence.teacher_id == current_user.id,
+        TeacherAbsence.date == today_iso,
+        TeacherAbsence.status == "absent"
+    ).first() is not None
+
+    is_absent_tomorrow = db.query(TeacherAbsence).filter(
+        TeacherAbsence.teacher_id == current_user.id,
+        TeacherAbsence.date == tomorrow_iso,
+        TeacherAbsence.status == "absent"
+    ).first() is not None
+
+    # Substitutions covering for this teacher if absent
+    sub_for_today = {
+        s.timetable_id: (s, u) for s, u in db.query(SubstitutionRecord, User).outerjoin(
+            User, SubstitutionRecord.substitute_teacher_id == User.id
+        ).filter(
+            SubstitutionRecord.date == today_iso,
+            SubstitutionRecord.original_teacher_id == current_user.id
+        ).all()
+        if s.timetable_id
+    }
+
+    sub_for_tomorrow = {
+        s.timetable_id: (s, u) for s, u in db.query(SubstitutionRecord, User).outerjoin(
+            User, SubstitutionRecord.substitute_teacher_id == User.id
+        ).filter(
+            SubstitutionRecord.date == tomorrow_iso,
+            SubstitutionRecord.original_teacher_id == current_user.id
+        ).all()
+        if s.timetable_id
+    }
+
+    # Substitutions assigned TO this teacher to cover for someone else
+    assigned_subs_today = db.query(SubstitutionRecord, User).join(
+        User, SubstitutionRecord.original_teacher_id == User.id
+    ).filter(
+        SubstitutionRecord.date == today_iso,
+        SubstitutionRecord.substitute_teacher_id == current_user.id,
+        SubstitutionRecord.status.in_(["assigned", "activity_fallback", "manual_override"])
+    ).all()
+
+    assigned_subs_tomorrow = db.query(SubstitutionRecord, User).join(
+        User, SubstitutionRecord.original_teacher_id == User.id
+    ).filter(
+        SubstitutionRecord.date == tomorrow_iso,
+        SubstitutionRecord.substitute_teacher_id == current_user.id,
+        SubstitutionRecord.status.in_(["assigned", "activity_fallback", "manual_override"])
+    ).all()
+
     def format_time(t_str: str) -> str:
         if not t_str or ":" not in t_str:
             return t_str
@@ -754,25 +808,76 @@ def get_teacher_calendar(
         except Exception:
             return t_str
 
+    # Build today events
+    today_events = []
+    for s in today_slots:
+        if is_absent_today:
+            sub_pair = sub_for_today.get(s.id)
+            sub_u = sub_pair[1] if sub_pair else None
+            sub_name = sub_u.name if sub_u else "Substitute Teacher"
+            title = f"{s.subject} (Class {s.class_}-{s.section}) [Absent - Covered by {sub_name}]"
+        else:
+            title = f"{s.subject} (Class {s.class_}-{s.section})"
+
+        today_events.append({
+            "id": s.id,
+            "title": title,
+            "time": format_time(s.start_time),
+            "room": s.room or "",
+            "isAbsent": is_absent_today,
+            "isSubstitution": False,
+        })
+
+    # Add substitutions assigned to this teacher today
+    for sub, orig_u in assigned_subs_today:
+        label = sub.activity_name if sub.is_activity_fallback else sub.subject
+        today_events.append({
+            "id": sub.id,
+            "title": f"Substitution: {label} (Class {sub.class_}-{sub.section}) [Covering for {orig_u.name}]",
+            "time": format_time(sub.start_time),
+            "room": sub.room or "",
+            "isAbsent": False,
+            "isSubstitution": True,
+            "isActivityFallback": sub.is_activity_fallback,
+        })
+
+    # Build tomorrow events
+    tomorrow_events = []
+    for s in tomorrow_slots:
+        if is_absent_tomorrow:
+            sub_pair = sub_for_tomorrow.get(s.id)
+            sub_u = sub_pair[1] if sub_pair else None
+            sub_name = sub_u.name if sub_u else "Substitute Teacher"
+            title = f"{s.subject} (Class {s.class_}-{s.section}) [Absent - Covered by {sub_name}]"
+        else:
+            title = f"{s.subject} (Class {s.class_}-{s.section})"
+
+        tomorrow_events.append({
+            "id": s.id,
+            "title": title,
+            "time": format_time(s.start_time),
+            "room": s.room or "",
+            "isAbsent": is_absent_tomorrow,
+            "isSubstitution": False,
+        })
+
+    for sub, orig_u in assigned_subs_tomorrow:
+        label = sub.activity_name if sub.is_activity_fallback else sub.subject
+        tomorrow_events.append({
+            "id": sub.id,
+            "title": f"Substitution: {label} (Class {sub.class_}-{sub.section}) [Covering for {orig_u.name}]",
+            "time": format_time(sub.start_time),
+            "room": sub.room or "",
+            "isAbsent": False,
+            "isSubstitution": True,
+            "isActivityFallback": sub.is_activity_fallback,
+        })
+
     return {
         "todayDateStr": today_date_str,
-        "todayEvents": [
-            {
-                "id": s.id,
-                "title": f"{s.subject} (Class {s.class_}-{s.section})",
-                "time": format_time(s.start_time),
-                "room": s.room or ""
-            }
-            for s in today_slots
-        ],
-        "tomorrowEvents": [
-            {
-                "id": s.id,
-                "title": f"{s.subject} (Class {s.class_}-{s.section})",
-                "time": format_time(s.start_time),
-                "room": s.room or ""
-            }
-            for s in tomorrow_slots
-        ]
+        "isAbsentToday": is_absent_today,
+        "isAbsentTomorrow": is_absent_tomorrow,
+        "todayEvents": today_events,
+        "tomorrowEvents": tomorrow_events,
     }
 

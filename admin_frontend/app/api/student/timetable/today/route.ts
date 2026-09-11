@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getAuthenticatedSession } from '@/lib/auth-helpers'
 import { db } from '@/lib/db'
-import { timetable, userProfile, user } from '@/lib/schema'
+import { timetable, userProfile, user, substitutionRecord } from '@/lib/schema'
 import { eq, and } from 'drizzle-orm'
 
 const SUBJECT_COLORS = [
@@ -75,8 +75,23 @@ export async function GET() {
       return NextResponse.json({ events: [] })
     }
 
+    const todayIso = new Date().toISOString().split('T')[0]
+    const activeSubs = await db
+      .select({
+        timetableId: substitutionRecord.timetableId,
+        isActivityFallback: substitutionRecord.isActivityFallback,
+        activityName: substitutionRecord.activityName,
+        substituteName: user.name,
+      })
+      .from(substitutionRecord)
+      .leftJoin(user, eq(substitutionRecord.substituteTeacherId, user.id))
+      .where(eq(substitutionRecord.date, todayIso))
+    
+    const subMap = new Map(activeSubs.filter(s => s.timetableId).map(s => [s.timetableId as string, s]))
+
     const slots = await db
       .select({
+        id: timetable.id,
         subject: timetable.subject,
         startTime: timetable.startTime,
         endTime: timetable.endTime,
@@ -108,11 +123,23 @@ export async function GET() {
       const ampm = startHourNum >= 12 ? 'PM' : 'AM'
       const timeStr = `${displayHour}:${displayMin} ${ampm}`
 
+      const sub = subMap.get(slot.id)
+      let title = `${slot.subject} (by ${slot.teacherName})`
+      if (sub) {
+        if (sub.isActivityFallback) {
+          title = `${sub.activityName || 'Activity'} (Sub: ${sub.substituteName || 'Staff'})`
+        } else {
+          title = `${slot.subject} (Sub: ${sub.substituteName || 'Teacher'})`
+        }
+      }
+
       return {
         hour: Math.floor(offsetHour), // match the grid column (0-indexed from 8 AM)
-        title: `${slot.subject} (by ${slot.teacherName})`,
+        title,
         time: timeStr,
         color: getSubjectColor(slot.subject),
+        isSubstituted: !!sub,
+        substituteName: sub?.substituteName,
       }
     })
 

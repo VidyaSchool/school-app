@@ -14,15 +14,27 @@ def get_db():
 
 
 def init_db() -> None:
+    from models import SubstitutionSettings
     SQLModel.metadata.create_all(engine)
     with Session(engine) as session:
-        try:
-            session.execute(text('ALTER TABLE teacher_note ADD COLUMN IF NOT EXISTS pdf_url TEXT;'))
-            session.commit()
-        except Exception:
-            session.rollback()
+        for sql in [
+            'ALTER TABLE teacher_note ADD COLUMN IF NOT EXISTS pdf_url TEXT;',
+            'ALTER TABLE user_profile ADD COLUMN IF NOT EXISTS teacher_category TEXT;',
+            'ALTER TABLE user_profile ADD COLUMN IF NOT EXISTS activity_skills TEXT;',
+            'ALTER TABLE user_profile ADD COLUMN IF NOT EXISTS is_available_for_substitution BOOLEAN DEFAULT TRUE;',
+        ]:
             try:
-                session.execute(text('ALTER TABLE teacher_note ADD COLUMN pdf_url TEXT;'))
+                session.execute(text(sql))
                 session.commit()
             except Exception:
                 session.rollback()
+
+        # Seed default substitution settings if not exists
+        try:
+            existing_settings = session.query(SubstitutionSettings).filter(SubstitutionSettings.id == "default").first()
+            if not existing_settings:
+                default_settings = SubstitutionSettings(id="default")
+                session.add(default_settings)
+                session.commit()
+        except Exception:
+            session.rollback()

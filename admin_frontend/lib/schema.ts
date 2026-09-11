@@ -35,6 +35,9 @@ export const userProfile = pgTable('user_profile', {
   classSectionChanges: text('class_section_changes'),
   secondaryRole: text('secondary_role'),
   transportMode: text('transport_mode'),
+  teacherCategory: text('teacher_category'), // 'PRT', 'TGT', 'PGT'
+  activitySkills: text('activity_skills'), // JSON string e.g. ["Games / Sports", "Computer"]
+  isAvailableForSubstitution: boolean('is_available_for_substitution').notNull().default(true),
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -297,6 +300,60 @@ export const customPage = pgTable('custom_page', {
   widgetsJson: text('widgets_json').notNull().default('[]'),
   authorId: text('author_id'),
   status: text('status').notNull().default('published'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const teacherAbsence = pgTable('teacher_absence', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(), // YYYY-MM-DD
+  status: text('status').notNull().default('absent'), // 'absent', 'half_day', 'on_leave'
+  reason: text('reason').notNull().default('Sick Leave'),
+  duration: text('duration').notNull().default('Full Day'),
+  remarks: text('remarks'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const substitutionRecord = pgTable('substitution_record', {
+  id: text('id').primaryKey(),
+  date: text('date').notNull(), // YYYY-MM-DD
+  absenceId: text('absence_id').references(() => teacherAbsence.id, { onDelete: 'cascade' }),
+  timetableId: text('timetable_id').references(() => timetable.id, { onDelete: 'set null' }),
+  periodName: text('period_name').notNull().default('Period 1'),
+  startTime: text('start_time').notNull(),
+  endTime: text('end_time').notNull(),
+  class: text('class').notNull(),
+  section: text('section').notNull(),
+  subject: text('subject').notNull(),
+  room: text('room'),
+  originalTeacherId: text('original_teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  substituteTeacherId: text('substitute_teacher_id').references(() => user.id, { onDelete: 'set null' }),
+  status: text('status').notNull().default('assigned'), // 'assigned', 'activity_fallback', 'unassigned', 'manual_override'
+  isActivityFallback: boolean('is_activity_fallback').notNull().default(false),
+  activityName: text('activity_name'),
+  suitabilityScore: integer('suitability_score'),
+  scoreBreakdown: text('score_breakdown'), // JSON string
+  notes: text('notes'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const substitutionSettings = pgTable('substitution_settings', {
+  id: text('id').primaryKey().default('default'),
+  sameSubjectScore: integer('same_subject_score').notNull().default(100),
+  sameCategoryScore: integer('same_category_score').notNull().default(50),
+  sameClassScore: integer('same_class_score').notNull().default(40),
+  sameSectionScore: integer('same_section_score').notNull().default(30),
+  matchingActivitySkillScore: integer('matching_activity_skill_score').notNull().default(25),
+  lowWorkloadBonus: integer('low_workload_bonus').notNull().default(10),
+  workloadPenaltyPerSub: integer('workload_penalty_per_sub').notNull().default(15),
+  highWorkloadPenalty: integer('high_workload_penalty').notNull().default(20),
+  highWorkloadThreshold: integer('high_workload_threshold').notNull().default(2),
+  activityFallbackThreshold: integer('activity_fallback_threshold').notNull().default(35),
+  enabledActivities: text('enabled_activities').notNull().default('["Games / Sports", "Arts", "Music", "Library", "Computer"]'),
+  allowCrossCategory: boolean('allow_cross_category').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })

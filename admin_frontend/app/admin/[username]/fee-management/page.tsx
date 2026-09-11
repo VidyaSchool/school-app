@@ -21,6 +21,7 @@ export default async function AdminFeeManagementPage({ params }: PageProps) {
         "cookie": cookieHeader,
       },
       cache: "no-store",
+      signal: AbortSignal.timeout(2500),
     })
     if (res.ok) {
       const data = await res.json()
