@@ -37,7 +37,8 @@ export interface ElementorWidget {
   id: string
   type: string
   name: string
-  props: Record<string, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  props: Record<string, any>
 }
 
 // ── Security Helpers: URL Sanitization, Video Whitelisting & HTML Guard ─────
@@ -490,7 +491,8 @@ function PublicWidgetRenderer({ widget }: { widget: ElementorWidget }) {
 
 interface EditorJsBlock {
   type: string
-  data: Record<string, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: Record<string, any>
 }
 
 interface TableCellButton {
