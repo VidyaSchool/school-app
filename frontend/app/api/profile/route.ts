@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 
-const BACKEND_URL = (process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000').replace(/\/+$/, '')
+const BACKEND_URL = (
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (process.env.NODE_ENV === 'production' ? 'https://api.vidyaschool.com' : 'http://localhost:8000')
+).replace(/\/+$/, '')
 
 export async function PATCH(req: NextRequest) {
   const hdrs = await headers()

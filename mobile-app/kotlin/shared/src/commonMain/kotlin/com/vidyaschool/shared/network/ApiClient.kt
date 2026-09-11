@@ -25,7 +25,7 @@ import kotlinx.serialization.json.Json
  * Shared Ktor HTTP client wrapping all VidyaSchool API calls.
  *
  * Two base URLs mirror the existing RetrofitClient:
- *   - [BACKEND_URL]  → https://api.blazeneuro.com  (primary backend)
+ *   - [BACKEND_URL]  → https://api.vidyaschool.com  (primary backend)
  *   - [FRONTEND_URL] → https://vidyaschool.vercel.app (frontend/public routes)
  *
  * All methods return the raw deserialized response body. Callers should handle
@@ -35,7 +35,7 @@ import kotlinx.serialization.json.Json
 class ApiClient {
 
     companion object {
-        const val BACKEND_URL = "https://api.blazeneuro.com"
+        const val BACKEND_URL = "https://api.vidyaschool.com"
         const val FRONTEND_URL = "https://vidyaschool.vercel.app"
     }
 

@@ -5,7 +5,11 @@ import { db } from '@/lib/db'
 import { user as userTable, session as sessionTable, userProfile } from '@/lib/schema'
 import { eq } from 'drizzle-orm'
 
-const BACKEND_URL = (process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000').replace(/\/+$/, '')
+const BACKEND_URL = (
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (process.env.NODE_ENV === 'production' ? 'https://api.vidyaschool.com' : 'http://localhost:8000')
+).replace(/\/+$/, '')
 
 export async function GET(req: NextRequest) {
   const hdrs = await headers()

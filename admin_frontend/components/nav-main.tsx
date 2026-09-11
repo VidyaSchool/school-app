@@ -72,25 +72,47 @@ export function NavMain({
                       : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/40"
                   )}
                 >
-                  <Link 
-                    href={item.url} 
-                    onClick={() => {
-                      if (isMobile) {
-                        setOpenMobile(false)
-                      }
-                    }}
-                    className="relative flex items-center justify-between w-full"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="relative flex shrink-0">
-                        {item.icon}
-                        {item.hasNotification && (
-                          <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-blue-500 ring-1 ring-sidebar dark:ring-sidebar" />
-                        )}
+                  {item.url.startsWith("http") ? (
+                    <a 
+                      href={item.url} 
+                      onClick={() => {
+                        if (isMobile) {
+                          setOpenMobile(false)
+                        }
+                      }}
+                      className="relative flex items-center justify-between w-full"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex shrink-0">
+                          {item.icon}
+                          {item.hasNotification && (
+                            <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-blue-500 ring-1 ring-sidebar dark:ring-sidebar" />
+                          )}
+                        </div>
+                        <span>{item.title}</span>
                       </div>
-                      <span>{item.title}</span>
-                    </div>
-                  </Link>
+                    </a>
+                  ) : (
+                    <Link 
+                      href={item.url} 
+                      onClick={() => {
+                        if (isMobile) {
+                          setOpenMobile(false)
+                        }
+                      }}
+                      className="relative flex items-center justify-between w-full"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex shrink-0">
+                          {item.icon}
+                          {item.hasNotification && (
+                            <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-blue-500 ring-1 ring-sidebar dark:ring-sidebar" />
+                          )}
+                        </div>
+                        <span>{item.title}</span>
+                      </div>
+                    </Link>
+                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )

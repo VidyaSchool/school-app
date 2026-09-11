@@ -42,7 +42,7 @@ object UpdateChecker {
             val currentVersion = pInfo.versionName ?: "1.0.0"
 
             val request = Request.Builder()
-                .url("https://api.github.com/repos/ankit-blazeneuro/vidyaschool/releases/latest")
+                .url("https://api.github.com/repos/VidyaSchool/school-app/releases/latest")
                 .header("User-Agent", "Vidyaschool-App")
                 .build()
 

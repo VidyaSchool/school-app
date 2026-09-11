@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://api.blazeneuro.com/"
+    private const val BASE_URL = "https://api.vidyaschool.com/"
     private const val FRONTEND_URL = "https://vidyaschool.vercel.app/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {

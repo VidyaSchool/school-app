@@ -51,7 +51,7 @@ std::string current_user_code;
 std::string current_verification_uri;
 
 // Production Backend API Base URL
-std::string api_base_url = "https://api.blazeneuro.com";
+std::string api_base_url = "https://api.vidyaschool.com";
 
 struct AuthUserData {
     std::string name;

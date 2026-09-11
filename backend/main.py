@@ -63,6 +63,7 @@ sio = socketio.AsyncServer(
         'https://www.vidyaschool.com',
         'https://dashboard.vidyaschool.com',
         'https://admin.vidyaschool.com',
+        'https://api.vidyaschool.com',
     ]
 )
 
@@ -407,10 +408,9 @@ app.add_middleware(
         "https://www.vidyaschool.com",
         "https://dashboard.vidyaschool.com",
         "https://admin.vidyaschool.com",
-        "https://blazeneuro.com",
-        "https://www.blazeneuro.com",
+        "https://api.vidyaschool.com",
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.blazeneuro\.com|https://.*\.vidyaschool\.com|https://vidyaschool\.com|http://localhost:.*",
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.vidyaschool\.com|https://vidyaschool\.com|http://localhost:.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

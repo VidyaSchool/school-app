@@ -1,7 +1,7 @@
 import { SessionManager } from "./session";
 import * as Types from "../types";
 
-const BASE_URL = "https://api.blazeneuro.com";
+const BASE_URL = "https://api.vidyaschool.com";
 const FRONTEND_URL = "https://vidyaschool.vercel.app";
 
 async function request<T>(

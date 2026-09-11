@@ -47,7 +47,7 @@ class UpdateChecker: ObservableObject {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         
         // 2. Fetch latest release from GitHub
-        guard let url = URL(string: "https://api.github.com/repos/ankit-blazeneuro/vidyaschool/releases/latest") else { return }
+        guard let url = URL(string: "https://api.github.com/repos/VidyaSchool/school-app/releases/latest") else { return }
         
         var request = URLRequest(url: url)
         request.setValue("Vidyaschool-App-iOS", forHTTPHeaderField: "User-Agent")
@@ -60,7 +60,7 @@ class UpdateChecker: ObservableObject {
             let latestVersion = release.tagName
             
             // 3. Find iOS IPA asset URL or fall back to HTML release page
-            var downloadUrl = release.htmlUrl ?? "https://github.com/ankit-blazeneuro/vidyaschool/releases"
+            var downloadUrl = release.htmlUrl ?? "https://github.com/VidyaSchool/school-app/releases"
             if let ipaAsset = release.assets?.first(where: { $0.name.lowercased().hasSuffix(".ipa") }) {
                 downloadUrl = ipaAsset.browserDownloadUrl
             }

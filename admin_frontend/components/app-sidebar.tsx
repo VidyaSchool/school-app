@@ -44,6 +44,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+
+const MAIN_PORTAL_URL = process.env.NEXT_PUBLIC_MAIN_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://vidyaschool.com' : 'http://localhost:3000')
 import { Button } from "@/components/ui/button"
 import { Smartphone, Download, Plus } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
@@ -244,7 +246,7 @@ const data = {
   navSecondary: [
     {
       title: "Sessions",
-      url: "/login-accounts",
+      url: `${MAIN_PORTAL_URL}/login-accounts`,
       icon: (
         <Settings2Icon
         />
@@ -252,7 +254,7 @@ const data = {
     },
     {
       title: "Get Help",
-      url: "/docs",
+      url: `${MAIN_PORTAL_URL}/docs`,
       icon: (
         <CircleHelpIcon
         />
@@ -296,7 +298,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isQrOpen, setIsQrOpen] = React.useState(false)
   const [appVersion, setAppVersion] = React.useState<string>("v1.0.52")
   const [downloadUrl, setDownloadUrl] = React.useState<string>(
-    "https://github.com/ankit-blazeneuro/vidyaschool/releases/download/v1.0.52/app-debug.apk"
+    "https://github.com/VidyaSchool/school-app/releases"
   )
 
   const [fetchedUser, setFetchedUser] = React.useState<any>(null)
@@ -315,19 +317,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       .then(() => setProfileLoading(false))
       .catch(() => setProfileLoading(false))
 
-    fetch('https://api.github.com/repos/ankit-blazeneuro/vidyaschool/releases/latest')
+    fetch('https://api.github.com/repos/VidyaSchool/school-app/releases')
       .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch latest release')
+        if (!res.ok) return []
         return res.json()
       })
       .then(data => {
-        if (data.tag_name) {
-          setAppVersion(data.tag_name)
-          const apkAsset = data.assets?.find((asset: any) => asset.name?.endsWith('.apk'))
+        const latest = Array.isArray(data) && data.length > 0 ? data[0] : null
+        if (latest?.tag_name) {
+          setAppVersion(latest.tag_name)
+          const apkAsset = latest.assets?.find((asset: any) => asset.name?.endsWith('.apk'))
           if (apkAsset?.browser_download_url) {
             setDownloadUrl(apkAsset.browser_download_url)
           } else {
-            setDownloadUrl(`https://github.com/ankit-blazeneuro/vidyaschool/releases/download/${data.tag_name}/app-debug.apk`)
+            setDownloadUrl(`https://github.com/VidyaSchool/school-app/releases/download/${latest.tag_name}/app-debug.apk`)
           }
         }
       })
@@ -480,7 +483,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     // 3. Setup Socket.IO — single persistent connection, reads pathname via ref
-    const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000", {
+    const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000'), {
       transports: ["websocket", "polling"]
     })
 
@@ -644,7 +647,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
           title: "Community Chat",
-          url: "/community",
+          url: `${MAIN_PORTAL_URL}/community`,
           icon: <MessageSquare />,
           hasNotification: unreadCommunity,
         },
@@ -695,7 +698,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
           title: "Community Chat",
-          url: "/community",
+          url: `${MAIN_PORTAL_URL}/community`,
           icon: <MessageSquare />,
           hasNotification: unreadCommunity,
         },
@@ -736,7 +739,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
           title: "Community Chat",
-          url: "/community",
+          url: `${MAIN_PORTAL_URL}/community`,
           icon: <MessageSquare />,
           hasNotification: unreadCommunity,
         },
@@ -806,7 +809,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ...baseNavMain,
     {
       title: "Mobile App",
-      url: "/downloads",
+      url: `${MAIN_PORTAL_URL}/downloads`,
       icon: <Smartphone />,
     }
   ]

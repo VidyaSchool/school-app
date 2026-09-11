@@ -70,8 +70,8 @@ export function HeroSection() {
 
                 <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
                   <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5">
-                    <Link href="/signup">
-                      <span>Continue</span>
+                    <Link href="/mandatory-public-disclosure">
+                      <span>Mandatory Public Disclosure</span>
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

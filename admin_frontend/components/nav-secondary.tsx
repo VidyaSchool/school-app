@@ -32,20 +32,37 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild className="text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/40 transition-all duration-150 h-9 rounded-xl pl-2">
-                <Link 
-                  href={item.url} 
-                  onClick={(e) => {
-                    if (item.onClick) {
-                      item.onClick(e)
-                    }
-                    if (isMobile) {
-                      setOpenMobile(false)
-                    }
-                  }}
-                >
-                  {item.icon}
-                  <span>{item.title}</span>
-                </Link>
+                {item.url.startsWith("http") ? (
+                  <a 
+                    href={item.url} 
+                    onClick={(e) => {
+                      if (item.onClick) {
+                        item.onClick(e)
+                      }
+                      if (isMobile) {
+                        setOpenMobile(false)
+                      }
+                    }}
+                  >
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </a>
+                ) : (
+                  <Link 
+                    href={item.url} 
+                    onClick={(e) => {
+                      if (item.onClick) {
+                        item.onClick(e)
+                      }
+                      if (isMobile) {
+                        setOpenMobile(false)
+                      }
+                    }}
+                  >
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </Link>
+                )}
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

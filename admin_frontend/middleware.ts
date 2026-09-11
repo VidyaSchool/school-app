@@ -6,7 +6,7 @@ import { user as userTable, session as sessionTable, userProfile } from './lib/s
 import { eq } from 'drizzle-orm'
 import { checkRateLimit } from './lib/rate-limit'
 
-const MAIN_URL = process.env.NEXT_PUBLIC_MAIN_URL || 'http://localhost:3000'
+const MAIN_URL = process.env.NEXT_PUBLIC_MAIN_URL || (process.env.NODE_ENV === 'production' ? 'https://vidyaschool.com' : 'http://localhost:3000')
 
 // Public routes on admin_frontend
 const publicRoutes = ['/login', '/unauthorized']
@@ -17,6 +17,7 @@ const mainPortalRoutes = [
   '/teacher',
   '/librarian',
   '/accounts',
+  '/login-accounts',
   '/community',
   '/downloads',
   '/signup',
@@ -82,6 +83,10 @@ export async function middleware(request: NextRequest) {
 
   // 2. Redirect non-admin routes to main frontend
   if (mainPortalRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    const isRSC = request.nextUrl.searchParams.has('_rsc') || request.headers.get('rsc') === '1'
+    if (isRSC) {
+      return new NextResponse(null, { status: 204 })
+    }
     return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, MAIN_URL)))
   }
 
@@ -219,6 +224,16 @@ export async function middleware(request: NextRequest) {
     }
     const dest = await resolveAdminDestination(session.user)
     return applySecurityHeaders(NextResponse.redirect(new URL(dest, request.url)))
+  }
+
+  // Handle /page-builder redirect
+  if (pathname === '/page-builder' || pathname.startsWith('/page-builder/')) {
+    if (!session?.user) {
+      return applySecurityHeaders(NextResponse.redirect(new URL('/login', request.url)))
+    }
+    const dest = await resolveAdminDestination(session.user)
+    const suffix = pathname.replace(/^\/page-builder/, '')
+    return applySecurityHeaders(NextResponse.redirect(new URL(`${dest}/page-builder${suffix}`, request.url)))
   }
 
   // If logged in and visiting /login

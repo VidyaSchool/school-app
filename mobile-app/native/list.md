@@ -10,7 +10,7 @@
 - ✅ done Configure `app.json` (name, slug, scheme, icons, splash)
 - ✅ done Install required dependencies (expo-router, async-storage, expo-secure-store, etc.)
 - ✅ done Setup TypeScript config
-- ✅ done Setup API base URLs (`https://api.blazeneuro.com/`, `https://vidyaschool.vercel.app/`)
+- ✅ done Setup API base URLs (`https://api.vidyaschool.com/`, `https://vidyaschool.vercel.app/`)
 - ✅ done Create folder structure (`app/`, `components/`, `services/`, `hooks/`, `theme/`, `types/`)
 
 ---

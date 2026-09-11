@@ -60,7 +60,7 @@ function DeviceAuthContent() {
 
       if (!res.ok) {
         // Fallback to direct backend URL if proxy failed
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://api.blazeneuro.com"
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://api.vidyaschool.com"
         res = await fetch(`${backendUrl}/api/auth/device/approve`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

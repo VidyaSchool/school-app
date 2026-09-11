@@ -334,7 +334,7 @@ fun TeacherScreen(
     }
 
     LaunchedEffect(sessionToken) {
-        // Fetch calendar events directly from Python backend (api.blazeneuro.com)
+        // Fetch calendar events directly from Python backend (api.vidyaschool.com)
         // using Bearer token — same auth as all other API calls
         calendarLoading = true
         try {

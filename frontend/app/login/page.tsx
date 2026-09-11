@@ -13,8 +13,8 @@ import { toast } from "sonner"
 import { QRCodeSVG } from "qrcode.react"
 import { io, Socket } from "socket.io-client"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000"
-const ADMIN_FRONTEND_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3001"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000')
+const ADMIN_FRONTEND_URL = process.env.NEXT_PUBLIC_ADMIN_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://dashboard.vidyaschool.com' : 'http://localhost:3001')
 const QR_TTL = 180 // seconds
 
 type QRStatus = "idle" | "generating" | "active" | "scanned" | "confirmed" | "expired"

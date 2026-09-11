@@ -9,25 +9,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 export function DownloadsClient() {
   const [appVersion, setAppVersion] = React.useState<string>("v1.0.52")
   const [downloadUrl, setDownloadUrl] = React.useState<string>(
-    "https://github.com/ankit-blazeneuro/vidyaschool/releases/download/v1.0.52/app-debug.apk"
+    "https://github.com/VidyaSchool/school-app/releases"
   )
   const [fetching, setFetching] = React.useState<boolean>(true)
 
   React.useEffect(() => {
-    fetch("https://api.github.com/repos/ankit-blazeneuro/vidyaschool/releases/latest")
+    fetch("https://api.github.com/repos/VidyaSchool/school-app/releases")
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch latest release")
+        if (!res.ok) return []
         return res.json()
       })
       .then((data) => {
-        if (data.tag_name) {
-          setAppVersion(data.tag_name)
-          const apkAsset = data.assets?.find((asset: { name?: string; browser_download_url?: string }) => asset.name?.endsWith(".apk"))
+        const latest = Array.isArray(data) && data.length > 0 ? data[0] : null
+        if (latest?.tag_name) {
+          setAppVersion(latest.tag_name)
+          const apkAsset = latest.assets?.find((asset: { name?: string; browser_download_url?: string }) => asset.name?.endsWith(".apk"))
           if (apkAsset?.browser_download_url) {
             setDownloadUrl(apkAsset.browser_download_url)
           } else {
             setDownloadUrl(
-              `https://github.com/ankit-blazeneuro/vidyaschool/releases/download/${data.tag_name}/app-debug.apk`
+              `https://github.com/VidyaSchool/school-app/releases/download/${latest.tag_name}/app-debug.apk`
             )
           }
         }

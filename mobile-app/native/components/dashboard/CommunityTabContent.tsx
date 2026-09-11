@@ -110,7 +110,7 @@ export const CommunityTabContent: React.FC<CommunityTabContentProps> = ({
   useEffect(() => {
     if (!currentUser) return;
 
-    const socket = io("https://api.blazeneuro.com", {
+    const socket = io("https://api.vidyaschool.com", {
       transports: ["polling", "websocket"],
       forceNew: true,
     });
