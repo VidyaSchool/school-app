@@ -28,10 +28,16 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           port: 22
           script: |
-            set -e
+            set -euo pipefail
 
-            echo "📦 Pulling latest code..."
+            echo "=================================================="
+            echo "🚀 Starting VidyaSchool Backend CI/CD Deploy"
+            echo "=================================================="
+
+            echo "📦 Ensuring remote origin is VidyaSchool/school-app..."
             cd /home/ubuntu/vidyaschool
+            git remote set-url origin https://github.com/VidyaSchool/school-app.git
+            git fetch origin main
             git reset --hard origin/main
             git pull origin main
 
@@ -42,9 +48,22 @@ jobs:
             echo "📥 Installing/updating dependencies..."
             pip install -q -r requirements.txt
 
+            echo "🗄️ Syncing database schema with models..."
+            python3 -c "from app.core.database import init_db; init_db(); print('Database schema and settings synced successfully')"
+
             echo "🔄 Restarting backend service..."
             sudo systemctl restart vidyaschool-backend
 
-            echo "✅ Deployment complete!"
-            sudo systemctl status vidyaschool-backend --no-pager
+            echo "🩺 Verifying backend health..."
+            if curl --retry 5 --retry-connrefused --retry-delay 2 -sf http://localhost:8000/api/health > /dev/null; then
+              echo "✅ Backend is healthy and operational!"
+            else
+              echo "⚠️ Backend health check failed! Inspecting status:"
+              sudo systemctl status vidyaschool-backend --no-pager -l
+              exit 1
+            fi
+
+            echo "=================================================="
+            echo "🎉 Backend & Database CI/CD Deployment complete!"
+            echo "=================================================="
 
