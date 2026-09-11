@@ -5,7 +5,10 @@ import httpx
 import asyncio
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Depends
+from sqlmodel import Session
+from app.core.database import get_db
+from app.routes.page_builder import verify_admin_or_service
 
 router = APIRouter()
 
@@ -330,8 +333,14 @@ def fallback_ai_layout_engine(prompt: str, existing_blocks: List[Dict[str, Any]]
 
 @router.post("/ai")
 @router.post("/api/page-builder/ai")
-async def generate_page_builder_ai(req: PageBuilderAIRequest):
+async def generate_page_builder_ai(
+    req: PageBuilderAIRequest,
+    request: Request,
+    db: Session = Depends(get_db)
+):
     """API endpoint for Page Builder AI Agent to arrange/design page elements."""
+    verify_admin_or_service(request, db)
+
     prompt = req.prompt
     existing_blocks = req.blocks or []
     

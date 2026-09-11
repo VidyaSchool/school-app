@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { customPage } from "@/lib/schema"
-import { eq, or, sql } from "drizzle-orm"
+import { eq, or, and, sql } from "drizzle-orm"
 
 // Helper to ensure custom_page table exists
 async function ensureTableExists() {
@@ -38,7 +38,12 @@ export async function GET(req: NextRequest) {
     const pages = await db
       .select()
       .from(customPage)
-      .where(or(eq(customPage.slug, identifier), eq(customPage.id, identifier)))
+      .where(
+        and(
+          or(eq(customPage.slug, identifier), eq(customPage.id, identifier)),
+          eq(customPage.status, "published")
+        )
+      )
       .limit(1)
 
     if (pages.length === 0) {
@@ -63,10 +68,11 @@ export async function GET(req: NextRequest) {
         updatedAt: page.updatedAt,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to load public page"
     console.error("Public page fetch error:", error)
     return NextResponse.json(
-      { error: error.message || "Failed to load public page" },
+      { error: message },
       { status: 500 }
     )
   }

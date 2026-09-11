@@ -37,6 +37,7 @@ from app.routes.notices import router as notices_router
 from app.routes.search import router as search_router
 from app.routes.chats import router as chats_router
 from app.routes.page_builder_ai import router as page_builder_ai_router
+from app.routes.page_builder import router as page_builder_router
 from app.routes.email import router as email_router
 from app.routes.sessions import router as sessions_router
 from app.routes.auth_device import router as auth_device_router
@@ -462,6 +463,7 @@ app.include_router(library_router)
 app.include_router(notices_router)
 app.include_router(search_router)
 app.include_router(chats_router)
+app.include_router(page_builder_router)
 app.include_router(page_builder_ai_router, prefix="/api/page-builder", tags=["page-builder"])
 app.include_router(email_router)
 app.include_router(sessions_router)

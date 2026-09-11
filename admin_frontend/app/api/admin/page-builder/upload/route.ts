@@ -16,19 +16,43 @@ const ALLOWED_MIME_TYPES = [
   "image/png",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
   "image/avif",
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ]
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024 // 25 MB limit for PDFs & assets
+const ALLOWED_EXTENSIONS = new Set([
+  "pdf", "jpeg", "jpg", "png", "webp", "gif", "avif",
+  "mp4", "webm", "ogg", "doc", "docx", "xls", "xlsx"
+])
+
+const DANGEROUS_EXTENSIONS = new Set([
+  "html", "htm", "svg", "exe", "bat", "cmd", "sh", "php", "js", "ts", "vbs", "ps1", "jsp", "asp", "aspx"
+])
+
+function isValidExtension(fileName: string): boolean {
+  const ext = (fileName.split(".").pop() || "").toLowerCase()
+  return !DANGEROUS_EXTENSIONS.has(ext) && ALLOWED_EXTENSIONS.has(ext)
+}
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50 MB limit for PDFs, Videos & Assets
 
 export async function POST(req: NextRequest) {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 })
-  }
-
   try {
+    const session = await auth.api.getSession({ headers: await headers() }).catch(() => null)
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized: Admin session required" }, { status: 401 })
+    }
+    const isUserAdmin = session.user.role === "admin" || (session.user as { isAdmin?: boolean }).isAdmin
+    if (!isUserAdmin) {
+      return NextResponse.json({ error: "Forbidden: Admin privileges required" }, { status: 403 })
+    }
+
     const contentType = req.headers.get("content-type") || ""
 
     // Mode 1: Presigned URL Request (JSON) - Direct S3 client-side upload
@@ -41,9 +65,16 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: "fileName and fileType are required" }, { status: 400 })
         }
 
+        if (!isValidExtension(fileName)) {
+          return NextResponse.json(
+            { error: "File extension not permitted. Executables, HTML, and SVG files are strictly prohibited." },
+            { status: 400 }
+          )
+        }
+
         if (!ALLOWED_MIME_TYPES.includes(fileType.toLowerCase())) {
           return NextResponse.json(
-            { error: `Invalid file format (${fileType}). Allowed: PDF, PNG, JPG, WEBP, SVG` },
+            { error: `Invalid file format (${fileType}). Allowed: PDF, PNG, JPG, WEBP, GIF, MP4, Documents` },
             { status: 400 }
           )
         }
@@ -85,14 +116,21 @@ export async function POST(req: NextRequest) {
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: "File exceeds 25MB size limit" },
+        { error: "File exceeds 50MB size limit" },
+        { status: 400 }
+      )
+    }
+
+    if (!isValidExtension(file.name)) {
+      return NextResponse.json(
+        { error: "File extension not permitted. Executables, HTML, and SVG files are strictly prohibited." },
         { status: 400 }
       )
     }
 
     if (!ALLOWED_MIME_TYPES.includes(file.type.toLowerCase())) {
       return NextResponse.json(
-        { error: `Invalid file format (${file.type}). Allowed: PDF, PNG, JPG, WEBP, SVG` },
+        { error: `Invalid file format (${file.type}). Allowed: PDF, PNG, JPG, WEBP, GIF, MP4, Documents` },
         { status: 400 }
       )
     }
@@ -120,7 +158,7 @@ export async function POST(req: NextRequest) {
             filename: file.name,
           })
         }
-      } catch (s3Err: any) {
+      } catch (s3Err: unknown) {
         console.error("S3 upload failed, falling back to serverless/local storage:", s3Err)
       }
     }
@@ -149,7 +187,7 @@ export async function POST(req: NextRequest) {
         filename: file.name,
         notice: "AWS S3 credentials not configured in env. File saved to local server storage.",
       })
-    } catch (fsErr: any) {
+    } catch (fsErr: unknown) {
       console.warn("Local filesystem write failed (likely serverless deployment). Converting to Data URI fallback:", fsErr)
       // 3. Serverless (Vercel) fallback: convert file buffer to Data URI
       const base64Data = buffer.toString("base64")
@@ -163,10 +201,11 @@ export async function POST(req: NextRequest) {
         notice: "Serverless read-only filesystem. File stored as Data URI.",
       })
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : "Failed to process file upload"
     console.error("Page Builder file upload error:", error)
     return NextResponse.json(
-      { error: error.message || "Failed to process file upload" },
+      { error: errorMsg },
       { status: 500 }
     )
   }

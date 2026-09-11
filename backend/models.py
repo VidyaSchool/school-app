@@ -380,3 +380,15 @@ class SubstitutionSettings(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
+
+class CustomPage(SQLModel, table=True):
+    __tablename__ = "custom_page"
+    id: str = Field(primary_key=True)
+    title: str = Field(default="Responsive Elementor Page")
+    slug: str = Field(default="responsive-elementor-page", index=True)
+    widgets_json: str = Field(default="[]")
+    author_id: Optional[str] = Field(default=None)
+    status: str = Field(default="published")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
