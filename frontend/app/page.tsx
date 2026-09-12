@@ -37,6 +37,8 @@ export default function Home() {
                 <img
                   src="/assets/illustrations/founder_bg.png"
                   alt="Founder Background"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-background/55 dark:bg-background/70 backdrop-blur-[1px]" />
@@ -159,6 +161,8 @@ export default function Home() {
             <img
               src="/assets/illustrations/separator.svg"
               alt="Bottom separator"
+              loading="lazy"
+              decoding="async"
               className="w-full max-w-xs h-7 object-contain dark:invert dark:hue-rotate-180 opacity-80 dark:opacity-90 pointer-events-none rotate-180"
             />
           </div>

@@ -1077,16 +1077,48 @@ interface CachedPublicPage {
 }
 const publicPageCache = new Map<string, CachedPublicPage>()
 
+function tryLoadFromLocalStorage(slug: string): { title: string; widgets: unknown } | null {
+  if (typeof window === "undefined") return null
+  const cleanSlug = slug.replace(/^\/?p\//, "").replace(/^\/+|\/+$/g, "").toLowerCase()
+  for (const key of ["vidya_elementor_pages", "vidya_pages"]) {
+    try {
+      const localRaw = localStorage.getItem(key)
+      if (localRaw) {
+        const list = JSON.parse(localRaw)
+        if (Array.isArray(list)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const matched = list.find((p: any) => {
+            const pSlug = (p.slug || "").replace(/^\/?p\//, "").replace(/^\/+|\/+$/g, "").toLowerCase()
+            const pId = p.uid || p.id || ""
+            return pSlug === cleanSlug || pId === slug || pSlug === slug.toLowerCase()
+          })
+          if (matched) {
+            return {
+              title: matched.title || matched.name || "Untitled Page",
+              widgets: matched.widgets || matched.contentJson || [],
+            }
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }
+  return null
+}
+
 export default function PublicLivePage() {
   const { slug } = useParams<{ slug: string }>()
 
-  // Instant transition: if page was previously fetched, initialize immediately with 0ms latency
+  // Instant transition: if page was previously fetched or saved in browser, initialize immediately
   const cached = slug ? publicPageCache.get(slug) : undefined
+  const localFallback = !cached && slug ? tryLoadFromLocalStorage(slug) : null
+  const initialData = cached || localFallback
 
-  const [pageTitle, setPageTitle] = React.useState<string>(cached?.title || "")
+  const [pageTitle, setPageTitle] = React.useState<string>(initialData?.title || "")
   const [editorBlocks, setEditorBlocks] = React.useState<EditorJsBlock[] | null>(() => {
-    if (cached) {
-      const raw = cached.widgets
+    if (initialData) {
+      const raw = initialData.widgets
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (raw && typeof raw === "object" && !Array.isArray(raw) && Array.isArray((raw as any).blocks)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1098,12 +1130,12 @@ export default function PublicLivePage() {
     return null
   })
   const [legacyWidgets, setLegacyWidgets] = React.useState<ElementorWidget[]>(() => {
-    if (cached && Array.isArray(cached.widgets) && (cached.widgets.length === 0 || !("data" in cached.widgets[0]))) {
-      return cached.widgets as ElementorWidget[]
+    if (initialData && Array.isArray(initialData.widgets) && (initialData.widgets.length === 0 || !("data" in initialData.widgets[0]))) {
+      return initialData.widgets as ElementorWidget[]
     }
     return []
   })
-  const [loading, setLoading] = React.useState(!cached)
+  const [loading, setLoading] = React.useState(!initialData)
   const [error, setError] = React.useState<string | null>(null)
   const [activeModal, setActiveModal] = React.useState<{
     type: "pdf" | "video"
@@ -1125,7 +1157,8 @@ export default function PublicLivePage() {
 
     // Only show loading pulse if not already cached
     const cachedData = publicPageCache.get(slug)
-    if (!cachedData) {
+    const localData = tryLoadFromLocalStorage(slug)
+    if (!cachedData && !localData) {
       setLoading(true)
     }
 
@@ -1137,6 +1170,25 @@ export default function PublicLivePage() {
         if (!isMounted) return
 
         if (!res.ok || !data.found || !data.page) {
+          const local = tryLoadFromLocalStorage(slug)
+          if (local) {
+            setPageTitle(local.title)
+            const rawWidgets = local.widgets
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if (rawWidgets && typeof rawWidgets === "object" && !Array.isArray(rawWidgets) && Array.isArray((rawWidgets as any).blocks)) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              setEditorBlocks(deduplicateBlocks((rawWidgets as any).blocks as EditorJsBlock[]))
+              setLegacyWidgets([])
+            } else if (Array.isArray(rawWidgets) && rawWidgets.length > 0 && "data" in rawWidgets[0]) {
+              setEditorBlocks(deduplicateBlocks(rawWidgets as EditorJsBlock[]))
+              setLegacyWidgets([])
+            } else if (Array.isArray(rawWidgets)) {
+              setEditorBlocks(null)
+              setLegacyWidgets(rawWidgets as ElementorWidget[])
+            }
+            setError(null)
+            return
+          }
           throw new Error(data.error || "Page not found")
         }
 
@@ -1163,6 +1215,25 @@ export default function PublicLivePage() {
         setError(null)
       } catch (err: unknown) {
         if (!isMounted) return
+        const local = tryLoadFromLocalStorage(slug)
+        if (local) {
+          setPageTitle(local.title)
+          const rawWidgets = local.widgets
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (rawWidgets && typeof rawWidgets === "object" && !Array.isArray(rawWidgets) && Array.isArray((rawWidgets as any).blocks)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setEditorBlocks(deduplicateBlocks((rawWidgets as any).blocks as EditorJsBlock[]))
+            setLegacyWidgets([])
+          } else if (Array.isArray(rawWidgets) && rawWidgets.length > 0 && "data" in rawWidgets[0]) {
+            setEditorBlocks(deduplicateBlocks(rawWidgets as EditorJsBlock[]))
+            setLegacyWidgets([])
+          } else if (Array.isArray(rawWidgets)) {
+            setEditorBlocks(null)
+            setLegacyWidgets(rawWidgets as ElementorWidget[])
+          }
+          setError(null)
+          return
+        }
         const msg = err instanceof Error ? err.message : "Failed to load public page"
         setError(msg)
       } finally {

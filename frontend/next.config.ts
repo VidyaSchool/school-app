@@ -29,6 +29,26 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  async redirects() {
+    return [
+      { source: '/about', destination: '/#about', permanent: false },
+      { source: '/principal-message', destination: '/mandatory-public-disclosure#general-info', permanent: false },
+      { source: '/infrastructure', destination: '/mandatory-public-disclosure#infrastructure', permanent: false },
+      { source: '/faculty-and-staff', destination: '/mandatory-public-disclosure#staff', permanent: false },
+      { source: '/management-committee', destination: '/mandatory-public-disclosure#documents-info', permanent: false },
+      { source: '/curriculum', destination: '/mandatory-public-disclosure#academics', permanent: false },
+      { source: '/academic-calendar', destination: '/mandatory-public-disclosure#academics', permanent: false },
+      { source: '/annual-report', destination: '/mandatory-public-disclosure#academics', permanent: false },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/:slug((?!api|_next|assets|student|teacher|librarian|admin|accounts|community|contact|dashboard|docs|downloads|gallery|login|login-accounts|signup|mandatory-public-disclosure|circulars|monitoring|p|favicon\\.ico).*)',
+        destination: '/p/:slug',
+      },
+    ];
+  },
   async headers() {
     return [
       {

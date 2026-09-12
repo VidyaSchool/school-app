@@ -23,13 +23,15 @@ export function BlurImage({ className, alt, onLoad, ...props }: ImageProps) {
   )
 }
 
-export function BlurImg({ className, alt, style, onLoad, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
+export function BlurImg({ className, alt, style, onLoad, loading = "lazy", decoding = "async", ...props }: React.ImgHTMLAttributes<HTMLImageElement>) {
   const [isLoaded, setIsLoaded] = useState(false)
 
   return (
     <img
       alt={alt || ""}
       style={style}
+      loading={loading}
+      decoding={decoding}
       ref={(node) => {
         if (node?.complete && node.naturalWidth > 0 && !isLoaded) {
           setIsLoaded(true)

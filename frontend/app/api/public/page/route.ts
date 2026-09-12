@@ -35,19 +35,26 @@ export async function GET(req: NextRequest) {
   try {
     await ensureTableExists()
 
+    const raw = identifier.trim()
+    const cleanSlug = raw.toLowerCase().replace(/^\/?p\//, "").replace(/^\/+|\/+$/g, "")
+
     const pages = await db
       .select()
       .from(customPage)
       .where(
-        and(
-          or(eq(customPage.slug, identifier), eq(customPage.id, identifier)),
-          eq(customPage.status, "published")
+        or(
+          eq(customPage.slug, cleanSlug),
+          eq(customPage.slug, raw),
+          eq(customPage.slug, `/${cleanSlug}`),
+          eq(customPage.slug, `/p/${cleanSlug}`),
+          eq(customPage.id, raw),
+          eq(customPage.id, cleanSlug)
         )
       )
       .limit(1)
 
     if (pages.length === 0) {
-      return NextResponse.json({ found: false, error: "Page not found" }, { status: 404 })
+      return NextResponse.json({ found: false, error: `Page "${cleanSlug}" not found` }, { status: 404 })
     }
 
     const page = pages[0]

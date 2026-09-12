@@ -7,6 +7,8 @@ export function SectionSeparator() {
       <img
         src="/assets/illustrations/separator.svg"
         alt="Top separator"
+        loading="lazy"
+        decoding="async"
         className="w-full max-w-5xl h-7 object-contain dark:invert dark:hue-rotate-180 opacity-80 dark:opacity-90 pointer-events-none -translate-x-8 sm:-translate-x-16"
       />
 
@@ -19,6 +21,8 @@ export function SectionSeparator() {
       <img
         src="/assets/illustrations/separator.svg"
         alt="Bottom separator"
+        loading="lazy"
+        decoding="async"
         className="w-full max-w-5xl h-7 object-contain dark:invert dark:hue-rotate-180 opacity-80 dark:opacity-90 pointer-events-none rotate-180 translate-x-8 sm:translate-x-16"
       />
     </div>

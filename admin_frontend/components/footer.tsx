@@ -55,19 +55,19 @@ export function Footer() {
             <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">About School</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/about" className="hover:text-foreground transition-colors">About VidyaSchool</Link>
+                <Link href="/#about" className="hover:text-foreground transition-colors">About VidyaSchool</Link>
               </li>
               <li>
-                <Link href="/principal-message" className="hover:text-foreground transition-colors">Principal&apos;s Message</Link>
+                <Link href="/mandatory-public-disclosure#general-info" className="hover:text-foreground transition-colors">Principal&apos;s Message</Link>
               </li>
               <li>
-                <Link href="/infrastructure" className="hover:text-foreground transition-colors">Infrastructure</Link>
+                <Link href="/mandatory-public-disclosure#infrastructure" className="hover:text-foreground transition-colors">Infrastructure</Link>
               </li>
               <li>
-                <Link href="/faculty-and-staff" className="hover:text-foreground transition-colors">Faculty &amp; Staff</Link>
+                <Link href="/mandatory-public-disclosure#staff" className="hover:text-foreground transition-colors">Faculty &amp; Staff</Link>
               </li>
               <li>
-                <Link href="/management-committee" className="hover:text-foreground transition-colors">School Management Committee</Link>
+                <Link href="/mandatory-public-disclosure#documents-info" className="hover:text-foreground transition-colors">School Management Committee</Link>
               </li>
             </ul>
           </div>
@@ -77,16 +77,16 @@ export function Footer() {
             <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Academics &amp; Info</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/curriculum" className="hover:text-foreground transition-colors">Curriculum</Link>
+                <Link href="/mandatory-public-disclosure#academics" className="hover:text-foreground transition-colors">Curriculum</Link>
               </li>
               <li>
-                <Link href="/academic-calendar" className="hover:text-foreground transition-colors">Academic Calendar</Link>
+                <Link href="/mandatory-public-disclosure#academics" className="hover:text-foreground transition-colors">Academic Calendar</Link>
               </li>
               <li>
                 <Link href="/mandatory-public-disclosure" className="hover:text-foreground transition-colors">Mandatory Public Disclosure</Link>
               </li>
               <li>
-                <Link href="/annual-report" className="hover:text-foreground transition-colors">Annual Report</Link>
+                <Link href="/mandatory-public-disclosure#academics" className="hover:text-foreground transition-colors">Annual Report</Link>
               </li>
             </ul>
           </div>

@@ -40,11 +40,13 @@ self.addEventListener("fetch", (event) => {
   // Avoid caching browser extensions or non-HTTP protocols (e.g. chrome-extension://)
   if (!event.request.url.startsWith(self.location.origin)) return
 
-  // Bypass API, Next.js dev/build assets, and WebSockets
+  // Bypass API, Next.js internal RSC data, page-builder public routes, and dev assets
   if (
     event.request.url.includes("/api/") ||
     event.request.url.includes("/socket.io") ||
-    event.request.url.includes("/_next/")
+    event.request.url.includes("/_next/") ||
+    event.request.url.includes("_rsc=") ||
+    event.request.url.includes("/p/")
   ) {
     return
   }
@@ -84,7 +86,10 @@ self.addEventListener("fetch", (event) => {
           }
           return networkResponse
         })
-        .catch(() => new Response("Offline", { status: 503 }))
+        .catch(() => {
+          // Do not inject artificial 503 into Next.js router
+          return new Response("", { status: 404, statusText: "Not Found" })
+        })
     })
   )
 })
