@@ -1,6 +1,7 @@
-const CACHE_NAME = "vidyaschool-cache-v2"
+const CACHE_NAME = "vidyaschool-cache-v3"
 const ASSETS_TO_CACHE = [
   "/favicon.ico",
+  "/assets/vidyaschool/Logo/vidyaSG_no_bg.png",
   "/assets/vidyaschool/Logo/no_title.svg",
   "/assets/vidyaschool/Logo/Full_circle_logo.webp",
 ]

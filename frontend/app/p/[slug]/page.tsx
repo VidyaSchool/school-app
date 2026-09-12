@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
+import Link from "next/link"
 import {
   FileText,
   Download,
@@ -74,6 +75,11 @@ function getSafeUrl(url?: string, fallback = "#"): string {
 
   if (trimmed.startsWith("www.")) {
     return `https://${trimmed}`
+  }
+
+  // Allow relative paths without leading slash (e.g. "p/tech-fest" -> "/p/tech-fest")
+  if (/^[a-zA-Z0-9_\-\/]+$/.test(trimmed) && !trimmed.includes("://")) {
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`
   }
 
   return fallback
@@ -157,6 +163,115 @@ function sanitizeHtml(rawHtml?: string): string {
   return clean
 }
 
+// ── SmartLink: Next.js Link for internal target routes (/p/...), regular <a> for external URLs ──
+
+export function isInternalLink(url?: string): boolean {
+  if (!url || typeof url !== "string") return false
+  const trimmed = url.trim()
+  if (!trimmed || trimmed === "#") return false
+
+  // Relative internal paths (e.g. /p/tech-fest, /admissions, /about) or hash anchors (#...)
+  if ((trimmed.startsWith("/") && !trimmed.startsWith("//")) || trimmed.startsWith("#")) {
+    return true
+  }
+
+  // Check if someone pasted a full URL pointing to the local or primary domain
+  try {
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+      const parsed = new URL(trimmed)
+      const isKnownHost =
+        parsed.host === "localhost:3000" ||
+        parsed.host === "localhost:3001" ||
+        parsed.host === "vidyaschool.com" ||
+        parsed.host === "www.vidyaschool.com" ||
+        parsed.host.endsWith(".vercel.app")
+
+      if (isKnownHost) return true
+
+      if (typeof window !== "undefined") {
+        if (parsed.host === window.location.host) {
+          return true
+        }
+      }
+    }
+  } catch {
+    // Ignore URL parse error
+  }
+
+  return false
+}
+
+export function getInternalHref(url: string): string {
+  const trimmed = url.trim()
+  if ((trimmed.startsWith("/") && !trimmed.startsWith("//")) || trimmed.startsWith("#")) {
+    return trimmed
+  }
+  try {
+    const parsed = new URL(trimmed)
+    return parsed.pathname + parsed.search + parsed.hash
+  } catch {
+    return trimmed
+  }
+}
+
+interface SmartLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  href?: string
+  children: React.ReactNode
+  className?: string
+  target?: string
+  rel?: string
+}
+
+export const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(
+  function SmartLink({ href = "#", children, className, target, rel, onClick, ...rest }, ref) {
+    const router = useRouter()
+    const safeUrl = getSafeUrl(href)
+
+    // 1. Internal Link: e.g. /p/tech-fest, /admissions, /about
+    // Uses Next.js client-side navigation (<Link>) without full page reload
+    if (isInternalLink(safeUrl)) {
+      const internalHref = getInternalHref(safeUrl)
+      return (
+        <Link
+          ref={ref}
+          href={internalHref}
+          className={className}
+          prefetch={true}
+          onClick={(e) => {
+            if (onClick) onClick(e)
+            // Ensure client-side SPA navigation without hard refresh
+            if (!e.defaultPrevented && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+              e.preventDefault()
+              router.push(internalHref)
+            }
+          }}
+          {...rest}
+        >
+          {children}
+        </Link>
+      )
+    }
+
+    // 2. External Link: e.g. https://www.youtube.com/, https://google.com
+    // Standard anchor tag with target="_blank" and rel="noopener noreferrer"
+    const isExternal = safeUrl.startsWith("http://") || safeUrl.startsWith("https://")
+    return (
+      <a
+        ref={ref}
+        href={safeUrl}
+        target={target ?? (isExternal ? "_blank" : undefined)}
+        rel={rel ?? (isExternal ? "noopener noreferrer" : undefined)}
+        className={className}
+        onClick={onClick}
+        {...rest}
+      >
+        {children}
+      </a>
+    )
+  }
+)
+SmartLink.displayName = "SmartLink"
+
 // ── Public Sub-Widget Renderer ───────────────────────────────────────────────
 
 function PublicSubWidgetRenderer({ subW }: { subW: ElementorWidget }) {
@@ -213,14 +328,18 @@ function PublicSubWidgetRenderer({ subW }: { subW: ElementorWidget }) {
   }
 
   if (subW.type === "button") {
-    const safeLink = getSafeUrl(typeof subW.props.link === "string" ? subW.props.link : "#")
-    const isExternal = safeLink.startsWith("http")
+    const rawLink = typeof subW.props.link === "string" ? subW.props.link : "#"
     return (
-      <a href={safeLink} target={isExternal ? "_blank" : undefined} rel="noreferrer">
-        <Button variant={(subW.props.variant as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | null | undefined) || "default"} size="sm" className="rounded-xl text-xs shadow-xs my-1 max-w-full truncate cursor-pointer font-bold">
+      <Button
+        asChild
+        variant={(subW.props.variant as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | null | undefined) || "default"}
+        size="sm"
+        className="rounded-xl text-xs shadow-xs my-1 max-w-full truncate cursor-pointer font-bold inline-flex"
+      >
+        <SmartLink href={rawLink}>
           {typeof subW.props.label === "string" ? subW.props.label : "Button"}
-        </Button>
-      </a>
+        </SmartLink>
+      </Button>
     )
   }
 
@@ -362,19 +481,19 @@ function PublicWidgetRenderer({ widget }: { widget: ElementorWidget }) {
   }
 
   if (widget.type === "button") {
-    const safeLink = getSafeUrl(typeof widget.props.link === "string" ? widget.props.link : "#")
-    const isExternal = safeLink.startsWith("http")
+    const rawLink = typeof widget.props.link === "string" ? widget.props.link : "#"
     return (
       <div className="py-2" style={{ textAlign: (widget.props.align as "left" | "center" | "right") || "left" }}>
-        <a href={safeLink} target={isExternal ? "_blank" : undefined} rel="noreferrer">
-          <Button
-            variant={(widget.props.variant as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | null | undefined) || "default"}
-            size={(widget.props.size as "default" | "sm" | "lg" | "icon" | null | undefined) || "lg"}
-            className="rounded-2xl shadow-xs font-bold text-sm max-w-full truncate px-6 py-2.5"
-          >
+        <Button
+          asChild
+          variant={(widget.props.variant as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link" | null | undefined) || "default"}
+          size={(widget.props.size as "default" | "sm" | "lg" | "icon" | null | undefined) || "lg"}
+          className="rounded-2xl shadow-xs font-bold text-sm max-w-full truncate px-6 py-2.5 inline-flex"
+        >
+          <SmartLink href={rawLink}>
             {typeof widget.props.label === "string" ? widget.props.label : "Button"}
-          </Button>
-        </a>
+          </SmartLink>
+        </Button>
       </div>
     )
   }
@@ -647,26 +766,19 @@ function PublicEditorJsBlockRenderer({
 
     return (
       <div className={cn("flex flex-wrap items-center gap-3 my-4", alignClass)}>
-        {rawItems.map((item, idx) => {
-          const safeUrl = getSafeUrl(item.url)
-          const isExternal = safeUrl.startsWith("http")
-          return (
-            <a
-              key={item.id || idx}
-              href={safeUrl}
-              target={isExternal ? "_blank" : undefined}
-              rel="noreferrer"
-            >
-              <Button
-                variant={item.variant || "default"}
-                size="lg"
-                className="rounded-xl font-semibold px-6 shadow-xs text-sm"
-              >
-                {item.text || "Button"}
-              </Button>
-            </a>
-          )
-        })}
+        {rawItems.map((item, idx) => (
+          <Button
+            key={item.id || idx}
+            asChild
+            variant={item.variant || "default"}
+            size="lg"
+            className="rounded-xl font-semibold px-6 shadow-xs text-sm inline-flex"
+          >
+            <SmartLink href={item.url || "#"}>
+              {item.text || "Button"}
+            </SmartLink>
+          </Button>
+        ))}
       </div>
     )
   }
@@ -725,14 +837,12 @@ function PublicEditorJsBlockRenderer({
               </div>
               {safeLink && safeLink !== "#" && (
                 <div className="pt-4 mt-3 border-t border-border/40 flex items-center justify-end">
-                  <a
+                  <SmartLink
                     href={safeLink}
-                    target={safeLink.startsWith("http") ? "_blank" : undefined}
-                    rel="noreferrer"
                     className="text-xs font-semibold text-primary flex items-center gap-1 hover:underline"
                   >
                     Learn More <ArrowRight className="size-3.5" />
-                  </a>
+                  </SmartLink>
                 </div>
               )}
             </Card>
@@ -872,21 +982,17 @@ function PublicEditorJsBlockRenderer({
                       >
                         {parsed.isButton && parsed.btn ? (
                           parsed.btn.actionType === "link" ? (
-                            <a
-                              href={getSafeUrl(parsed.btn.url)}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-block"
+                            <Button
+                              asChild
+                              variant={parsed.btn.variant || "default"}
+                              size="sm"
+                              className="h-8 gap-1.5 text-xs font-semibold cursor-pointer shadow-xs inline-flex"
                             >
-                              <Button
-                                variant={parsed.btn.variant || "default"}
-                                size="sm"
-                                className="h-8 gap-1.5 text-xs font-semibold cursor-pointer shadow-xs"
-                              >
+                              <SmartLink href={parsed.btn.url || "#"}>
                                 {renderTableCellIcon(parsed.btn.icon)}
                                 <span>{parsed.btn.label || "Action"}</span>
-                              </Button>
-                            </a>
+                              </SmartLink>
+                            </Button>
                           ) : parsed.btn.actionType === "download" ? (
                             <a
                               href={getSafeUrl(parsed.btn.url)}
@@ -964,13 +1070,40 @@ function deduplicateBlocks(blocks: EditorJsBlock[]): EditorJsBlock[] {
 
 // ── Main Unauthenticated Public Page Renderer Component ────────────────────────
 
+interface CachedPublicPage {
+  title: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  widgets: any
+}
+const publicPageCache = new Map<string, CachedPublicPage>()
+
 export default function PublicLivePage() {
   const { slug } = useParams<{ slug: string }>()
 
-  const [pageTitle, setPageTitle] = React.useState("Page")
-  const [editorBlocks, setEditorBlocks] = React.useState<EditorJsBlock[] | null>(null)
-  const [legacyWidgets, setLegacyWidgets] = React.useState<ElementorWidget[]>([])
-  const [loading, setLoading] = React.useState(true)
+  // Instant transition: if page was previously fetched, initialize immediately with 0ms latency
+  const cached = slug ? publicPageCache.get(slug) : undefined
+
+  const [pageTitle, setPageTitle] = React.useState<string>(cached?.title || "")
+  const [editorBlocks, setEditorBlocks] = React.useState<EditorJsBlock[] | null>(() => {
+    if (cached) {
+      const raw = cached.widgets
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (raw && typeof raw === "object" && !Array.isArray(raw) && Array.isArray((raw as any).blocks)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return deduplicateBlocks((raw as any).blocks as EditorJsBlock[])
+      } else if (Array.isArray(raw) && raw.length > 0 && "data" in raw[0]) {
+        return deduplicateBlocks(raw as EditorJsBlock[])
+      }
+    }
+    return null
+  })
+  const [legacyWidgets, setLegacyWidgets] = React.useState<ElementorWidget[]>(() => {
+    if (cached && Array.isArray(cached.widgets) && (cached.widgets.length === 0 || !("data" in cached.widgets[0]))) {
+      return cached.widgets as ElementorWidget[]
+    }
+    return []
+  })
+  const [loading, setLoading] = React.useState(!cached)
   const [error, setError] = React.useState<string | null>(null)
   const [activeModal, setActiveModal] = React.useState<{
     type: "pdf" | "video"
@@ -978,19 +1111,43 @@ export default function PublicLivePage() {
     title: string
   } | null>(null)
 
+  // Keep browser document title synchronized with user-selected page title
+  React.useEffect(() => {
+    if (pageTitle && pageTitle !== "Page") {
+      document.title = `${pageTitle} | Vidya School`
+    }
+  }, [pageTitle])
+
   React.useEffect(() => {
     if (!slug) return
+
+    let isMounted = true
+
+    // Only show loading pulse if not already cached
+    const cachedData = publicPageCache.get(slug)
+    if (!cachedData) {
+      setLoading(true)
+    }
 
     const fetchPublicPage = async () => {
       try {
         const res = await fetch(`/api/public/page?slug=${encodeURIComponent(slug)}`)
         const data = await res.json()
 
+        if (!isMounted) return
+
         if (!res.ok || !data.found || !data.page) {
           throw new Error(data.error || "Page not found")
         }
 
-        setPageTitle(data.page.title || "Untitled Page")
+        const title = data.page.title || "Untitled Page"
+        setPageTitle(title)
+
+        // Store in memory cache for subsequent instant navigations
+        publicPageCache.set(slug, {
+          title,
+          widgets: data.page.widgets,
+        })
 
         const raw = data.page.widgets
         if (raw && typeof raw === "object" && !Array.isArray(raw) && Array.isArray(raw.blocks)) {
@@ -1003,60 +1160,94 @@ export default function PublicLivePage() {
           setEditorBlocks(null)
           setLegacyWidgets(raw)
         }
+        setError(null)
       } catch (err: unknown) {
+        if (!isMounted) return
         const msg = err instanceof Error ? err.message : "Failed to load public page"
         setError(msg)
       } finally {
-        setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
 
     fetchPublicPage()
+
+    return () => {
+      isMounted = false
+    }
   }, [slug])
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground space-y-3 p-4">
-        <Loader2 className="size-8 animate-spin text-primary" />
-        <p className="text-xs font-semibold text-muted-foreground">Loading public page...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground space-y-4 p-4 text-center">
-        <AlertCircle className="size-12 text-rose-500" />
-        <div>
-          <h1 className="text-2xl font-black">Page Not Found</h1>
-          <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-            {error || "The requested public page does not exist or has been unpublished."}
-          </p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground flex flex-col">
-      {/* Shared site-wide Header */}
+      {/* Dynamic Title hoisted into head */}
+      <title>{pageTitle && pageTitle !== "Page" ? `${pageTitle} | Vidya School` : "Vidya School"}</title>
+
+      {/* Shared site-wide Header — persistent, never unmounts or flashes */}
       <Header />
 
       {/* Main Public Page Content Container */}
-      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-8 sm:py-12 space-y-2">
-        <h1 className="sr-only">{pageTitle}</h1>
-        {editorBlocks ? (
-          editorBlocks.map((block, idx) => (
-            <PublicEditorJsBlockRenderer
-              key={idx}
-              block={block}
-              onTriggerModal={(m) => setActiveModal(m)}
-            />
-          ))
+      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-8 sm:py-12 space-y-4">
+        {loading ? (
+          <div className="space-y-6 py-4 animate-pulse">
+            <div className="h-10 bg-muted/60 rounded-xl w-3/4 mb-6" />
+            <div className="space-y-2.5">
+              <div className="h-4 bg-muted/40 rounded-md w-full" />
+              <div className="h-4 bg-muted/40 rounded-md w-5/6" />
+              <div className="h-4 bg-muted/40 rounded-md w-2/3" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+              <div className="h-28 bg-muted/30 rounded-2xl border border-border/40" />
+              <div className="h-28 bg-muted/30 rounded-2xl border border-border/40" />
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <AlertCircle className="size-12 text-rose-500" />
+            <div>
+              <h2 className="text-2xl font-black">Page Not Found</h2>
+              <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                {error || "The requested public page does not exist or has been unpublished."}
+              </p>
+            </div>
+          </div>
         ) : (
-          legacyWidgets.map((widget) => (
-            <PublicWidgetRenderer key={widget.id} widget={widget} />
-          ))
+          <>
+            {/* Page Title — dynamically matches user-selected title from page builder */}
+            {pageTitle && (
+              <div className="pb-4 mb-4 border-b border-border/40">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+                  {pageTitle}
+                </h1>
+              </div>
+            )}
+
+            {editorBlocks ? (
+              editorBlocks
+                .filter((block, idx) => {
+                  // Avoid duplicate heading if block 0 repeats the page title
+                  if (idx === 0 && block.type === "header") {
+                    const headerText = typeof block.data?.text === "string" ? block.data.text.trim().toLowerCase() : ""
+                    if (headerText === pageTitle.trim().toLowerCase()) {
+                      return false
+                    }
+                  }
+                  return true
+                })
+                .map((block, idx) => (
+                  <PublicEditorJsBlockRenderer
+                    key={idx}
+                    block={block}
+                    onTriggerModal={(m) => setActiveModal(m)}
+                  />
+                ))
+            ) : (
+              legacyWidgets.map((widget) => (
+                <PublicWidgetRenderer key={widget.id} widget={widget} />
+              ))
+            )}
+          </>
         )}
       </main>
 

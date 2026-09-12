@@ -29,8 +29,9 @@ export const metadata: Metadata = {
   description: "Welcome to VidyaSchool, a premier educational portal dedicated to academic excellence, STEM innovation, and holistic student growth through co-curricular arts.",
   keywords: ["VidyaSchool", "school portal", "academics", "STEM education", "performing arts", "student portal", "teacher portal"],
   icons: {
-    icon: "/assets/vidyaschool/Logo/no_title.svg",
-    shortcut: "/assets/vidyaschool/Logo/no_title.svg",
+    icon: "/assets/vidyaschool/Logo/vidyaSG_no_bg.png?v=2",
+    shortcut: "/assets/vidyaschool/Logo/vidyaSG_no_bg.png?v=2",
+    apple: "/assets/vidyaschool/Logo/vidyaSG_no_bg.png?v=2",
   },
 }
 

@@ -652,6 +652,7 @@ export default function PageBuilderEditor() {
           const fastApiRes = await fetch(`${backendUrl}/api/page-builder`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({
               uid,
               title: pageTitle,
@@ -664,7 +665,10 @@ export default function PageBuilderEditor() {
             saveSuccessful = true
           } else {
             const errData = await fastApiRes.json().catch(() => null)
-            errorMessage = errData?.detail || errData?.error || errorMessage
+            console.warn("Direct FastAPI fallback response:", errData)
+            if (!errorMessage || errorMessage === "Failed to save to database") {
+              errorMessage = errData?.detail || errData?.error || errorMessage
+            }
           }
         } catch {
           // Both failed

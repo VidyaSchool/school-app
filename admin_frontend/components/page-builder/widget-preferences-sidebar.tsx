@@ -781,8 +781,11 @@ function ButtonBlockInspector({
                       value={btn.url}
                       onChange={(e) => handleUpdateItem(idx, { url: e.target.value })}
                       className="h-7 text-xs font-mono bg-background"
-                      placeholder="/apply or https://..."
+                      placeholder="/p/tech-fest or https://..."
                     />
+                    <p className="text-[10px] text-muted-foreground">
+                      Use <span className="font-mono font-medium">/p/...</span> for fast Next.js page routing, or external <span className="font-mono font-medium">https://...</span>
+                    </p>
                   </div>
 
                   <div className="space-y-1">
@@ -1064,8 +1067,11 @@ function CardBlockInspector({
                       value={c.linkUrl || ""}
                       onChange={(e) => handleUpdateCard(idx, { linkUrl: e.target.value })}
                       className="h-7 text-xs font-mono bg-background"
-                      placeholder="/facility or https://..."
+                      placeholder="/p/tech-fest or https://..."
                     />
+                    <p className="text-[10px] text-muted-foreground">
+                      Use <span className="font-mono font-medium">/p/...</span> for Next.js internal link, or full URL for external
+                    </p>
                   </div>
                 </div>
               )}
@@ -1498,8 +1504,11 @@ function TableBlockInspector({
                 value={btnData.url || ""}
                 onChange={(e) => handleUpdateButton({ url: e.target.value })}
                 className="h-8 text-xs font-mono"
-                placeholder="https://..."
+                placeholder="/p/tech-fest or https://..."
               />
+              <p className="text-[10px] text-muted-foreground">
+                Internal routes (e.g. <span className="font-mono font-medium">/p/slug</span>) use Next.js Link; external links open in a new tab.
+              </p>
             </div>
 
             {/* Upload to AWS S3 Bucket */}
