@@ -517,7 +517,7 @@ export function HeroSection() {
                   </div>
                 ) : (
                   /* ── Dynamic Slides: On mobile (< lg) matches hero main slider layout; on desktop (lg:) full-coverage card ── */
-                  <div className="w-full h-full">
+                  <div className="w-full h-full flex items-center justify-center">
                     {/* Mobile layout (< lg): Matches hero main slider layout exactly */}
                     <div className="grid lg:hidden w-full h-full grid-cols-1 items-center gap-8 py-6 sm:gap-10 sm:py-12 max-w-[1380px] mx-auto pb-4">
                       <div className="order-2 flex flex-col justify-center">
@@ -676,12 +676,12 @@ export function HeroSection() {
           </div>
         )}
 
-        {/* Desktop Navigation Controls: Stationed bottom-left inside card on lg screens */}
+      {/* Desktop Navigation Controls: Stationed bottom-left inside image on lg screens */}
       {slides.length > 1 && (
-        <div className="hidden lg:flex absolute inset-0 pointer-events-none items-center justify-center z-20">
+        <div className="hidden lg:flex absolute inset-0 pointer-events-none items-center justify-center z-20 px-2 sm:px-4 md:px-6 lg:px-8">
           <div className="relative w-full h-[540px] sm:h-[610px] lg:h-[78dvh] max-h-[730px]">
             <div
-              className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 select-none text-white shadow-xl transition-all duration-300"
+              className="absolute bottom-8 sm:bottom-10 left-8 sm:left-10 pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 select-none text-white shadow-xl transition-all duration-300"
               aria-label="Slider navigation"
             >
               {/* Prev Slide */}
