@@ -1,6 +1,13 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 from typing import Optional, List, Dict, Any
 import re
+import json
+import logging
+from sqlmodel import Session, select
+from app.core.database import get_db
+from models import CustomPage
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/search", tags=["search"])
 
@@ -452,11 +459,47 @@ SEARCH_INDEX: List[Dict[str, Any]] = [
     },
 ]
 
+def extract_text_from_widgets(widgets_data: Any) -> str:
+    """Recursively extract readable text from page builder widgets."""
+    texts: List[str] = []
+
+    def _traverse(obj: Any):
+        if isinstance(obj, dict):
+            # Extract common text properties
+            props = obj.get("props", {}) if isinstance(obj.get("props"), dict) else obj
+            for key in ["text", "title", "description", "label", "label1", "label2", "label3", 
+                        "stat1", "stat2", "stat3", "q1", "a1", "q2", "a2", "q3", "a3", 
+                        "col1Title", "col1Body", "col2Title", "col2Body", "col3Title", "col3Body"]:
+                val = props.get(key)
+                if isinstance(val, str) and val.strip():
+                    texts.append(val.strip())
+            
+            # Recurse into nested widget arrays or child objects
+            for k, v in obj.items():
+                if k in ["col1Widgets", "col2Widgets", "col3Widgets", "widgets", "children"] and isinstance(v, list):
+                    _traverse(v)
+                elif isinstance(v, (dict, list)):
+                    _traverse(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                _traverse(item)
+
+    _traverse(widgets_data)
+    seen = set()
+    unique_texts = []
+    for t in texts:
+        if t not in seen:
+            seen.add(t)
+            unique_texts.append(t)
+    return " ".join(unique_texts)
+
+
 @router.get("")
 def search(
     query: str = Query(..., alias="q"),
     role: Optional[str] = None,
-    username: Optional[str] = None
+    username: Optional[str] = None,
+    db: Session = Depends(get_db)
 ):
     cleaned_query = query.strip().lower()
     if not cleaned_query:
@@ -467,6 +510,7 @@ def search(
     
     results = []
     
+    # 1. Search Static Portal Index
     for item in SEARCH_INDEX:
         # Check if item is role-restricted
         if role and "roles" in item and role not in item["roles"]:
@@ -476,18 +520,18 @@ def search(
         title_lower = item["title"].lower()
         content_lower = item["content"].lower()
         
-        # 1. Exact title match gets absolute highest points
+        # Exact title match gets absolute highest points
         if cleaned_query == title_lower:
             score += 150
         elif cleaned_query in title_lower:
             score += 80
             
-        # 2. Token match points for Title
+        # Token match points for Title
         for token in query_tokens:
             if token in title_lower:
                 score += 20
                 
-        # 3. Match against keywords list
+        # Match against keywords list
         for kw in item.get("keywords", []):
             kw_lower = kw.lower()
             if cleaned_query == kw_lower:
@@ -501,7 +545,7 @@ def search(
                     elif token in kw_lower:
                         score += 12
                         
-        # 4. Match in content body
+        # Match in content body
         if cleaned_query in content_lower:
             score += 25
         for token in query_tokens:
@@ -509,7 +553,6 @@ def search(
                 score += 8
                 
         if score > 0:
-            # Format the URL if username is present
             item_url = item["url"]
             if username and "{username}" in item_url:
                 formatted_url = item_url.format(username=username)
@@ -523,6 +566,83 @@ def search(
                 "url": formatted_url,
                 "score": score
             })
+
+    # 2. Search Dynamic Custom Pages Created via Page Builder
+    try:
+        if role == "admin":
+            stmt = select(CustomPage)
+        else:
+            stmt = select(CustomPage).where(CustomPage.status == "published")
+        custom_pages = db.exec(stmt).all()
+
+        for page in custom_pages:
+            title_lower = (page.title or "").lower()
+            slug_lower = (page.slug or "").lower()
+            slug_words = slug_lower.replace("-", " ")
+            
+            # Parse widgets_json to extract textual content
+            parsed_widgets = []
+            if page.widgets_json:
+                try:
+                    parsed_widgets = json.loads(page.widgets_json)
+                except Exception:
+                    parsed_widgets = []
+                    
+            extracted_text = extract_text_from_widgets(parsed_widgets)
+            extracted_lower = extracted_text.lower()
+            
+            score = 0
+            
+            # Exact title or slug matches
+            if cleaned_query == title_lower:
+                score += 160
+            elif cleaned_query == slug_lower or cleaned_query == slug_words:
+                score += 150
+            elif cleaned_query in title_lower:
+                score += 90
+            elif cleaned_query in slug_lower or cleaned_query in slug_words:
+                score += 80
+                
+            # Token matches in title or slug
+            for token in query_tokens:
+                if token in title_lower:
+                    score += 25
+                if token in slug_words:
+                    score += 20
+                    
+            # Content matches in widget text
+            if cleaned_query in extracted_lower:
+                score += 35
+            for token in query_tokens:
+                if token in extracted_lower:
+                    score += 10
+                    
+            if score > 0:
+                snippet = extracted_text[:160].strip()
+                if not snippet:
+                    snippet = f"Custom page created via Page Builder: /{page.slug}"
+                elif len(extracted_text) > 160:
+                    snippet += "..."
+                    
+                results.append({
+                    "id": f"page-custom-{page.slug}",
+                    "title": page.title,
+                    "content": snippet,
+                    "url": f"/p/{page.slug}",
+                    "score": score
+                })
+                
+                # If admin with username, provide a direct shortcut to edit the page in Page Builder
+                if role == "admin" and username:
+                    results.append({
+                        "id": f"builder-edit-{page.id}",
+                        "title": f"Edit {page.title} (Page Builder)",
+                        "content": f"Open Elementor Page Builder editor for /{page.slug}",
+                        "url": f"/admin/{username}/page-builder/{page.id}",
+                        "score": score - 2
+                    })
+    except Exception as e:
+        logger.error(f"Error searching page-builder custom pages: {e}")
             
     # Sort results by score in descending order
     results.sort(key=lambda x: x["score"], reverse=True)

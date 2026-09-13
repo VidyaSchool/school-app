@@ -14,16 +14,26 @@ import {
 import { Search } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
+export interface SearchResultItem {
+  id: string
+  title: string
+  content?: string
+  url: string
+  type?: string
+  badge?: string
+  onSelect?: () => void
+  node?: React.ReactNode
+  [key: string]: unknown
+}
+
 export function CustomSearchDialog(props: SharedProps) {
   const [search, setSearch] = React.useState("")
-  const [results, setResults] = React.useState<any[]>([])
+  const [results, setResults] = React.useState<SearchResultItem[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
-  const [isFocused, setIsFocused] = React.useState(false)
   const [loaderPhase, setLoaderPhase] = React.useState(0)
 
   React.useEffect(() => {
     if (!isLoading) {
-      setLoaderPhase(0)
       return
     }
     const interval = setInterval(() => {
@@ -33,15 +43,19 @@ export function CustomSearchDialog(props: SharedProps) {
   }, [isLoading])
 
   React.useEffect(() => {
-    if (!search.trim()) {
-      setResults([])
-      setIsLoading(false)
-      return
+    const trimmed = search.trim()
+    if (!trimmed) {
+      const resetTimer = setTimeout(() => {
+        setResults([])
+        setIsLoading(false)
+      }, 0)
+      return () => clearTimeout(resetTimer)
     }
-    setIsLoading(true)
-    const timer = setTimeout(async () => {
+
+    const startTimer = setTimeout(() => setIsLoading(true), 0)
+    const fetchTimer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(search)}`)
+        const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`)
         if (res.ok) {
           const data = await res.json()
           setResults(data)
@@ -52,10 +66,14 @@ export function CustomSearchDialog(props: SharedProps) {
         setIsLoading(false)
       }
     }, 150)
-    return () => clearTimeout(timer)
+
+    return () => {
+      clearTimeout(startTimer)
+      clearTimeout(fetchTimer)
+    }
   }, [search])
 
-  const renderItem = ({ item, onClick }: { item: any; onClick: () => void }) => {
+  const renderItem = ({ item, onClick }: { item: SearchResultItem; onClick: () => void }) => {
     if (item.type === "action") {
       return (
         <button key={item.id} onClick={item.onSelect} className="w-full text-left">
@@ -65,7 +83,9 @@ export function CustomSearchDialog(props: SharedProps) {
     }
 
     const isDoc = item.id?.startsWith("docs-") || item.url?.startsWith("/docs/")
-    const typeLabel = isDoc ? "Docs" : "Page"
+    const isCustom = item.id?.startsWith("page-custom-") || item.url?.startsWith("/p/")
+    const isBuilder = item.id?.startsWith("builder-edit-") || item.url?.includes("/page-builder/")
+    const typeLabel = isDoc ? "Docs" : isBuilder ? "Builder" : isCustom ? "Custom" : "Page"
 
     return (
       <SearchDialogListItem
@@ -77,11 +97,15 @@ export function CustomSearchDialog(props: SharedProps) {
       >
         {/* Row 1: type pill + title */}
         <div className="flex items-center gap-2 w-full">
-          <span className="shrink-0 text-[9px] font-semibold tracking-widest uppercase
-                           px-1.5 py-0.5 rounded
-                           bg-sidebar-foreground/10
-                           text-muted-foreground
-                           border border-border/60">
+          <span className={`shrink-0 text-[9px] font-semibold tracking-widest uppercase px-1.5 py-0.5 rounded border ${
+            isBuilder
+              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+              : isCustom
+              ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30"
+              : isDoc
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+              : "bg-sidebar-foreground/10 text-muted-foreground border-border/60"
+          }`}>
             {typeLabel}
           </span>
           <span className="text-xs font-medium text-foreground truncate flex-1 leading-snug">
