@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Sparkles,
   ArrowRight,
+  Check,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -663,7 +664,71 @@ function renderTableCellIcon(iconName?: string) {
   }
 }
 
+function getListItemText(item: unknown): string {
+  if (typeof item === "string") return item
+  if (typeof item === "number") return String(item)
+  if (item && typeof item === "object") {
+    const obj = item as Record<string, unknown>
+    if (typeof obj.content === "string") return obj.content
+    if (typeof obj.text === "string") return obj.text
+    if (typeof obj.value === "string") return obj.value
+  }
+  return ""
+}
 
+function getListItemChildren(item: unknown): unknown[] {
+  if (item && typeof item === "object") {
+    const obj = item as Record<string, unknown>
+    if (Array.isArray(obj.items)) return obj.items
+  }
+  return []
+}
+
+function RenderEditorJsList({
+  items,
+  isOrdered,
+  depth = 0,
+}: {
+  items: unknown[]
+  isOrdered: boolean
+  depth?: number
+}) {
+  if (!Array.isArray(items) || items.length === 0) return null
+
+  const ListTag = isOrdered ? "ol" : "ul"
+  const listClass = isOrdered ? "list-decimal" : "list-disc"
+  const spacingClass =
+    depth === 0
+      ? "my-4 space-y-2 text-base sm:text-lg text-foreground/85"
+      : "mt-1.5 space-y-1.5 text-sm sm:text-base text-foreground/80"
+
+  return (
+    <ListTag className={cn(listClass, "pl-6 leading-relaxed marker:text-primary/70", spacingClass)}>
+      {items.map((it, idx) => {
+        const text = getListItemText(it)
+        const subItems = getListItemChildren(it)
+        const sanitized = sanitizeHtml(text)
+        const subIsOrdered =
+          it && typeof it === "object" && "style" in (it as Record<string, unknown>)
+            ? (it as Record<string, unknown>).style === "ordered"
+            : isOrdered
+
+        return (
+          <li key={idx} className="pl-1">
+            {sanitized ? (
+              <span dangerouslySetInnerHTML={{ __html: sanitized }} />
+            ) : text ? (
+              <span>{text}</span>
+            ) : null}
+            {subItems.length > 0 && (
+              <RenderEditorJsList items={subItems} isOrdered={subIsOrdered} depth={depth + 1} />
+            )}
+          </li>
+        )
+      })}
+    </ListTag>
+  )
+}
 
 function PublicEditorJsBlockRenderer({
   block,
@@ -913,19 +978,42 @@ function PublicEditorJsBlockRenderer({
 
   if (block.type === "list") {
     const isOrdered = block.data?.style === "ordered"
-    const items = block.data?.items || []
-    return isOrdered ? (
-      <ol className="list-decimal list-inside my-3 space-y-1.5 text-foreground/85 text-base sm:text-lg">
-        {items.map((it: string, idx: number) => (
-          <li key={idx} dangerouslySetInnerHTML={{ __html: sanitizeHtml(it) }} />
-        ))}
-      </ol>
-    ) : (
-      <ul className="list-disc list-inside my-3 space-y-1.5 text-foreground/85 text-base sm:text-lg">
-        {items.map((it: string, idx: number) => (
-          <li key={idx} dangerouslySetInnerHTML={{ __html: sanitizeHtml(it) }} />
-        ))}
-      </ul>
+    const items = Array.isArray(block.data?.items) ? block.data.items : []
+    return <RenderEditorJsList items={items} isOrdered={isOrdered} />
+  }
+
+  if (block.type === "checklist") {
+    const items = Array.isArray(block.data?.items) ? block.data.items : []
+    return (
+      <div className="my-4 space-y-2.5 text-foreground/85 text-base sm:text-lg">
+        {items.map((it: unknown, idx: number) => {
+          const text = getListItemText(it)
+          const checked = it && typeof it === "object" ? Boolean((it as Record<string, unknown>).checked) : false
+          const sanitized = sanitizeHtml(text)
+
+          return (
+            <div key={idx} className="flex items-start gap-3 pl-1">
+              <div
+                className={cn(
+                  "size-5 rounded-md border flex items-center justify-center shrink-0 mt-1 transition-colors",
+                  checked
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-muted-foreground/30 bg-muted/20"
+                )}
+              >
+                {checked && <Check className="size-3.5 stroke-[3]" />}
+              </div>
+              <span
+                className={cn(
+                  "leading-relaxed",
+                  checked ? "line-through text-muted-foreground" : "text-foreground/85"
+                )}
+                dangerouslySetInnerHTML={{ __html: sanitized || text }}
+              />
+            </div>
+          )
+        })}
+      </div>
     )
   }
 
