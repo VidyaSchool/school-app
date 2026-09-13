@@ -233,6 +233,31 @@ export function HeroSection() {
   const [isHovered, setIsHovered] = useState(false)
   const [, setIsAllLoaded] = useState(false)
 
+  // Restore user autoplay preference from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("antigravity_hero_slider_playing")
+      if (saved !== null) {
+        setIsPlaying(saved === "true")
+      }
+    } catch {
+      // localStorage may be unavailable or restricted
+    }
+  }, [])
+
+  // Toggle play/pause and persist user preference to localStorage
+  const togglePlayPause = useCallback(() => {
+    setIsPlaying((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem("antigravity_hero_slider_playing", String(next))
+      } catch {
+        // ignore errors if storage quota exceeded or disabled
+      }
+      return next
+    })
+  }, [])
+
   // Touch swipe tracking
   const touchStartRef = useRef<number | null>(null)
   const touchEndRef = useRef<number | null>(null)
@@ -522,7 +547,7 @@ export function HeroSection() {
                     <div className="grid lg:hidden w-full h-full grid-cols-1 items-center gap-8 py-6 sm:gap-10 sm:py-12 max-w-[1380px] mx-auto pb-4">
                       <div className="order-2 flex flex-col justify-center">
                         <div className="space-y-3 text-center sm:space-y-5">
-                          <h2 className="text-[clamp(1.75rem,5vw+0.75rem,4.5rem)] tracking-tight text-foreground leading-[1.08] text-balance font-extrabold">
+                          <h2 className="text-[clamp(1.75rem,5vw+0.75rem,4.5rem)] tracking-tight text-foreground leading-[1.08] text-balance">
                             {slide.title}
                           </h2>
 
@@ -531,7 +556,7 @@ export function HeroSection() {
                           </p>
 
                           <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center">
-                            <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5 font-semibold">
+                            <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5">
                               <Link href={slide.primaryCta.href}>
                                 <span>{slide.primaryCta.text}</span>
                                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -549,7 +574,7 @@ export function HeroSection() {
                       </div>
 
                       {/* Image on top on mobile, matching Slide 0's aspect ratio and position */}
-                      <div className="order-1 relative aspect-square sm:aspect-[4/3] min-h-[280px] sm:min-h-[380px] max-h-[420px] w-full flex items-center justify-center rounded-3xl overflow-hidden shadow-md border border-border/60 bg-muted/20">
+                      <div className="order-1 relative aspect-square sm:aspect-[4/3] min-h-[280px] sm:min-h-[380px] max-h-[420px] w-full flex items-center justify-center rounded-3xl overflow-hidden bg-muted/20">
                         <img
                           src={slide.imageUrl}
                           alt={slide.title}
@@ -561,7 +586,7 @@ export function HeroSection() {
                     </div>
 
                     {/* Desktop layout (lg and up): The full-coverage hero card */}
-                    <div className="hidden lg:block relative w-full h-[540px] sm:h-[610px] lg:h-[78dvh] max-h-[730px] rounded-3xl overflow-hidden border border-border/60 bg-black/40 group">
+                    <div className="hidden lg:block relative w-full h-[540px] sm:h-[610px] lg:h-[78dvh] max-h-[730px] rounded-3xl overflow-hidden bg-black/40 group">
                       <img
                         src={slide.imageUrl}
                         alt={slide.title}
@@ -570,27 +595,28 @@ export function HeroSection() {
                         decoding="async"
                       />
 
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/20" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
+                      {/* Gentle dark scrim on left text area so the image behind stays crystal clear */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
 
                       <div className="absolute inset-0 p-6 sm:p-10 md:p-14 lg:p-16 pb-20 sm:pb-24 lg:pb-16 flex flex-col justify-end lg:justify-center items-start z-10 max-w-2xl lg:max-w-3xl space-y-3 sm:space-y-4 lg:space-y-5">
-                        <h2 className="text-[clamp(1.75rem,4vw+0.75rem,3.75rem)] tracking-tight text-white leading-[1.08] font-extrabold drop-shadow-md text-balance">
+                        <h2 className="text-[clamp(1.75rem,5vw+0.75rem,4.5rem)] tracking-tight text-white leading-[1.08] text-balance drop-shadow-md">
                           {slide.title}
                         </h2>
 
-                        <p className="text-sm sm:text-base md:text-lg text-white/90 leading-relaxed max-w-xl drop-shadow-sm">
+                        <p className="mx-auto max-w-xl text-sm leading-relaxed text-white/90 sm:text-base md:text-lg lg:mx-0 drop-shadow-sm">
                           {slide.description}
                         </p>
 
                         <div className="flex w-full flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center">
-                          <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5 font-semibold">
+                          <Button asChild size="md" className="w-full sm:w-auto px-6 py-2.5 bg-white text-zinc-950 hover:bg-zinc-100 shadow-md transition-all border-0">
                             <Link href={slide.primaryCta.href}>
                               <span>{slide.primaryCta.text}</span>
                               <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                           </Button>
                           {slide.secondaryCta && (
-                            <Button asChild variant="outline" size="md" className="w-full sm:w-auto px-6 py-2.5 bg-background/25 backdrop-blur-md text-white border-white/30 hover:bg-background/45 hover:text-white">
+                            <Button asChild variant="outline" size="md" className="w-full sm:w-auto px-6 py-2.5 bg-white/15 hover:bg-white/25 text-white border-white/30 backdrop-blur-md transition-all">
                               <Link href={slide.secondaryCta.href}>
                                 <span>{slide.secondaryCta.text}</span>
                               </Link>
@@ -661,7 +687,7 @@ export function HeroSection() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={togglePlayPause}
                 className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted ml-0.5 cursor-pointer"
                 aria-label={isPlaying ? "Pause slider" : "Play slider"}
               >
@@ -681,7 +707,12 @@ export function HeroSection() {
         <div className="hidden lg:flex absolute inset-0 pointer-events-none items-center justify-center z-20 px-2 sm:px-4 md:px-6 lg:px-8">
           <div className="relative w-full h-[540px] sm:h-[610px] lg:h-[78dvh] max-h-[730px]">
             <div
-              className="absolute bottom-8 sm:bottom-10 left-8 sm:left-10 pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 select-none text-white shadow-xl transition-all duration-300"
+              className={cn(
+                "absolute bottom-8 sm:bottom-10 left-8 sm:left-10 pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full backdrop-blur-xl select-none shadow-xl transition-all duration-300",
+                currentSlideIndex === 0
+                  ? "bg-background/90 dark:bg-black/60 border border-border/80 dark:border-white/20 text-foreground dark:text-white"
+                  : "bg-black/60 border border-white/20 text-white"
+              )}
               aria-label="Slider navigation"
             >
               {/* Prev Slide */}
@@ -689,7 +720,12 @@ export function HeroSection() {
                 variant="ghost"
                 size="icon"
                 onClick={goToPrev}
-                className="h-7 w-7 rounded-full hover:bg-white/20 text-white"
+                className={cn(
+                  "h-7 w-7 rounded-full cursor-pointer",
+                  currentSlideIndex === 0
+                    ? "text-foreground dark:text-white hover:bg-muted dark:hover:bg-white/20"
+                    : "text-white hover:bg-white/20"
+                )}
                 aria-label="Previous slide"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -704,8 +740,20 @@ export function HeroSection() {
                       key={s.id || dotIdx}
                       onClick={() => goToSlide(dotIdx)}
                       className={cn(
-                        "h-2 rounded-full transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer",
-                        isActive ? "w-6 bg-white" : "w-2 bg-white/40 hover:bg-white/70"
+                        "h-2 rounded-full transition-all duration-300 outline-none cursor-pointer",
+                        currentSlideIndex === 0
+                          ? cn(
+                              "focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-white",
+                              isActive
+                                ? "w-6 bg-primary dark:bg-white"
+                                : "w-2 bg-muted-foreground/30 dark:bg-white/40 hover:bg-muted-foreground/60 dark:hover:bg-white/70"
+                            )
+                          : cn(
+                              "focus-visible:ring-2 focus-visible:ring-white",
+                              isActive
+                                ? "w-6 bg-white"
+                                : "w-2 bg-white/40 hover:bg-white/70"
+                            )
                       )}
                       aria-label={`Go to slide ${dotIdx + 1}: ${s.title}`}
                       aria-current={isActive ? "true" : undefined}
@@ -719,7 +767,12 @@ export function HeroSection() {
                 variant="ghost"
                 size="icon"
                 onClick={goToNext}
-                className="h-7 w-7 rounded-full hover:bg-white/20 text-white"
+                className={cn(
+                  "h-7 w-7 rounded-full cursor-pointer",
+                  currentSlideIndex === 0
+                    ? "text-foreground dark:text-white hover:bg-muted dark:hover:bg-white/20"
+                    : "text-white hover:bg-white/20"
+                )}
                 aria-label="Next slide"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -729,15 +782,27 @@ export function HeroSection() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="h-7 w-7 rounded-full text-white/80 hover:text-white hover:bg-white/20 ml-0.5"
+                onClick={togglePlayPause}
+                className={cn(
+                  "h-7 w-7 rounded-full ml-0.5 cursor-pointer",
+                  currentSlideIndex === 0
+                    ? "text-muted-foreground dark:text-white/80 hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-white/20"
+                    : "text-white/80 hover:text-white hover:bg-white/20"
+                )}
                 aria-label={isPlaying ? "Pause slider" : "Play slider"}
               >
                 {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
               </Button>
 
               {/* Slide Index Counter */}
-              <span className="text-[11px] text-white/80 font-mono pl-1 border-l border-white/20">
+              <span
+                className={cn(
+                  "text-[11px] font-mono pl-1 border-l",
+                  currentSlideIndex === 0
+                    ? "text-muted-foreground dark:text-white/80 border-border dark:border-white/20"
+                    : "text-white/80 border-white/20"
+                )}
+              >
                 {String(currentSlideIndex + 1).padStart(2, "0")}/{String(slides.length).padStart(2, "0")}
               </span>
             </div>
