@@ -37,19 +37,20 @@ self.addEventListener("fetch", (event) => {
   // Never cache HTML navigations — stale pages break Next.js routing and HMR
   if (event.request.mode === "navigate") return
 
-  // Avoid caching browser extensions or non-HTTP protocols (e.g. chrome-extension://)
+  // Avoid caching browser extensions or non-HTTP protocols
   if (!event.request.url.startsWith(self.location.origin)) return
 
-  // Bypass API, Next.js internal RSC data, page-builder public routes, and dev assets
-  if (
-    event.request.url.includes("/api/") ||
-    event.request.url.includes("/socket.io") ||
-    event.request.url.includes("/_next/") ||
-    event.request.url.includes("_rsc=") ||
-    event.request.url.includes("/p/")
-  ) {
-    return
-  }
+  const url = event.request.url
+
+  // Only intercept static assets (images, fonts, static css/js chunks, favicons)
+  const isStaticAsset =
+    url.includes("/assets/") ||
+    url.includes("/_next/static/") ||
+    url.includes("/images/") ||
+    url.includes("/favicon.ico")
+
+  // Let browser network handle all page routes, Next.js RSC, APIs, and websockets natively
+  if (!isStaticAsset) return
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -72,13 +73,7 @@ self.addEventListener("fetch", (event) => {
 
       return fetch(event.request)
         .then((networkResponse) => {
-          // Dynamically cache static files (images, CSS/JS chunks, fonts)
-          const isStaticAsset =
-            event.request.url.includes("/assets/") ||
-            event.request.url.includes("/_next/static/") ||
-            event.request.url.includes("/images/")
-
-          if (networkResponse.status === 200 && isStaticAsset) {
+          if (networkResponse.status === 200) {
             const responseClone = networkResponse.clone()
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseClone)
@@ -87,7 +82,6 @@ self.addEventListener("fetch", (event) => {
           return networkResponse
         })
         .catch(() => {
-          // Do not inject artificial 503 into Next.js router
           return new Response("", { status: 404, statusText: "Not Found" })
         })
     })

@@ -863,12 +863,13 @@ export default function PageBuilderEditor() {
     const cleanTitle = settingsTitle.trim() || pageTitle
     const cleanSlug = (settingsSlug.trim() || cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")).replace(/^-+|-+$/g, "")
 
-    setPageTitle(cleanTitle)
-    setPageSlug(cleanSlug)
-    setIsSettingsOpen(false)
+    if (!cleanSlug) {
+      toast.error("Please provide a valid URL slug")
+      return
+    }
 
     try {
-      await fetch("/api/admin/page-builder", {
+      const res = await fetch("/api/admin/page-builder", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -877,9 +878,40 @@ export default function PageBuilderEditor() {
           slug: cleanSlug,
         }),
       })
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null)
+        const errMsg = errData?.error || "Failed to update page settings"
+        toast.error(errMsg)
+        return
+      }
+
+      setPageTitle(cleanTitle)
+      setPageSlug(cleanSlug)
+      setIsSettingsOpen(false)
+
+      // Sync updated slug to local storage
+      for (const key of STORAGE_KEYS) {
+        try {
+          const raw = localStorage.getItem(key)
+          if (raw) {
+            const list = JSON.parse(raw) as StoredPage[]
+            const idx = list.findIndex((p) => (p.uid || p.id) === uid)
+            if (idx >= 0) {
+              list[idx].title = cleanTitle
+              list[idx].name = cleanTitle
+              list[idx].slug = cleanSlug
+              localStorage.setItem(key, JSON.stringify(list))
+            }
+          }
+        } catch {
+          // Ignore
+        }
+      }
+
       toast.success("Page settings updated")
     } catch {
-      toast.error("Failed to update settings")
+      toast.error("Network error while updating settings")
     }
   }
 

@@ -123,6 +123,19 @@ export default function PageBuilderDashboard() {
   const [slugManuallyEdited, setSlugManuallyEdited] = React.useState(false)
   const [creating, setCreating] = React.useState(false)
 
+  // Real-time slug conflict detection for Create Page dialog
+  const currentCleanSlug = React.useMemo(() => {
+    return (
+      newSlug.trim() ||
+      newTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    ).replace(/^-+|-+$/g, "")
+  }, [newSlug, newTitle])
+
+  const conflictingPage = React.useMemo(() => {
+    if (!currentCleanSlug) return null
+    return pages.find((p) => p.slug.toLowerCase() === currentCleanSlug.toLowerCase()) || null
+  }, [currentCleanSlug, pages])
+
   // Delete dialog
   const [deleteTarget, setDeleteTarget] = React.useState<PageEntry | null>(null)
   const [deleting, setDeleting] = React.useState(false)
@@ -220,43 +233,37 @@ export default function PageBuilderDashboard() {
       trimmedTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")
     ).replace(/^-+|-+$/g, "")
 
+    if (!trimmedSlug) {
+      toast.error("Please provide a valid URL slug")
+      return
+    }
+
+    // Client-side uniqueness validation against existing pages
+    const existingWithSlug = pages.find(
+      (p) => p.slug.toLowerCase() === trimmedSlug.toLowerCase()
+    )
+    if (existingWithSlug) {
+      toast.error(
+        `A page with slug "${trimmedSlug}" already exists ("${existingWithSlug.title}"). Slugs must be unique.`
+      )
+      return
+    }
+
     setCreating(true)
 
     const uid = crypto.randomUUID()
     const newPage: PageEntry = {
       uid,
       title: trimmedTitle,
-      slug: trimmedSlug || `page-${uid.slice(0, 6)}`,
+      slug: trimmedSlug,
       status: "published",
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
     }
 
-    // Save locally
+    // 1. Verify and save to PostgreSQL backend first
     try {
-      const raw = localStorage.getItem("vidya_elementor_pages")
-      const parsed = raw ? JSON.parse(raw) : []
-      const updated = [
-        {
-          uid,
-          id: uid,
-          title: newPage.title,
-          name: newPage.title,
-          slug: newPage.slug,
-          status: "published",
-          widgets: [],
-          updatedAt: newPage.updatedAt,
-        },
-        ...parsed,
-      ]
-      localStorage.setItem("vidya_elementor_pages", JSON.stringify(updated))
-    } catch {
-      // Ignore
-    }
-
-    // Save to PostgreSQL backend
-    try {
-      await fetch("/api/admin/page-builder", {
+      const res = await fetch("/api/admin/page-builder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -266,8 +273,42 @@ export default function PageBuilderDashboard() {
           widgets: [],
         }),
       })
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null)
+        const errMsg = errData?.error || "Failed to create page in database"
+        toast.error(errMsg)
+        setCreating(false)
+        return
+      }
     } catch {
-      // Backend error fallback
+      toast.error("Network error while creating page")
+      setCreating(false)
+      return
+    }
+
+    // 2. Save locally only after backend confirmation
+    for (const key of STORAGE_KEYS) {
+      try {
+        const raw = localStorage.getItem(key)
+        const parsed = raw ? JSON.parse(raw) : []
+        const updated = [
+          {
+            uid,
+            id: uid,
+            title: newPage.title,
+            name: newPage.title,
+            slug: newPage.slug,
+            status: "published",
+            widgets: [],
+            updatedAt: newPage.updatedAt,
+          },
+          ...parsed,
+        ]
+        localStorage.setItem(key, JSON.stringify(updated))
+      } catch {
+        // Ignore
+      }
     }
 
     setPages((prev) => [newPage, ...prev])
@@ -276,7 +317,7 @@ export default function PageBuilderDashboard() {
     setNewSlug("")
     setSlugManuallyEdited(false)
     setCreating(false)
-    toast.success("Page created")
+    toast.success("Page created successfully")
 
     router.push(`/admin/${username}/page-builder/${uid}`)
   }
@@ -629,9 +670,15 @@ export default function PageBuilderDashboard() {
                   required
                 />
               </div>
-              <p className="text-[11px] text-muted-foreground">
-                Public address will be: <span className="font-mono">/p/{newSlug || "your-slug"}</span>
-              </p>
+              {conflictingPage ? (
+                <p className="text-[11px] text-rose-500 font-medium">
+                  ⚠️ The slug &ldquo;{currentCleanSlug}&rdquo; is already in use by &ldquo;{conflictingPage.title}&rdquo;. Slugs must be unique.
+                </p>
+              ) : (
+                <p className="text-[11px] text-muted-foreground">
+                  Public address will be: <span className="font-mono">/p/{currentCleanSlug || "your-slug"}</span>
+                </p>
+              )}
             </div>
             <DialogFooter className="pt-2">
               <Button
@@ -642,7 +689,7 @@ export default function PageBuilderDashboard() {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={creating || !newTitle.trim()}>
+              <Button type="submit" disabled={creating || !newTitle.trim() || Boolean(conflictingPage)}>
                 {creating ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />

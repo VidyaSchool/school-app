@@ -5,6 +5,7 @@ from typing import Optional, List, Dict, Any, Union
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, File
 from pydantic import BaseModel
 from sqlmodel import Session, select, desc
+from sqlalchemy import func
 from app.core.database import get_db
 from app.core.auth import decode_session_token, get_utc_now
 from models import CustomPage, User, Session as SessionModel
@@ -229,6 +230,18 @@ async def save_page(
     raw_slug = (body.slug or "").strip() or sanitize_slug(page_title)
     page_slug = sanitize_slug(raw_slug)
 
+    # Check if slug is already in use by another page (enforce unique slug)
+    conflict_stmt = select(CustomPage).where(
+        CustomPage.id != body.uid,
+        func.lower(CustomPage.slug) == page_slug.lower()
+    )
+    conflict = db.exec(conflict_stmt).first()
+    if conflict:
+        raise HTTPException(
+            status_code=409,
+            detail=f"The slug '{page_slug}' is already in use by page '{conflict.title}'. Every page must have a unique URL slug."
+        )
+
     widgets_str = json.dumps(body.widgets if body.widgets is not None else [])
     page_status = body.status or "published"
     now = datetime.utcnow()
@@ -307,7 +320,18 @@ async def update_page_meta(
     if body.title is not None:
         page.title = body.title.strip() or page.title
     if body.slug is not None:
-        page.slug = sanitize_slug(body.slug)
+        new_slug = sanitize_slug(body.slug)
+        conflict_stmt = select(CustomPage).where(
+            CustomPage.id != body.uid,
+            func.lower(CustomPage.slug) == new_slug.lower()
+        )
+        conflict = db.exec(conflict_stmt).first()
+        if conflict:
+            raise HTTPException(
+                status_code=409,
+                detail=f"The slug '{new_slug}' is already in use by page '{conflict.title}'. Every page must have a unique URL slug."
+            )
+        page.slug = new_slug
     if body.status is not None:
         page.status = body.status
 

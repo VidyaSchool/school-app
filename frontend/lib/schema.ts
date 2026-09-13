@@ -293,7 +293,7 @@ export const teacherEmail = pgTable('teacher_email', {
 export const customPage = pgTable('custom_page', {
   id: text('id').primaryKey(),
   title: text('title').notNull().default('Responsive Elementor Page'),
-  slug: text('slug').notNull(),
+  slug: text('slug').notNull().unique(),
   widgetsJson: text('widgets_json').notNull().default('[]'),
   authorId: text('author_id'),
   status: text('status').notNull().default('published'),

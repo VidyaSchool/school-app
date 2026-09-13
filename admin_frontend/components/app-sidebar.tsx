@@ -238,7 +238,7 @@ const data = {
   navSecondary: [
     {
       title: "Sessions",
-      url: `${MAIN_PORTAL_URL}/login-accounts`,
+      url: "/login-accounts",
       icon: (
         <Settings2Icon
         />
@@ -246,7 +246,7 @@ const data = {
     },
     {
       title: "Get Help",
-      url: `${MAIN_PORTAL_URL}/docs`,
+      url: "https://beta.blazeneuro.com/docs",
       icon: (
         <CircleHelpIcon
         />
@@ -615,7 +615,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
           title: "Community Chat",
-          url: `${MAIN_PORTAL_URL}/community`,
+          url: "/community",
           icon: <MessageSquare />,
           hasNotification: unreadCommunity,
         },
@@ -666,7 +666,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
           title: "Community Chat",
-          url: `${MAIN_PORTAL_URL}/community`,
+          url: "/community",
           icon: <MessageSquare />,
           hasNotification: unreadCommunity,
         },
@@ -707,7 +707,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
         {
           title: "Community Chat",
-          url: `${MAIN_PORTAL_URL}/community`,
+          url: "/community",
           icon: <MessageSquare />,
           hasNotification: unreadCommunity,
         },

@@ -142,15 +142,6 @@ export function Header() {
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
-              {/* Direct Links */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/downloads" className="text-foreground/80 hover:text-foreground text-sm font-medium">
-                    Mobile App
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
               {/* Support & Contact Dropdown */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
@@ -158,6 +149,9 @@ export function Header() {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ListItem href="/downloads" title="Mobile App">
+                      Download the official VidyaSchool Android and iOS mobile application.
+                    </ListItem>
                     <ListItem href="/student/notice" title="Notices & Circulars">
                       Read latest school-wide notifications, announcements, and bulletins.
                     </ListItem>
@@ -267,28 +261,29 @@ export function Header() {
             </div>
           </div>
 
-          {/* Direct Links Panel */}
-          <div className="border-t border-border pt-3 space-y-1">
-            <Link href="/mandatory-public-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-              Mandatory Public Disclosure
-            </Link>
-            <Link href="/downloads" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-              Mobile App Download
-            </Link>
-            <Link href="/student/notice" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-              Notices
-            </Link>
-            <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-              Help & Support
-            </Link>
-            <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary shrink-0" />
-              Contact Us
-            </Link>
-            <Link href="/developers" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
-              <Code className="h-4 w-4 text-primary shrink-0" />
-              Developers & Creators
-            </Link>
+          {/* Support & Contact Panel */}
+          <div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Support & Contact</div>
+            <div className="grid gap-1">
+              <Link href="/downloads" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
+                <Smartphone className="h-4 w-4 text-primary shrink-0" />
+                Mobile App
+              </Link>
+              <Link href="/student/notice" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Notices & Circulars
+              </Link>
+              <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Help & Support
+              </Link>
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-primary shrink-0" />
+                Contact Us
+              </Link>
+              <Link href="/developers" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
+                <Code className="h-4 w-4 text-primary shrink-0" />
+                Developers & Creators
+              </Link>
+            </div>
           </div>
 
           {/* Action Buttons Panel */}

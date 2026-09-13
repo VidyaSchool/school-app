@@ -88,7 +88,7 @@ export default function ContactPage() {
             <img
               src="/assets/vidyaschool/school.jpg"
               alt="VidyaSchool campus — DLF Phase 3, Gurugram"
-              fetchPriority="high"
+              loading="lazy"
               decoding="async"
               className="w-full object-cover h-56 sm:h-80 lg:h-[420px]"
             />

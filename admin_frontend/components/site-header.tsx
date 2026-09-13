@@ -60,6 +60,7 @@ export function SiteHeader({ title, children, actions }: SiteHeaderProps) {
       borrowings: "Book Issues",
       community: "Community Chat",
       notes: "Notes",
+      "login-accounts": "Sessions & Devices",
     }
 
     if (pathMap[lastSegment.toLowerCase()]) {

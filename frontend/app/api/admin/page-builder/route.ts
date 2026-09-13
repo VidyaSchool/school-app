@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { customPage } from "@/lib/schema"
-import { eq, sql } from "drizzle-orm"
+import { eq, ne, and, sql } from "drizzle-orm"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
+
+// Helper to normalize and sanitize slug
+export function normalizeSlug(raw?: string, titleFallback?: string): string {
+  const source = (raw || "").trim() || (titleFallback || "").trim() || "custom-page"
+  const clean = source
+    .toLowerCase()
+    .replace(/^\/?p\//, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+  return clean || "custom-page"
+}
 
 // Helper to ensure custom_page table exists in PostgreSQL database
 async function ensureTableExists() {
@@ -18,7 +29,10 @@ async function ensureTableExists() {
         "status" text NOT NULL DEFAULT 'published',
         "created_at" timestamp NOT NULL DEFAULT NOW(),
         "updated_at" timestamp NOT NULL DEFAULT NOW()
-      );
+      )
+    `)
+    await db.execute(sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS "custom_page_slug_unique_idx" ON "custom_page" (LOWER("slug"))
     `)
   } catch (err) {
     console.error("Failed to ensure custom_page table exists in PostgreSQL:", err)
@@ -93,8 +107,31 @@ export async function POST(req: NextRequest) {
     await ensureTableExists()
 
     const widgetsJson = JSON.stringify(widgets || [])
-    const pageTitle = title || "Responsive Elementor Page"
-    const pageSlug = slug || pageTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    const pageTitle = (title || "").trim() || "Responsive Elementor Page"
+    const pageSlug = normalizeSlug(slug, pageTitle)
+
+    // Enforce unique slug: check if another page already uses this slug
+    const slugConflict = await db
+      .select({ id: customPage.id, title: customPage.title, slug: customPage.slug })
+      .from(customPage)
+      .where(
+        and(
+          ne(customPage.id, uid),
+          eq(sql`LOWER(${customPage.slug})`, pageSlug.toLowerCase())
+        )
+      )
+      .limit(1)
+
+    if (slugConflict.length > 0) {
+      return NextResponse.json(
+        {
+          error: `The slug "${pageSlug}" is already in use by page "${slugConflict[0].title}". Every page must have a unique URL slug.`,
+          conflictPageId: slugConflict[0].id,
+          conflictPageTitle: slugConflict[0].title,
+        },
+        { status: 409 }
+      )
+    }
 
     // Check if page exists in DB
     const existing = await db.select().from(customPage).where(eq(customPage.id, uid)).limit(1)

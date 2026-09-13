@@ -385,7 +385,7 @@ class CustomPage(SQLModel, table=True):
     __tablename__ = "custom_page"
     id: str = Field(primary_key=True)
     title: str = Field(default="Responsive Elementor Page")
-    slug: str = Field(default="responsive-elementor-page", index=True)
+    slug: str = Field(default="responsive-elementor-page", unique=True, index=True)
     widgets_json: str = Field(default="[]")
     author_id: Optional[str] = Field(default=None)
     status: str = Field(default="published")

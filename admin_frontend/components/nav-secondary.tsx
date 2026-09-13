@@ -35,6 +35,8 @@ export function NavSecondary({
                 {item.url.startsWith("http") ? (
                   <a 
                     href={item.url} 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={(e) => {
                       if (item.onClick) {
                         item.onClick(e)
