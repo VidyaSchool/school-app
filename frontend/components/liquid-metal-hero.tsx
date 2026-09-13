@@ -13,7 +13,7 @@ const LiquidMetal = dynamic(
   { ssr: false }
 )
 
-export default function LiquidMetalHero() {
+export default function LiquidMetalHero({ active = true }: { active?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isInView, setIsInView] = useState(true)
@@ -86,7 +86,7 @@ export default function LiquidMetalHero() {
     })
   }, [startTransition])
 
-  const shouldAnimate = isReady && isPlaying && isInView && isTabVisible && !reducedMotion
+  const shouldAnimate = isReady && isPlaying && isInView && isTabVisible && !reducedMotion && active
 
   return (
     <div ref={containerRef} className="relative h-full w-full flex items-center justify-center translate-x-0 lg:translate-x-6">
