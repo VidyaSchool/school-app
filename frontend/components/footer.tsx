@@ -7,10 +7,10 @@ export function Footer() {
   return (
     <footer className="bg-background py-12 md:py-16">
       <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-10">
           
           {/* Column 1: Brand Info & Connect */}
-          <div className="space-y-4">
+          <div className="space-y-4 sm:col-span-2 md:col-span-3 lg:col-span-1">
             <Link id="footer-brand-logo" href="/" className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground hover:opacity-90">
               <span className="font-semibold text-sm">VidyaSchool</span>
             </Link>
@@ -18,6 +18,11 @@ export function Footer() {
             <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
               Affiliated with CBSE. Dedicated to academic excellence, creative exploration, STEM innovation, and holistic student development.
             </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Plot No. 3126, Block S, DLF Phase–3, Sector 24, Gurugram, Haryana 122002</p>
+              <p className="font-medium text-foreground">Ph: +91-8130672281</p>
+              <p>info.vidyaschool@vidya-india.org</p>
+            </div>
             <div className="pt-2 space-y-2">
               <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Connect With Us</h4>
               <div className="flex items-center gap-2">
@@ -50,51 +55,148 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Column 2: About School */}
+          {/* Column 2: About & Campus */}
           <div>
-            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">About School</h3>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">About &amp; Campus</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/#about" className="hover:text-foreground transition-colors">About VidyaSchool</Link>
+                <Link href="/p/about-vidyaschool" className="hover:text-foreground transition-colors">About VidyaSchool</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure#general-info" className="hover:text-foreground transition-colors">Principal&apos;s Message</Link>
+                <Link href="/p/principals-message" className="hover:text-foreground transition-colors">Principal&apos;s Message</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure#infrastructure" className="hover:text-foreground transition-colors">Infrastructure</Link>
+                <Link href="/p/vision-and-mission" className="hover:text-foreground transition-colors">Vision &amp; Mission</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure#staff" className="hover:text-foreground transition-colors">Faculty &amp; Staff</Link>
+                <Link href="/p/leadership" className="hover:text-foreground transition-colors">Leadership &amp; Governance</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure#documents-info" className="hover:text-foreground transition-colors">School Management Committee</Link>
+                <Link href="/p/infrastructure" className="hover:text-foreground transition-colors">Campus Infrastructure</Link>
+              </li>
+              <li>
+                <Link href="/p/laboratories" className="hover:text-foreground transition-colors">Science Laboratories</Link>
+              </li>
+              <li>
+                <Link href="/p/library" className="hover:text-foreground transition-colors">Library Resource Centre</Link>
+              </li>
+              <li>
+                <Link href="/p/sports" className="hover:text-foreground transition-colors">Sports &amp; Physical Ed</Link>
+              </li>
+              <li>
+                <Link href="/p/stem" className="hover:text-foreground transition-colors">STEM &amp; Robotics Hub</Link>
+              </li>
+              <li>
+                <Link href="/p/arts-and-music" className="hover:text-foreground transition-colors">Arts, Dance &amp; Music</Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Academics & Disclosures */}
+          {/* Column 3: Academics & Admissions */}
           <div>
-            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Academics &amp; Info</h3>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Academics &amp; Admissions</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/mandatory-public-disclosure#academics" className="hover:text-foreground transition-colors">Curriculum</Link>
+                <Link href="/p/curriculum" className="hover:text-foreground transition-colors">Curriculum Overview</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure#academics" className="hover:text-foreground transition-colors">Academic Calendar</Link>
+                <Link href="/p/subjects" className="hover:text-foreground transition-colors">Academic Subjects</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure" className="hover:text-foreground transition-colors">Mandatory Public Disclosure</Link>
+                <Link href="/p/syllabus" className="hover:text-foreground transition-colors">Curriculum Syllabus</Link>
               </li>
               <li>
-                <Link href="/mandatory-public-disclosure#academics" className="hover:text-foreground transition-colors">Annual Report</Link>
+                <Link href="/p/textbooks" className="hover:text-foreground transition-colors">Prescribed Textbooks</Link>
+              </li>
+              <li>
+                <Link href="/p/examinations" className="hover:text-foreground transition-colors">Examinations &amp; Evaluations</Link>
+              </li>
+              <li>
+                <Link href="/p/academic-calendar" className="hover:text-foreground transition-colors">Academic Calendar</Link>
+              </li>
+              <li>
+                <Link href="/p/results" className="hover:text-foreground transition-colors">Board Exam Results</Link>
+              </li>
+              <li>
+                <Link href="/p/admission-process" className="hover:text-foreground transition-colors">Admission Process</Link>
+              </li>
+              <li>
+                <Link href="/p/eligibility" className="hover:text-foreground transition-colors">Eligibility Criteria</Link>
+              </li>
+              <li>
+                <Link href="/p/fee-structure" className="hover:text-foreground transition-colors">Fee Structure &amp; Scholarships</Link>
+              </li>
+              <li>
+                <Link href="/p/faqs" className="hover:text-foreground transition-colors">Admission FAQs</Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Portals & Contact */}
+          {/* Column 4: Students & Community */}
           <div>
-            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Portals &amp; Contact</h3>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Students &amp; Community</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
+              <li>
+                <Link href="/p/student-life" className="hover:text-foreground transition-colors">Student Life at Vidya</Link>
+              </li>
+              <li>
+                <Link href="/p/achievements" className="hover:text-foreground transition-colors">Achievements &amp; Honors</Link>
+              </li>
+              <li>
+                <Link href="/p/clubs" className="hover:text-foreground transition-colors">Student Clubs &amp; Societies</Link>
+              </li>
+              <li>
+                <Link href="/p/activities" className="hover:text-foreground transition-colors">Co-Curricular Activities</Link>
+              </li>
+              <li>
+                <Link href="/p/get-involved" className="hover:text-foreground transition-colors font-medium text-primary">Get Involved &amp; Mentorship</Link>
+              </li>
+              <li>
+                <Link href="/p/tech-fest" className="hover:text-foreground transition-colors">Vidya Tech Fest</Link>
+              </li>
+              <li>
+                <Link href="/p/events" className="hover:text-foreground transition-colors">Events &amp; Celebrations</Link>
+              </li>
+              <li>
+                <Link href="/p/notices" className="hover:text-foreground transition-colors">Notices &amp; Bulletins</Link>
+              </li>
+              <li>
+                <Link href="/p/circulars" className="hover:text-foreground transition-colors">Administrative Circulars</Link>
+              </li>
+              <li>
+                <Link href="/gallery" className="hover:text-foreground transition-colors">Campus Photo Gallery</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 5: Disclosures & Portals */}
+          <div>
+            <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Disclosures &amp; Portals</h3>
+            <ul className="space-y-2.5 text-xs text-muted-foreground">
+              <li>
+                <Link href="/p/mandatory-public-disclosure" className="hover:text-foreground transition-colors">Mandatory Public Disclosure</Link>
+              </li>
+              <li>
+                <Link href="/p/affiliation" className="hover:text-foreground transition-colors">CBSE Affiliation Status</Link>
+              </li>
+              <li>
+                <Link href="/p/certificates" className="hover:text-foreground transition-colors">Compliance Certificates</Link>
+              </li>
+              <li>
+                <Link href="/p/annual-report" className="hover:text-foreground transition-colors">Annual Reports</Link>
+              </li>
+              <li>
+                <Link href="/p/school-management-committee" className="hover:text-foreground transition-colors">School Management (SMC)</Link>
+              </li>
+              <li>
+                <Link href="/p/pta" className="hover:text-foreground transition-colors">Parents Teachers Assoc. (PTA)</Link>
+              </li>
+              <li>
+                <Link href="/p/faculty-details" className="hover:text-foreground transition-colors">Faculty Details (OASIS)</Link>
+              </li>
+              <li>
+                <Link href="/p/infrastructure-details" className="hover:text-foreground transition-colors">Infrastructure Details</Link>
+              </li>
               <li>
                 <Link href="/student" className="hover:text-foreground transition-colors">Student Portal</Link>
               </li>
@@ -102,13 +204,7 @@ export function Footer() {
                 <Link href="/teacher" className="hover:text-foreground transition-colors">Teacher Portal</Link>
               </li>
               <li>
-                <Link href="/student/library" className="hover:text-foreground transition-colors">Library Catalog</Link>
-              </li>
-              <li>
-                <Link href="/student/fees" className="hover:text-foreground transition-colors">Fees Desk</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link>
+                <Link href="/p/contact" className="hover:text-foreground transition-colors">Contact Us</Link>
               </li>
             </ul>
           </div>

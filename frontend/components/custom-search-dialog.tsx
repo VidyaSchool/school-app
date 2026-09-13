@@ -30,6 +30,7 @@ export function CustomSearchDialog(props: SharedProps) {
   const [search, setSearch] = React.useState("")
   const [results, setResults] = React.useState<SearchResultItem[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
+  const [, setIsFocused] = React.useState(false)
   const [loaderPhase, setLoaderPhase] = React.useState(0)
 
   React.useEffect(() => {
@@ -90,7 +91,8 @@ export function CustomSearchDialog(props: SharedProps) {
     return (
       <SearchDialogListItem
         key={item.id}
-        item={item}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        item={item as unknown as any}
         onClick={onClick}
         className="flex flex-col items-start gap-0.5 py-3 px-3 mx-1 w-[calc(100%-8px)] cursor-pointer
                    border-b border-border/30 last:border-b-0"
@@ -189,8 +191,10 @@ export function CustomSearchDialog(props: SharedProps) {
               </div>
             )}
             <SearchDialogList
-              items={search.trim() === "" ? null : results}
-              Item={renderItem}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              items={search.trim() === "" ? null : (results as unknown as any)}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              Item={renderItem as unknown as any}
               className="p-1 space-y-1"
             />
           </ScrollArea>

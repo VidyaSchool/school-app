@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTheme } from "@/components/theme-provider"
-import { Sun, Moon, Menu, X, Smartphone, MapPin, Code } from "lucide-react"
+import { Sun, Moon, Menu, X } from "lucide-react"
 
 import {
   NavigationMenu,
@@ -12,7 +12,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -64,24 +63,30 @@ export function Header() {
           <NavigationMenu>
             <NavigationMenuList className="gap-1">
               
-              {/* Portals Dropdown */}
+              {/* About Us Dropdown */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
-                  Portals
+                  About
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/student" title="Student Portal">
-                      Access your reports, marks, academic fees, and announcements.
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[640px]">
+                    <ListItem href="/p/about-vidyaschool" title="About VidyaSchool">
+                      Inaugurated in 2009, providing holistic CBSE education to 1000+ students.
                     </ListItem>
-                    <ListItem href="/teacher" title="Teacher Portal">
-                      Manage class registers, students, and post notices.
+                    <ListItem href="/p/principals-message" title="Principal's Message">
+                      Educational philosophy and welcoming address from the Principal.
                     </ListItem>
-                    <ListItem href="/student/library" title="Library Catalog">
-                      Search library books, view reservations, and issue status.
+                    <ListItem href="/p/vision-and-mission" title="Vision & Mission">
+                      Our core foundational pillars to Educate, Empower, and Transform.
                     </ListItem>
-                    <ListItem href="/student/fees" title="Fees Portal">
-                      View details of student tuition, fees structures, and history.
+                    <ListItem href="/p/leadership" title="Leadership & Governance">
+                      Distinguished educational trustees, directorate, and school leadership.
+                    </ListItem>
+                    <ListItem href="/torch-bearers" title="Torch Bearers">
+                      Meet the visionary mentors and founders guiding VidyaSchool.
+                    </ListItem>
+                    <ListItem href="/sponsors" title="Sponsors & Partners">
+                      Corporate and philanthropic partners empowering our digital classrooms.
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
@@ -90,79 +95,152 @@ export function Header() {
               {/* Academics Dropdown */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
-                  Academics & Life
+                  Academics
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/student/notice" title="Circulars & Notices">
-                      Latest announcements and circulars for students and parents.
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[640px]">
+                    <ListItem href="/p/curriculum" title="Curriculum Overview">
+                      Holistic CBSE curriculum framework and continuous evaluations.
                     </ListItem>
-                    <ListItem href="/student/marks" title="Curriculum & Exams">
-                      Exams, syllabus outlines, and student assessment schemes.
+                    <ListItem href="/p/subjects" title="Academic Subjects">
+                      Core and skill subjects from Primary to Senior Secondary levels.
                     </ListItem>
-                    <ListItem href="/docs/admissions" title="Admissions Guide">
-                      Enrollment instructions, registration forms, and policy guides.
+                    <ListItem href="/p/syllabus" title="Curriculum Syllabus">
+                      Unit-wise competency syllabus aligned with NCERT and NEP.
                     </ListItem>
-                    <ListItem href="/docs/co-curriculars" title="Co-Curricular Activities">
-                      Indian performing arts, choral singing, music, and robotics.
+                    <ListItem href="/p/textbooks" title="Prescribed Textbooks">
+                      Authentic NCERT and CBSE learning materials provided to students.
                     </ListItem>
-                    <ListItem href="/gallery" title="Photo Gallery">
-                      Explore campus life, student activities, robotics, and school events.
+                    <ListItem href="/p/examinations" title="Examinations & Assessments">
+                      Periodic reviews, term-end exams, and pre-board simulations.
+                    </ListItem>
+                    <ListItem href="/p/academic-calendar" title="Academic Calendar">
+                      Term schedules, holidays, examinations, and annual milestone dates.
+                    </ListItem>
+                    <ListItem href="/p/results" title="Board Results & Honors">
+                      100% board pass percentage and academic distinction awards.
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* About Us Dropdown */}
+              {/* Campus & Life Dropdown */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
-                  About Us
+                  Campus & Life
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/torch-bearers" title="Torch Bearers">
-                      Meet the visionary leaders, Principal, and mentors guiding VidyaSchool.
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[640px]">
+                    <ListItem href="/p/infrastructure" title="Campus Infrastructure">
+                      Digital smart classrooms, athletic fields, and modern school facilities.
                     </ListItem>
-                    <ListItem href="/sponsors" title="Sponsors & Partners">
-                      Organizations backing and empowering our digital classrooms.
+                    <ListItem href="/p/laboratories" title="Science Laboratories">
+                      Modern Physics, Chemistry, Biology, and Computer Science laboratories.
                     </ListItem>
-                    <ListItem href="/mandatory-public-disclosure" title="Mandatory Public Disclosure">
-                      CBSE SARAS compliance, school affiliation credentials, and governance disclosures.
+                    <ListItem href="/p/library" title="Library Resource Centre">
+                      Over 10,000 volumes, e-learning stations, and reading circles.
+                    </ListItem>
+                    <ListItem href="/p/sports" title="Sports & Physical Ed">
+                      Football, cricket pitches, basketball courts, and athletics training.
+                    </ListItem>
+                    <ListItem href="/p/stem" title="STEM & Robotics Hub">
+                      Lego STEM arena, micro-controllers, coding, and annual Tech Fest.
+                    </ListItem>
+                    <ListItem href="/p/arts-and-music" title="Arts, Dance & Music">
+                      Visual arts studio, classical Indian music, and theater drama academy.
+                    </ListItem>
+                    <ListItem href="/p/student-life" title="Student Life at Vidya">
+                      Four house system, hot meals, health care, and student council.
+                    </ListItem>
+                    <ListItem href="/p/clubs" title="Clubs & Activities">
+                      Robotics, Eco Crusaders, Literary & Debating Society, and excursions.
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Mandatory Public Disclosure */}
-              <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/mandatory-public-disclosure" className="text-foreground/80 hover:text-foreground text-sm font-medium whitespace-nowrap">
-                    Mandatory Public Disclosure
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-
-              {/* Support & Contact Dropdown */}
+              {/* Admissions Dropdown */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
-                  Support & Contact
+                  Admissions
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/downloads" title="Mobile App">
-                      Download the official VidyaSchool Android and iOS mobile application.
+                    <ListItem href="/p/admission-process" title="Admission Process">
+                      Step-by-step registration guidelines and document verification.
                     </ListItem>
-                    <ListItem href="/student/notice" title="Notices & Circulars">
-                      Read latest school-wide notifications, announcements, and bulletins.
+                    <ListItem href="/p/eligibility" title="Eligibility Criteria">
+                      Age requirements and prerequisites across Nursery to Class XI.
                     </ListItem>
-                    <ListItem href="/docs" title="Help & Support">
-                      Browse detailed guides, user onboarding instructions, and platform FAQs.
+                    <ListItem href="/p/fee-structure" title="Fee Structure & Scholarships">
+                      Subsidized community tuition and 100% full sponsorship opportunities.
                     </ListItem>
-                    <ListItem href="/contact" title="Contact Us">
-                      Find campus coordinates, working hours, maps, and direct phone lines.
+                    <ListItem href="/p/faqs" title="Admissions FAQs">
+                      Frequently asked questions regarding admissions, timings, and buses.
                     </ListItem>
-                    <ListItem href="/developers" title="Developers & Creators">
-                      Meet the engineers, designers, and contributors behind VidyaSchool.
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Disclosures Dropdown */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                  Disclosures
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[640px]">
+                    <ListItem href="/p/mandatory-public-disclosure" title="Mandatory Public Disclosure">
+                      CBSE Appendix IX compliance, SARAS credentials, and disclosures.
+                    </ListItem>
+                    <ListItem href="/p/affiliation" title="CBSE Affiliation Status">
+                      Senior Secondary English-medium CBSE affiliation status details.
+                    </ListItem>
+                    <ListItem href="/p/certificates" title="Compliance Certificates">
+                      Building safety, fire safety, water hygiene, and recognition NOCs.
+                    </ListItem>
+                    <ListItem href="/p/annual-report" title="Annual Reports">
+                      Annual review of institutional operations, academics, and activities.
+                    </ListItem>
+                    <ListItem href="/p/school-management-committee" title="School Management (SMC)">
+                      Governing committee composition, executive members, and roles.
+                    </ListItem>
+                    <ListItem href="/p/pta" title="Parents Teachers Assoc. (PTA)">
+                      Collaborative parent-teacher engagement, forums, and PTM schedules.
+                    </ListItem>
+                    <ListItem href="/p/faculty-details" title="Faculty Details (OASIS)">
+                      Official teacher count, qualifications, and student-teacher ratios.
+                    </ListItem>
+                    <ListItem href="/p/infrastructure-details" title="Infrastructure Details">
+                      Campus land specs, classroom dimensions, and safety measures.
+                    </ListItem>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Community & Get Involved Dropdown */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                  Community
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ListItem href="/p/get-involved" title="Get Involved & Mentorship">
+                      Join the VIDYA MITR mentoring program, workshops, and visits.
+                    </ListItem>
+                    <ListItem href="/p/events" title="Events & Celebrations">
+                      Tech Fest, Lit Fest, National Days, and cultural celebrations.
+                    </ListItem>
+                    <ListItem href="/p/notices" title="Notices & Bulletins">
+                      Official notifications, calendar updates, and parent circulars.
+                    </ListItem>
+                    <ListItem href="/p/contact" title="Contact Us">
+                      Campus coordinates, phone lines, visiting hours, and inquiry form.
+                    </ListItem>
+                    <ListItem href="/student" title="Student Portal">
+                      Access homework, attendance, fee desk, and academic notices.
+                    </ListItem>
+                    <ListItem href="/teacher" title="Teacher Portal">
+                      Class management, attendance marking, and grading tools.
                     </ListItem>
                   </ul>
                 </NavigationMenuContent>
@@ -205,83 +283,163 @@ export function Header() {
 
       {/* Mobile Drawer Panel */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-4">
+        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-4 max-h-[85vh] overflow-y-auto">
           
-          {/* Portals Panel */}
+          {/* About Us Panel */}
           <div>
-            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Portals</div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">About</div>
             <div className="grid gap-1">
+              <Link href="/p/about-vidyaschool" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                About VidyaSchool
+              </Link>
+              <Link href="/p/principals-message" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Principal&apos;s Message
+              </Link>
+              <Link href="/p/vision-and-mission" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Vision &amp; Mission
+              </Link>
+              <Link href="/p/leadership" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Leadership &amp; Governance
+              </Link>
+              <Link href="/torch-bearers" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Torch Bearers
+              </Link>
+            </div>
+          </div>
+
+          {/* Academics Panel */}
+          <div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Academics</div>
+            <div className="grid gap-1">
+              <Link href="/p/curriculum" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Curriculum Overview
+              </Link>
+              <Link href="/p/subjects" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Academic Subjects
+              </Link>
+              <Link href="/p/syllabus" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Curriculum Syllabus
+              </Link>
+              <Link href="/p/textbooks" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Prescribed Textbooks
+              </Link>
+              <Link href="/p/examinations" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Examinations &amp; Evaluations
+              </Link>
+              <Link href="/p/academic-calendar" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Academic Calendar
+              </Link>
+              <Link href="/p/results" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Board Exam Results
+              </Link>
+            </div>
+          </div>
+
+          {/* Campus & Life Panel */}
+          <div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Campus &amp; Life</div>
+            <div className="grid gap-1">
+              <Link href="/p/infrastructure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Campus Infrastructure
+              </Link>
+              <Link href="/p/laboratories" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Science Laboratories
+              </Link>
+              <Link href="/p/library" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Library Resource Centre
+              </Link>
+              <Link href="/p/sports" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Sports &amp; Athletics
+              </Link>
+              <Link href="/p/stem" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                STEM &amp; Robotics Hub
+              </Link>
+              <Link href="/p/arts-and-music" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Arts, Dance &amp; Music
+              </Link>
+              <Link href="/p/student-life" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Student Life at Vidya
+              </Link>
+              <Link href="/p/clubs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Clubs &amp; Activities
+              </Link>
+              <Link href="/gallery" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Photo Gallery
+              </Link>
+            </div>
+          </div>
+
+          {/* Admissions Panel */}
+          <div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Admissions</div>
+            <div className="grid gap-1">
+              <Link href="/p/admission-process" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Admission Process
+              </Link>
+              <Link href="/p/eligibility" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Eligibility Criteria
+              </Link>
+              <Link href="/p/fee-structure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Fee Structure &amp; Scholarships
+              </Link>
+              <Link href="/p/faqs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Admissions FAQs
+              </Link>
+            </div>
+          </div>
+
+          {/* Disclosures Panel */}
+          <div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Disclosures</div>
+            <div className="grid gap-1">
+              <Link href="/p/mandatory-public-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Mandatory Public Disclosure
+              </Link>
+              <Link href="/p/affiliation" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                CBSE Affiliation Status
+              </Link>
+              <Link href="/p/certificates" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Compliance Certificates
+              </Link>
+              <Link href="/p/annual-report" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Annual Reports
+              </Link>
+              <Link href="/p/school-management-committee" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                School Management (SMC)
+              </Link>
+              <Link href="/p/pta" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Parents Teachers Assoc. (PTA)
+              </Link>
+              <Link href="/p/faculty-details" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Faculty Details (OASIS)
+              </Link>
+              <Link href="/p/infrastructure-details" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Infrastructure Details
+              </Link>
+            </div>
+          </div>
+
+          {/* Community & Contact Panel */}
+          <div>
+            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Community &amp; Portals</div>
+            <div className="grid gap-1">
+              <Link href="/p/get-involved" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-primary hover:bg-accent rounded-md">
+                Get Involved &amp; Mentorship
+              </Link>
+              <Link href="/p/notices" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Notices &amp; Bulletins
+              </Link>
+              <Link href="/p/events" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Events &amp; Celebrations
+              </Link>
+              <Link href="/p/contact" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Contact Us
+              </Link>
               <Link href="/student" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Student Portal
               </Link>
               <Link href="/teacher" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Teacher Portal
-              </Link>
-              <Link href="/student/library" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Library Catalog
-              </Link>
-              <Link href="/student/fees" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Fees Portal
-              </Link>
-            </div>
-          </div>
-
-          {/* Academics & Life Panel */}
-          <div>
-            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Academics & Life</div>
-            <div className="grid gap-1">
-              <Link href="/student/notice" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Circulars & Notices
-              </Link>
-              <Link href="/student/marks" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Curriculum & Exams
-              </Link>
-              <Link href="/docs/admissions" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Admissions Guide
-              </Link>
-              <Link href="/docs/co-curriculars" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Co-Curricular Activities
-              </Link>
-            </div>
-          </div>
-
-          {/* About Us Panel */}
-          <div>
-            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">About Us</div>
-            <div className="grid gap-1">
-              <Link href="/torch-bearers" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Torch Bearers
-              </Link>
-              <Link href="/sponsors" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Sponsors & Partners
-              </Link>
-              <Link href="/mandatory-public-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Mandatory Public Disclosure
-              </Link>
-            </div>
-          </div>
-
-          {/* Support & Contact Panel */}
-          <div>
-            <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Support & Contact</div>
-            <div className="grid gap-1">
-              <Link href="/downloads" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
-                <Smartphone className="h-4 w-4 text-primary shrink-0" />
-                Mobile App
-              </Link>
-              <Link href="/student/notice" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Notices & Circulars
-              </Link>
-              <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Help & Support
-              </Link>
-              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary shrink-0" />
-                Contact Us
-              </Link>
-              <Link href="/developers" onClick={() => setMobileMenuOpen(false)} className="px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md flex items-center gap-2">
-                <Code className="h-4 w-4 text-primary shrink-0" />
-                Developers & Creators
               </Link>
             </div>
           </div>
