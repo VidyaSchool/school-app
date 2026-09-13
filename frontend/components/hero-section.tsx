@@ -681,7 +681,7 @@ export function HeroSection() {
         <div className="hidden lg:flex absolute inset-0 pointer-events-none items-center justify-center z-20">
           <div className="relative w-full h-[540px] sm:h-[610px] lg:h-[78dvh] max-h-[730px]">
             <div
-              className="absolute bottom-7 left-8 pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 select-none text-white"
+              className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-white/20 select-none text-white shadow-xl transition-all duration-300"
               aria-label="Slider navigation"
             >
               {/* Prev Slide */}
