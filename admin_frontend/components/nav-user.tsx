@@ -35,11 +35,23 @@ export function NavUser() {
   const { isMobile } = useSidebar()
   const { setTheme } = useTheme()
   const { data: session, isPending } = useSession()
-  const [fetchedUser, setFetchedUser] = React.useState<any>(null)
-  const [username, setUsername] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(true)
+  const [cachedData] = React.useState<any>(() => {
+    if (typeof window === "undefined") return null
+    try {
+      const raw = localStorage.getItem("vs_admin_user_cache")
+      if (raw) return JSON.parse(raw)
+    } catch {}
+    return null
+  })
+  const [fetchedUser, setFetchedUser] = React.useState<any>(() => cachedData?.user || null)
+  const [username, setUsername] = React.useState<string | null>(() => cachedData?.username || null)
+  const [loading, setLoading] = React.useState(!cachedData?.user)
 
   React.useEffect(() => {
+    if (cachedData?.user && Date.now() - (cachedData.savedAt || 0) < 5 * 60 * 1000) {
+      setLoading(false)
+      return
+    }
     fetch('/api/account')
       .then(res => {
         if (!res.ok) return null
@@ -55,7 +67,7 @@ export function NavUser() {
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [cachedData])
 
   const currentUser = session?.user || fetchedUser
 

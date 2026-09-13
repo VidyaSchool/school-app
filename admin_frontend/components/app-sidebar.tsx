@@ -7,7 +7,6 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
 import { OnboardingAlert } from "@/components/onboarding-alert"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -44,45 +43,191 @@ import { Plus } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
 
-// Module-level username cache — fetched once per page load, shared across all hooks
-let _cachedUsername: string | null = null
+// Persistent Cache Keys & TTLs
+const USER_CACHE_KEY = "vs_admin_user_cache"
+const NOTIFS_CACHE_KEY = "vs_admin_notifs_cache"
+const USER_CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const NOTIFS_CACHE_TTL = 60 * 1000   // 60 seconds
+
+interface CachedUserData {
+  user: {
+    id: string
+    name: string
+    email: string
+    role: string
+    image?: string | null
+  }
+  username: string | null
+  savedAt: number
+}
+
+interface CachedNotifsData {
+  unreadCommunity: boolean
+  unreadRequests: boolean
+  unreadNotices: boolean
+  unreadComplaints: boolean
+  savedAt: number
+}
+
+// In-memory singletons to prevent layout remount re-reads and duplicate network calls
+let _memoryUserCache: CachedUserData | null = null
+let _memoryNotifsCache: CachedNotifsData | null = null
+let _accountFetchPromise: Promise<any> | null = null
 let _usernameFetchPromise: Promise<string | null> | null = null
+let _sharedSocket: any = null
+let _cachedUsername: string | null = null
+
+function getStoredUser(): CachedUserData | null {
+  if (_memoryUserCache) return _memoryUserCache
+  if (typeof window === "undefined") return null
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY)
+    if (raw) {
+      const parsed: CachedUserData = JSON.parse(raw)
+      _memoryUserCache = parsed
+      return parsed
+    }
+  } catch {}
+  return null
+}
+
+function setStoredUser(data: { user: any; username: string | null }) {
+  if (typeof window === "undefined") return
+  const item: CachedUserData = {
+    user: {
+      id: data.user.id,
+      name: data.user.name,
+      email: data.user.email,
+      role: data.user.role,
+      image: data.user.image,
+    },
+    username: data.username,
+    savedAt: Date.now(),
+  }
+  _memoryUserCache = item
+  _cachedUsername = data.username
+  try {
+    localStorage.setItem(USER_CACHE_KEY, JSON.stringify(item))
+  } catch {}
+}
+
+function getStoredNotifs(): CachedNotifsData | null {
+  if (_memoryNotifsCache) return _memoryNotifsCache
+  if (typeof window === "undefined") return null
+  try {
+    const raw = sessionStorage.getItem(NOTIFS_CACHE_KEY)
+    if (raw) {
+      const parsed: CachedNotifsData = JSON.parse(raw)
+      _memoryNotifsCache = parsed
+      return parsed
+    }
+  } catch {}
+  return null
+}
+
+function setStoredNotifs(data: Partial<CachedNotifsData>) {
+  if (typeof window === "undefined") return
+  const current = getStoredNotifs() || {
+    unreadCommunity: false,
+    unreadRequests: false,
+    unreadNotices: false,
+    unreadComplaints: false,
+    savedAt: 0,
+  }
+  const updated: CachedNotifsData = {
+    ...current,
+    ...data,
+    savedAt: Date.now(),
+  }
+  _memoryNotifsCache = updated
+  try {
+    sessionStorage.setItem(NOTIFS_CACHE_KEY, JSON.stringify(updated))
+  } catch {}
+}
 
 function fetchUsernameOnce(): Promise<string | null> {
-  if (_cachedUsername !== null) return Promise.resolve(_cachedUsername)
+  const cached = getStoredUser()
+  if (cached?.username) {
+    _cachedUsername = cached.username
+    return Promise.resolve(cached.username)
+  }
   if (_usernameFetchPromise) return _usernameFetchPromise
-  _usernameFetchPromise = fetch('/api/profile/username')
-    .then(res => res.json())
-    .then(data => {
-      _cachedUsername = data.username ?? null
-      return _cachedUsername
+
+  _usernameFetchPromise = fetch("/api/profile/username")
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => {
+      const u = data?.username ?? null
+      if (u) {
+        _cachedUsername = u
+        const cur = getStoredUser()
+        if (cur) {
+          setStoredUser({ user: cur.user, username: u })
+        }
+      }
+      return u
     })
-    .catch(() => { _cachedUsername = null; return null })
+    .catch(() => null)
+    .finally(() => {
+      _usernameFetchPromise = null
+    })
+
   return _usernameFetchPromise
 }
 
-// Single shared hook — extracts username from URL or fetches from API
+// Single shared hook — extracts username from URL, memory, or persistent localStorage cache
 function useProfileUsername(): string | null {
   const pathname = usePathname()
+
+  const urlUsername = React.useMemo(() => {
+    if (!pathname) return null
+    const parts = pathname.split("/").filter(Boolean)
+    if (parts.length >= 2 && ["student", "teacher", "admin", "librarian", "accounts"].includes(parts[0])) {
+      return parts[1]
+    }
+    return null
+  }, [pathname])
+
   const [username, setUsername] = React.useState<string | null>(() => {
+    if (urlUsername) {
+      _cachedUsername = urlUsername
+      return urlUsername
+    }
     if (_cachedUsername) return _cachedUsername
-    if (pathname) {
-      const parts = pathname.split('/').filter(Boolean)
-      if (parts.length >= 2 && ['student', 'teacher', 'admin', 'librarian', 'accounts'].includes(parts[0])) {
-        return parts[1]
-      }
+    const stored = getStoredUser()
+    if (stored?.username) {
+      _cachedUsername = stored.username
+      return stored.username
     }
     return null
   })
 
+  // Synchronize when URL contains a valid username
   React.useEffect(() => {
-    fetchUsernameOnce().then(u => {
-      if (u) {
-        _cachedUsername = u
-        setUsername(u)
+    if (urlUsername && urlUsername !== username) {
+      _cachedUsername = urlUsername
+      setUsername(urlUsername)
+      const stored = getStoredUser()
+      if (stored && stored.username !== urlUsername) {
+        setStoredUser({ user: stored.user, username: urlUsername })
       }
-    })
-  }, [pathname])
+    }
+  }, [urlUsername, username])
+
+  // Only fallback to network if username is not yet known
+  React.useEffect(() => {
+    if (!username) {
+      fetchUsernameOnce().then((u) => {
+        if (u) {
+          _cachedUsername = u
+          setUsername(u)
+          const stored = getStoredUser()
+          if (stored) {
+            setStoredUser({ user: stored.user, username: u })
+          }
+        }
+      })
+    }
+  }, [username])
 
   return username
 }
@@ -286,35 +431,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
   const { data: session, isPending } = useSession()
   const { isMobile, setOpenMobile } = useSidebar()
-  const [profileLoading, setProfileLoading] = React.useState(true)
 
-  const [fetchedUser, setFetchedUser] = React.useState<any>(null)
+  // 1. Synchronously initialize user from memory / localStorage cache
+  const [cachedUser, setCachedUser] = React.useState<any>(() => {
+    const stored = getStoredUser()
+    return stored?.user || null
+  })
 
-  React.useEffect(() => {
-    fetch('/api/account')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.user) setFetchedUser(data.user)
-      })
-      .catch(() => {})
-  }, [])
+  const userToDisplay = session?.user || cachedUser
+  // In admin_frontend, default to cached role or "admin" to prevent flash of student navigation
+  const userRole = userToDisplay?.role || cachedUser?.role || (pathname?.startsWith("/teacher") ? "teacher" : "admin")
 
-  React.useEffect(() => {
-    fetch('/api/profile/username')
-      .then(() => setProfileLoading(false))
-      .catch(() => setProfileLoading(false))
-  }, [])
+  // Sidebar is only loading if we have NEITHER session NOR cached user
+  const isLoading = !userToDisplay && isPending
 
-  const userToDisplay = session?.user || fetchedUser
-  const isLoading = (isPending && !fetchedUser) || profileLoading
-  const userRole = userToDisplay?.role || session?.user?.role
-  
-  const isLibrarian = userRole === "librarian" || (userRole === undefined && pathname?.startsWith("/librarian"))
-  const isTeacher = userRole === "teacher" || (userRole === undefined && pathname?.startsWith("/teacher"))
-  const isAdmin = userRole === "admin" || (userRole === undefined && pathname?.startsWith("/admin"))
-  const isAccount = userRole === "account" || (userRole === undefined && pathname?.startsWith("/accounts"))
-  
-  // Single fetch — shared by all URL builders via module-level cache
+  const isLibrarian = userRole === "librarian" || pathname?.startsWith("/librarian")
+  const isTeacher = userRole === "teacher" || pathname?.startsWith("/teacher")
+  const isAdmin = userRole === "admin" || (!isTeacher && !isLibrarian && !pathname?.startsWith("/accounts"))
+  const isAccount = userRole === "account" || pathname?.startsWith("/accounts")
+
   const profileUsername = useProfileUsername()
 
   const adminUrls = React.useMemo(() => buildAdminUrls(profileUsername), [profileUsername])
@@ -364,11 +499,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     router.push(targetUrl)
   }
 
-  // Notification states
-  const [unreadCommunity, setUnreadCommunity] = React.useState(false)
-  const [unreadRequests, setUnreadRequests] = React.useState(false)
-  const [unreadNotices, setUnreadNotices] = React.useState(false)
-  const [unreadComplaints, setUnreadComplaints] = React.useState(false)
+  // Stale-While-Revalidate: fetch /api/account ONLY when cache is missing, stale (>5m), or session user changed
+  React.useEffect(() => {
+    const stored = getStoredUser()
+    const isStale = !stored || (Date.now() - stored.savedAt > USER_CACHE_TTL)
+    const idMismatch = session?.user && stored && session.user.id !== stored.user.id
+
+    if (!isStale && !idMismatch && stored?.user) {
+      if (!cachedUser) setCachedUser(stored.user)
+      return
+    }
+
+    if (_accountFetchPromise) {
+      _accountFetchPromise.then((data) => {
+        if (data?.user) setCachedUser(data.user)
+      })
+      return
+    }
+
+    _accountFetchPromise = fetch("/api/account")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) {
+          setCachedUser(data.user)
+          const usernameVal = data.profile?.username || profileUsername || null
+          setStoredUser({ user: data.user, username: usernameVal })
+        }
+        return data
+      })
+      .catch(() => null)
+      .finally(() => {
+        _accountFetchPromise = null
+      })
+  }, [session?.user?.id, profileUsername])
+
+  // Notification states — initialized synchronously from sessionStorage cache
+  const [unreadCommunity, setUnreadCommunity] = React.useState(() => getStoredNotifs()?.unreadCommunity ?? false)
+  const [unreadRequests, setUnreadRequests] = React.useState(() => getStoredNotifs()?.unreadRequests ?? false)
+  const [unreadNotices, setUnreadNotices] = React.useState(() => getStoredNotifs()?.unreadNotices ?? false)
+  const [unreadComplaints, setUnreadComplaints] = React.useState(() => getStoredNotifs()?.unreadComplaints ?? false)
 
   // AI Chats State for Teacher
   const [teacherChats, setTeacherChats] = React.useState<{ id: string; title: string }[]>([])
@@ -396,85 +565,116 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
   }, [isTeacher, loadTeacherChats])
 
-  // Clear notifications when visiting pages
+  // Clear notifications when visiting pages & persist clear to cache
   React.useEffect(() => {
     if (!pathname) return
     if (pathname === "/community") {
       setUnreadCommunity(false)
+      setStoredNotifs({ unreadCommunity: false })
     }
     if (pathname.includes("/requests")) {
       setUnreadRequests(false)
+      setStoredNotifs({ unreadRequests: false })
     }
     if (pathname.includes("/notice")) {
       setUnreadNotices(false)
+      setStoredNotifs({ unreadNotices: false })
     }
     if (pathname.includes("/complaints")) {
       setUnreadComplaints(false)
+      setStoredNotifs({ unreadComplaints: false })
     }
   }, [pathname])
 
   // Keep a ref to pathname so socket handlers always see the latest value
-  // without needing pathname in the dep array (which would reconnect on every nav)
   const pathnameRef = React.useRef(pathname)
   React.useEffect(() => { pathnameRef.current = pathname }, [pathname])
 
-  // Fetch initial pending status on mount and connect to Socket.IO
-  // Deps: session + role flags only — NOT pathname, so socket stays alive across navigations
+  // Fetch initial pending status (suppressed if fetched within last 60s) & persistent Socket.IO listeners
   React.useEffect(() => {
-    if (!session?.user) return
+    if (!session?.user && !cachedUser) return
 
-    // 1. Fetch complaints status
-    const roleParam = isTeacher || isLibrarian ? "teacher" : isAdmin ? "admin" : ""
-    if (roleParam) {
-      fetch(`/api/complaints?role=${roleParam}`)
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            const hasPending = data.some(c => c.status === "pending")
-            setUnreadComplaints(hasPending)
-          }
-        })
-        .catch(() => {})
+    const storedNotifs = getStoredNotifs()
+    const isNotifsFresh = storedNotifs && (Date.now() - storedNotifs.savedAt < NOTIFS_CACHE_TTL)
+
+    if (!isNotifsFresh) {
+      // 1. Fetch complaints status
+      const roleParam = isTeacher || isLibrarian ? "teacher" : isAdmin ? "admin" : ""
+      if (roleParam) {
+        fetch(`/api/complaints?role=${roleParam}`)
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              const hasPending = data.some(c => c.status === "pending")
+              setUnreadComplaints(hasPending)
+              setStoredNotifs({ unreadComplaints: hasPending })
+            }
+          })
+          .catch(() => {})
+      }
+
+      // 2. Fetch admin requests status
+      if (isAdmin) {
+        fetch('/api/admin/requests')
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              const hasPending = data.some((r: any) => r.status === "pending")
+              setUnreadRequests(hasPending)
+              setStoredNotifs({ unreadRequests: hasPending })
+            }
+          })
+          .catch(() => {})
+      }
     }
 
-    // 2. Fetch admin requests status
-    if (isAdmin) {
-      fetch('/api/admin/requests')
-        .then(res => res.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            const hasPending = data.some((r: any) => r.status === "pending")
-            setUnreadRequests(hasPending)
-          }
-        })
-        .catch(() => {})
+    // 3. Setup Socket.IO with singleton connection
+    if (!_sharedSocket || !_sharedSocket.connected) {
+      _sharedSocket = io(
+        process.env.NEXT_PUBLIC_BACKEND_URL ||
+          (typeof window !== "undefined" && window.location.hostname !== "localhost"
+            ? "https://api.vidyaschool.com"
+            : "http://localhost:8000"),
+        {
+          transports: ["websocket", "polling"],
+        }
+      )
     }
+    const socket = _sharedSocket
 
-    // 3. Setup Socket.IO — single persistent connection, reads pathname via ref
-    const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000'), {
-      transports: ["websocket", "polling"]
-    })
-
-    socket.on("new_message", () => {
+    const handleNewMessage = () => {
       if (pathnameRef.current !== "/community") {
         setUnreadCommunity(true)
+        setStoredNotifs({ unreadCommunity: true })
       }
-    })
+    }
 
-    socket.on("teacher_request_created", () => {
+    const handleTeacherRequest = () => {
       if (isAdmin && !pathnameRef.current?.includes("/requests")) {
         setUnreadRequests(true)
+        setStoredNotifs({ unreadRequests: true })
       }
-    })
+    }
 
-    socket.on("complaint_created", () => {
+    const handleComplaint = () => {
       if ((isAdmin || isTeacher) && !pathnameRef.current?.includes("/complaints")) {
         setUnreadComplaints(true)
+        setStoredNotifs({ unreadComplaints: true })
       }
-    })
+    }
+
+    socket.off("new_message", handleNewMessage)
+    socket.off("teacher_request_created", handleTeacherRequest)
+    socket.off("complaint_created", handleComplaint)
+
+    socket.on("new_message", handleNewMessage)
+    socket.on("teacher_request_created", handleTeacherRequest)
+    socket.on("complaint_created", handleComplaint)
 
     return () => {
-      socket.disconnect()
+      socket.off("new_message", handleNewMessage)
+      socket.off("teacher_request_created", handleTeacherRequest)
+      socket.off("complaint_created", handleComplaint)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id, isTeacher, isAdmin, isLibrarian])
@@ -902,6 +1102,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     className="w-full justify-start gap-2.5 px-2.5"
                     onClick={async () => {
                       setIsCommandOpen(false)
+                      try {
+                        localStorage.removeItem(USER_CACHE_KEY)
+                        sessionStorage.removeItem(NOTIFS_CACHE_KEY)
+                        _memoryUserCache = null
+                        _memoryNotifsCache = null
+                        _cachedUsername = null
+                      } catch {}
                       await logoutUser()
                     }}
                   >
