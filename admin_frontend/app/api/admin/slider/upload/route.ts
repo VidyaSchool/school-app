@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { getAuthenticatedSession } from "@/lib/auth-helpers"
 import { generatePresignedUploadUrl, uploadBufferToS3, isS3Configured } from "@/lib/s3"
 import { writeFile, mkdir } from "fs/promises"
 import path from "path"
@@ -19,13 +18,14 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB limit
 
 export async function POST(req: NextRequest) {
   // Security Check: Verify user session and admin role
-  const session = await auth.api.getSession({ headers: await headers() })
+  const session = await getAuthenticatedSession(req)
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 })
   }
 
   // Check admin authorization
-  const isUserAdmin = session.user.role === "admin" || (session.user as any).isAdmin
+  const user = session.user as any
+  const isUserAdmin = user.role === "admin" || user.isAdmin === true
   if (!isUserAdmin) {
     return NextResponse.json({ error: "Forbidden: Admin privileges required" }, { status: 403 })
   }

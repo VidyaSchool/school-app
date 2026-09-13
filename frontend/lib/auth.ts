@@ -11,9 +11,16 @@ export const auth = betterAuth({
   trustedOrigins: [
     'https://vidyaschool.vercel.app',
     'https://*.vercel.app',
+    'https://dashboard.vidyaschool.com',
+    'https://vidyaschool.com',
+    'https://*.vidyaschool.com',
+    'https://*.blazeneuro.com',
     ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
+    ...(process.env.NEXT_PUBLIC_ADMIN_URL ? [process.env.NEXT_PUBLIC_ADMIN_URL] : []),
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://localhost:3002',
   ],
   database: drizzleAdapter(db, {
     provider: 'pg',

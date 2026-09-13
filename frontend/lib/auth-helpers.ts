@@ -7,21 +7,48 @@ import { eq } from 'drizzle-orm'
 
 export type Role = 'student' | 'teacher' | 'admin' | 'account' | 'librarian'
 
-export async function getAuthenticatedSession() {
-  const hdrs = await headers()
+export async function getAuthenticatedSession(req?: any) {
+  let hdrs: Headers
+  try {
+    hdrs = await headers()
+  } catch {
+    hdrs = req?.headers || new Headers()
+  }
+
   let session = null
   try {
     session = await auth.api.getSession({
-      headers: hdrs
+      headers: req?.headers || hdrs
     })
   } catch (err) {
     console.error('[getAuthenticatedSession] getSession error:', err)
   }
 
   if (!session?.user) {
-    const rawCookie = hdrs.get('cookie')
-    const cookieMatch = rawCookie?.match(/(?:__Secure-better-auth\.session_token|better-auth\.session_token)=([^;]+)/)
-    const tokenVal = cookieMatch ? cookieMatch[1] : null
+    let tokenVal: string | null = null
+
+    // 1. Check req.cookies if available
+    if (req && 'cookies' in req && typeof req.cookies?.get === 'function') {
+      tokenVal =
+        req.cookies.get('__Secure-better-auth.session_token')?.value ||
+        req.cookies.get('better-auth.session_token')?.value ||
+        null
+    }
+
+    // 2. Check cookie header
+    if (!tokenVal) {
+      const rawCookie = req?.headers?.get?.('cookie') || hdrs.get('cookie')
+      const cookieMatch = rawCookie?.match(/(?:__Secure-better-auth\.session_token|better-auth\.session_token)=([^;]+)/)
+      tokenVal = cookieMatch ? cookieMatch[1] : null
+    }
+
+    // 3. Check authorization header (Bearer token)
+    if (!tokenVal) {
+      const authHeader = req?.headers?.get?.('authorization') || hdrs.get('authorization')
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        tokenVal = authHeader.substring(7).trim()
+      }
+    }
 
     if (tokenVal) {
       const cleanToken = decodeURIComponent(tokenVal).split('.')[0]

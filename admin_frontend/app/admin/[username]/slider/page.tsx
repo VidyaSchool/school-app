@@ -125,7 +125,8 @@ export default function SliderManagementPage() {
         setImages(data.images || updatedList)
         toast.success("Slider banners saved successfully")
       } else {
-        toast.error("Failed to save changes")
+        const errJson = await res.json().catch(() => null)
+        toast.error(errJson?.detail || errJson?.error || "Failed to save changes")
       }
     } catch (err) {
       console.error("Failed to save slider images", err)
@@ -184,6 +185,11 @@ export default function SliderManagementPage() {
           fileType: file.type,
         }),
       })
+
+      if (presignedRes.status === 401 || presignedRes.status === 403) {
+        const errorData = await presignedRes.json().catch(() => ({ error: "Unauthorized access" }))
+        throw new Error(errorData.error || "Unauthorized: Admin session required")
+      }
 
       if (presignedRes.ok) {
         const presignedData = await presignedRes.json()
