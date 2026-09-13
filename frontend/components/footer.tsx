@@ -149,7 +149,7 @@ export function Footer() {
                 <Link href="/p/activities" className="hover:text-foreground transition-colors">Co-Curricular Activities</Link>
               </li>
               <li>
-                <Link href="/p/get-involved" className="hover:text-foreground transition-colors font-medium text-primary">Get Involved &amp; Mentorship</Link>
+                <Link href="/p/get-involved" className="hover:text-foreground transition-colors">Get Involved &amp; Mentorship</Link>
               </li>
               <li>
                 <Link href="/p/tech-fest" className="hover:text-foreground transition-colors">Vidya Tech Fest</Link>

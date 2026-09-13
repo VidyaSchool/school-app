@@ -423,7 +423,7 @@ export function Header() {
           <div>
             <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Community &amp; Portals</div>
             <div className="grid gap-1">
-              <Link href="/p/get-involved" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-primary hover:bg-accent rounded-md">
+              <Link href="/p/get-involved" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Get Involved &amp; Mentorship
               </Link>
               <Link href="/p/notices" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
