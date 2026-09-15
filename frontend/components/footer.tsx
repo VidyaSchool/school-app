@@ -22,6 +22,9 @@ export function Footer() {
               <p>Plot No. 3126, Block S, DLF Phase–3, Sector 24, Gurugram, Haryana 122002</p>
               <p className="font-medium text-foreground">Ph: +91-8130672281</p>
               <p>info.vidyaschool@vidya-india.org</p>
+              <p className="pt-1 text-[11px]">
+                Parent Org: <a href="https://vidya-india.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">VIDYA India (Non-Profit)</a>
+              </p>
             </div>
             <div className="pt-2 space-y-2">
               <h4 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Connect With Us</h4>

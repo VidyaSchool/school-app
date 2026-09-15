@@ -29,21 +29,21 @@
               "id": "cnt-1",
               "badge": "Campus Location",
               "title": "Gurugram Campus",
-              "description": "Plot No. 3126, Block S, Near St. Stephen's Hospital, DLF Phase-3, Sector 24, Gurugram, Haryana 122002 (Nathupur, Garden Estate 122010)",
-              "linkUrl": "#"
+              "description": "Plot No. 3126, Block S, Near St. Stephen's Hospital, DLF Phase-3, Sector 24, Gurugram, Haryana 122002",
+              "linkUrl": "https://maps.google.com/?q=DLF+Phase+3+Sector+24+Gurugram+Haryana+122002"
             },
             {
               "id": "cnt-2",
               "badge": "Direct Helpline",
               "title": "Phone & Inquiries",
-              "description": "+91-8130672281 (School Office Hours: Monday to Saturday, 8:00 AM – 3:30 PM)",
+              "description": "+91-8130672281 (Office Hours: Monday – Friday: 8:00 AM – 4:30 PM, Saturday: 8:00 AM – 2:00 PM)",
               "linkUrl": "tel:+918130672281"
             },
             {
               "id": "cnt-3",
               "badge": "Email & Web",
-              "title": "Official Inquiries",
-              "description": "info.vidyaschool@vidya-india.org | Official Pan-India Website: www.vidya-india.org",
+              "title": "Official Inquiries & Portals",
+              "description": "info.vidyaschool@vidya-india.org | VIDYA School website: www.vidyaschool.com | VIDYA India organization website: www.vidya-india.org",
               "linkUrl": "mailto:info.vidyaschool@vidya-india.org"
             }
           ]
@@ -54,7 +54,7 @@
         "type": "alert",
         "data": {
           "title": "Campus Visitor Timings",
-          "message": "Visitors and prospective parents are welcome between 9:00 AM and 1:00 PM on working school days with prior appointment.",
+          "message": "Visitors and prospective parents are welcome Monday to Friday between 9:00 AM and 1:00 PM with prior appointment.",
           "variant": "default"
         }
       },

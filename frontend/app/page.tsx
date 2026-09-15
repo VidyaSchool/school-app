@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { BlurImg } from "@/components/blur-image"
 import dynamic from "next/dynamic"
 import type { Metadata } from 'next'
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: 'VidyaSchool | Empowering Minds, Shaping Futures',
@@ -88,8 +89,8 @@ export default function Home() {
                     A highly recognized educator deeply committed to empowering underprivileged youth through modern, practical education.
                   </p>
                   <div className="space-y-2.5 pt-1 text-sm text-muted-foreground">
-                    <p>✓ <span className="font-medium text-foreground">National Award Winner</span> — Received the Institutional Leadership in Entrepreneurship Award at the Youth Ideathon Awards Ceremony hosted at IIT Delhi.</p>
-                    <p>✓ <span className="font-medium text-foreground">Innovation Advocate</span> — Under her guidance, students created "Park2Land" — a smart, tech-driven urban parking solution that beat over 1.85 lakh students to reach the Top 125 National Finals.</p>
+                    <p>✓ <span className="font-medium text-foreground">National Award Winner</span> — Conferred the Institutional Leadership in Entrepreneurship Award at the Youth Ideathon National Awards at IIT Delhi.</p>
+                    <p>✓ <span className="font-medium text-foreground">Innovation &amp; Mentorship</span> — Guided student innovators whose project &ldquo;Park2Land&rdquo; (smart urban parking system) earned National Top-125 finalist honors at the CBSE &amp; MEPSC Youth Ideathon hosted at IIT Delhi. <Link href="/p/achievements" className="text-primary hover:underline font-medium inline-flex items-center">View verified awards &rarr;</Link></p>
                   </div>
                 </div>
 

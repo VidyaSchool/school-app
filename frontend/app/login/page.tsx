@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, RefreshCw, Smartphone, CheckCircle2, Loader2, KeyRound, ArrowLeft } from "lucide-react"
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
@@ -13,13 +15,42 @@ import { toast } from "sonner"
 import { QRCodeSVG } from "qrcode.react"
 import { io, Socket } from "socket.io-client"
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000')
-const ADMIN_FRONTEND_URL = process.env.NEXT_PUBLIC_ADMIN_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://dashboard.vidyaschool.com' : 'http://localhost:3001')
+const isLocal = typeof window !== 'undefined'
+  ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  : process.env.NODE_ENV === 'development'
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || (isLocal ? 'http://localhost:8000' : 'https://api.vidyaschool.com')
+const ADMIN_FRONTEND_URL = process.env.NEXT_PUBLIC_ADMIN_URL || (isLocal ? 'http://localhost:3001' : 'https://dashboard.vidyaschool.com')
 const QR_TTL = 180 // seconds
 
 type QRStatus = "idle" | "generating" | "active" | "scanned" | "confirmed" | "expired"
 
-export default function LoginPage() {
+function LoginFormContent() {
+  const searchParams = useSearchParams()
+  const fromParam = (searchParams?.get("from") || searchParams?.get("redirect") || "").toLowerCase()
+
+  const portalMeta = useMemo(() => {
+    if (fromParam.includes("student")) {
+      return {
+        badge: "Student Portal",
+        title: "Student Portal Login",
+        description: "Sign in with your student credentials to access academic records & classes",
+      }
+    }
+    if (fromParam.includes("teacher")) {
+      return {
+        badge: "Faculty & Staff Portal",
+        title: "Faculty Portal Login",
+        description: "Sign in with your staff account to access classroom & grading systems",
+      }
+    }
+    return {
+      badge: "Institutional Access",
+      title: "Welcome back",
+      description: "Sign in to your VidyaSchool workspace (Students, Faculty & Staff)",
+    }
+  }, [fromParam])
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -290,10 +321,13 @@ export default function LoginPage() {
             {/* ── MODE 1: EMAIL & PASSWORD FORM ─────────────────────────── */}
             {mode === "form" ? (
               <div className="space-y-6">
-                <div className="flex flex-col gap-1.5 text-center">
-                  <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
+                <div className="flex flex-col items-center gap-1.5 text-center">
+                  <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5 mb-1">
+                    {portalMeta.badge}
+                  </Badge>
+                  <h1 className="text-2xl font-bold tracking-tight">{portalMeta.title}</h1>
                   <p className="text-sm text-muted-foreground">
-                    Sign in to your VidyaSchool workspace
+                    {portalMeta.description}
                   </p>
                 </div>
 
@@ -568,3 +602,18 @@ export default function LoginPage() {
     </div>
   )
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <LoginFormContent />
+    </Suspense>
+  )
+}
+

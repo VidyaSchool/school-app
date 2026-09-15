@@ -6,7 +6,7 @@ import { user as userTable, session as sessionTable, userProfile } from './lib/s
 import { eq } from 'drizzle-orm'
 import { checkRateLimit } from './lib/rate-limit'
 
-const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || (process.env.NODE_ENV === 'production' ? "https://dashboard.vidyaschool.com" : "http://localhost:3001")
 
 // Public routes - accessible without authentication
 const publicRoutes = ['/', '/login', '/signup', '/unauthorized', '/downloads']

@@ -165,7 +165,7 @@ export default function MandatoryPublicDisclosurePage() {
                       <TableCell className="text-center font-medium">4</TableCell>
                       <TableCell className="font-semibold text-foreground">Complete Address with PIN Code</TableCell>
                       <TableCell className="text-muted-foreground whitespace-normal">
-                        VIDYA SCHOOL, Plot 3126, S Block, Sector 24, DLF Phase 3, Gurgaon - 122010, Haryana, India
+                        VIDYA SCHOOL, Plot 3126, S Block, Sector 24, DLF Phase 3, Gurugram - 122002, Haryana, India
                       </TableCell>
                     </TableRow>
                     <TableRow>

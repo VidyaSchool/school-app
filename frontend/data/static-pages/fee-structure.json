@@ -1,7 +1,7 @@
 {
   "slug": "fee-structure",
-  "title": "Fee Structure & Scholarships (2025-26)",
-  "description": "Official fee schedule and scholarship information for the academic session 2025-26 at The VIDYA School, Gurugram.",
+  "title": "Fee Structure & Scholarships (Session 2026–27)",
+  "description": "Official fee schedule and scholarship information for the academic session 2026–27 at The VIDYA School, Gurugram.",
   "widgets": {
     "time": 1789273458831,
     "blocks": [
@@ -9,15 +9,24 @@
         "id": "blk-h1",
         "type": "header",
         "data": {
-          "text": "Fee Structure for the Academic Year 2025-26",
+          "text": "Fee Structure & Scholarships (Academic Session 2026–27)",
           "level": 1
+        }
+      },
+      {
+        "id": "blk-alert-session",
+        "type": "alert",
+        "data": {
+          "title": "Session Validity & Admission Status (Academic Year 2026–27)",
+          "message": "The fee schedule detailed below is the official government-approved schedule applicable for Academic Session 2026–27 (continuing approved rates under Haryana School Education Department norms). VIDYA School is dedicated to providing high-quality English-medium CBSE education to children from underprivileged backgrounds; fees are heavily subsidized with full and partial philanthropic scholarships available. For active admission guidelines, please refer to the <a href=\"/p/admission-process\" class=\"underline font-semibold\">Admission Process & Schedule</a>.",
+          "variant": "default"
         }
       },
       {
         "id": "blk-intro",
         "type": "paragraph",
         "data": {
-          "text": "Official fee schedule approved for <strong>The VIDYA School, Gurugram</strong> (Notification dated 17.03.2025). As a premier CBSE-affiliated school dedicated to providing quality English-medium education to children from underprivileged backgrounds, fees are heavily subsidized, transparent, and strictly compliant with Haryana Government norms and CBSE affiliation bylaws."
+          "text": "Official fee schedule approved for <strong>The VIDYA School, Gurugram</strong> (CBSE Affiliation No. 531105). In strict compliance with Haryana Government norms and CBSE bylaws, all fees are transparent, non-commercial, and capped to maintain accessibility for every deserving child."
         }
       },
       {
@@ -63,7 +72,7 @@
         "id": "blk-h2-table",
         "type": "header",
         "data": {
-          "text": "Official Fee Breakdown (Session 2025-26)",
+          "text": "Approved Fee Schedule (Session 2026–27)",
           "level": 2
         }
       },
@@ -71,7 +80,7 @@
         "id": "blk-table-p",
         "type": "paragraph",
         "data": {
-          "text": "The table below reflects the approved fee structure notified on 17.03.2025 for The VIDYA School, Sector 24, DLF Phase-3, Gurugram:"
+          "text": "The table below reflects the approved fee structure for The VIDYA School, Sector 24, DLF Phase 3, Gurugram, Haryana 122002:"
         }
       },
       {

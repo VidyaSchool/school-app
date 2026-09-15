@@ -17,7 +17,7 @@
         "type": "alert",
         "data": {
           "title": "Statutory Transparency Information",
-          "message": "In accordance with CBSE affiliation regulations and Appendix IX directives, complete certified documentation and institutional particulars of The VIDYA School are publicly accessible.",
+          "message": "In accordance with CBSE affiliation regulations, Circular No. 09/2021, and Appendix IX directives, complete certified documentation and institutional particulars of The VIDYA School are publicly accessible.",
           "variant": "warning"
         }
       },
@@ -36,39 +36,44 @@
           "withHeadings": true,
           "content": [
             [
-              "Disclosure Parameter",
-              "Institutional Particulars",
-              "Verification Authority"
+              "S.No.",
+              "Information",
+              "Details"
             ],
             [
-              "Name of the School",
-              "The VIDYA School",
-              "VIDYA Integrated Development for Youth and Adults"
+              "1",
+              "Name of School",
+              "VIDYA SCHOOL, GURGAON"
             ],
             [
-              "Affiliation Status & Level",
-              "CBSE Affiliated Senior Secondary English Medium",
-              "Central Board of Secondary Education, New Delhi"
+              "2",
+              "Affiliation No. (If Applicable)",
+              "531105"
             ],
             [
-              "School Location & Address",
-              "Plot No. 3126, Block S, Near St. Stephen's Hospital, DLF Phase-3, Sector 24, Gurugram 122002",
-              "Government of Haryana"
+              "3",
+              "School Code (If Applicable)",
+              "41054"
             ],
             [
-              "Principal Name & Qualifications",
-              "Ms. Ila Sarin, Post Graduate, B.Ed., Experienced Administrator",
-              "Recognized University"
+              "4",
+              "Complete Address with PIN Code",
+              "VIDYA SCHOOL, Plot 3126, S Block, Sector 24, DLF Phase 3, Gurugram - 122002, Haryana, India"
             ],
             [
-              "Official Contact Details",
-              "info.vidyaschool@vidya-india.org | +91-8130672281",
-              "Administrative Office"
+              "5",
+              "Principal Name & Qualification",
+              "Ms. Ila Sarin (MSc Chemistry, B.Ed)"
             ],
             [
-              "Campus Land Area",
-              "Over 2.0 Acres / 20,235 sq. meters with boundary wall",
-              "Municipal Corporation of Gurugram (MCG)"
+              "6",
+              "School Email ID",
+              "principal.vidyaschool@vidya-india.org | info.vidyaschool@vidya-india.org"
+            ],
+            [
+              "7",
+              "Contact Detail",
+              "+91-8130672281"
             ]
           ]
         }
@@ -320,6 +325,11 @@
             ],
             [
               "9",
+              "Innovations & Initiatives",
+              "Available upon request"
+            ],
+            [
+              "10",
               "Important SMC Decisions",
               {
                 "isButton": true,
@@ -329,6 +339,262 @@
                 "icon": "file-text",
                 "variant": "default"
               }
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-res10",
+        "type": "header",
+        "data": {
+          "text": "C (i): Result Class X (Secondary School Examination - AISSE)",
+          "level": 3
+        }
+      },
+      {
+        "id": "blk-table-res10",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Year",
+              "Registered Students",
+              "Passed Students",
+              "Pass Percentage"
+            ],
+            [
+              "1",
+              "2022-2023",
+              "70",
+              "70",
+              "100%"
+            ],
+            [
+              "2",
+              "2023-2024",
+              "79",
+              "79",
+              "100%"
+            ],
+            [
+              "3",
+              "2024-2025",
+              "67",
+              "67",
+              "100%"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-res12",
+        "type": "header",
+        "data": {
+          "text": "C (ii): Result Class XII (Senior School Certificate Examination - AISSCE)",
+          "level": 3
+        }
+      },
+      {
+        "id": "blk-table-res12",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Year",
+              "Registered Students",
+              "Passed Students",
+              "Pass Percentage"
+            ],
+            [
+              "1",
+              "2022-2023",
+              "72",
+              "72",
+              "100%"
+            ],
+            [
+              "2",
+              "2023-2024",
+              "88",
+              "88",
+              "100%"
+            ],
+            [
+              "3",
+              "2024-2025",
+              "82",
+              "82",
+              "100%"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-staff",
+        "type": "header",
+        "data": {
+          "text": "D: Staff (Teaching)",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-staff",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Information",
+              "Details",
+              "Name and Qualifications / Document"
+            ],
+            [
+              "1",
+              "Principal",
+              "01",
+              "Ms. Ila Sarin, MSc (Chemistry), B.Ed"
+            ],
+            [
+              "2",
+              "Total No. of Teachers (PGT: 16 | TGT: 18 | PRT: 15)",
+              "49",
+              {
+                "isButton": true,
+                "label": "Click here to view faculty register",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464883613-20633369-dd67-44b1-b298-9fc8c8e91430-13.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "3",
+              "Teachers Qualification & Designation",
+              "49",
+              {
+                "isButton": true,
+                "label": "Click here to view faculty register",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464883613-20633369-dd67-44b1-b298-9fc8c8e91430-13.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "4",
+              "Teacher Section Ratio",
+              "40:1",
+              "Standard CBSE class strength"
+            ],
+            [
+              "5",
+              "Details of Special Educator",
+              "01",
+              "Ms. Uma Jangra, B.A, M.A (Political Science), B.Ed (Special Education)"
+            ],
+            [
+              "6",
+              "Details of Counsellor",
+              "01",
+              "Ms. Nikita Kulhari, M.A (Applied Psychology)"
+            ],
+            [
+              "7",
+              "Details of Teacher Training",
+              "—",
+              {
+                "isButton": true,
+                "label": "Click here to view training records (XLSX)",
+                "url": "https://www.vidyaschool.com/wp-content/uploads/2026/02/CBSE-TEACHERS-TRAINING-2025.xlsx",
+                "actionType": "link",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "8",
+              "Details of Wellness Teacher",
+              "01",
+              "Ms. Archana, B.A (Social Work)"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-infra",
+        "type": "header",
+        "data": {
+          "text": "E: School Infrastructure",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-infra",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Information",
+              "Details"
+            ],
+            [
+              "1",
+              "Total Campus Area of the School",
+              "20,235 Sq Mtr"
+            ],
+            [
+              "2",
+              "Number and Size of the Classrooms",
+              "70 (50 Sq Mtr each)"
+            ],
+            [
+              "3",
+              "Number and Size of Laboratories Including Computer Labs",
+              "08 (76 Sq Mtr each)"
+            ],
+            [
+              "4",
+              "Internet Facility (Y/N)",
+              "YES"
+            ],
+            [
+              "5",
+              "Number of Girls Toilets",
+              "24"
+            ],
+            [
+              "6",
+              "Number of Boys Toilets",
+              "24"
+            ],
+            [
+              "7",
+              "Link of YouTube Video of the Inspection of School Covering Infrastructure",
+              {
+                "isButton": true,
+                "label": "Watch YouTube Video",
+                "url": "https://youtu.be/ND57JV3uZd4",
+                "actionType": "view_video",
+                "icon": "video",
+                "variant": "outline"
+              }
+            ],
+            [
+              "8",
+              "Number and Size of Library",
+              "02 (111.48 Sq Mtr each)"
+            ],
+            [
+              "9",
+              "Number of CWSN Toilets",
+              "—"
             ]
           ]
         }
@@ -390,6 +656,12 @@
               "text": "Certificates & Compliance",
               "url": "/p/certificates",
               "variant": "secondary"
+            },
+            {
+              "id": "b4",
+              "text": "Annual Report",
+              "url": "/p/annual-report",
+              "variant": "outline"
             }
           ]
         }

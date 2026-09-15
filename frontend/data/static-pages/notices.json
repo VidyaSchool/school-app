@@ -1,6 +1,6 @@
 {
   "slug": "notices",
-  "title": "School Notices & Circulars",
+  "title": "School Notices & Circulars (Session 2026–27)",
   "widgets": {
     "time": 1789273458831,
     "blocks": [
@@ -8,45 +8,92 @@
         "id": "blk-h1",
         "type": "header",
         "data": {
-          "text": "Official School Notices & Bulletin",
+          "text": "Official School Notices & Circulars",
           "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Statutory notices, administrative circulars, and institutional advisories issued for Academic Session 2026–27 by The VIDYA School. Each entry provides an official reference code, issue date, actionable timeline, and verifying authority."
         }
       },
       {
         "id": "blk-alert",
         "type": "alert",
         "data": {
-          "title": "Academic Session Notification",
-          "message": "Classes are operating according to standard seasonal schedules. Parents and students are requested to review notice boards and portals regularly for circulars and calendar updates.",
-          "variant": "warning"
+          "title": "Notice Board Status: Academic Session 2026–27",
+          "message": "Notice board updated as of September 2026. For inquiries or physical copies of circulars, please contact the administrative desk at +91-8130672281 or info.vidyaschool@vidya-india.org (Monday to Friday, 8:00 AM – 4:30 PM).",
+          "variant": "default"
         }
       },
       {
-        "id": "blk-cards",
-        "type": "card",
+        "id": "blk-table-notices",
+        "type": "table",
         "data": {
-          "columns": 3,
+          "withHeadings": true,
+          "content": [
+            [
+              "Notice Ref. No.",
+              "Date Issued",
+              "Subject Matter & Directive",
+              "Target Cohort",
+              "Action Timeline",
+              "Authority"
+            ],
+            [
+              "VS/CBSE/2026/018",
+              "02 Sep 2026",
+              "CBSE Board Examination LOC Verification & Subject Finalization",
+              "Classes X & XII",
+              "Action by 25 Sep 2026",
+              "Examination Controller"
+            ],
+            [
+              "VS/PTM/2026/015",
+              "28 Aug 2026",
+              "Term-1 Parent-Teacher Meeting (PTM) & Formative Assessment Review",
+              "Classes Nursery – XII",
+              "Saturday, 19 Sep 2026 (08:30 – 13:00)",
+              "Academic Coordinator"
+            ],
+            [
+              "VS/SPT/2026/012",
+              "20 Aug 2026",
+              "Annual Inter-House Sports Trials & Track Events Selection",
+              "Classes VI – XII",
+              "10 – 18 Sep 2026",
+              "Head of Physical Education"
+            ],
+            [
+              "VS/ADM/2026/007",
+              "15 Jul 2026",
+              "Monsoon School Route Timings & Campus Safety Protocols",
+              "All Students & Staff",
+              "Ongoing Monsoon Cycle",
+              "Office of the Principal"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
           "items": [
             {
-              "id": "not-1",
-              "badge": "Examinations",
-              "title": "CBSE Board Examination Registration",
-              "description": "Verification of list of candidates (LOC) and subject confirmation for Class X and Class XII candidates.",
-              "linkUrl": "/p/examinations"
+              "id": "b-circ",
+              "text": "View Administrative Circulars Archive",
+              "url": "/p/circulars",
+              "variant": "default"
             },
             {
-              "id": "not-2",
-              "badge": "Athletics",
-              "title": "Annual Sports Day Trials",
-              "description": "House trials for track events, relay sprints, cricket, and football begin on campus grounds next week.",
-              "linkUrl": "/p/sports"
-            },
-            {
-              "id": "not-3",
-              "badge": "PTM",
-              "title": "Parent-Teacher Interactive Meeting",
-              "description": "PTM scheduled for Saturday to discuss formative progress reports and individual learning plans.",
-              "linkUrl": "/p/pta"
+              "id": "b-cal",
+              "text": "Academic Calendar 2026–27",
+              "url": "/p/academic-calendar",
+              "variant": "outline"
             }
           ]
         }

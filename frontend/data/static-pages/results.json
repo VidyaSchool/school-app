@@ -1,6 +1,6 @@
 {
   "slug": "results",
-  "title": "Board Results & Academic Performance",
+  "title": "CBSE Board Examination Results (Official 3-Year Record)",
   "widgets": {
     "time": 1789273458831,
     "blocks": [
@@ -8,7 +8,7 @@
         "id": "blk-h1",
         "type": "header",
         "data": {
-          "text": "Board Examination Results & Academic Laurels",
+          "text": "CBSE Board Examination Results",
           "level": 1
         }
       },
@@ -16,45 +16,105 @@
         "id": "blk-p1",
         "type": "paragraph",
         "data": {
-          "text": "Celebrating the stellar achievements and inspirational academic triumphs of VIDYA School scholars in the CBSE Board examinations."
+          "text": "Official academic performance records of The VIDYA School, Gurugram (CBSE Affiliation No. 531105, School Code: 41054) as published in the statutory CBSE Mandatory Public Disclosure."
         }
       },
       {
         "id": "blk-stats",
         "type": "stats",
         "data": {
-          "stat": "98.4%",
-          "label": "Top Class X Board Score",
-          "subtext": "100% first-division pass record in secondary board exams"
+          "stat": "100%",
+          "label": "CBSE Board Pass Rate",
+          "subtext": "100% pass record in AISSE (Class X) and AISSCE (Class XII) across consecutive academic sessions"
         }
       },
       {
-        "id": "blk-cards",
-        "type": "card",
+        "id": "blk-h2-res10",
+        "type": "header",
         "data": {
-          "columns": 3,
-          "items": [
-            {
-              "id": "res-1",
-              "badge": "AISSE Class X",
-              "title": "100% Board Pass Percentage",
-              "description": "Consistent high distinctions with students scoring 90%+ in Mathematics, Science, and English.",
-              "linkUrl": "/p/achievements"
-            },
-            {
-              "id": "res-2",
-              "badge": "AISSCE Class XII",
-              "title": "Senior Secondary Success",
-              "description": "Scholars securing prestigious admissions in engineering, business administration, medical sciences, and arts.",
-              "linkUrl": "/p/achievements"
-            },
-            {
-              "id": "res-3",
-              "badge": "Higher Education",
-              "title": "College & Career Pathways",
-              "description": "Active scholarship placements and corporate internships supporting graduates through university degrees.",
-              "linkUrl": "/p/get-involved"
-            }
+          "text": "Class X Results (AISSE — Secondary School Examination)",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-res10",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Academic Session",
+              "Registered Students",
+              "Passed Students",
+              "Pass Percentage",
+              "Official Verification"
+            ],
+            [
+              "2022–2023",
+              "70",
+              "70",
+              "100%",
+              "CBSE Verified"
+            ],
+            [
+              "2023–2024",
+              "79",
+              "79",
+              "100%",
+              "CBSE Verified"
+            ],
+            [
+              "2024–2025",
+              "67",
+              "67",
+              "100%",
+              "CBSE Verified"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-res12",
+        "type": "header",
+        "data": {
+          "text": "Class XII Results (AISSCE — Senior School Certificate Examination)",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-res12",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Academic Session",
+              "Registered Students",
+              "Passed Students",
+              "Pass Percentage",
+              "Official Verification"
+            ],
+            [
+              "2022–2023",
+              "72",
+              "72",
+              "100%",
+              "CBSE Verified"
+            ],
+            [
+              "2023–2024",
+              "88",
+              "88",
+              "100%",
+              "CBSE Verified"
+            ],
+            [
+              "2024–2025",
+              "82",
+              "82",
+              "100%",
+              "CBSE Verified"
+            ]
           ]
         }
       },
@@ -66,13 +126,13 @@
           "items": [
             {
               "id": "b-res-pdf",
-              "text": "Download Last 3 Years Board Results (PDF)",
+              "text": "Download Official 3-Year Board Results (PDF)",
               "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789465033786-0dd47513-e8a9-4f00-82d0-8ef2f727bac6-15.pdf",
               "variant": "default"
             },
             {
               "id": "b-m-disc",
-              "text": "Mandatory Public Disclosure",
+              "text": "CBSE Mandatory Public Disclosure",
               "url": "/p/mandatory-public-disclosure",
               "variant": "outline"
             }

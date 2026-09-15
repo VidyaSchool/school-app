@@ -155,17 +155,37 @@ export default function ContactPage() {
                     Email
                   </p>
                   <a
-                    href="mailto:info@vidyaschool.edu.in"
+                    href="mailto:info.vidyaschool@vidya-india.org"
                     className="flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
                   >
                     <Mail className="h-3.5 w-3.5 text-primary" />
-                    info@vidyaschool.edu.in
+                    info.vidyaschool@vidya-india.org
                   </a>
+                </div>
+
+                <div className="space-y-1 pt-1 border-t border-border/40">
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                    Web Portals
+                  </p>
+                  <div className="space-y-1 text-xs">
+                    <p>
+                      <span className="text-muted-foreground">School Website: </span>
+                      <a href="https://www.vidyaschool.com" target="_blank" rel="noopener noreferrer" className="font-medium text-foreground hover:text-primary underline">
+                        vidyaschool.com
+                      </a>
+                    </p>
+                    <p>
+                      <span className="text-muted-foreground">Parent Organization: </span>
+                      <a href="https://vidya-india.org" target="_blank" rel="noopener noreferrer" className="font-medium text-foreground hover:text-primary underline">
+                        vidya-india.org
+                      </a>
+                    </p>
+                  </div>
                 </div>
               </div>
 
               <div className="mt-auto rounded-lg border border-border/50 bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-                📞 Phone lines are active during working hours only. For urgent matters outside hours, email us.
+                📞 Phone lines are active during working hours only (Mon–Fri 8:00–16:30, Sat 8:00–14:00). For inquiries outside hours, email us.
               </div>
             </div>
 
