@@ -78,6 +78,6 @@
     "eslint-config-next": "16.2.9",
     "monaco-editor": "^0.56.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
