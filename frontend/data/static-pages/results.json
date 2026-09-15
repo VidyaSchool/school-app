@@ -57,6 +57,27 @@
             }
           ]
         }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b-res-pdf",
+              "text": "Download Last 3 Years Board Results (PDF)",
+              "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789465033786-0dd47513-e8a9-4f00-82d0-8ef2f727bac6-15.pdf",
+              "variant": "default"
+            },
+            {
+              "id": "b-m-disc",
+              "text": "Mandatory Public Disclosure",
+              "url": "/p/mandatory-public-disclosure",
+              "variant": "outline"
+            }
+          ]
+        }
       }
     ],
     "version": "2.30.7"

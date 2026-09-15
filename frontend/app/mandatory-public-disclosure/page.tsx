@@ -243,47 +243,47 @@ export default function MandatoryPublicDisclosurePage() {
                       {
                         sno: "1",
                         title: "Copies of Affiliation / Upgradation Letter and Recent Extension of Affiliation, if any",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/DocScanner-13-Feb-2026-10-20.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464277721-1adf5d9f-8c2e-491c-8bb7-0ac277e0c1de-docscanner-13-feb-2026-10-20.pdf",
                       },
                       {
                         sno: "2",
                         title: "Copies of Societies / Company Registration / Renewal Certificate, as applicable",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/DOC-20260214-WA0003..pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464317815-01b430e1-fccc-4ebf-a218-7cfc54054844-2.pdf",
                       },
                       {
                         sno: "3",
                         title: "Copy of No Objection Certificate (NOC) issued, if applicable, by the State Govt./UT",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/3-page.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464347042-a551cf2c-5794-4acc-9638-9fab6927b041-3.pdf",
                       },
                       {
                         sno: "4",
                         title: "Copies of Recognition Certificate under RTE Act, 2009 and its renewal if applicable",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/DocScanner-13-Feb-2026-10-23-1.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464376314-30153e2d-4e55-4583-8107-9107827afe31-4.pdf",
                       },
                       {
                         sno: "5",
                         title: "Copy of Valid Building Safety Certificate as per the National Building Code",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/01/new-Building-Certificate.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464418972-a4a3ca4c-59c3-4554-b9d5-e4a7c6c1d069-5.pdf",
                       },
                       {
                         sno: "6",
                         title: "Copy of Valid Fire Safety Certificate issued by the Competent Authority",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/03/updtaed-fire-safety.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464470755-aab29405-7de6-4fab-82a3-da643016a4dd-6.pdf",
                       },
                       {
                         sno: "7",
                         title: "Copy of the Valid DEO Certificate submitted by the school for affiliation/upgradation/extension of affiliation or Self Declaration by School",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/3-page.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464561125-286c3273-280f-45bd-b3ea-f11ce54dd774-7.pdf",
                       },
                       {
                         sno: "8",
                         title: "Copies of Valid Drinking Water, Health and Sanitation Certificates and Water Testing Report",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/DOC-20260214-WA0001..pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464611310-81ec139f-2d96-43e6-b34d-ff6ca8c6c075-8.pdf",
                       },
                       {
                         sno: "9",
                         title: "Copy of Valid Structural Stability Certificate",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2022/05/New-Doc-05-30-2022-10.51.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464660947-d42577fc-6a82-4637-b605-ea561e07f1b3-9.pdf",
                       },
                     ].map((doc) => (
                       <TableRow key={doc.sno}>
@@ -338,42 +338,42 @@ export default function MandatoryPublicDisclosurePage() {
                       {
                         sno: "1",
                         title: "Fee Structure of the School (2025-2026)",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/01/Fee-Structure-2025-26.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464712531-bff656a3-abb5-4e12-b699-a4f935490b2b-10.pdf",
                       },
                       {
                         sno: "2",
                         title: "Annual Academic Calendar",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/Academic-Session-2025-26-session.docx",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/images/1789464750311-aff6f183-98ca-44a2-b198-ea5b4edfa990-11.docx",
                       },
                       {
                         sno: "3",
                         title: "List of School Management Committee (SMC)",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/SMC.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464834216-a339cad7-627a-489c-b689-ce7313a10aaa-12.pdf",
                       },
                       {
                         sno: "4",
                         title: "Teachers Qualification & Designation",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/DocScanner-13-Feb-2026-10-251_rotated.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464883613-20633369-dd67-44b1-b298-9fc8c8e91430-13.pdf",
                       },
                       {
                         sno: "5",
                         title: "List of Parents Teachers Association (PTA) Members",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/pta-members.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464935370-1e98f952-255c-42c1-b72e-a9512e0196f0-14.pdf",
                       },
                       {
                         sno: "6",
                         title: "Last Three Years Academic Results of Board Classes",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/DocScanner-13-Feb-2026-10-24-1.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789465033786-0dd47513-e8a9-4f00-82d0-8ef2f727bac6-15.pdf",
                       },
                       {
                         sno: "7",
                         title: "Student Strength 2025-2026",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/SCHOOL-STRENGTH.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789465082465-1228efac-cf3f-498f-93c4-29bc8be80d1c-16.pdf",
                       },
                       {
                         sno: "8",
                         title: "Achievements",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/02/achievements.docx",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/images/1789466368061-f17735b6-9cfa-49e4-ac1d-346f36f90754-17.docx",
                       },
                       {
                         sno: "9",
@@ -383,7 +383,7 @@ export default function MandatoryPublicDisclosurePage() {
                       {
                         sno: "10",
                         title: "Important SMC Decisions",
-                        url: "https://www.vidyaschool.com/wp-content/uploads/2026/03/WhatsApp-Image-2026-02-26-at-8.01.45-AM-1-1.pdf",
+                        url: "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789466460231-ab947af5-c680-4ad4-ad55-64fe84443e71-18.pdf",
                       },
                     ].map((doc) => (
                       <TableRow key={doc.sno}>
@@ -577,7 +577,7 @@ export default function MandatoryPublicDisclosurePage() {
                       <TableCell>
                         <Button variant="outline" size="sm" asChild className="gap-1.5 h-8">
                           <a
-                            href="https://www.vidyaschool.com/wp-content/uploads/2026/02/web-te.pdf"
+                            href="https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464883613-20633369-dd67-44b1-b298-9fc8c8e91430-13.pdf"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -790,7 +790,7 @@ export default function MandatoryPublicDisclosurePage() {
                       <TableCell className="text-right pr-6 whitespace-nowrap">
                         <Button size="sm" asChild className="gap-1.5 h-8">
                           <a
-                            href="https://www.vidyaschool.com/wp-content/uploads/2025/01/Mandatory-Disclosure-Details-_-SARAS-5.0.pdf"
+                            href="https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789466542365-d4df1d64-be70-4511-861c-e5e152f94d8c-19.pdf"
                             target="_blank"
                             rel="noopener noreferrer"
                           >

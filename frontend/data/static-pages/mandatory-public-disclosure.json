@@ -2,7 +2,7 @@
   "slug": "mandatory-public-disclosure",
   "title": "Mandatory Public Disclosure (CBSE)",
   "widgets": {
-    "time": 1789273458831,
+    "time": 1789466547671,
     "blocks": [
       {
         "id": "blk-h1",
@@ -22,7 +22,15 @@
         }
       },
       {
-        "id": "blk-table",
+        "id": "blk-h2-gen",
+        "type": "header",
+        "data": {
+          "text": "A: General Information",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-gen",
         "type": "table",
         "data": {
           "withHeadings": true,
@@ -38,7 +46,7 @@
               "VIDYA Integrated Development for Youth and Adults"
             ],
             [
-              "Affiliation Status",
+              "Affiliation Status & Level",
               "CBSE Affiliated Senior Secondary English Medium",
               "Central Board of Secondary Education, New Delhi"
             ],
@@ -49,7 +57,7 @@
             ],
             [
               "Principal Name & Qualifications",
-              "Principal, Post Graduate, B.Ed., Experienced Administrator",
+              "Ms. Ila Sarin, Post Graduate, B.Ed., Experienced Administrator",
               "Recognized University"
             ],
             [
@@ -59,8 +67,302 @@
             ],
             [
               "Campus Land Area",
-              "Over 2.0 Acres / 8,000+ sq. meters with boundary wall",
+              "Over 2.0 Acres / 20,235 sq. meters with boundary wall",
               "Municipal Corporation of Gurugram (MCG)"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-docs",
+        "type": "header",
+        "data": {
+          "text": "B: Documents and Information",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-docs",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Documents / Information",
+              "Upload Documents"
+            ],
+            [
+              "1",
+              "Copies of Affiliation / Upgradation Letter and Recent Extension of Affiliation, if any",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464277721-1adf5d9f-8c2e-491c-8bb7-0ac277e0c1de-docscanner-13-feb-2026-10-20.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "2",
+              "Copies of Societies / Company Registration / Renewal Certificate, as applicable",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464317815-01b430e1-fccc-4ebf-a218-7cfc54054844-2.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "3",
+              "Copy of No Objection Certificate (NOC) issued, if applicable, by the State Govt./UT",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464347042-a551cf2c-5794-4acc-9638-9fab6927b041-3.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "4",
+              "Copies of Recognition Certificate under RTE Act, 2009 and its renewal if applicable",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464376314-30153e2d-4e55-4583-8107-9107827afe31-4.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "5",
+              "Copy of Valid Building Safety Certificate as per the National Building Code",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464418972-a4a3ca4c-59c3-4554-b9d5-e4a7c6c1d069-5.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "6",
+              "Copy of Valid Fire Safety Certificate issued by the Competent Authority",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464470755-aab29405-7de6-4fab-82a3-da643016a4dd-6.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "7",
+              "Copy of the Valid DEO Certificate submitted by the school for affiliation/upgradation/extension of affiliation or Self Declaration by School",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464561125-286c3273-280f-45bd-b3ea-f11ce54dd774-7.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "8",
+              "Copies of Valid Drinking Water, Health and Sanitation Certificates and Water Testing Report",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464611310-81ec139f-2d96-43e6-b34d-ff6ca8c6c075-8.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "9",
+              "Copy of Valid Structural Stability Certificate",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464660947-d42577fc-6a82-4637-b605-ea561e07f1b3-9.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-acad",
+        "type": "header",
+        "data": {
+          "text": "C: Result and Academics",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-acad",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Documents / Information",
+              "Upload Documents"
+            ],
+            [
+              "1",
+              "Fee Structure of the School (2025-2026)",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464712531-bff656a3-abb5-4e12-b699-a4f935490b2b-10.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "2",
+              "Annual Academic Calendar",
+              {
+                "isButton": true,
+                "label": "Click here to view (DOCX)",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/images/1789464750311-aff6f183-98ca-44a2-b198-ea5b4edfa990-11.docx",
+                "actionType": "link",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "3",
+              "List of School Management Committee (SMC)",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464834216-a339cad7-627a-489c-b689-ce7313a10aaa-12.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "4",
+              "Teachers Qualification & Designation",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464883613-20633369-dd67-44b1-b298-9fc8c8e91430-13.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "5",
+              "List of Parents Teachers Association (PTA) Members",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464935370-1e98f952-255c-42c1-b72e-a9512e0196f0-14.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "6",
+              "Last Three Years Academic Results of Board Classes",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789465033786-0dd47513-e8a9-4f00-82d0-8ef2f727bac6-15.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "7",
+              "Student Strength 2025-2026",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789465082465-1228efac-cf3f-498f-93c4-29bc8be80d1c-16.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "8",
+              "Achievements",
+              {
+                "isButton": true,
+                "label": "Click here to view (DOCX)",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/images/1789466368061-f17735b6-9cfa-49e4-ac1d-346f36f90754-17.docx",
+                "actionType": "link",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "9",
+              "Important SMC Decisions",
+              {
+                "isButton": true,
+                "label": "Click here to view",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789466460231-ab947af5-c680-4ad4-ad55-64fe84443e71-18.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-saras",
+        "type": "header",
+        "data": {
+          "text": "F: Mandatory Public Disclosure (SARAS 4.0 / 5.0)",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-saras",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No.",
+              "Documents / Information",
+              "Upload Documents"
+            ],
+            [
+              "1",
+              "Mandatory Disclosure _ SARAS 4.0 / 5.0 (Consolidated Institutional Dossier)",
+              {
+                "isButton": true,
+                "label": "Click here to view (PDF)",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789466542365-d4df1d64-be70-4511-861c-e5e152f94d8c-19.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
             ]
           ]
         }
@@ -79,8 +381,8 @@
             },
             {
               "id": "b2",
-              "text": "Annual Report",
-              "url": "/p/annual-report",
+              "text": "Fee Structure & Scholarships",
+              "url": "/p/fee-structure",
               "variant": "outline"
             },
             {
@@ -93,6 +395,6 @@
         }
       }
     ],
-    "version": "2.30.7"
+    "version": "2.31.6"
   }
 }

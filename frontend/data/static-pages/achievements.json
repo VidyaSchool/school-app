@@ -48,6 +48,27 @@
             }
           ]
         }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b-ach-doc",
+              "text": "Download Official Achievements Dossier (DOCX)",
+              "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/images/1789466368061-f17735b6-9cfa-49e4-ac1d-346f36f90754-17.docx",
+              "variant": "default"
+            },
+            {
+              "id": "b-m-disc",
+              "text": "Mandatory Public Disclosure",
+              "url": "/p/mandatory-public-disclosure",
+              "variant": "outline"
+            }
+          ]
+        }
       }
     ],
     "version": "2.30.7"

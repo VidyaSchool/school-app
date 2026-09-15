@@ -94,10 +94,22 @@
           "align": "left",
           "items": [
             {
+              "id": "b-smc-doc",
+              "text": "Download Official SMC List (PDF)",
+              "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464834216-a339cad7-627a-489c-b689-ce7313a10aaa-12.pdf",
+              "variant": "default"
+            },
+            {
+              "id": "b-smc-dec",
+              "text": "Important SMC Decisions (PDF)",
+              "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789466460231-ab947af5-c680-4ad4-ad55-64fe84443e71-18.pdf",
+              "variant": "outline"
+            },
+            {
               "id": "b1",
               "text": "Leadership & Governance",
               "url": "/p/leadership",
-              "variant": "default"
+              "variant": "secondary"
             },
             {
               "id": "b2",

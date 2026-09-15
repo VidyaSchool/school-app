@@ -69,6 +69,27 @@
             ]
           ]
         }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b-fac-pdf",
+              "text": "Download Official Faculty Register (PDF)",
+              "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464883613-20633369-dd67-44b1-b298-9fc8c8e91430-13.pdf",
+              "variant": "default"
+            },
+            {
+              "id": "b-m-disc",
+              "text": "Mandatory Public Disclosure",
+              "url": "/p/mandatory-public-disclosure",
+              "variant": "outline"
+            }
+          ]
+        }
       }
     ],
     "version": "2.30.7"

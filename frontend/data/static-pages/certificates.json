@@ -2,7 +2,7 @@
   "slug": "certificates",
   "title": "School Certificates & Regulatory Compliance",
   "widgets": {
-    "time": 1789273458831,
+    "time": 1789466547671,
     "blocks": [
       {
         "id": "blk-h1",
@@ -29,36 +29,111 @@
               "Certificate Name",
               "Issuing Government Authority",
               "Compliance Status",
-              "Inspection Frequency"
+              "Verified Document"
             ],
             [
               "Building Safety Certificate",
               "Public Works Department (PWD) / Certified Structural Engineer",
               "Certified Structurally Sound & Safe",
-              "Periodic Renewal"
+              {
+                "isButton": true,
+                "label": "View Certificate",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464418972-a4a3ca4c-59c3-4554-b9d5-e4a7c6c1d069-5.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
             ],
             [
               "Fire Safety Certificate (NOC)",
               "Fire & Emergency Services, Haryana",
               "Compliant with hydrants, extinguishers, alarms",
-              "Annual Audit Verified"
+              {
+                "isButton": true,
+                "label": "View Certificate",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464470755-aab29405-7de6-4fab-82a3-da643016a4dd-6.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
             ],
             [
               "Safe Drinking Water & Sanitation",
               "Public Health Engineering Department (PHED)",
               "RO filtration tested & hygienic facilities certified",
-              "Annual Laboratory Test"
+              {
+                "isButton": true,
+                "label": "View Certificate",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464611310-81ec139f-2d96-43e6-b34d-ff6ca8c6c075-8.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
             ],
             [
               "Government Recognition (NOC)",
               "Directorate of School Education, Haryana",
               "Permanent recognition granted for Senior Secondary",
-              "Perpetual Compliance"
+              {
+                "isButton": true,
+                "label": "View Certificate",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464347042-a551cf2c-5794-4acc-9638-9fab6927b041-3.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "RTE Act Recognition Certificate",
+              "Department of Elementary Education, Haryana",
+              "Recognized under Right to Education Act, 2009",
+              {
+                "isButton": true,
+                "label": "View Certificate",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464376314-30153e2d-4e55-4583-8107-9107827afe31-4.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
+            ],
+            [
+              "Structural Stability Certificate",
+              "Registered Chartered Structural Engineer",
+              "National Building Code Compliant",
+              {
+                "isButton": true,
+                "label": "View Certificate",
+                "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464660947-d42577fc-6a82-4637-b605-ea561e07f1b3-9.pdf",
+                "actionType": "view_pdf",
+                "icon": "file-text",
+                "variant": "default"
+              }
             ]
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b-m-disc",
+              "text": "Mandatory Public Disclosure (All Docs)",
+              "url": "/p/mandatory-public-disclosure",
+              "variant": "default"
+            },
+            {
+              "id": "b-smc",
+              "text": "School Management Committee",
+              "url": "/p/school-management-committee",
+              "variant": "outline"
+            }
           ]
         }
       }
     ],
-    "version": "2.30.7"
+    "version": "2.31.6"
   }
 }

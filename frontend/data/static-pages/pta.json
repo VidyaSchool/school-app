@@ -56,6 +56,27 @@
           "text": "Education is a shared partnership between committed teachers, motivated students, and supportive parents.",
           "caption": "VIDYA School PTA Philosophy"
         }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b-pta-pdf",
+              "text": "Download Official PTA Members List (PDF)",
+              "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464935370-1e98f952-255c-42c1-b72e-a9512e0196f0-14.pdf",
+              "variant": "default"
+            },
+            {
+              "id": "b-smc",
+              "text": "School Management Committee",
+              "url": "/p/school-management-committee",
+              "variant": "outline"
+            }
+          ]
+        }
       }
     ],
     "version": "2.30.7"

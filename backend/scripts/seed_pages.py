@@ -1540,7 +1540,7 @@ PAGES_DATA = [
                 "data": {
                     "title": "Official Fee Structure 2025-26 Circular (VIDYA SCHOOL GURGAON)",
                     "fileSize": "Official Notification (Signed & Approved 17.03.2025)",
-                    "url": "/docs/Fee-Structure-2025-26.pdf"
+                    "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464712531-bff656a3-abb5-4e12-b699-a4f935490b2b-10.pdf"
                 }
             },
             {
@@ -1552,13 +1552,13 @@ PAGES_DATA = [
                         {
                             "id": "b-dl",
                             "text": "Download Official PDF",
-                            "url": "/docs/Fee-Structure-2025-26.pdf",
+                            "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464712531-bff656a3-abb5-4e12-b699-a4f935490b2b-10.pdf",
                             "variant": "default"
                         },
                         {
                             "id": "b-orig",
-                            "text": "View on Vidyaschool.com",
-                            "url": "https://www.vidyaschool.com/wp-content/uploads/2026/01/Fee-Structure-2025-26.pdf",
+                            "text": "View Uploaded PDF",
+                            "url": "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/page-builder/pdfs/1789464712531-bff656a3-abb5-4e12-b699-a4f935490b2b-10.pdf",
                             "variant": "outline"
                         },
                         {
