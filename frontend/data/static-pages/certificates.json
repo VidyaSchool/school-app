@@ -1,0 +1,64 @@
+{
+  "slug": "certificates",
+  "title": "School Certificates & Regulatory Compliance",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "School Certificates & Safety Approvals",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Certified compliances verifying structural safety, fire safety, water purity, sanitation, and governmental recognition."
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Certificate Name",
+              "Issuing Government Authority",
+              "Compliance Status",
+              "Inspection Frequency"
+            ],
+            [
+              "Building Safety Certificate",
+              "Public Works Department (PWD) / Certified Structural Engineer",
+              "Certified Structurally Sound & Safe",
+              "Periodic Renewal"
+            ],
+            [
+              "Fire Safety Certificate (NOC)",
+              "Fire & Emergency Services, Haryana",
+              "Compliant with hydrants, extinguishers, alarms",
+              "Annual Audit Verified"
+            ],
+            [
+              "Safe Drinking Water & Sanitation",
+              "Public Health Engineering Department (PHED)",
+              "RO filtration tested & hygienic facilities certified",
+              "Annual Laboratory Test"
+            ],
+            [
+              "Government Recognition (NOC)",
+              "Directorate of School Education, Haryana",
+              "Permanent recognition granted for Senior Secondary",
+              "Perpetual Compliance"
+            ]
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

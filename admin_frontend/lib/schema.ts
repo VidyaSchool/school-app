@@ -357,3 +357,61 @@ export const substitutionSettings = pgTable('substitution_settings', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
+
+// ── Hybrid CMS Architecture Tables ──────────────────────────────────────────
+
+export const cmsPages = pgTable('cms_pages', {
+  id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  type: text('type').notNull().default('page_builder'), // 'page_builder' | 'custom_developer'
+  status: text('status').notNull().default('draft'), // 'draft' | 'published' | 'archived'
+  
+  // SEO Metadata
+  seoTitle: text('seo_title'),
+  seoDescription: text('seo_description'),
+  ogImage: text('og_image'),
+  canonicalUrl: text('canonical_url'),
+  noIndex: boolean('no_index').notNull().default(false),
+
+  // Authorship & Timestamps
+  authorId: text('author_id'),
+  updatedById: text('updated_by_id'),
+  publishedAt: timestamp('published_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const cmsPageSections = pgTable('cms_page_sections', {
+  id: text('id').primaryKey(),
+  pageId: text('page_id').notNull().references(() => cmsPages.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // 'hero', 'richText', 'table', 'cards', 'faculty', etc.
+  order: integer('order').notNull().default(0),
+  props: text('props').notNull().default('{}'), // JSON-serialized section props
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const cmsMedia = pgTable('cms_media', {
+  id: text('id').primaryKey(),
+  filename: text('filename').notNull(),
+  url: text('url').notNull(),
+  altText: text('alt_text'),
+  fileSize: integer('file_size'),
+  mimeType: text('mime_type'),
+  width: integer('width'),
+  height: integer('height'),
+  uploadedById: text('uploaded_by_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const cmsPageVersions = pgTable('cms_page_versions', {
+  id: text('id').primaryKey(),
+  pageId: text('page_id').notNull().references(() => cmsPages.id, { onDelete: 'cascade' }),
+  versionNumber: integer('version_number').notNull(),
+  snapshot: text('snapshot').notNull(), // Full JSON dump of page + sections
+  createdById: text('created_by_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+

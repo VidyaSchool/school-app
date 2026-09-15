@@ -1,0 +1,63 @@
+{
+  "slug": "pta",
+  "title": "Parents Teachers Association (PTA)",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Parents Teachers Association (PTA)",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Building a close, collaborative bridge between families and teachers to champion the emotional, academic, and physical growth of every child."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "pta-1",
+              "badge": "Consultation",
+              "title": "Regular PTM Forums",
+              "description": "Structured parent-teacher meetings following every assessment cycle to celebrate progress and address support areas.",
+              "linkUrl": "/p/notices"
+            },
+            {
+              "id": "pta-2",
+              "badge": "Representation",
+              "title": "Parent Executive Committee",
+              "description": "Elected parent members providing insights on student welfare, nutrition, transport, and community events.",
+              "linkUrl": "/p/leadership"
+            },
+            {
+              "id": "pta-3",
+              "badge": "Empowerment",
+              "title": "Parent Literacy Workshops",
+              "description": "Community sessions on positive parenting, digital awareness, nutritional guidance, and health practices.",
+              "linkUrl": "/p/student-life"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-quote",
+        "type": "quote",
+        "data": {
+          "text": "Education is a shared partnership between committed teachers, motivated students, and supportive parents.",
+          "caption": "VIDYA School PTA Philosophy"
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "slug": "vision-and-mission",
+  "title": "Vision & Mission",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Vision & Mission of The VIDYA School",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "At The VIDYA School, our foundational mission is to educate, empower, and transform young lives through holistic education, cutting-edge infrastructure, and moral grounding."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "vm1",
+              "badge": "Our Vision",
+              "title": "Educate, Empower & Transform",
+              "description": "To nurture a generation of empowered, socially responsible, and intellectually curious young leaders capable of thriving in India's emerging global knowledge economy.",
+              "linkUrl": "/p/about-vidyaschool"
+            },
+            {
+              "id": "vm2",
+              "badge": "Our Mission",
+              "title": "Equal Opportunities for All",
+              "description": "To provide equal access to world-class English-medium education, digital literacy, life skills, and character building for children from underprivileged backgrounds.",
+              "linkUrl": "/p/about-vidyaschool"
+            },
+            {
+              "id": "vm3",
+              "badge": "Core Values",
+              "title": "Integrity, Empathy & Excellence",
+              "description": "Fostering academic curiosity, moral leadership, resilient spirit, gender equality, and lifelong civic responsibility.",
+              "linkUrl": "/p/student-life"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-quote",
+        "type": "quote",
+        "data": {
+          "text": "The difference between who you are and who you want to be is what you do.",
+          "caption": "The VIDYA Guiding Principle"
+        }
+      },
+      {
+        "id": "blk-list",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "items": [
+            "Deliver high-standard CBSE education with complete learning resources provided to all students.",
+            "Equip every learner with modern STEM, robotics, computer science, and English conversational fluency.",
+            "Foster vibrant artistic expression through classical music, fine arts, and physical education.",
+            "Engage institutional partners and mentors to bridge the digital and corporate opportunities divide."
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "slug": "syllabus",
+  "title": "Curriculum Syllabus",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Curriculum Syllabus & Unit Frameworks",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "Academic Year 2025-2026 Syllabus",
+          "message": "All subject modules are aligned with the latest CBSE guidelines, NCERT core textbooks, and national competency-based learning standards.",
+          "variant": "warning"
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 2,
+          "items": [
+            {
+              "id": "syl-1",
+              "badge": "Foundational & Primary",
+              "title": "Classes I to V Syllabus",
+              "description": "Activity-centered learning focusing on foundational literacy, numeracy, storytelling, environmental observations, and motor skills.",
+              "linkUrl": "/p/subjects"
+            },
+            {
+              "id": "syl-2",
+              "badge": "Middle School",
+              "title": "Classes VI to VIII Syllabus",
+              "description": "Scientific inquiry, algebraic reasoning, historical civilizations, bilingual proficiency, and introductory coding.",
+              "linkUrl": "/p/subjects"
+            },
+            {
+              "id": "syl-3",
+              "badge": "Secondary",
+              "title": "Classes IX & X (AISSE) Syllabus",
+              "description": "Structured CBSE curriculum covering experimental science, mathematics, world history, geography, and digital applications.",
+              "linkUrl": "/p/examinations"
+            },
+            {
+              "id": "syl-4",
+              "badge": "Senior Secondary",
+              "title": "Classes XI & XII (AISSCE) Syllabus",
+              "description": "Specialized coursework in Science and Commerce streams preparing students for board exams and competitive university entrance tests.",
+              "linkUrl": "/p/examinations"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

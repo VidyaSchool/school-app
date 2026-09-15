@@ -1,0 +1,744 @@
+{
+  "slug": "about-vidyaschool",
+  "title": "About VidyaSchool",
+  "widgets": {
+    "time": 1789294782254,
+    "blocks": [
+      {
+        "id": "F1Fc1dfTth",
+        "type": "header",
+        "data": {
+          "text": "About VidyaSchool",
+          "level": 1
+        }
+      },
+      {
+        "id": "b_pgSmRLLj",
+        "type": "header",
+        "data": {
+          "text": "Educating. Empowering. Transforming.",
+          "level": 2
+        }
+      },
+      {
+        "id": "NetyMIxYJJ",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA School, Gurugram is more than a school. It is part of a larger journey that began with a simple but powerful belief: every child deserves the opportunity to learn, grow, dream and build a better future."
+        }
+      },
+      {
+        "id": "FmgP58BuKi",
+        "type": "paragraph",
+        "data": {
+          "text": "Established in 1985 by Ms. Rashmi Misra, VIDYA began with just five girls being taught at her home on the IIT Delhi campus. What started as a small educational initiative gradually grew into a national movement dedicated to the education, empowerment and transformation of children, youth and women from underserved communities."
+        }
+      },
+      {
+        "id": "mDD7nH3tAc",
+        "type": "paragraph",
+        "data": {
+          "text": "Today, VIDYA works across India to create opportunities through education, skills, employability and empowerment. VIDYA School, Gurugram, inaugurated in November 2009, is the organisation's flagship school and reflects this vision in action."
+        }
+      },
+      {
+        "id": "iyrNKw4b3o",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "zl-KwEae7m",
+        "type": "header",
+        "data": {
+          "text": "Our Story",
+          "level": 1
+        }
+      },
+      {
+        "id": "9sfqzpHVe7",
+        "type": "header",
+        "data": {
+          "text": "From Five Girls to a Movement",
+          "level": 2
+        }
+      },
+      {
+        "id": "9Rnj_fb4T2",
+        "type": "paragraph",
+        "data": {
+          "text": "In 1985, VIDYA began with five girls and a vision to make quality education accessible to those who needed it most."
+        }
+      },
+      {
+        "id": "4s1a-6aCp6",
+        "type": "paragraph",
+        "data": {
+          "text": "Over four decades, that vision has grown into a nationwide organisation working across education, skills development, employability, women's empowerment and social transformation."
+        }
+      },
+      {
+        "id": "_-DMABPjvp",
+        "type": "paragraph",
+        "data": {
+          "text": "At the heart of VIDYA's journey has always been the belief that education can change the direction of a person's life. But education, in its truest sense, extends beyond textbooks and examinations. It builds confidence, develops capabilities, creates opportunities and enables individuals to become active participants in their communities and society."
+        }
+      },
+      {
+        "id": "aGf26r35cJ",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA continues to carry this philosophy forward by creating pathways through which children and young people can <b>learn, discover their potential, develop skills and pursue their aspirations.</b>"
+        }
+      },
+      {
+        "id": "18eodU71Yc",
+        "type": "header",
+        "data": {
+          "text": "VIDYA School, Gurugram",
+          "level": 1
+        }
+      },
+      {
+        "id": "dwSiFJVT7e",
+        "type": "header",
+        "data": {
+          "text": "A School Built on Opportunity",
+          "level": 2
+        }
+      },
+      {
+        "id": "D7WE7EOB9b",
+        "type": "paragraph",
+        "data": {
+          "text": "Inaugurated in November 2009, VIDYA School, Gurugram is a CBSE-accredited, co-educational K–12 institution created to provide children from underserved communities with access to high-quality education and opportunities comparable with some of the best schools in the country."
+        }
+      },
+      {
+        "id": "KyDoUrb-9Q",
+        "type": "paragraph",
+        "data": {
+          "text": "Today, the school serves more than 1,200 students and provides an environment where academic learning is complemented by technology, sports, arts, life skills, experiential learning and opportunities for personal growth."
+        }
+      },
+      {
+        "id": "S9y8lJQiS2",
+        "type": "paragraph",
+        "data": {
+          "text": "The school has developed a modern learning environment with:"
+        }
+      },
+      {
+        "id": "gljkwAqed3",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "IT-enabled classrooms",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Science and STEM learning facilities",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Robotics and technology programmes",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Digital language-learning facilities",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "A well-stocked library",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Extensive sports facilities",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Arts, music, dance and theatre",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Life-skills and cultural programmes",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Remedial and additional academic support",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Career counselling and mentoring",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Vocational learning opportunities",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "cirVvZkrpB",
+        "type": "paragraph",
+        "data": {
+          "text": "Our objective is not simply to help students pass examinations. It is to help them become confident, capable and responsible individuals who are prepared to participate, compete, excel and lead."
+        }
+      },
+      {
+        "id": "VoY7MzjVSQ",
+        "type": "header",
+        "data": {
+          "text": "Our Educational Philosophy",
+          "level": 1
+        }
+      },
+      {
+        "id": "ZrSwH5DUyA",
+        "type": "header",
+        "data": {
+          "text": "Learning Beyond the Classroom",
+          "level": 2
+        }
+      },
+      {
+        "id": "KqXJoiO2Bc",
+        "type": "paragraph",
+        "data": {
+          "text": "At VIDYA, we believe that every child learns differently."
+        }
+      },
+      {
+        "id": "CVlyp4hYHM",
+        "type": "paragraph",
+        "data": {
+          "text": "Our educational approach therefore places the learner at the centre of the learning process. Teachers facilitate discovery, encourage questions and create opportunities for students to connect what they learn in school with the world around them."
+        }
+      },
+      {
+        "id": "qPZ7fAynhK",
+        "type": "paragraph",
+        "data": {
+          "text": "Our pedagogy incorporates:"
+        }
+      },
+      {
+        "id": "FeXEsPoyu3",
+        "type": "paragraph",
+        "data": {
+          "text": "Child-Centred LearningUnderstanding individual strengths, needs and learning styles and providing appropriate support."
+        }
+      },
+      {
+        "id": "_CVJz3pYw9",
+        "type": "paragraph",
+        "data": {
+          "text": "Experiential LearningConnecting concepts with real-world experiences so that learning becomes meaningful and memorable."
+        }
+      },
+      {
+        "id": "gSyUAi5pA0",
+        "type": "paragraph",
+        "data": {
+          "text": "Collaborative LearningEncouraging students to work together, communicate ideas and learn from different perspectives."
+        }
+      },
+      {
+        "id": "Z9N2b1F015",
+        "type": "paragraph",
+        "data": {
+          "text": "Interdisciplinary LearningHelping students understand the connections between different subjects and apply knowledge to real-world problems."
+        }
+      },
+      {
+        "id": "uOxIcEy0Xs",
+        "type": "paragraph",
+        "data": {
+          "text": "Inquiry and Critical ThinkingEncouraging students to ask questions, investigate possibilities, analyse information and develop their own understanding."
+        }
+      },
+      {
+        "id": "LAxZdQBVu9",
+        "type": "paragraph",
+        "data": {
+          "text": "Through this approach, we seek to develop learners who are not merely knowledgeable, but curious, independent and capable of thinking for themselves."
+        }
+      },
+      {
+        "id": "Uot-n7sW0Y",
+        "type": "header",
+        "data": {
+          "text": "Beyond Academics",
+          "level": 1
+        }
+      },
+      {
+        "id": "yMwgvLICFe",
+        "type": "header",
+        "data": {
+          "text": "Developing the Whole Child",
+          "level": 2
+        }
+      },
+      {
+        "id": "UWs-Gb5Rtx",
+        "type": "paragraph",
+        "data": {
+          "text": "Education cannot be measured only through marks."
+        }
+      },
+      {
+        "id": "cioqfI3NI5",
+        "type": "paragraph",
+        "data": {
+          "text": "A student's development also includes their confidence, communication, creativity, physical well-being, emotional growth, relationships and ability to make responsible decisions."
+        }
+      },
+      {
+        "id": "LsUxCX_FmJ",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA therefore provides students with opportunities to participate in sports, music, dance, theatre, fine arts, cultural activities, technology and community-oriented initiatives."
+        }
+      },
+      {
+        "id": "Gdl2mHFGIF",
+        "type": "paragraph",
+        "data": {
+          "text": "These experiences help students discover interests and abilities that may not always emerge inside a conventional classroom."
+        }
+      },
+      {
+        "id": "NS1fZMAe3n",
+        "type": "paragraph",
+        "data": {
+          "text": "Our aim is to create well-rounded individuals who can understand themselves, work with others and contribute meaningfully to society."
+        }
+      },
+      {
+        "id": "S-ip71OFWw",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "SCF8Qb-pxr",
+        "type": "header",
+        "data": {
+          "text": "Empowering Every Child",
+          "level": 1
+        }
+      },
+      {
+        "id": "uz8GmD2MJr",
+        "type": "header",
+        "data": {
+          "text": "Opportunity Changes Possibilities",
+          "level": 2
+        }
+      },
+      {
+        "id": "iSL4b08cPv",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA's work is rooted in the belief that circumstances should not determine a child's potential."
+        }
+      },
+      {
+        "id": "qALzG9x_kT",
+        "type": "paragraph",
+        "data": {
+          "text": "Students at VIDYA School come from communities where access to high-quality educational opportunities may otherwise be limited. The school seeks to bridge that gap by providing not only education, but also the infrastructure, exposure, guidance and support required for students to pursue their ambitions."
+        }
+      },
+      {
+        "id": "wtcKpvgiEl",
+        "type": "paragraph",
+        "data": {
+          "text": "Particular emphasis is placed on empowering girls, ensuring that they receive equal opportunities to learn, participate, develop leadership abilities and shape their futures."
+        }
+      },
+      {
+        "id": "MpMwSRI57a",
+        "type": "paragraph",
+        "data": {
+          "text": "For students whose aspirations extend beyond conventional academic pathways, VIDYA also provides exposure to vocational skills, career guidance and opportunities that can support further education and employability."
+        }
+      },
+      {
+        "id": "PxIh0XMESP",
+        "type": "header",
+        "data": {
+          "text": "Innovation &amp; Future Readiness",
+          "level": 1
+        }
+      },
+      {
+        "id": "LU3EEf71kf",
+        "type": "header",
+        "data": {
+          "text": "Preparing Students for a Changing World",
+          "level": 2
+        }
+      },
+      {
+        "id": "yOflCQzTyd",
+        "type": "paragraph",
+        "data": {
+          "text": "The world our students will enter is changing rapidly."
+        }
+      },
+      {
+        "id": "Sbse8NZlvS",
+        "type": "paragraph",
+        "data": {
+          "text": "Technology, artificial intelligence, automation and new forms of work are reshaping the skills required for the future. At VIDYA, we believe students must therefore be encouraged not only to consume knowledge, but also to create, question, experiment and solve problems."
+        }
+      },
+      {
+        "id": "_uNC3szy66",
+        "type": "paragraph",
+        "data": {
+          "text": "The school's focus on technology, robotics, STEM learning, digital education and innovation is part of this larger effort."
+        }
+      },
+      {
+        "id": "Dx2eP8nLHh",
+        "type": "paragraph",
+        "data": {
+          "text": "We want our students to approach the future with curiosity rather than uncertainty—to become people who can adapt to change, learn continuously and create solutions to the challenges around them."
+        }
+      },
+      {
+        "id": "n8j3U1a7WL",
+        "type": "header",
+        "data": {
+          "text": "A Culture of Participation",
+          "level": 1
+        }
+      },
+      {
+        "id": "ih5PE-Pvsz",
+        "type": "header",
+        "data": {
+          "text": "Discover. Participate. Lead.",
+          "level": 2
+        }
+      },
+      {
+        "id": "LNBVkitQ6d",
+        "type": "paragraph",
+        "data": {
+          "text": "Learning becomes powerful when students are given the opportunity to take ownership."
+        }
+      },
+      {
+        "id": "ll4AcE_Nbv",
+        "type": "paragraph",
+        "data": {
+          "text": "From sports competitions and cultural programmes to innovation challenges, projects, exhibitions and community initiatives, students are encouraged to participate beyond the boundaries of their classrooms."
+        }
+      },
+      {
+        "id": "m0DJYxxxC9",
+        "type": "paragraph",
+        "data": {
+          "text": "These experiences develop qualities that cannot be taught through textbooks alone:"
+        }
+      },
+      {
+        "id": "cqWFKekMku",
+        "type": "paragraph",
+        "data": {
+          "text": "Confidence. Creativity. Collaboration. Communication. Leadership. Resilience."
+        }
+      },
+      {
+        "id": "D7geq14cNz",
+        "type": "paragraph",
+        "data": {
+          "text": "Every opportunity to participate is an opportunity for a student to discover something about themselves."
+        }
+      },
+      {
+        "id": "q979cyOGk7",
+        "type": "header",
+        "data": {
+          "text": "Our Impact",
+          "level": 1
+        }
+      },
+      {
+        "id": "67MxlRgmJY",
+        "type": "header",
+        "data": {
+          "text": "Creating Possibilities, One Student at a Time",
+          "level": 2
+        }
+      },
+      {
+        "id": "DgcsGt67rh",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA School's impact is not measured only by examination results."
+        }
+      },
+      {
+        "id": "QIKqiU9noG",
+        "type": "paragraph",
+        "data": {
+          "text": "It can also be seen in students who discover a passion for science, step onto a sports field for the first time, develop confidence in speaking English, build their first technological project, pursue higher education or return to the school as successful alumni."
+        }
+      },
+      {
+        "id": "OV5ZJ39_nY",
+        "type": "paragraph",
+        "data": {
+          "text": "The school's students have participated in national and international competitions, achieved strong academic results, excelled in sports and progressed to higher education and professional pathways."
+        }
+      },
+      {
+        "id": "rs-zoSUgl8",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA's wider journey has similarly grown from a small initiative into a national organisation working to create educational and economic opportunities for children, youth and women."
+        }
+      },
+      {
+        "id": "bOLUWCRLaI",
+        "type": "paragraph",
+        "data": {
+          "text": "At the school level, our greatest measure of success remains simple:"
+        }
+      },
+      {
+        "id": "eFpj6LTYAz",
+        "type": "paragraph",
+        "data": {
+          "text": "A child who begins with limited opportunities should leave with expanded possibilities."
+        }
+      },
+      {
+        "id": "4mELTGv7eZ",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "FYoOiNkhd7",
+        "type": "header",
+        "data": {
+          "text": "Our Vision",
+          "level": 1
+        }
+      },
+      {
+        "id": "LEbkR0mpDk",
+        "type": "header",
+        "data": {
+          "text": "To enable every child to discover their potential, access meaningful opportunities and develop the confidence and capabilities to shape their own future.",
+          "level": 3
+        }
+      },
+      {
+        "id": "LpKA8xnjcl",
+        "type": "paragraph",
+        "data": {
+          "text": "We envision a learning community where every student is encouraged to:"
+        }
+      },
+      {
+        "id": "j7RaCLhsVR",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "Learn with curiosity",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Think independently",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Create fearlessly",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Participate confidently",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Lead responsibly",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Contribute meaningfully",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "MA0HneA4wN",
+        "type": "header",
+        "data": {
+          "text": "Our Mission",
+          "level": 1
+        }
+      },
+      {
+        "id": "EvBAej6oFz",
+        "type": "header",
+        "data": {
+          "text": "To provide high-quality, holistic and inclusive education that enables students from underserved communities to compete, excel and lead.",
+          "level": 3
+        }
+      },
+      {
+        "id": "PaFo4wcRQ8",
+        "type": "paragraph",
+        "data": {
+          "text": "We work towards this by combining academic learning with:"
+        }
+      },
+      {
+        "id": "6xLafknuSz",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "Life skills",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Technology and innovation",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Sports and the arts",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Experiential learning",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Career guidance",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Vocational exposure",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Mentoring and support",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "Values and social responsibility",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "rXBHBLMe9N",
+        "type": "header",
+        "data": {
+          "text": "The VIDYA Spirit",
+          "level": 1
+        }
+      },
+      {
+        "id": "9GwUxGhub5",
+        "type": "header",
+        "data": {
+          "text": "Education with Purpose",
+          "level": 2
+        }
+      },
+      {
+        "id": "PLnbTwcxCZ",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA's journey began with five girls."
+        }
+      },
+      {
+        "id": "D_U7Nun8IP",
+        "type": "paragraph",
+        "data": {
+          "text": "Today, that beginning represents something much larger—a belief that when people are given access to education, encouragement and opportunity, they can change the course of their lives."
+        }
+      },
+      {
+        "id": "2rgFcaaAe4",
+        "type": "paragraph",
+        "data": {
+          "text": "At VIDYA School, we strive to create that possibility every day."
+        }
+      },
+      {
+        "id": "0MCRJbv0SG",
+        "type": "paragraph",
+        "data": {
+          "text": "We want every student who walks through our gates to leave with more than knowledge."
+        }
+      },
+      {
+        "id": "BJfzoInNR3",
+        "type": "paragraph",
+        "data": {
+          "text": "We want them to leave with confidence.With curiosity.With skills.With character.And with the courage to imagine a future beyond what they thought was possible."
+        }
+      },
+      {
+        "id": "5yxHJ7jQm8",
+        "type": "header",
+        "data": {
+          "text": "This is VIDYA.",
+          "level": 3
+        }
+      },
+      {
+        "id": "tE6vI9qcIP",
+        "type": "paragraph",
+        "data": {
+          "text": "Educate. Empower. Transform."
+        }
+      }
+    ],
+    "version": "2.31.6"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "slug": "eligibility",
+  "title": "Admission Eligibility Criteria",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Admission Eligibility Criteria & Age Guidelines",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Criteria and minimum age requirements as prescribed by the Directorate of Education and CBSE for entry into various classes."
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Grade Level",
+              "Minimum Age (as of March 31)",
+              "Academic Prerequisites",
+              "Class Section Size"
+            ],
+            [
+              "Nursery / Balvatika",
+              "3 Years to 4 Years",
+              "Foundational physical & communicative readiness",
+              "25 - 30 Students"
+            ],
+            [
+              "Kindergarten (KG)",
+              "4 Years to 5 Years",
+              "Basic pre-literacy and pre-numeracy familiarity",
+              "30 Students"
+            ],
+            [
+              "Class I",
+              "5 Years to 6 Years",
+              "Foundational literacy & basic cognitive readiness",
+              "35 Students"
+            ],
+            [
+              "Classes II – VIII",
+              "Age-appropriate (6+ to 13+)",
+              "Passing marks in previous grade from recognized school",
+              "35 - 40 Students"
+            ],
+            [
+              "Classes IX – XI",
+              "14+ Years",
+              "CBSE / State Board passing report card and TC",
+              "35 - 40 Students"
+            ]
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

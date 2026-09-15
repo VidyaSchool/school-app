@@ -1,0 +1,93 @@
+{
+  "slug": "admission-process",
+  "title": "Admission Process",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Admission Process & Guidelines",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "Admissions Open for Academic Session",
+          "message": "The VIDYA School welcomes applications for underprivileged children seeking quality English-medium CBSE education. Application forms can be downloaded online or collected at the school office.",
+          "variant": "warning"
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Admission Step",
+              "Procedure Description",
+              "Key Documentation Required",
+              "Timeline"
+            ],
+            [
+              "Step 1: Application Form",
+              "Fill online registration form or collect paper form from school reception",
+              "Child Birth Certificate, 4 Passport Photos",
+              "December – February"
+            ],
+            [
+              "Step 2: Document Verification",
+              "Verification of residence and family income affidavit",
+              "Aadhaar Card, Proof of Residence, Income Certificate",
+              "February – March"
+            ],
+            [
+              "Step 3: Interaction",
+              "Friendly informal interaction with child and parents to evaluate grade placement",
+              "Previous School Progress Report / TC (if applicable)",
+              "March"
+            ],
+            [
+              "Step 4: Orientation & Kit",
+              "Welcome orientation, distribution of textbooks, uniform, and school kit",
+              "Signed parent commitment form",
+              "First week of April"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Check Eligibility Criteria",
+              "url": "/p/eligibility",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Fee Structure & Scholarships",
+              "url": "/p/fee-structure",
+              "variant": "outline"
+            },
+            {
+              "id": "b3",
+              "text": "Admission FAQs",
+              "url": "/p/faqs",
+              "variant": "secondary"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

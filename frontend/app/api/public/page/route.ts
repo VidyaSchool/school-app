@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { customPage } from "@/lib/schema"
-import { eq, or, and, sql } from "drizzle-orm"
+import { eq, or, sql } from "drizzle-orm"
+import { getStaticPage } from "@/lib/static-pages"
 
 // Helper to ensure custom_page table exists
 async function ensureTableExists() {
@@ -23,7 +24,7 @@ async function ensureTableExists() {
   }
 }
 
-// GET: Public endpoint (no auth required) to serve published pages by slug or id
+// GET: Public endpoint (no auth required) to serve pages by slug or id
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const identifier = searchParams.get("slug") || searchParams.get("id") || searchParams.get("uid")
@@ -32,11 +33,27 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Page identifier (slug or ID) is required" }, { status: 400 })
   }
 
+  const raw = identifier.trim()
+  const cleanSlug = raw.toLowerCase().replace(/^\/?p\//, "").replace(/^\/+|\/+$/g, "")
+
+  // 1. Check static pages in code directory first (instant, 0ms DB latency)
+  const staticPage = getStaticPage(cleanSlug) || getStaticPage(raw)
+  if (staticPage) {
+    return NextResponse.json({
+      found: true,
+      page: {
+        id: staticPage.slug,
+        title: staticPage.title,
+        slug: staticPage.slug,
+        widgets: staticPage.widgets,
+        updatedAt: new Date().toISOString(),
+      },
+    })
+  }
+
+  // 2. Fallback to database for runtime-created dynamic pages
   try {
     await ensureTableExists()
-
-    const raw = identifier.trim()
-    const cleanSlug = raw.toLowerCase().replace(/^\/?p\//, "").replace(/^\/+|\/+$/g, "")
 
     const pages = await db
       .select()

@@ -44,6 +44,7 @@ export const viewport = {
   ]
 }
 
+import { AlertBanner } from "@/components/alert-banner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { RootProvider } from "fumadocs-ui/provider/next"
 import { PWARegister } from "@/components/pwa-register"
@@ -83,6 +84,7 @@ export default async function RootLayout({
               theme={{ enabled: false }}
               search={{ SearchDialog: CustomSearchDialog }}
             >
+              <AlertBanner />
               <PWARegister />
               {children}
               <Analytics />

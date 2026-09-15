@@ -1,0 +1,55 @@
+{
+  "slug": "activities",
+  "title": "Co-Curricular Activities",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Co-Curricular & Extra-Curricular Activities",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Education extends far beyond textbooks. We offer a rich spectrum of experiential learning, field excursions, and cultural events."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "act-1",
+              "badge": "Exploration",
+              "title": "Educational Excursions",
+              "description": "Visits to the National Science Centre, Nehru Planetarium, National Museum of Natural History, and Sultanpur National Park.",
+              "linkUrl": "/p/get-involved"
+            },
+            {
+              "id": "act-2",
+              "badge": "Industry Insight",
+              "title": "Corporate Office Visits",
+              "description": "Guided 2-3 hour exposure visits to leading corporate offices, inspiring students about modern career opportunities.",
+              "linkUrl": "/p/get-involved"
+            },
+            {
+              "id": "act-3",
+              "badge": "Traditions",
+              "title": "Cultural Celebrations",
+              "description": "Grand celebrations for Independence Day, Republic Day, Diwali, Christmas, Teacher's Day, and Earth Day.",
+              "linkUrl": "/p/events"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

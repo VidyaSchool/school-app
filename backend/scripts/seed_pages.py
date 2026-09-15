@@ -1153,59 +1153,443 @@ PAGES_DATA = [
     },
     {
         "slug": "fee-structure",
-        "title": "Fee Structure & Scholarships",
+        "title": "Fee Structure & Scholarships (2025-26)",
         "blocks": [
             {
                 "id": "blk-h1",
                 "type": "header",
                 "data": {
-                    "text": "Fee Structure & Scholarship Policies",
+                    "text": "Fee Structure for the Academic Year 2025-26",
                     "level": 1
                 }
             },
             {
-                "id": "blk-p1",
+                "id": "blk-intro",
                 "type": "paragraph",
                 "data": {
-                    "text": "The VIDYA School is dedicated to providing high-quality CBSE education to children from underprivileged backgrounds on heavily subsidized or 100% scholarship basis."
+                    "text": "Official fee schedule approved for <strong>The VIDYA School, Gurugram</strong> (Notification dated 17.03.2025). As a premier CBSE-affiliated school dedicated to providing quality English-medium education to children from underprivileged backgrounds, fees are heavily subsidized, transparent, and strictly compliant with Haryana Government norms and CBSE affiliation bylaws."
                 }
             },
             {
-                "id": "blk-alert",
+                "id": "blk-alert-zero",
                 "type": "alert",
                 "data": {
-                    "title": "Zero Capitation Policy",
-                    "message": "The VIDYA School strictly prohibits any capitation fees, donations, or hidden charges. Subsidized parental contributions ensure dignity, investment, and sustainability.",
+                    "title": "Zero Capitation Policy & 100% Refundable Caution Deposit",
+                    "message": "The VIDYA School strictly prohibits capitation fees, donations, or any hidden levies. A nominal one-time caution money of \u20b9750 is collected at the time of admission and is 100% refundable upon student clearance. Deserving students and those from economically weaker sections are supported through full scholarships and philanthropic partnerships.",
                     "variant": "success"
                 }
             },
             {
-                "id": "blk-cards",
+                "id": "blk-quick-cards",
                 "type": "card",
                 "data": {
                     "columns": 3,
                     "items": [
                         {
-                            "id": "fee-1",
-                            "badge": "Subsidized Education",
-                            "title": "Community Tuition Model",
-                            "description": "Nominal, highly affordable monthly contributions tailored to family economic capacity.",
+                            "id": "card-adm",
+                            "badge": "One-Time at Admission",
+                            "title": "Admission & Caution Money",
+                            "description": "Total \u20b9950 across all grades (\u20b9200 Admission Fee + \u20b9750 100% Refundable Caution Deposit).",
                             "linkUrl": "/p/admission-process"
                         },
                         {
-                            "id": "fee-2",
-                            "badge": "Full Scholarships",
-                            "title": "100% Sponsorship Scheme",
-                            "description": "Complete tuition, book kits, stationery, uniform, and midday meal support for economically disadvantaged scholars.",
-                            "linkUrl": "/p/get-involved"
+                            "id": "card-annual",
+                            "badge": "Annual Development",
+                            "title": "Annual Statutory Charges",
+                            "description": "\u20b9600 School Development Charges plus statutory Haryana Govt Sports, Red Cross, & Welfare funds.",
+                            "linkUrl": "/p/admission-process"
                         },
                         {
-                            "id": "fee-3",
-                            "badge": "Corporate CSR",
-                            "title": "Philanthropic Partnerships",
-                            "description": "Leading corporate partners and foundations sponsor student cohorts throughout their schooling.",
+                            "id": "card-monthly",
+                            "badge": "Monthly Subsidized Fee",
+                            "title": "From \u20b9565 to \u20b91,355 / Month",
+                            "description": "Nominal monthly charges inclusive of Tuition, Computer & Smart Class, Activities, Labs, and Sports.",
                             "linkUrl": "/p/get-involved"
                         }
+                    ]
+                }
+            },
+            {
+                "id": "blk-h2-table",
+                "type": "header",
+                "data": {
+                    "text": "Official Fee Breakdown (Session 2025-26)",
+                    "level": 2
+                }
+            },
+            {
+                "id": "blk-table-p",
+                "type": "paragraph",
+                "data": {
+                    "text": "The table below reflects the approved fee structure notified on 17.03.2025 for The VIDYA School, Sector 24, DLF Phase-3, Gurugram:"
+                }
+            },
+            {
+                "id": "blk-fee-table",
+                "type": "table",
+                "data": {
+                    "withHeadings": true,
+                    "content": [
+                        [
+                            "S.No",
+                            "Particulars",
+                            "Fee Class<br>Nurs & KG",
+                            "Fee Class<br>I to V",
+                            "Fee Class<br>VI to VIII",
+                            "Fee Class<br>IX & X",
+                            "Fee Class XI & XII<br><span class=\"text-[11px] font-normal text-muted-foreground\">(Arts & Commerce)</span>",
+                            "Fee Class XI & XII<br><span class=\"text-[11px] font-normal text-muted-foreground\">(Science Stream)</span>"
+                        ],
+                        [
+                            "<b>1</b>",
+                            "<b>At the time of Admission only</b>",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014"
+                        ],
+                        [
+                            "i",
+                            "Admission Fee",
+                            "\u20b9200",
+                            "\u20b9200",
+                            "\u20b9200",
+                            "\u20b9200",
+                            "\u20b9200",
+                            "\u20b9200"
+                        ],
+                        [
+                            "ii",
+                            "Caution Money (Refundable)",
+                            "\u20b9750",
+                            "\u20b9750",
+                            "\u20b9750",
+                            "\u20b9750",
+                            "\u20b9750",
+                            "\u20b9750"
+                        ],
+                        [
+                            "",
+                            "<b>Total (At Admission Only)</b>",
+                            "<b>\u20b9950</b>",
+                            "<b>\u20b9950</b>",
+                            "<b>\u20b9950</b>",
+                            "<b>\u20b9950</b>",
+                            "<b>\u20b9950</b>",
+                            "<b>\u20b9950</b>"
+                        ],
+                        [
+                            "<b>2</b>",
+                            "<b>Once in a year (Annual Charges)</b>",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014"
+                        ],
+                        [
+                            "i",
+                            "School Development Charges",
+                            "\u20b9600",
+                            "\u20b9600",
+                            "\u20b9600",
+                            "\u20b9600",
+                            "\u20b9600",
+                            "\u20b9600"
+                        ],
+                        [
+                            "ii",
+                            "Haryana Govt Sports Fund",
+                            "\u2014",
+                            "\u2014",
+                            "\u20b910",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014"
+                        ],
+                        [
+                            "iii",
+                            "Haryana Govt Red Cross Fund",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u20b945",
+                            "\u20b945",
+                            "\u20b945"
+                        ],
+                        [
+                            "iv",
+                            "Haryana Govt Children Welfare Fund",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u20b936",
+                            "\u20b936",
+                            "\u20b936"
+                        ],
+                        [
+                            "",
+                            "<b>Total (Once in a Year)</b>",
+                            "<b>\u20b9600</b>",
+                            "<b>\u20b9600</b>",
+                            "<b>\u20b9610</b>",
+                            "<b>\u20b9681</b>",
+                            "<b>\u20b9681</b>",
+                            "<b>\u20b9681</b>"
+                        ],
+                        [
+                            "<b>3</b>",
+                            "<b>Monthly Charges</b>",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014"
+                        ],
+                        [
+                            "i",
+                            "Tuition Fee",
+                            "\u20b9365",
+                            "\u20b9340",
+                            "\u20b9350",
+                            "\u20b9325",
+                            "\u20b9880",
+                            "\u20b9880"
+                        ],
+                        [
+                            "ii",
+                            "Computer & Smart Class Charges",
+                            "\u20b950",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100"
+                        ],
+                        [
+                            "iii",
+                            "Activity Charges",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100"
+                        ],
+                        [
+                            "iv",
+                            "Lab Charges",
+                            "\u2014",
+                            "\u2014",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100",
+                            "\u20b9100"
+                        ],
+                        [
+                            "v",
+                            "Sports Charges",
+                            "\u20b950",
+                            "\u20b950",
+                            "\u20b950",
+                            "\u20b950",
+                            "\u20b9100",
+                            "\u20b9100"
+                        ],
+                        [
+                            "vi",
+                            "Haryana Govt Sports Fund",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u20b925",
+                            "\u20b960",
+                            "\u20b975"
+                        ],
+                        [
+                            "",
+                            "<b>Total (Monthly Charges)</b>",
+                            "<b>\u20b9565</b>",
+                            "<b>\u20b9590</b>",
+                            "<b>\u20b9700</b>",
+                            "<b>\u20b9700</b>",
+                            "<b>\u20b91,340</b>",
+                            "<b>\u20b91,355</b>"
+                        ],
+                        [
+                            "<b>4</b>",
+                            "<b>Optional Facility Charges</b>",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014",
+                            "\u2014"
+                        ],
+                        [
+                            "vii",
+                            "Transport Charges <span class=\"text-xs text-muted-foreground font-normal\">(Only for those who are using the Bus)</span>",
+                            "\u20b91,000",
+                            "\u20b91,000",
+                            "\u20b91,000",
+                            "\u20b91,000",
+                            "\u20b91,000",
+                            "\u20b91,000"
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "blk-sep1",
+                "type": "delimiter",
+                "data": {}
+            },
+            {
+                "id": "blk-h2-summary",
+                "type": "header",
+                "data": {
+                    "text": "Grade-by-Grade Fee Summary",
+                    "level": 2
+                }
+            },
+            {
+                "id": "blk-p-summary",
+                "type": "paragraph",
+                "data": {
+                    "text": "Summary of one-time admission, annual composite charges, and monthly commitments per grade band:"
+                }
+            },
+            {
+                "id": "blk-grade-cards",
+                "type": "card",
+                "data": {
+                    "columns": 3,
+                    "items": [
+                        {
+                            "id": "g-nursery",
+                            "badge": "Pre-Primary",
+                            "title": "Nursery & KG",
+                            "description": "\u2022 At Admission: \u20b9950 (\u20b9750 refundable caution)<br>\u2022 Annual Charges: \u20b9600 / year<br>\u2022 Monthly Charges: \u20b9565 / month (Tuition \u20b9365, Computer \u20b950, Activities \u20b9100, Sports \u20b950)<br>\u2022 Bus Transport (Optional): \u20b91,000 / month",
+                            "linkUrl": "/p/admission-process"
+                        },
+                        {
+                            "id": "g-primary",
+                            "badge": "Primary Wing",
+                            "title": "Classes I to V",
+                            "description": "\u2022 At Admission: \u20b9950 (\u20b9750 refundable caution)<br>\u2022 Annual Charges: \u20b9600 / year<br>\u2022 Monthly Charges: \u20b9590 / month (Tuition \u20b9340, Computer \u20b9100, Activities \u20b9100, Sports \u20b950)<br>\u2022 Bus Transport (Optional): \u20b91,000 / month",
+                            "linkUrl": "/p/admission-process"
+                        },
+                        {
+                            "id": "g-middle",
+                            "badge": "Middle Wing",
+                            "title": "Classes VI to VIII",
+                            "description": "\u2022 At Admission: \u20b9950 (\u20b9750 refundable caution)<br>\u2022 Annual Charges: \u20b9610 / year (includes \u20b910 Sports Fund)<br>\u2022 Monthly Charges: \u20b9700 / month (Tuition \u20b9350, Computer \u20b9100, Activities \u20b9100, Labs \u20b9100, Sports \u20b950)<br>\u2022 Bus Transport (Optional): \u20b91,000 / month",
+                            "linkUrl": "/p/admission-process"
+                        },
+                        {
+                            "id": "g-secondary",
+                            "badge": "Secondary Wing",
+                            "title": "Classes IX & X",
+                            "description": "\u2022 At Admission: \u20b9950 (\u20b9750 refundable caution)<br>\u2022 Annual Charges: \u20b9681 / year (includes Red Cross \u20b945 & Welfare \u20b936)<br>\u2022 Monthly Charges: \u20b9700 / month (Tuition \u20b9325, Smart Class \u20b9100, Activities \u20b9100, Labs \u20b9100, Sports \u20b950, Sports Fund \u20b925)<br>\u2022 Bus Transport (Optional): \u20b91,000 / month",
+                            "linkUrl": "/p/admission-process"
+                        },
+                        {
+                            "id": "g-senior-arts-comm",
+                            "badge": "Senior Secondary",
+                            "title": "Classes XI & XII (Arts & Commerce)",
+                            "description": "\u2022 At Admission: \u20b9950 (\u20b9750 refundable caution)<br>\u2022 Annual Charges: \u20b9681 / year<br>\u2022 Monthly Charges: \u20b91,340 / month (Tuition \u20b9880, Smart Class \u20b9100, Activities \u20b9100, Labs \u20b9100, Sports \u20b9100, Sports Fund \u20b960)<br>\u2022 Bus Transport (Optional): \u20b91,000 / month",
+                            "linkUrl": "/p/admission-process"
+                        },
+                        {
+                            "id": "g-senior-sci",
+                            "badge": "Senior Secondary",
+                            "title": "Classes XI & XII (Science Stream)",
+                            "description": "\u2022 At Admission: \u20b9950 (\u20b9750 refundable caution)<br>\u2022 Annual Charges: \u20b9681 / year<br>\u2022 Monthly Charges: \u20b91,355 / month (Tuition \u20b9880, Smart Class \u20b9100, Activities \u20b9100, Labs \u20b9100, Sports \u20b9100, Sports Fund \u20b975)<br>\u2022 Bus Transport (Optional): \u20b91,000 / month",
+                            "linkUrl": "/p/admission-process"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "blk-sep2",
+                "type": "delimiter",
+                "data": {}
+            },
+            {
+                "id": "blk-h2-doc",
+                "type": "header",
+                "data": {
+                    "text": "Official Notification Circular (PDF)",
+                    "level": 2
+                }
+            },
+            {
+                "id": "blk-p-doc",
+                "type": "paragraph",
+                "data": {
+                    "text": "Download or preview the official signed circular approved for VIDYA SCHOOL GURGAON:"
+                }
+            },
+            {
+                "id": "blk-pdf",
+                "type": "pdf",
+                "data": {
+                    "title": "Official Fee Structure 2025-26 Circular (VIDYA SCHOOL GURGAON)",
+                    "fileSize": "Official Notification (Signed & Approved 17.03.2025)",
+                    "url": "/docs/Fee-Structure-2025-26.pdf"
+                }
+            },
+            {
+                "id": "blk-btns",
+                "type": "button",
+                "data": {
+                    "align": "left",
+                    "items": [
+                        {
+                            "id": "b-dl",
+                            "text": "Download Official PDF",
+                            "url": "/docs/Fee-Structure-2025-26.pdf",
+                            "variant": "default"
+                        },
+                        {
+                            "id": "b-orig",
+                            "text": "View on Vidyaschool.com",
+                            "url": "https://www.vidyaschool.com/wp-content/uploads/2026/01/Fee-Structure-2025-26.pdf",
+                            "variant": "outline"
+                        },
+                        {
+                            "id": "b-adm",
+                            "text": "Admission Guidelines",
+                            "url": "/p/admission-process",
+                            "variant": "secondary"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "blk-h3-reg",
+                "type": "header",
+                "data": {
+                    "text": "Important Regulations & Fee Policies",
+                    "level": 3
+                }
+            },
+            {
+                "id": "blk-list-reg",
+                "type": "list",
+                "data": {
+                    "style": "unordered",
+                    "items": [
+                        "<b>Refundable Caution Deposit:</b> The Caution Money of \u20b9750 collected at the time of admission is fully refundable when a pupil leaves the school, upon presentation of the original caution deposit receipt and complete clearance of all institutional dues.",
+                        "<b>School Development Charges:</b> Annual development charges of \u20b9600 are levied once per academic year towards maintaining digital smart classrooms, laboratories, libraries, and campus facilities.",
+                        "<b>Statutory Government Levies:</b> Haryana Govt Sports Fund, Red Cross Fund, and Children Welfare Fund are statutory collections remitted strictly to state authorities in compliance with Haryana Education rules.",
+                        "<b>Optional Transport:</b> School bus transport is strictly optional and billed at \u20b91,000 per month only for students utilizing the designated bus routes.",
+                        "<b>Fee Remittance Schedule:</b> Monthly contributions must be remitted by the 10th of every calendar month through the online payment portal or at the school accounts desk.",
+                        "<b>100% Scholarships & Subsidies:</b> Deserving students and children facing extreme economic hardship are eligible for full tuition fee waivers, book sets, uniforms, and mid-day meal sponsorship through VIDYA's philanthropic donor network."
                     ]
                 }
             }

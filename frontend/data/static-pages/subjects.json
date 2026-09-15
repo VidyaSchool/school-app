@@ -1,0 +1,85 @@
+{
+  "slug": "subjects",
+  "title": "Academic Subjects",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Academic Subjects & Curriculum Disciplines",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "The VIDYA School offers a comprehensive array of core and elective subjects aligned with the Central Board of Secondary Education (CBSE) and the National Education Policy (NEP)."
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Grade Level",
+              "Core Academic Subjects",
+              "Skill & Co-Curricular Subjects",
+              "Assessment Scheme"
+            ],
+            [
+              "Primary (Grades I - V)",
+              "English, Hindi, Mathematics, Environmental Studies (EVS)",
+              "Computer Basics, Visual Arts, Music, Physical Education",
+              "Continuous & Comprehensive Evaluation (CCE)"
+            ],
+            [
+              "Middle School (Grades VI - VIII)",
+              "English, Hindi, Sanskrit, Mathematics, Integrated Science, Social Science",
+              "Artificial Intelligence, Coding, Performing Arts, Yoga",
+              "Term-End Summative & Formative Unit Tests"
+            ],
+            [
+              "Secondary (Grades IX - X)",
+              "English Communicative, Hindi Course-A, Mathematics Standard/Basic, Science, Social Science",
+              "Information Technology, Financial Literacy, Health & Physical Education",
+              "CBSE AISSE Board Examination & Internal Practicums"
+            ],
+            [
+              "Senior Secondary (Grades XI - XII)",
+              "Physics, Chemistry, Biology, Mathematics, Accountancy, Business Studies, Economics",
+              "Computer Science, Applied Mathematics, Physical Education",
+              "CBSE AISSCE Board Examinations & Laboratory Practicals"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "View Curriculum Overview",
+              "url": "/p/curriculum",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Download Syllabus",
+              "url": "/p/syllabus",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

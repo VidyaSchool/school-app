@@ -1,0 +1,83 @@
+{
+  "slug": "annual-report",
+  "title": "Annual Reports & Institutional Milestones",
+  "widgets": {
+    "blocks": [
+      {
+        "id": "blk-ar-1",
+        "type": "header",
+        "data": {
+          "text": "Annual Reports & Institutional Milestones",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-ar-2",
+        "type": "paragraph",
+        "data": {
+          "text": "In accordance with CBSE guidelines and our commitment to public accountability, The VIDYA School publishes comprehensive annual reports highlighting academic excellence, student accomplishments, infrastructural growth, and community development."
+        }
+      },
+      {
+        "id": "blk-ar-3",
+        "type": "alert",
+        "data": {
+          "title": "Statutory Transparency Information",
+          "message": "The annual report presents audited scholastic achievements, board examination metrics, teacher development programs, co-curricular laurels, and corporate partnership outcomes.",
+          "variant": "default"
+        }
+      },
+      {
+        "id": "blk-ar-4",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "ar-1",
+              "badge": "Academic Session 2024-2025",
+              "title": "Annual Academic Report 2024–25",
+              "description": "Detailed overview of CBSE Class X board triumphs, STEM innovation challenges, inter-school cultural victories, and alumni placements.",
+              "linkUrl": "/p/results"
+            },
+            {
+              "id": "ar-2",
+              "badge": "Academic Session 2023-2024",
+              "title": "Annual Academic Report 2023–24",
+              "description": "Documentation of scholastic progress, sports laurels, VIDYA MITR mentorship milestones, and community outreach achievements.",
+              "linkUrl": "/p/achievements"
+            },
+            {
+              "id": "ar-3",
+              "badge": "Community & Mentorship",
+              "title": "Impact & Philanthropic Progress",
+              "description": "Annual report on corporate social responsibility (CSR) initiatives, infrastructure enhancements, and digital classroom modernization.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-ar-5",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Mandatory Public Disclosure",
+              "url": "/mandatory-public-disclosure",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Board Results & Honors",
+              "url": "/p/results",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

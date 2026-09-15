@@ -1,0 +1,64 @@
+{
+  "slug": "academic-calendar",
+  "title": "Academic Calendar",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Academic Calendar 2025 - 2026",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Schedule of terms, examinations, vacations, sports meets, cultural fests, and parent-teacher consultations for the academic session."
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Month / Period",
+              "Academic Milestones",
+              "Examinations & Assessments",
+              "Holidays & Observances"
+            ],
+            [
+              "April - May 2025",
+              "Session Commencement, Baseline Assessments, Earth Day",
+              "Diagnostic Skill Tests",
+              "Mahavir Jayanti, Good Friday, Summer Vacation"
+            ],
+            [
+              "July - September 2025",
+              "School Reopening, Science Fair, Independence Day",
+              "Periodic Test 1, Mid-Term / Half-Yearly Exams",
+              "Independence Day, Raksha Bandhan, Janmashtami"
+            ],
+            [
+              "October - December 2025",
+              "Annual Sports Championship, Vidya Tech Fest, Lit Fest",
+              "Periodic Test 2, Practical Project Submissions",
+              "Gandhi Jayanti, Dussehra, Diwali Break, Christmas"
+            ],
+            [
+              "January - March 2026",
+              "Republic Day Celebrations, Remedial Clinics, Pre-Boards",
+              "Pre-Board II, Annual Final Exams, CBSE Board Exams",
+              "Republic Day, Maha Shivratri, Holi"
+            ]
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

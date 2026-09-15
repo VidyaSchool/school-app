@@ -1,0 +1,85 @@
+{
+  "slug": "contact",
+  "title": "Contact Us",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Contact The VIDYA School",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "We welcome parents, partners, volunteers, and visitors. Please reach out to our school administrative office."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "cnt-1",
+              "badge": "Campus Location",
+              "title": "Gurugram Campus",
+              "description": "Plot No. 3126, Block S, Near St. Stephen's Hospital, DLF Phase-3, Sector 24, Gurugram, Haryana 122002 (Nathupur, Garden Estate 122010)",
+              "linkUrl": "#"
+            },
+            {
+              "id": "cnt-2",
+              "badge": "Direct Helpline",
+              "title": "Phone & Inquiries",
+              "description": "+91-8130672281 (School Office Hours: Monday to Saturday, 8:00 AM – 3:30 PM)",
+              "linkUrl": "tel:+918130672281"
+            },
+            {
+              "id": "cnt-3",
+              "badge": "Email & Web",
+              "title": "Official Inquiries",
+              "description": "info.vidyaschool@vidya-india.org | Official Pan-India Website: www.vidya-india.org",
+              "linkUrl": "mailto:info.vidyaschool@vidya-india.org"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "Campus Visitor Timings",
+          "message": "Visitors and prospective parents are welcome between 9:00 AM and 1:00 PM on working school days with prior appointment.",
+          "variant": "default"
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Admissions Information",
+              "url": "/p/admission-process",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Get Involved as Volunteer",
+              "url": "/p/get-involved",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

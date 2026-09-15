@@ -1,0 +1,449 @@
+{
+  "slug": "fee-structure",
+  "title": "Fee Structure & Scholarships (2025-26)",
+  "description": "Official fee schedule and scholarship information for the academic session 2025-26 at The VIDYA School, Gurugram.",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Fee Structure for the Academic Year 2025-26",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-intro",
+        "type": "paragraph",
+        "data": {
+          "text": "Official fee schedule approved for <strong>The VIDYA School, Gurugram</strong> (Notification dated 17.03.2025). As a premier CBSE-affiliated school dedicated to providing quality English-medium education to children from underprivileged backgrounds, fees are heavily subsidized, transparent, and strictly compliant with Haryana Government norms and CBSE affiliation bylaws."
+        }
+      },
+      {
+        "id": "blk-alert-zero",
+        "type": "alert",
+        "data": {
+          "title": "Zero Capitation Policy & 100% Refundable Caution Deposit",
+          "message": "The VIDYA School strictly prohibits capitation fees, donations, or any hidden levies. A nominal one-time caution money of ₹750 is collected at the time of admission and is 100% refundable upon student clearance. Deserving students and those from economically weaker sections are supported through full scholarships and philanthropic partnerships.",
+          "variant": "success"
+        }
+      },
+      {
+        "id": "blk-quick-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "card-adm",
+              "badge": "One-Time at Admission",
+              "title": "Admission & Caution Money",
+              "description": "Total ₹950 across all grades (₹200 Admission Fee + ₹750 100% Refundable Caution Deposit).",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "card-annual",
+              "badge": "Annual Development",
+              "title": "Annual Statutory Charges",
+              "description": "₹600 School Development Charges plus statutory Haryana Govt Sports, Red Cross, & Welfare funds.",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "card-monthly",
+              "badge": "Monthly Subsidized Fee",
+              "title": "From ₹565 to ₹1,355 / Month",
+              "description": "Nominal monthly charges inclusive of Tuition, Computer & Smart Class, Activities, Labs, and Sports.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-h2-table",
+        "type": "header",
+        "data": {
+          "text": "Official Fee Breakdown (Session 2025-26)",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-table-p",
+        "type": "paragraph",
+        "data": {
+          "text": "The table below reflects the approved fee structure notified on 17.03.2025 for The VIDYA School, Sector 24, DLF Phase-3, Gurugram:"
+        }
+      },
+      {
+        "id": "blk-fee-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "S.No",
+              "Particulars",
+              "Fee Class<br>Nurs & KG",
+              "Fee Class<br>I to V",
+              "Fee Class<br>VI to VIII",
+              "Fee Class<br>IX & X",
+              "Fee Class XI & XII<br><span class=\"text-[11px] font-normal text-muted-foreground\">(Arts & Commerce)</span>",
+              "Fee Class XI & XII<br><span class=\"text-[11px] font-normal text-muted-foreground\">(Science Stream)</span>"
+            ],
+            [
+              "<b>1</b>",
+              "<b>At the time of Admission only</b>",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            [
+              "i",
+              "Admission Fee",
+              "₹200",
+              "₹200",
+              "₹200",
+              "₹200",
+              "₹200",
+              "₹200"
+            ],
+            [
+              "ii",
+              "Caution Money (Refundable)",
+              "₹750",
+              "₹750",
+              "₹750",
+              "₹750",
+              "₹750",
+              "₹750"
+            ],
+            [
+              "",
+              "<b>Total (At Admission Only)</b>",
+              "<b>₹950</b>",
+              "<b>₹950</b>",
+              "<b>₹950</b>",
+              "<b>₹950</b>",
+              "<b>₹950</b>",
+              "<b>₹950</b>"
+            ],
+            [
+              "<b>2</b>",
+              "<b>Once in a year (Annual Charges)</b>",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            [
+              "i",
+              "School Development Charges",
+              "₹600",
+              "₹600",
+              "₹600",
+              "₹600",
+              "₹600",
+              "₹600"
+            ],
+            [
+              "ii",
+              "Haryana Govt Sports Fund",
+              "—",
+              "—",
+              "₹10",
+              "—",
+              "—",
+              "—"
+            ],
+            [
+              "iii",
+              "Haryana Govt Red Cross Fund",
+              "—",
+              "—",
+              "—",
+              "₹45",
+              "₹45",
+              "₹45"
+            ],
+            [
+              "iv",
+              "Haryana Govt Children Welfare Fund",
+              "—",
+              "—",
+              "—",
+              "₹36",
+              "₹36",
+              "₹36"
+            ],
+            [
+              "",
+              "<b>Total (Once in a Year)</b>",
+              "<b>₹600</b>",
+              "<b>₹600</b>",
+              "<b>₹610</b>",
+              "<b>₹681</b>",
+              "<b>₹681</b>",
+              "<b>₹681</b>"
+            ],
+            [
+              "<b>3</b>",
+              "<b>Monthly Charges</b>",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            [
+              "i",
+              "Tuition Fee",
+              "₹365",
+              "₹340",
+              "₹350",
+              "₹325",
+              "₹880",
+              "₹880"
+            ],
+            [
+              "ii",
+              "Computer & Smart Class Charges",
+              "₹50",
+              "₹100",
+              "₹100",
+              "₹100",
+              "₹100",
+              "₹100"
+            ],
+            [
+              "iii",
+              "Activity Charges",
+              "₹100",
+              "₹100",
+              "₹100",
+              "₹100",
+              "₹100",
+              "₹100"
+            ],
+            [
+              "iv",
+              "Lab Charges",
+              "—",
+              "—",
+              "₹100",
+              "₹100",
+              "₹100",
+              "₹100"
+            ],
+            [
+              "v",
+              "Sports Charges",
+              "₹50",
+              "₹50",
+              "₹50",
+              "₹50",
+              "₹100",
+              "₹100"
+            ],
+            [
+              "vi",
+              "Haryana Govt Sports Fund",
+              "—",
+              "—",
+              "—",
+              "₹25",
+              "₹60",
+              "₹75"
+            ],
+            [
+              "",
+              "<b>Total (Monthly Charges)</b>",
+              "<b>₹565</b>",
+              "<b>₹590</b>",
+              "<b>₹700</b>",
+              "<b>₹700</b>",
+              "<b>₹1,340</b>",
+              "<b>₹1,355</b>"
+            ],
+            [
+              "<b>4</b>",
+              "<b>Optional Facility Charges</b>",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            [
+              "vii",
+              "Transport Charges <span class=\"text-xs text-muted-foreground font-normal\">(Only for those who are using the Bus)</span>",
+              "₹1,000",
+              "₹1,000",
+              "₹1,000",
+              "₹1,000",
+              "₹1,000",
+              "₹1,000"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-sep1",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "blk-h2-summary",
+        "type": "header",
+        "data": {
+          "text": "Grade-by-Grade Fee Summary",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-p-summary",
+        "type": "paragraph",
+        "data": {
+          "text": "Summary of one-time admission, annual composite charges, and monthly commitments per grade band:"
+        }
+      },
+      {
+        "id": "blk-grade-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "g-nursery",
+              "badge": "Pre-Primary",
+              "title": "Nursery & KG",
+              "description": "• At Admission: ₹950 (₹750 refundable caution)<br>• Annual Charges: ₹600 / year<br>• Monthly Charges: ₹565 / month (Tuition ₹365, Computer ₹50, Activities ₹100, Sports ₹50)<br>• Bus Transport (Optional): ₹1,000 / month",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "g-primary",
+              "badge": "Primary Wing",
+              "title": "Classes I to V",
+              "description": "• At Admission: ₹950 (₹750 refundable caution)<br>• Annual Charges: ₹600 / year<br>• Monthly Charges: ₹590 / month (Tuition ₹340, Computer ₹100, Activities ₹100, Sports ₹50)<br>• Bus Transport (Optional): ₹1,000 / month",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "g-middle",
+              "badge": "Middle Wing",
+              "title": "Classes VI to VIII",
+              "description": "• At Admission: ₹950 (₹750 refundable caution)<br>• Annual Charges: ₹610 / year (includes ₹10 Sports Fund)<br>• Monthly Charges: ₹700 / month (Tuition ₹350, Computer ₹100, Activities ₹100, Labs ₹100, Sports ₹50)<br>• Bus Transport (Optional): ₹1,000 / month",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "g-secondary",
+              "badge": "Secondary Wing",
+              "title": "Classes IX & X",
+              "description": "• At Admission: ₹950 (₹750 refundable caution)<br>• Annual Charges: ₹681 / year (includes Red Cross ₹45 & Welfare ₹36)<br>• Monthly Charges: ₹700 / month (Tuition ₹325, Smart Class ₹100, Activities ₹100, Labs ₹100, Sports ₹50, Sports Fund ₹25)<br>• Bus Transport (Optional): ₹1,000 / month",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "g-senior-arts-comm",
+              "badge": "Senior Secondary",
+              "title": "Classes XI & XII (Arts & Commerce)",
+              "description": "• At Admission: ₹950 (₹750 refundable caution)<br>• Annual Charges: ₹681 / year<br>• Monthly Charges: ₹1,340 / month (Tuition ₹880, Smart Class ₹100, Activities ₹100, Labs ₹100, Sports ₹100, Sports Fund ₹60)<br>• Bus Transport (Optional): ₹1,000 / month",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "g-senior-sci",
+              "badge": "Senior Secondary",
+              "title": "Classes XI & XII (Science Stream)",
+              "description": "• At Admission: ₹950 (₹750 refundable caution)<br>• Annual Charges: ₹681 / year<br>• Monthly Charges: ₹1,355 / month (Tuition ₹880, Smart Class ₹100, Activities ₹100, Labs ₹100, Sports ₹100, Sports Fund ₹75)<br>• Bus Transport (Optional): ₹1,000 / month",
+              "linkUrl": "/p/admission-process"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-sep2",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "blk-h2-doc",
+        "type": "header",
+        "data": {
+          "text": "Official Notification Circular (PDF)",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-p-doc",
+        "type": "paragraph",
+        "data": {
+          "text": "Download or preview the official signed circular approved for VIDYA SCHOOL GURGAON:"
+        }
+      },
+      {
+        "id": "blk-pdf",
+        "type": "pdf",
+        "data": {
+          "title": "Official Fee Structure 2025-26 Circular (VIDYA SCHOOL GURGAON)",
+          "fileSize": "Official Notification (Signed & Approved 17.03.2025)",
+          "url": "/docs/Fee-Structure-2025-26.pdf"
+        }
+      },
+      {
+        "id": "blk-btns",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b-dl",
+              "text": "Download Official PDF",
+              "url": "/docs/Fee-Structure-2025-26.pdf",
+              "variant": "default"
+            },
+            {
+              "id": "b-orig",
+              "text": "View on Vidyaschool.com",
+              "url": "https://www.vidyaschool.com/wp-content/uploads/2026/01/Fee-Structure-2025-26.pdf",
+              "variant": "outline"
+            },
+            {
+              "id": "b-adm",
+              "text": "Admission Guidelines",
+              "url": "/p/admission-process",
+              "variant": "secondary"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-h3-reg",
+        "type": "header",
+        "data": {
+          "text": "Important Regulations & Fee Policies",
+          "level": 3
+        }
+      },
+      {
+        "id": "blk-list-reg",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "items": [
+            "<b>Refundable Caution Deposit:</b> The Caution Money of ₹750 collected at the time of admission is fully refundable when a pupil leaves the school, upon presentation of the original caution deposit receipt and complete clearance of all institutional dues.",
+            "<b>School Development Charges:</b> Annual development charges of ₹600 are levied once per academic year towards maintaining digital smart classrooms, laboratories, libraries, and campus facilities.",
+            "<b>Statutory Government Levies:</b> Haryana Govt Sports Fund, Red Cross Fund, and Children Welfare Fund are statutory collections remitted strictly to state authorities in compliance with Haryana Education rules.",
+            "<b>Optional Transport:</b> School bus transport is strictly optional and billed at ₹1,000 per month only for students utilizing the designated bus routes.",
+            "<b>Fee Remittance Schedule:</b> Monthly contributions must be remitted by the 10th of every calendar month through the online payment portal or at the school accounts desk.",
+            "<b>100% Scholarships & Subsidies:</b> Deserving students and children facing extreme economic hardship are eligible for full tuition fee waivers, book sets, uniforms, and mid-day meal sponsorship through VIDYA's philanthropic donor network."
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "slug": "sports",
+  "title": "Sports & Physical Education",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Sports, Athletics & Physical Education",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "At The VIDYA School, athletic training, physical vitality, and teamwork are fundamental pillars of holistic human development."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "sp-1",
+              "badge": "Outdoor Arena",
+              "title": "Outdoor Sports Complex",
+              "description": "Cricket training pitches, full-size football turf, regulation basketball court, volleyball arena, and running tracks.",
+              "linkUrl": "/p/infrastructure"
+            },
+            {
+              "id": "sp-2",
+              "badge": "Indoor Sports",
+              "title": "Indoor Games & Fitness",
+              "description": "Badminton courts, table tennis arenas, chess and carrom halls, and gymnastics practice facilities.",
+              "linkUrl": "/p/activities"
+            },
+            {
+              "id": "sp-3",
+              "badge": "Mind-Body Health",
+              "title": "Daily Yoga & Wellness",
+              "description": "Morning pranayama, yogic asanas, mental mindfulness conditioning, and annual sports championship meets.",
+              "linkUrl": "/p/student-life"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -31,14 +31,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: '/about', destination: '/#about', permanent: false },
-      { source: '/principal-message', destination: '/mandatory-public-disclosure#general-info', permanent: false },
-      { source: '/infrastructure', destination: '/mandatory-public-disclosure#infrastructure', permanent: false },
-      { source: '/faculty-and-staff', destination: '/mandatory-public-disclosure#staff', permanent: false },
-      { source: '/management-committee', destination: '/mandatory-public-disclosure#documents-info', permanent: false },
-      { source: '/curriculum', destination: '/mandatory-public-disclosure#academics', permanent: false },
-      { source: '/academic-calendar', destination: '/mandatory-public-disclosure#academics', permanent: false },
-      { source: '/annual-report', destination: '/mandatory-public-disclosure#academics', permanent: false },
+      { source: '/about', destination: '/about-vidyaschool', permanent: false },
+      { source: '/principal-message', destination: '/principals-message', permanent: false },
+      { source: '/faculty-and-staff', destination: '/teachers-and-staff', permanent: false },
+      { source: '/management-committee', destination: '/school-management-committee', permanent: false },
     ];
   },
   async rewrites() {

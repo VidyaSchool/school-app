@@ -1,0 +1,55 @@
+{
+  "slug": "stem",
+  "title": "STEM & Robotics Innovation",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "STEM, Robotics & Innovation Hub",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Equipping children with hands-on 21st-century technological skills, design thinking, robotic automation, and problem solving."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "stem-1",
+              "badge": "Robotics Studio",
+              "title": "Lego & Micro-controller Arena",
+              "description": "Hands-on robotics kits, Arduino, Raspberry Pi, sensor integration, and autonomous obstacle navigation.",
+              "linkUrl": "/p/tech-fest"
+            },
+            {
+              "id": "stem-2",
+              "badge": "Software & AI",
+              "title": "Coding & Artificial Intelligence",
+              "description": "Visual block coding for primary students, progressing to Python, web engineering, and introductory AI models.",
+              "linkUrl": "/p/laboratories"
+            },
+            {
+              "id": "stem-3",
+              "badge": "Annual Fest",
+              "title": "Vidya Tech Fest",
+              "description": "Our flagship inter-school technology conclave hosting hackathons, tech exhibitions, and robotic tournaments.",
+              "linkUrl": "/p/tech-fest"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

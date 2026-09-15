@@ -1,0 +1,74 @@
+{
+  "slug": "admission",
+  "title": "Admissions at The VIDYA School",
+  "widgets": {
+    "blocks": [
+      {
+        "id": "blk-adm-1",
+        "type": "header",
+        "data": {
+          "text": "Admissions at The VIDYA School",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-adm-2",
+        "type": "paragraph",
+        "data": {
+          "text": "Welcome to the Admissions Portal of The VIDYA School, Sector 24, DLF Phase-3, Gurugram. We provide high-quality English-medium CBSE education to deserving children, fostering intellectual curiosity, character, and lifelong leadership."
+        }
+      },
+      {
+        "id": "blk-adm-3",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "adm-c1",
+              "badge": "Step-by-Step",
+              "title": "Admission Process",
+              "description": "Learn about registration forms, document submission, assessment dates, and enrollment formalities.",
+              "linkUrl": "/p/admission-process"
+            },
+            {
+              "id": "adm-c2",
+              "badge": "Criteria & Age",
+              "title": "Eligibility Criteria",
+              "description": "Age eligibility norms, residence parameters, and grade-wise entry criteria aligned with CBSE guidelines.",
+              "linkUrl": "/p/eligibility"
+            },
+            {
+              "id": "adm-c3",
+              "badge": "Zero Capitation",
+              "title": "Fee Structure & Scholarships",
+              "description": "Affordable fee schedules, need-based fee remissions, and full philanthropic scholarships.",
+              "linkUrl": "/p/fee-structure"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-adm-4",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Explore Admission Process",
+              "url": "/p/admission-process",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Frequently Asked Questions",
+              "url": "/p/faqs",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

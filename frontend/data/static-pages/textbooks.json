@@ -1,0 +1,73 @@
+{
+  "slug": "textbooks",
+  "title": "Prescribed Textbooks",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Prescribed Textbooks & Learning Materials",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "The VIDYA School prescribes authentic NCERT textbooks and authorized CBSE reference literature to ensure standardized, equitable, and top-tier learning materials."
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "CBSE Compliance Certification",
+          "message": "The school strictly adheres to CBSE directives regarding textbook prescription and prohibits unnecessary commercial books. All core books and learning kits are provided to enrolled students.",
+          "variant": "success"
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Class Band",
+              "Official Publisher",
+              "Core Subject Titles",
+              "Provision Details"
+            ],
+            [
+              "Primary (I - V)",
+              "NCERT Publications",
+              "Mridang, Marigold, Math-Magic, Looking Around (EVS)",
+              "Provided free/subsidized with school stationery kits"
+            ],
+            [
+              "Middle (VI - VIII)",
+              "NCERT Publications",
+              "Honeysuckle, Vasant, Mathematics, Science, Our Pasts",
+              "Supplied through school book bank & digital library"
+            ],
+            [
+              "Secondary (IX - X)",
+              "NCERT Publications",
+              "Beehive, Moments, Kshitij, Standard Mathematics, Science",
+              "Issued from school resource center with lab manuals"
+            ],
+            [
+              "Senior Secondary (XI - XII)",
+              "NCERT / CBSE",
+              "Physics, Chemistry, Biology, Accountancy, Economics",
+              "Comprehensive library loan system and digital copies"
+            ]
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

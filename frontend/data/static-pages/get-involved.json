@@ -1,0 +1,153 @@
+{
+  "slug": "get-involved",
+  "title": "Get Involved – Volunteering & Mentorship",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Get Involved – Volunteering & Mentorship",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "Be the Guiding Star",
+          "message": "Your knowledge, time, and empathy can change a child's destiny. Partner with The VIDYA School to mentor, teach, and inspire our students.",
+          "variant": "success"
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "The VIDYA School invites volunteers, educators, and corporate partners to engage with our students through mentorship, workshops, cultural celebrations, and skill-building programs."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "gi-1",
+              "badge": "Mentorship",
+              "title": "VIDYA MITR Program",
+              "description": "A structured buddying program pairing mentors with students to build confidence, career goals, and communication skills.",
+              "linkUrl": "/p/contact"
+            },
+            {
+              "id": "gi-2",
+              "badge": "Curriculum Plus",
+              "title": "Beyond Curriculum Learning",
+              "description": "Conduct sessions demystifying Science wonders, Mathematics tricks, Cybersecurity, and English conversational fluency.",
+              "linkUrl": "/p/stem"
+            },
+            {
+              "id": "gi-3",
+              "badge": "Workplace Exposure",
+              "title": "Corporate Office Inductions",
+              "description": "Host a 2-3 hour workplace visit where professionals show students modern office workflows and career horizons.",
+              "linkUrl": "/p/contact"
+            },
+            {
+              "id": "gi-4",
+              "badge": "Festivals",
+              "title": "Festival Celebrations",
+              "description": "Light Diyas together at Diwali, sing carols at Christmas, and unfurl the tricolor on Independence Day with our students.",
+              "linkUrl": "/p/events"
+            },
+            {
+              "id": "gi-5",
+              "badge": "Athletics",
+              "title": "Friendly Sports Matches",
+              "description": "Play a football or cricket match against our students or conduct coaching clinics on school sports day.",
+              "linkUrl": "/p/sports"
+            },
+            {
+              "id": "gi-6",
+              "badge": "Arts & Stories",
+              "title": "Workshops & Storytelling",
+              "description": "Conduct week-long music, dance, or theater workshops, or narrate inspirational stories in the classroom.",
+              "linkUrl": "/p/arts-and-music"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-quote",
+        "type": "quote",
+        "data": {
+          "text": "The MITR program is a mentoring/buddying program that endeavors to use the knowledge and experience of mentors to bring out the true potential of VIDYA students.",
+          "caption": "VIDYA School Volunteer Network"
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Volunteering Program",
+              "Activity Scope & Description",
+              "Engagement Mode"
+            ],
+            [
+              "VIDYA MITR Mentoring",
+              "Mentoring secondary students on personal development and career choices",
+              "Weekly / Bi-weekly in person or online"
+            ],
+            [
+              "Beyond Curriculum: STEM & AI",
+              "Hands-on science experiments, coding basics, and safe internet usage",
+              "Weekend workshop / Lecture series"
+            ],
+            [
+              "Career Counselling",
+              "Industry overviews in aviation, engineering, medicine, arts, and hospitality",
+              "Interactive panel sessions"
+            ],
+            [
+              "Excursions & Field Trips",
+              "Accompanying students to science museums, planetariums, and national parks",
+              "Full day weekend excursions"
+            ],
+            [
+              "Creative & Performing Arts",
+              "Music, dance, painting, and theater production training",
+              "Short term guest workshops"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Contact School to Volunteer",
+              "url": "/p/contact",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "About The VIDYA School",
+              "url": "/p/about-vidyaschool",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "slug": "mandatory-public-disclosure",
+  "title": "Mandatory Public Disclosure (CBSE)",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "CBSE Mandatory Public Disclosure (Appendix IX)",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "Statutory Transparency Information",
+          "message": "In accordance with CBSE affiliation regulations and Appendix IX directives, complete certified documentation and institutional particulars of The VIDYA School are publicly accessible.",
+          "variant": "warning"
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Disclosure Parameter",
+              "Institutional Particulars",
+              "Verification Authority"
+            ],
+            [
+              "Name of the School",
+              "The VIDYA School",
+              "VIDYA Integrated Development for Youth and Adults"
+            ],
+            [
+              "Affiliation Status",
+              "CBSE Affiliated Senior Secondary English Medium",
+              "Central Board of Secondary Education, New Delhi"
+            ],
+            [
+              "School Location & Address",
+              "Plot No. 3126, Block S, Near St. Stephen's Hospital, DLF Phase-3, Sector 24, Gurugram 122002",
+              "Government of Haryana"
+            ],
+            [
+              "Principal Name & Qualifications",
+              "Principal, Post Graduate, B.Ed., Experienced Administrator",
+              "Recognized University"
+            ],
+            [
+              "Official Contact Details",
+              "info.vidyaschool@vidya-india.org | +91-8130672281",
+              "Administrative Office"
+            ],
+            [
+              "Campus Land Area",
+              "Over 2.0 Acres / 8,000+ sq. meters with boundary wall",
+              "Municipal Corporation of Gurugram (MCG)"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "School Management Committee (SMC)",
+              "url": "/p/school-management-committee",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Annual Report",
+              "url": "/p/annual-report",
+              "variant": "outline"
+            },
+            {
+              "id": "b3",
+              "text": "Certificates & Compliance",
+              "url": "/p/certificates",
+              "variant": "secondary"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "slug": "student-life",
+  "title": "Student Life at Vidya",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Vibrant Student Life at The VIDYA School",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "A warm, nurturing home where underprivileged children discover their dreams, build lifelong friendships, and prepare to lead society."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "life-1",
+              "badge": "Camaraderie",
+              "title": "The Four Houses",
+              "description": "Agni, Prithvi, Vayu, and Jal houses inspiring healthy teamwork, sportsmanship, and leadership across all grades.",
+              "linkUrl": "/p/clubs"
+            },
+            {
+              "id": "life-2",
+              "badge": "Health & Care",
+              "title": "Nutrition & Wellness",
+              "description": "Daily hygienic hot meals, pediatric check-ups, dental camps, eye check-ups, and clean RO drinking water systems.",
+              "linkUrl": "/p/infrastructure-details"
+            },
+            {
+              "id": "life-3",
+              "badge": "Student Voice",
+              "title": "Student Council & Leadership",
+              "description": "Head Boy, Head Girl, house captains, and prefects actively participating in school governance and peer mentorship.",
+              "linkUrl": "/p/leadership"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

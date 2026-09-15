@@ -1,0 +1,65 @@
+{
+  "slug": "tech-fest",
+  "title": "Tech Fest 2026 Updated",
+  "widgets": {
+    "time": 1789235586451,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "VidyaSchool Annual Tech Fest 2026",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Welcome to the official portal of VidyaSchool's flagship annual technology festival. Explore student innovations, autonomous robotics exhibitions, competitive coding hackathons, and scientific breakthroughs."
+        }
+      },
+      {
+        "id": "blk-card",
+        "type": "card",
+        "data": {
+          "columns": 2,
+          "items": [
+            {
+              "id": "c1",
+              "badge": "Robotics & IoT",
+              "title": "Autonomous Lego STEM Arena",
+              "description": "Student-engineered obstacle-navigating robots competing in real-time navigation tasks.",
+              "linkUrl": "/gallery"
+            },
+            {
+              "id": "c2",
+              "badge": "Coding Hackathon",
+              "title": "CodeQuest 2026",
+              "description": "12-hour collaborative algorithmic problem solving and web development challenge.",
+              "linkUrl": "/student/notice"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-quote",
+        "type": "quote",
+        "data": {
+          "text": "Empowering young minds through practical engineering, collaborative inquiry, and scientific excellence.",
+          "caption": "Department of STEM & Innovation, VidyaSchool"
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "text": "Contact Tech Fest Organizing Committee",
+          "url": "/contact",
+          "variant": "default"
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

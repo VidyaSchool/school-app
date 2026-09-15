@@ -1,0 +1,55 @@
+{
+  "slug": "achievements",
+  "title": "Student Achievements & Honors",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Student Achievements & Academic Honors",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Recognizing the remarkable distinctions, competitive victories, and inspiring milestones earned by our brilliant scholars."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "ach-1",
+              "badge": "Olympiads",
+              "title": "National Science & Math Laurels",
+              "description": "Gold and silver medals in National Cyber Olympiad, Science Olympiad Foundation, and inter-school academic bees.",
+              "linkUrl": "/p/results"
+            },
+            {
+              "id": "ach-2",
+              "badge": "Athletics",
+              "title": "District & State Sports Trophies",
+              "description": "Championship wins in inter-school football, athletics sprints, chess tournaments, and yoga competitions.",
+              "linkUrl": "/p/sports"
+            },
+            {
+              "id": "ach-3",
+              "badge": "Alumni",
+              "title": "Inspiring Higher Education Pathways",
+              "description": "Scholars securing admissions into reputed universities and technical academies across engineering, medicine, and management.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

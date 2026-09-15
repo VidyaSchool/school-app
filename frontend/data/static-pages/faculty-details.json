@@ -1,0 +1,76 @@
+{
+  "slug": "faculty-details",
+  "title": "Faculty Details (CBSE OASIS)",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Faculty Details & Teaching Staff (CBSE OASIS)",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Official disclosure of faculty qualifications, staff strength, and educator ratios in compliance with CBSE OASIS norms."
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Designation",
+              "Total Staff",
+              "Prescribed Qualification",
+              "Compliance Status"
+            ],
+            [
+              "Principal",
+              "1",
+              "Post Graduate, B.Ed. with 15+ years experience",
+              "Fully Certified"
+            ],
+            [
+              "Post Graduate Teachers (PGT)",
+              "12",
+              "Master's Degree in subject with B.Ed.",
+              "Fully Certified"
+            ],
+            [
+              "Trained Graduate Teachers (TGT)",
+              "24",
+              "Bachelor's / Master's with B.Ed. & CTET",
+              "Fully Certified"
+            ],
+            [
+              "Primary Teachers (PRT)",
+              "18",
+              "Graduation with B.Ed. / D.El.Ed.",
+              "Fully Certified"
+            ],
+            [
+              "Special Educator & Counselor",
+              "2",
+              "Post Graduate in Psychology / RCI Certified",
+              "Fully Certified"
+            ],
+            [
+              "Physical Education Coaches",
+              "4",
+              "B.P.Ed. / M.P.Ed. with National Sports Accreditations",
+              "Fully Certified"
+            ]
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

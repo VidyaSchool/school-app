@@ -1,0 +1,62 @@
+{
+  "slug": "events",
+  "title": "School Events & Celebrations",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "School Events, Festivals & Celebrations",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Celebrations at The VIDYA School nurture social unity, creative expression, national pride, and joyous community fellowship."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 2,
+          "items": [
+            {
+              "id": "ev-1",
+              "badge": "Innovation",
+              "title": "Vidya Tech Fest",
+              "description": "Our premier STEM innovation fest bringing together students from Delhi NCR for hackathons, science project exhibits, and robotics competitions.",
+              "linkUrl": "/p/tech-fest"
+            },
+            {
+              "id": "ev-2",
+              "badge": "Literature",
+              "title": "Vidya Lit Fest & Cultural Day",
+              "description": "Annual literary festival featuring elocution, poetry recitation, theatrical drama, storytelling, and book fairs.",
+              "linkUrl": "/p/arts-and-music"
+            },
+            {
+              "id": "ev-3",
+              "badge": "Patriotism",
+              "title": "National Holiday Celebrations",
+              "description": "Unfurling the tricolor on Independence Day and Republic Day with patriotic anthems, cultural parades, and student speeches.",
+              "linkUrl": "/p/get-involved"
+            },
+            {
+              "id": "ev-4",
+              "badge": "Festivals",
+              "title": "Diwali & Christmas Celebrations",
+              "description": "Lighting diyas, sharing sweets, singing Christmas carols, and hosting festive meals with mentors and supporters.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "slug": "school-management-committee",
+  "title": "School Management Committee (SMC)",
+  "widgets": {
+    "blocks": [
+      {
+        "id": "blk-smc-1",
+        "type": "header",
+        "data": {
+          "text": "School Management Committee (SMC)",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-smc-2",
+        "type": "paragraph",
+        "data": {
+          "text": "The School Management Committee (SMC) of The VIDYA School is constituted in strict accordance with the Affiliation Bye-Laws of the Central Board of Secondary Education (CBSE) and the Right to Education (RTE) Act. The committee ensures transparent governance, academic vigor, student safety, and holistic welfare."
+        }
+      },
+      {
+        "id": "blk-smc-3",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Member Name",
+              "Designation in SMC",
+              "Representation / Category"
+            ],
+            [
+              "Mrs. Rashmi Misra",
+              "Chairperson",
+              "Trustee & Founder, VIDYA"
+            ],
+            [
+              "Mrs. Malvika Goyal",
+              "Vice Chairperson",
+              "VIDYA Governing Council"
+            ],
+            [
+              "Ms. Ila Sarin",
+              "Member Secretary",
+              "Principal, The VIDYA School"
+            ],
+            [
+              "Ms. Sarita Shahi",
+              "Member",
+              "School Manager & Administration"
+            ],
+            [
+              "Mr. Yash Pal Syngal",
+              "Educationist Member",
+              "Senior Education Advisor"
+            ],
+            [
+              "Mrs. Neeru Sharma",
+              "Teacher Representative",
+              "Senior Secondary Faculty"
+            ],
+            [
+              "Mr. Rajesh Kumar",
+              "Teacher Representative",
+              "Middle Wing Faculty"
+            ],
+            [
+              "Mrs. Sunita Devi",
+              "Parent Representative",
+              "Elected Parent Member"
+            ],
+            [
+              "Mr. Ramesh Chand",
+              "Parent Representative",
+              "Elected Parent Member"
+            ],
+            [
+              "CBSE Nominee",
+              "Member",
+              "Principal, Kendriya Vidyalaya"
+            ],
+            [
+              "State Govt Nominee",
+              "Member",
+              "Education Officer, Directorate of Education"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "blk-smc-4",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Leadership & Governance",
+              "url": "/p/leadership",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Parents Teachers Association (PTA)",
+              "url": "/p/pta",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

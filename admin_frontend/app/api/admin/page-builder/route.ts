@@ -238,6 +238,21 @@ export async function POST(req: NextRequest) {
       // Backend sync error is non-fatal since DB is already updated
     }
 
+    // 3. Trigger on-demand ISR revalidation on frontend website
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+    try {
+      await fetch(`${frontendUrl}/api/cms/revalidate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-cms-revalidate-secret": internalKey,
+        },
+        body: JSON.stringify({ slug: pageSlug }),
+      })
+    } catch {
+      // Frontend revalidation error is non-fatal
+    }
+
     return NextResponse.json({
       success: true,
       message: "Page saved successfully to database!",
@@ -285,6 +300,21 @@ export async function DELETE(req: NextRequest) {
           "X-Internal-Service-Key": internalKey,
           Cookie: req.headers.get("cookie") || "",
         },
+      })
+    } catch {
+      // Non-fatal
+    }
+
+    // Revalidate on frontend
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+    try {
+      await fetch(`${frontendUrl}/api/cms/revalidate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-cms-revalidate-secret": internalKey,
+        },
+        body: JSON.stringify({ slug: uid }),
       })
     } catch {
       // Non-fatal
@@ -367,6 +397,22 @@ export async function PATCH(req: NextRequest) {
           Cookie: req.headers.get("cookie") || "",
         },
         body: JSON.stringify({ uid, title, slug, status }),
+      })
+    } catch {
+      // Non-fatal
+    }
+
+    // Revalidate frontend cache
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+    try {
+      const targetSlug = updates.slug || slug || uid
+      await fetch(`${frontendUrl}/api/cms/revalidate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-cms-revalidate-secret": internalKey,
+        },
+        body: JSON.stringify({ slug: targetSlug }),
       })
     } catch {
       // Non-fatal

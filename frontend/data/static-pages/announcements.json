@@ -1,0 +1,55 @@
+{
+  "slug": "announcements",
+  "title": "Official Announcements",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Official School Announcements",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Key institutional news, recognitions, press statements, and milestone achievements of The VIDYA School."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "ann-1",
+              "badge": "Achievement",
+              "title": "CBSE Board Distinction Honors",
+              "description": "Class X and Class XII scholars record 100% pass percentages with exceptional distinctions in mathematics and science.",
+              "linkUrl": "/p/results"
+            },
+            {
+              "id": "ann-2",
+              "badge": "Campus Upgrade",
+              "title": "New Robotics Innovation Lab",
+              "description": "State-of-the-art STEM center equipped with micro-controllers and robotics suites inaugurated on campus.",
+              "linkUrl": "/p/stem"
+            },
+            {
+              "id": "ann-3",
+              "badge": "Partnership",
+              "title": "Corporate Mentorship Expansion",
+              "description": "Expanded VIDYA MITR mentoring cohort connecting senior students with corporate professionals and industry leaders.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

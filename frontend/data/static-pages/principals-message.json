@@ -1,0 +1,131 @@
+{
+  "slug": "principals-message",
+  "title": "Principal's Message",
+  "widgets": {
+    "time": 1789293827523,
+    "blocks": [
+      {
+        "id": "6tIz0CFNuF",
+        "type": "header",
+        "data": {
+          "text": "Principal's Message",
+          "level": 1
+        }
+      },
+      {
+        "id": "ZlVDuyJoSd",
+        "type": "header",
+        "data": {
+          "text": "A Journey of Learning, Growth and Possibility",
+          "level": 2
+        }
+      },
+      {
+        "id": "JtQ4E16oFa",
+        "type": "paragraph",
+        "data": {
+          "text": "Dear Students, Parents and Well-Wishers,"
+        }
+      },
+      {
+        "id": "9PkRBcRbcW",
+        "type": "paragraph",
+        "data": {
+          "text": "It gives me immense pleasure to welcome you to VIDYA School, Gurugram."
+        }
+      },
+      {
+        "id": "sClru3492w",
+        "type": "paragraph",
+        "data": {
+          "text": "At VIDYA, we believe that education is much more than the acquisition of knowledge. It is about discovering one's potential, developing the confidence to pursue one's dreams, and acquiring the values and skills needed to make a meaningful contribution to society."
+        }
+      },
+      {
+        "id": "w0qvMEpf7y",
+        "type": "paragraph",
+        "data": {
+          "text": "Our vision is to create an environment where every child feels valued, encouraged and empowered to learn. We strive to provide our students with opportunities that extend beyond the classroom—opportunities to question, explore, create, collaborate and learn from experience. Academic excellence remains an important part of this journey, but so are curiosity, creativity, empathy, resilience and integrity."
+        }
+      },
+      {
+        "id": "cF0HStry1U",
+        "type": "paragraph",
+        "data": {
+          "text": "As education continues to evolve, our responsibility as educators is to prepare children not merely for examinations, but for an ever-changing world. We are therefore committed to embracing innovative approaches to teaching and learning, making meaningful use of technology, and developing skills that enable our students to become independent thinkers and lifelong learners. Our efforts in areas such as innovation, artificial intelligence, financial literacy, life skills and experiential learning are guided by this belief."
+        }
+      },
+      {
+        "id": "oZc3mg9Ei8",
+        "type": "paragraph",
+        "data": {
+          "text": "I am particularly proud of the culture of participation and innovation that our students and teachers continue to build together. When a child is encouraged to ask a question, develop an idea, solve a problem or take responsibility for a cause, education becomes truly transformative."
+        }
+      },
+      {
+        "id": "Fleli2gAtV",
+        "type": "paragraph",
+        "data": {
+          "text": "Equally important to us is the development of responsible and compassionate citizens. We want our students to understand that success is not measured only by what we achieve for ourselves, but also by the positive difference we make in the lives of others and in the world around us. Our emphasis on environmental responsibility, community engagement and sustainable practices reflects this commitment."
+        }
+      },
+      {
+        "id": "P1NIdpcN-_",
+        "type": "paragraph",
+        "data": {
+          "text": "None of this would be possible without our dedicated teachers and staff, whose commitment and belief in every child form the foundation of our school. I am equally grateful to our parents and well-wishers for their continued trust and partnership. Education is most effective when school, home and community work together with a shared purpose."
+        }
+      },
+      {
+        "id": "sz1iev7Lcn",
+        "type": "paragraph",
+        "data": {
+          "text": "To our students, I would say: believe in yourselves, remain curious, embrace challenges and never be afraid to learn from your mistakes. Your background does not determine the extent of your possibilities. With determination, discipline and the right opportunities, you can dream boldly, learn continuously and create your own path."
+        }
+      },
+      {
+        "id": "5nAUO-5QNk",
+        "type": "paragraph",
+        "data": {
+          "text": "At VIDYA School, our endeavour is to ensure that every child receives not only an education, but also the confidence, character and capabilities to use that education well."
+        }
+      },
+      {
+        "id": "fDWD8PYjz3",
+        "type": "paragraph",
+        "data": {
+          "text": "Let us continue this journey together—learning, growing and creating possibilities for a brighter future."
+        }
+      },
+      {
+        "id": "FArQHAcGkL",
+        "type": "paragraph",
+        "data": {
+          "text": "With warm regards,"
+        }
+      },
+      {
+        "id": "bJmUyCqE2c",
+        "type": "paragraph",
+        "data": {
+          "text": "Ms. Ila Sarin"
+        }
+      },
+      {
+        "id": "r9s1aNFA0j",
+        "type": "paragraph",
+        "data": {
+          "text": "<i>Principal</i>"
+        }
+      },
+      {
+        "id": "tmo8CHxf4q",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA School, Gurugram"
+        }
+      }
+    ],
+    "version": "2.31.6"
+  }
+}

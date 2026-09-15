@@ -1,0 +1,64 @@
+{
+  "slug": "library",
+  "title": "Library & Learning Resource Centre",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Library & Learning Resource Centre",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "A sanctuary of knowledge fostering reading habits, research acumen, and curiosity with a curated collection of literature, periodicals, and digital media."
+        }
+      },
+      {
+        "id": "blk-stats",
+        "type": "stats",
+        "data": {
+          "stat": "10,000+",
+          "label": "Books & Literary Volumes",
+          "subtext": "Spanning fiction, science, history, encyclopedias, and regional literature"
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "lib-1",
+              "badge": "Book Stacks",
+              "title": "Comprehensive Catalog",
+              "description": "Extensive multilingual collection in English, Hindi, and Sanskrit covering classical literature, biographies, and STEM reference.",
+              "linkUrl": "/p/infrastructure"
+            },
+            {
+              "id": "lib-2",
+              "badge": "Digital Kiosk",
+              "title": "e-Learning & Research",
+              "description": "Computer terminals equipped with educational multimedia encyclopedias, CBSE reference papers, and online journals.",
+              "linkUrl": "/p/stem"
+            },
+            {
+              "id": "lib-3",
+              "badge": "Literary Circles",
+              "title": "Book Clubs & Story Hours",
+              "description": "Weekly reading circles, creative writing workshops, book reviews, and author guest lectures.",
+              "linkUrl": "/p/clubs"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

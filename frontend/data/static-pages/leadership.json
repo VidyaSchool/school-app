@@ -1,0 +1,76 @@
+{
+  "slug": "leadership",
+  "title": "Leadership & Governance",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "School Leadership & Governance",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "The VIDYA School operates under the visionary guidance of experienced educators, community leaders, and institutional trustees committed to transparency, excellence, and social equity."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "lead-1",
+              "badge": "Governance",
+              "title": "Board of Trustees & Patrons",
+              "description": "Guiding institutional strategy, educational outreach, regulatory compliance, and community partnerships.",
+              "linkUrl": "/p/school-management-committee"
+            },
+            {
+              "id": "lead-2",
+              "badge": "Academics",
+              "title": "Principal & Directorate",
+              "description": "Steering pedagogy, continuous professional teacher training, student mental wellness, and board exam preparation.",
+              "linkUrl": "/p/principals-message"
+            },
+            {
+              "id": "lead-3",
+              "badge": "Operations",
+              "title": "Administration & Staff",
+              "description": "Ensuring campus safety, health and nutrition programs, infrastructure maintenance, and parent relations.",
+              "linkUrl": "/p/faculty-details"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-btn",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "School Management Committee",
+              "url": "/p/school-management-committee",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "Principal's Message",
+              "url": "/p/principals-message",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

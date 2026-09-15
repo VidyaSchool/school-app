@@ -1,0 +1,55 @@
+{
+  "slug": "affiliation",
+  "title": "CBSE Affiliation Status",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "CBSE Affiliation Status & Details",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "The VIDYA School is a recognized English-medium institution affiliated with the Central Board of Secondary Education (CBSE), New Delhi, up to Senior Secondary level."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "aff-1",
+              "badge": "Affiliation",
+              "title": "Senior Secondary Status",
+              "description": "Co-educational English-medium school following the national NCERT curriculum framework.",
+              "linkUrl": "/p/mandatory-public-disclosure"
+            },
+            {
+              "id": "aff-2",
+              "badge": "Curriculum",
+              "title": "NCERT & NEP Aligned",
+              "description": "Strict compliance with all National Education Policy and CBSE examination guidelines.",
+              "linkUrl": "/p/curriculum"
+            },
+            {
+              "id": "aff-3",
+              "badge": "Compliance",
+              "title": "Statutory Certifications",
+              "description": "Valid building safety, fire safety, health hygiene, and drinking water certificates.",
+              "linkUrl": "/p/certificates"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "slug": "results",
+  "title": "Board Results & Academic Performance",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Board Examination Results & Academic Laurels",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Celebrating the stellar achievements and inspirational academic triumphs of VIDYA School scholars in the CBSE Board examinations."
+        }
+      },
+      {
+        "id": "blk-stats",
+        "type": "stats",
+        "data": {
+          "stat": "98.4%",
+          "label": "Top Class X Board Score",
+          "subtext": "100% first-division pass record in secondary board exams"
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "res-1",
+              "badge": "AISSE Class X",
+              "title": "100% Board Pass Percentage",
+              "description": "Consistent high distinctions with students scoring 90%+ in Mathematics, Science, and English.",
+              "linkUrl": "/p/achievements"
+            },
+            {
+              "id": "res-2",
+              "badge": "AISSCE Class XII",
+              "title": "Senior Secondary Success",
+              "description": "Scholars securing prestigious admissions in engineering, business administration, medical sciences, and arts.",
+              "linkUrl": "/p/achievements"
+            },
+            {
+              "id": "res-3",
+              "badge": "Higher Education",
+              "title": "College & Career Pathways",
+              "description": "Active scholarship placements and corporate internships supporting graduates through university degrees.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

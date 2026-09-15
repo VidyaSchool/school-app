@@ -1,0 +1,62 @@
+{
+  "slug": "faqs",
+  "title": "Frequently Asked Questions (FAQs)",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Frequently Asked Questions (FAQs)",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Common questions regarding admissions, curriculum, academic support, school timings, and student facilities at The VIDYA School."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 2,
+          "items": [
+            {
+              "id": "faq-1",
+              "badge": "Affiliation",
+              "title": "What board is The VIDYA School affiliated with?",
+              "description": "The VIDYA School is fully affiliated with the Central Board of Secondary Education (CBSE), New Delhi, following the national NCERT curriculum framework up to Senior Secondary level.",
+              "linkUrl": "/p/affiliation"
+            },
+            {
+              "id": "faq-2",
+              "badge": "Timings",
+              "title": "What are the daily school operating hours?",
+              "description": "Primary Classes (I - V): 8:00 AM – 1:30 PM. Secondary & Senior Secondary: 8:00 AM – 2:30 PM. Remedial clinics and specialized sports clubs operate until 4:00 PM.",
+              "linkUrl": "/p/academic-calendar"
+            },
+            {
+              "id": "faq-3",
+              "badge": "Transport",
+              "title": "Does the school provide transportation?",
+              "description": "Yes, safe school buses and vans operate across designated routes covering communities in Sector 24, DLF Phase-3, Nathupur, and neighboring Delhi NCR borders.",
+              "linkUrl": "/p/contact"
+            },
+            {
+              "id": "faq-4",
+              "badge": "Mentorship",
+              "title": "How can volunteers get involved?",
+              "description": "Volunteers and corporate professionals can join the VIDYA MITR mentoring program, conduct workshops in STEM, career counseling, or sponsor student educational needs.",
+              "linkUrl": "/p/get-involved"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

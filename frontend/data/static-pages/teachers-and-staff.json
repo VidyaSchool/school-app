@@ -1,0 +1,64 @@
+{
+  "slug": "teachers-and-staff",
+  "title": "Teachers & Staff Faculty",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Teachers, Educators & Administrative Faculty",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Our dedicated educators are passionate mentors committed to unlocking the potential of every child through empathy, patience, and pedagogical excellence."
+        }
+      },
+      {
+        "id": "blk-stats",
+        "type": "stats",
+        "data": {
+          "stat": "60+",
+          "label": "Qualified Teachers & Coaches",
+          "subtext": "1:20 teacher-student ratio providing focused individual mentorship"
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "fac-1",
+              "badge": "Academics",
+              "title": "Subject Master Teachers",
+              "description": "Post-graduate, B.Ed. certified masters in Mathematics, Sciences, Social Studies, English, and Hindi.",
+              "linkUrl": "/p/faculty-details"
+            },
+            {
+              "id": "fac-2",
+              "badge": "Technology & STEM",
+              "title": "Computer & Robotics Mentors",
+              "description": "Specialized instructors leading computer programming, electronics, robotics competitions, and digital literacy.",
+              "linkUrl": "/p/stem"
+            },
+            {
+              "id": "fac-3",
+              "badge": "Holistic Development",
+              "title": "Counselors & Coaches",
+              "description": "Certified child psychologists, special educators, music masters, fine arts trainers, and sports coaches.",
+              "linkUrl": "/p/faculty-details"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

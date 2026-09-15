@@ -1,0 +1,64 @@
+{
+  "slug": "examinations",
+  "title": "Examinations & Assessments",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Examinations, Assessments & Evaluations",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Our examination framework balances continuous formative feedback with standardized summative evaluations, nurturing critical thinking over rote memorization."
+        }
+      },
+      {
+        "id": "blk-stats",
+        "type": "stats",
+        "data": {
+          "stat": "100%",
+          "label": "CBSE Board Pass Rate",
+          "subtext": "Exemplary performance across Class X and Class XII examinations"
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "exam-1",
+              "badge": "Formative Reviews",
+              "title": "Periodic Tests (PT 1, 2, 3)",
+              "description": "Regular unit checks assessing student conceptual grasp, assignments, notebook upkeep, and subject enrichment.",
+              "linkUrl": "/p/academic-calendar"
+            },
+            {
+              "id": "exam-2",
+              "badge": "Summative Milestones",
+              "title": "Term-End Examinations",
+              "description": "Mid-term and annual comprehensive assessments formatted in full alignment with official CBSE question blueprints.",
+              "linkUrl": "/p/results"
+            },
+            {
+              "id": "exam-3",
+              "badge": "Board Simulation",
+              "title": "Pre-Board Assessments",
+              "description": "Three rigorous simulation cycles for board-appearing classes with personalized remedial clinics and answer analysis.",
+              "linkUrl": "/p/results"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

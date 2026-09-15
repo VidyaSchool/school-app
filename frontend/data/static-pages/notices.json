@@ -1,0 +1,57 @@
+{
+  "slug": "notices",
+  "title": "School Notices & Circulars",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Official School Notices & Bulletin",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-alert",
+        "type": "alert",
+        "data": {
+          "title": "Academic Session Notification",
+          "message": "Classes are operating according to standard seasonal schedules. Parents and students are requested to review notice boards and portals regularly for circulars and calendar updates.",
+          "variant": "warning"
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "not-1",
+              "badge": "Examinations",
+              "title": "CBSE Board Examination Registration",
+              "description": "Verification of list of candidates (LOC) and subject confirmation for Class X and Class XII candidates.",
+              "linkUrl": "/p/examinations"
+            },
+            {
+              "id": "not-2",
+              "badge": "Athletics",
+              "title": "Annual Sports Day Trials",
+              "description": "House trials for track events, relay sprints, cricket, and football begin on campus grounds next week.",
+              "linkUrl": "/p/sports"
+            },
+            {
+              "id": "not-3",
+              "badge": "PTM",
+              "title": "Parent-Teacher Interactive Meeting",
+              "description": "PTM scheduled for Saturday to discuss formative progress reports and individual learning plans.",
+              "linkUrl": "/p/pta"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "slug": "clubs",
+  "title": "Student Clubs & Societies",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Student Clubs & Societies",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Clubs at The VIDYA School provide collaborative spaces for students to cultivate special passions, teamwork, and creative ideas."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 2,
+          "items": [
+            {
+              "id": "cl-1",
+              "badge": "Technology",
+              "title": "Robotics & Makers Club",
+              "description": "Weekly hands-on circuit assembly, robot programming, 3D modelling, and preparing for national robotics contests.",
+              "linkUrl": "/p/stem"
+            },
+            {
+              "id": "cl-2",
+              "badge": "Sustainability",
+              "title": "Eco & Green Crusaders Club",
+              "description": "Tree plantation drives, waste segregation, solar energy awareness, plastic-free campaigns, and school herb garden care.",
+              "linkUrl": "/p/activities"
+            },
+            {
+              "id": "cl-3",
+              "badge": "Elocution",
+              "title": "Literary & Debating Society",
+              "description": "Bilingual debates, Model United Nations simulations, creative writing, poetry recitations, and the Vidya Vaani newsletter.",
+              "linkUrl": "/p/activities"
+            },
+            {
+              "id": "cl-4",
+              "badge": "Aesthetics",
+              "title": "Arts & Cultural Guild",
+              "description": "Traditional handicrafts, theater drama, street plays, classical music, and preparing for the Vidya Lit Fest.",
+              "linkUrl": "/p/arts-and-music"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

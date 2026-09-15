@@ -1,0 +1,64 @@
+{
+  "slug": "circulars",
+  "title": "Administrative Circulars",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Administrative & Academic Circulars",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Official directives, policies, and procedural guidelines issued by the School Directorate and CBSE."
+        }
+      },
+      {
+        "id": "blk-table",
+        "type": "table",
+        "data": {
+          "withHeadings": true,
+          "content": [
+            [
+              "Date",
+              "Circular Reference",
+              "Subject Matter",
+              "Authority"
+            ],
+            [
+              "10 August 2025",
+              "VS/ADM/2025/084",
+              "Monsoon School Timings & Bus Safety Protocols",
+              "Office of the Principal"
+            ],
+            [
+              "22 September 2025",
+              "VS/ACAD/2025/112",
+              "Mid-Term Formative Evaluation Date Sheet & Syllabus",
+              "Academic Committee"
+            ],
+            [
+              "15 November 2025",
+              "VS/EVT/2025/145",
+              "Annual Day & Vidya Lit Fest Participation Guidelines",
+              "Cultural Directorate"
+            ],
+            [
+              "05 January 2026",
+              "VS/CBSE/2026/009",
+              "Pre-Board Examination Schedule & Board Admit Cards",
+              "Examination Controller"
+            ]
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

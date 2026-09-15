@@ -1,0 +1,62 @@
+{
+  "slug": "laboratories",
+  "title": "Laboratories & Research Facilities",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Modern Laboratories & Research Facilities",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Practical inquiry and scientific discovery are central to learning at The VIDYA School. We maintain advanced, fully compliant laboratories."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 2,
+          "items": [
+            {
+              "id": "lab-1",
+              "badge": "Physical Sciences",
+              "title": "Physics Laboratory",
+              "description": "Equipped with precision optical benches, electronic meters, resonance apparatus, and mechanics kits meeting CBSE practical specifications.",
+              "linkUrl": "/p/infrastructure"
+            },
+            {
+              "id": "lab-2",
+              "badge": "Chemical Sciences",
+              "title": "Chemistry Laboratory",
+              "description": "Features modern fume hoods, chemical storage, digital titration instruments, fire retardant benches, and safety showers.",
+              "linkUrl": "/p/infrastructure"
+            },
+            {
+              "id": "lab-3",
+              "badge": "Life Sciences",
+              "title": "Biology Laboratory",
+              "description": "High-powered binocular microscopes, extensive human anatomy models, botanical specimens, and ecological testing kits.",
+              "linkUrl": "/p/infrastructure"
+            },
+            {
+              "id": "lab-4",
+              "badge": "Digital Computing",
+              "title": "Computer & IT Center",
+              "description": "High-speed networked terminals, fiber-optic internet, licensed programming environments, and digital audio-visual suites.",
+              "linkUrl": "/p/stem"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "slug": "curriculum",
+  "title": "Curriculum Overview",
+  "widgets": {
+    "blocks": [
+      {
+        "id": "blk-curr-1",
+        "type": "header",
+        "data": {
+          "text": "Holistic CBSE Curriculum Framework",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-curr-2",
+        "type": "paragraph",
+        "data": {
+          "text": "The academic program at The VIDYA School is affiliated with the Central Board of Secondary Education (CBSE), New Delhi. Our curriculum is thoughtfully aligned with the National Education Policy (NEP 2020) and National Curriculum Framework (NCF), providing a student-centric learning continuum from the Foundational Stage through Senior Secondary."
+        }
+      },
+      {
+        "id": "blk-curr-3",
+        "type": "stats",
+        "data": {
+          "stat": "100%",
+          "label": "CBSE Board Pass Rate",
+          "subtext": "Excellence across Secondary (Class X) & Senior Secondary (Class XII)"
+        }
+      },
+      {
+        "id": "blk-curr-4",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "c1",
+              "badge": "Foundational & Preparatory",
+              "title": "Classes Nursery to V",
+              "description": "Activity-based, experiential learning focused on early literacy, numeracy, language discovery, art, and motor skill development.",
+              "linkUrl": "/p/syllabus"
+            },
+            {
+              "id": "c2",
+              "badge": "Middle Stage",
+              "title": "Classes VI to VIII",
+              "description": "Subject-specialized instruction across sciences, mathematics, humanities, computational thinking, and vocational arts.",
+              "linkUrl": "/p/subjects"
+            },
+            {
+              "id": "c3",
+              "badge": "Secondary & Senior Secondary",
+              "title": "Classes IX to XII",
+              "description": "Rigorous academic preparation for CBSE Board Examinations, career counseling, pre-board evaluations, and competitive entrance coaching.",
+              "linkUrl": "/p/examinations"
+            }
+          ]
+        }
+      },
+      {
+        "id": "blk-curr-5",
+        "type": "header",
+        "data": {
+          "text": "Key Pedagogical Pillars",
+          "level": 2
+        }
+      },
+      {
+        "id": "blk-curr-6",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "items": [
+            "Inquiry-Based & Experiential Learning in dedicated science and math labs",
+            "Continuous and Comprehensive Evaluation (CCE) tracking student growth holistically",
+            "Art-Integrated and Sports-Integrated Pedagogy as recommended by NEP 2020",
+            "Digital Literacy & Robotics Studios embedded from primary grades",
+            "Life Skills, Financial Literacy, and Social-Emotional Wellbeing programs"
+          ]
+        }
+      },
+      {
+        "id": "blk-curr-7",
+        "type": "button",
+        "data": {
+          "align": "left",
+          "items": [
+            {
+              "id": "b1",
+              "text": "Explore Academic Subjects",
+              "url": "/p/subjects",
+              "variant": "default"
+            },
+            {
+              "id": "b2",
+              "text": "View Syllabus Guidelines",
+              "url": "/p/syllabus",
+              "variant": "outline"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

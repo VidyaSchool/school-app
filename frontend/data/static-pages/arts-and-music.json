@@ -1,0 +1,55 @@
+{
+  "slug": "arts-and-music",
+  "title": "Arts, Dance & Music",
+  "widgets": {
+    "time": 1789273458831,
+    "blocks": [
+      {
+        "id": "blk-h1",
+        "type": "header",
+        "data": {
+          "text": "Arts, Dance & Music Academy",
+          "level": 1
+        }
+      },
+      {
+        "id": "blk-p1",
+        "type": "paragraph",
+        "data": {
+          "text": "Fostering boundless artistic expression, aesthetic sensibility, and cultural heritage through visual arts, Indian classical music, and theater."
+        }
+      },
+      {
+        "id": "blk-cards",
+        "type": "card",
+        "data": {
+          "columns": 3,
+          "items": [
+            {
+              "id": "art-1",
+              "badge": "Fine Arts",
+              "title": "Visual Arts Studio",
+              "description": "Oil and acrylic painting, clay sculpting, sketching, digital illustration, and traditional Indian folk crafts.",
+              "linkUrl": "/p/activities"
+            },
+            {
+              "id": "art-2",
+              "badge": "Harmony",
+              "title": "Vocal & Instrumental Music",
+              "description": "Classical vocal training, harmonium, tabla, guitar, synthesizers, and school choir performances.",
+              "linkUrl": "/p/activities"
+            },
+            {
+              "id": "art-3",
+              "badge": "Expression",
+              "title": "Theater & Dance Studio",
+              "description": "Classical Kathak, contemporary dance, elocution, street plays (Nukkad Natak), and annual stage musicals.",
+              "linkUrl": "/p/events"
+            }
+          ]
+        }
+      }
+    ],
+    "version": "2.30.7"
+  }
+}
