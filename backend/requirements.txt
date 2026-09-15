@@ -19,7 +19,7 @@ pytest==9.1.1
 python-dotenv==1.2.2
 python-engineio==4.13.3
 python-socketio==5.16.3
-sentry-sdk==2.63.0
+sentry-sdk==2.69.1
 simple-websocket==1.1.0
 SQLAlchemy==2.0.51
 sqlmodel==0.0.38
