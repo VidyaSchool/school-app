@@ -154,114 +154,133 @@ export function StemChipHero() {
           <g className="text-zinc-400 dark:text-zinc-500">
             {/* Top Pin 1: Steps up and bends left */}
             <path
-              d="M 58.5,0 L 58.5,-12 L 40,-12"
+              d="M 58.5,0 L 58.5,-18 L 34,-18"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeOpacity="0.65"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <circle
-              cx="36"
-              cy="-12"
-              r="3"
+              cx="29"
+              cy="-18"
+              r="4"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
               fill="hsl(var(--background))"
             />
 
             {/* Top Pin 4: Central test trace going straight up */}
             <path
-              d="M 130.5,0 L 130.5,-18"
+              d="M 130.5,0 L 130.5,-26"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeOpacity="0.65"
               fill="none"
               strokeLinecap="round"
             />
             <circle
               cx="130.5"
-              cy="-22"
-              r="3"
+              cy="-32"
+              r="4"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Top Pin 5: Steps up and bends right */}
+            <path
+              d="M 150.5,0 L 150.5,-14 L 164,-14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeOpacity="0.65"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="169"
+              cy="-14"
+              r="4"
+              stroke="currentColor"
+              strokeWidth="2"
               fill="hsl(var(--background))"
             />
 
             {/* Bottom Pin 2: Steps down and bends left */}
             <path
-              d="M 82.5,112 L 82.5,124 L 66,124"
+              d="M 82.5,112 L 82.5,130 L 58,130"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeOpacity="0.65"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <circle
-              cx="62"
-              cy="124"
-              r="3"
+              cx="52"
+              cy="130"
+              r="4"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
               fill="hsl(var(--background))"
             />
 
             {/* Bottom Pin 6: Steps down and bends right */}
             <path
-              d="M 178.5,112 L 178.5,124 L 195,124"
+              d="M 178.5,112 L 178.5,130 L 202,130"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeOpacity="0.65"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <circle
-              cx="199"
-              cy="124"
-              r="3"
+              cx="208"
+              cy="130"
+              r="4"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
               fill="hsl(var(--background))"
             />
 
             {/* Left Pin 1: Steps left and bends up */}
             <path
-              d="M 6,42 L -14,42 L -14,28"
+              d="M 6,42 L -20,42 L -20,24"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeOpacity="0.65"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <circle
-              cx="-14"
-              cy="24"
-              r="3"
+              cx="-20"
+              cy="18"
+              r="4"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
               fill="hsl(var(--background))"
             />
 
             {/* Right Pin 2: Steps right and bends down */}
             <path
-              d="M 255,70 L 275,70 L 275,84"
+              d="M 255,70 L 280,70 L 280,88"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeWidth="2"
+              strokeOpacity="0.65"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
             <circle
-              cx="275"
-              cy="88"
-              r="3"
+              cx="280"
+              cy="94"
+              r="4"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="2"
               fill="hsl(var(--background))"
             />
           </g>
@@ -285,12 +304,14 @@ export function StemChipHero() {
         </div>
       </div>
 
-      {/* Animated Bended Beams connecting the chip pins to the 3 cards */}
+      {/* Animated Bended Beams connecting the chip pins to the 3 cards (made slightly bigger/bolder) */}
       {/* 1. Chip Top Pin 2 -> Top Left Card */}
       <AnimatedBeam
         duration={3}
         curveType="bended"
         bendRadius={12}
+        pathWidth={3}
+        pathOpacity={0.25}
         containerRef={containerRef}
         fromRef={pinTopLeftRef}
         toRef={card1TargetRef}
@@ -305,6 +326,8 @@ export function StemChipHero() {
         duration={3}
         curveType="bended"
         bendRadius={12}
+        pathWidth={3}
+        pathOpacity={0.25}
         containerRef={containerRef}
         fromRef={pinTopRightRef}
         toRef={card2TargetRef}
@@ -320,6 +343,8 @@ export function StemChipHero() {
         duration={3}
         curveType="bended"
         bendRadius={12}
+        pathWidth={3}
+        pathOpacity={0.25}
         containerRef={containerRef}
         fromRef={pinBottomCenterRef}
         toRef={card3TargetRef}
