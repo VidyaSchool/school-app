@@ -68,7 +68,7 @@ def request_device_code():
     DEVICE_AUTH_STORE[user_code] = data
     DEVICE_TOKEN_MAP[device_token] = user_code
 
-    verification_uri = f"https://vidyaschool.vercel.app/auth/device?code={user_code}"
+    verification_uri = f"https://beta.vidyaschool.com/auth/device?code={user_code}"
 
     return DeviceCodeResponse(
         user_code=user_code,

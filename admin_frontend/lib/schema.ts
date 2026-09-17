@@ -429,3 +429,19 @@ export const galleryImage = pgTable('gallery_image', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+export const deviceAuthRequest = pgTable('device_auth_request', {
+  id: text('id').primaryKey(),
+  userCode: text('user_code').notNull().unique(),
+  deviceToken: text('device_token').notNull().unique(),
+  status: text('status').notNull().default('pending'),
+  userId: text('user_id'),
+  name: text('name'),
+  email: text('email'),
+  role: text('role'),
+  sessionToken: text('session_token'),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+

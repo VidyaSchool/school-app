@@ -21,14 +21,18 @@ function DeviceAuthContent() {
   const [approved, setApproved] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
 
-  // Fetch logged in user profile
+  // Fetch logged in user profile via better-auth session
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch("/api/backend/api/profile", { credentials: "include" })
+        const res = await fetch("/api/auth/get-session", { credentials: "include" })
         if (res.ok) {
-          const userData = await res.json()
-          setUser(userData)
+          const data = await res.json()
+          if (data?.user) {
+            setUser(data.user)
+          } else {
+            setUser(null)
+          }
         } else {
           setUser(null)
         }
@@ -51,7 +55,7 @@ function DeviceAuthContent() {
     setErrorMsg("")
 
     try {
-      let res = await fetch("/api/backend/api/auth/device/approve", {
+      let res = await fetch("/api/auth/device/approve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -59,19 +63,8 @@ function DeviceAuthContent() {
       })
 
       if (!res.ok) {
-        // Fallback to direct backend URL if proxy failed
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://api.vidyaschool.com"
-        res = await fetch(`${backendUrl}/api/auth/device/approve`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ user_code: code.trim().toUpperCase() }),
-        })
-      }
-
-      if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.detail || "Failed to authorize device.")
+        throw new Error(data.error || data.detail || "Failed to authorize device.")
       }
 
       setApproved(true)

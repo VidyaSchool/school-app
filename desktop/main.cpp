@@ -51,7 +51,7 @@ std::string current_user_code;
 std::string current_verification_uri;
 
 // Production Backend API Base URL
-std::string api_base_url = "https://api.vidyaschool.com";
+std::string api_base_url = "https://beta.vidyaschool.com";
 
 struct AuthUserData {
     std::string name;
@@ -251,7 +251,7 @@ void trigger_device_auth_flow() {
 
     // Fallback to local server if primary backend is unreachable
     if (res.empty() || res.find("user_code") == std::string::npos) {
-        api_base_url = "http://localhost:8000";
+        api_base_url = "http://localhost:3000";
         code_url = api_base_url + "/api/auth/device/code";
         res = http_post_json(code_url, "");
     }
@@ -261,7 +261,7 @@ void trigger_device_auth_flow() {
     std::string verification_uri = extract_json_value(res, "verification_uri");
 
     if (verification_uri.empty()) {
-        verification_uri = "https://vidyaschool.vercel.app/auth/device?code=" + user_code;
+        verification_uri = "https://beta.vidyaschool.com/auth/device?code=" + user_code;
     }
 
     current_user_code = user_code;
@@ -300,7 +300,7 @@ void on_logout_button_clicked(GtkWidget *widget, gpointer data) {
     is_polling = false;
     current_verification_uri = "";
     gtk_label_set_markup(GTK_LABEL(lbl_code_display), "<span size='medium' font_family='Monospace' foreground='#71717a'>No Active Code</span>");
-    gtk_label_set_text(GTK_LABEL(lbl_status), "Click below to authorize via vidyaschool.vercel.app");
+    gtk_label_set_text(GTK_LABEL(lbl_status), "Click below to authorize via beta.vidyaschool.com");
     gtk_button_set_label(GTK_BUTTON(btn_login), "Login With Browser");
     gtk_stack_set_visible_child_name(GTK_STACK(stack), "login_page");
 }
