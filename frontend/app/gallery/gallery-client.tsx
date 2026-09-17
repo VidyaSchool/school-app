@@ -117,8 +117,6 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItem[] })
 
   return (
     <main className="min-h-screen bg-background text-foreground transition-colors duration-300 relative overflow-hidden font-sans">
-      {/* ── Background Glow ── */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary/10 via-indigo-500/5 to-transparent blur-3xl opacity-70" />
 
       {/* ── Photo Grid Section ── */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-24">
