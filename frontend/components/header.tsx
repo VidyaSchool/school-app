@@ -51,19 +51,10 @@ const SearchButton = React.memo(function SearchButton() {
   const handleOpenSearch = React.useCallback(() => {
     try {
       setOpenSearch(true)
-    } catch {
-      // Fallback
+    } catch {}
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("open-vidya-search"))
     }
-    // Also dispatch keydown event to ensure any listener catches it
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "k",
-        code: "KeyK",
-        ctrlKey: true,
-        metaKey: true,
-        bubbles: true,
-      })
-    )
   }, [setOpenSearch])
 
   return (

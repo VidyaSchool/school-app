@@ -1128,15 +1128,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {/* Quick Search Button */}
             <button
               onClick={() => {
-                const event = new KeyboardEvent("keydown", {
-                  key: "k",
-                  code: "KeyK",
-                  ctrlKey: true,
-                  metaKey: true,
-                  bubbles: true,
-                  cancelable: true,
-                })
-                window.dispatchEvent(event)
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("open-vidya-search"))
+                }
                 if (isMobile) {
                   setOpenMobile(false)
                 }

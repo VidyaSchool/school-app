@@ -27,6 +27,58 @@ export interface SearchResultItem {
 }
 
 export function CustomSearchDialog(props: SharedProps) {
+  const [internalOpen, setInternalOpen] = React.useState<boolean | null>(null)
+  const isDialogOpen = internalOpen !== null ? internalOpen : props.open
+
+  const handleOpenChange = React.useCallback(
+    (open: boolean) => {
+      setInternalOpen(open)
+      try {
+        props.onOpenChange?.(open)
+      } catch {}
+      if (!open) {
+        setSearch("")
+        setResults([])
+      }
+    },
+    [props]
+  )
+
+  React.useEffect(() => {
+    const handleCustomOpen = () => {
+      setInternalOpen(true)
+      try {
+        props.onOpenChange?.(true)
+      } catch {}
+    }
+
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault()
+        e.stopPropagation()
+        setInternalOpen((prev) => {
+          const current = prev !== null ? prev : props.open
+          const next = !current
+          try {
+            props.onOpenChange?.(next)
+          } catch {}
+          return next
+        })
+      }
+    }
+
+    window.addEventListener("open-vidya-search", handleCustomOpen)
+    window.addEventListener("keydown", handleGlobalKeyDown, true)
+    return () => {
+      window.removeEventListener("open-vidya-search", handleCustomOpen)
+      window.removeEventListener("keydown", handleGlobalKeyDown, true)
+    }
+  }, [props])
+
+  React.useEffect(() => {
+    setInternalOpen(props.open)
+  }, [props.open])
+
   const [search, setSearch] = React.useState("")
   const [results, setResults] = React.useState<SearchResultItem[]>([])
   const [isLoading, setIsLoading] = React.useState(false)
@@ -126,7 +178,13 @@ export function CustomSearchDialog(props: SharedProps) {
   }
 
   return (
-    <SearchDialog search={search} onSearchChange={setSearch} {...props}>
+    <SearchDialog
+      search={search}
+      onSearchChange={setSearch}
+      {...props}
+      open={isDialogOpen}
+      onOpenChange={handleOpenChange}
+    >
       {/* Overlay — same as sidebar backdrop */}
       <SearchDialogOverlay className="backdrop-blur-md bg-black/50" />
 

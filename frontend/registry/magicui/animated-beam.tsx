@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils"
 export interface AnimatedBeamProps {
   className?: string
   containerRef: React.RefObject<HTMLElement | null>
-  fromRef: React.RefObject<HTMLElement | null>
-  toRef: React.RefObject<HTMLElement | null>
+  fromRef: React.RefObject<HTMLElement | SVGElement | null>
+  toRef: React.RefObject<HTMLElement | SVGElement | null>
   curvature?: number
+  curveType?: "curve" | "bended"
+  bendRadius?: number
   reverse?: boolean
   pathColor?: string
   pathWidth?: number
@@ -22,6 +24,8 @@ export interface AnimatedBeamProps {
   startYOffset?: number
   endXOffset?: number
   endYOffset?: number
+  fromAnchor?: "center" | "top" | "bottom"
+  toAnchor?: "center" | "top" | "bottom"
 }
 
 export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
@@ -30,6 +34,8 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   fromRef,
   toRef,
   curvature = 0,
+  curveType = "bended",
+  bendRadius = 12,
   reverse = false,
   duration = 3,
   delay = 0,
@@ -42,6 +48,8 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   startYOffset = 0,
   endXOffset = 0,
   endYOffset = 0,
+  fromAnchor,
+  toAnchor,
 }) => {
   const id = useId()
   const [pathD, setPathD] = useState("")
@@ -70,39 +78,91 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
       const svgHeight = containerRect.height
       setSvgDimensions({ width: svgWidth, height: svgHeight })
 
-      const startX = rectA.left - containerRect.left + rectA.width / 2 + startXOffset
-      const startY = rectA.top - containerRect.top + rectA.height / 2 + startYOffset
-      const endX = rectB.left - containerRect.left + rectB.width / 2 + endXOffset
-      const endY = rectB.top - containerRect.top + rectB.height / 2 + endYOffset
+      // Determine vertical departure point from A
+      let startY = rectA.top - containerRect.top + rectA.height / 2 + startYOffset
+      if (fromAnchor === "bottom") {
+        startY = rectA.bottom - containerRect.top + startYOffset
+      } else if (fromAnchor === "top") {
+        startY = rectA.top - containerRect.top + startYOffset
+      } else if (!fromAnchor) {
+        if (rectB.top > rectA.bottom) {
+          startY = rectA.bottom - containerRect.top + startYOffset
+        } else if (rectB.bottom < rectA.top) {
+          startY = rectA.top - containerRect.top + startYOffset
+        }
+      }
 
-      const isVertical = Math.abs(endY - startY) >= Math.abs(endX - startX)
+      // Determine vertical arrival point into B
+      let endY = rectB.top - containerRect.top + rectB.height / 2 + endYOffset
+      if (toAnchor === "top") {
+        endY = rectB.top - containerRect.top + endYOffset
+      } else if (toAnchor === "bottom") {
+        endY = rectB.bottom - containerRect.top + endYOffset
+      } else if (!toAnchor) {
+        if (rectB.top > rectA.bottom) {
+          endY = rectB.top - containerRect.top + endYOffset
+        } else if (rectB.bottom < rectA.top) {
+          endY = rectB.bottom - containerRect.top + endYOffset
+        }
+      }
+
+      const startX = rectA.left - containerRect.left + rectA.width / 2 + startXOffset
+      const endX = rectB.left - containerRect.left + rectB.width / 2 + endXOffset
 
       let d = ""
-      if (isVertical) {
-        const midY = (startY + endY) / 2
-        const controlX = (startX + endX) / 2 + curvature
-        d = `M ${startX},${startY} C ${startX},${midY} ${controlX},${midY} ${endX},${endY}`
+      if (curveType === "bended") {
+        const dx = Math.abs(endX - startX)
+        const dy = Math.abs(endY - startY)
+        if (dx < 4) {
+          d = `M ${startX},${startY} L ${endX},${endY}`
+        } else {
+          const dirX = endX > startX ? 1 : -1
+          const dirY = endY > startY ? 1 : -1
+          const midY = startY + (endY - startY) * 0.5
+          const r = Math.min(bendRadius, dx / 2, dy / 2)
+          d =
+            `M ${startX},${startY} ` +
+            `L ${startX},${midY - dirY * r} ` +
+            `Q ${startX},${midY} ${startX + dirX * r},${midY} ` +
+            `L ${endX - dirX * r},${midY} ` +
+            `Q ${endX},${midY} ${endX},${midY + dirY * r} ` +
+            `L ${endX},${endY}`
+        }
       } else {
-        const controlY = startY - curvature
-        d = `M ${startX},${startY} Q ${(startX + endX) / 2},${controlY} ${endX},${endY}`
+        const isVertical = Math.abs(endY - startY) >= Math.abs(endX - startX)
+        if (isVertical) {
+          const dy = endY - startY
+          const cp1X = startX + curvature
+          const cp1Y = startY + dy * 0.5
+          const cp2X = endX + curvature
+          const cp2Y = endY - dy * 0.5
+          d = `M ${startX},${startY} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${endX},${endY}`
+        } else {
+          const controlY = startY - curvature
+          d = `M ${startX},${startY} Q ${(startX + endX) / 2},${controlY} ${endX},${endY}`
+        }
       }
 
       setPathD(d)
 
-      // Linear gradient travel path from source to target
+      const dist = Math.hypot(endX - startX, endY - startY) || 1
+      const pulseLen = Math.max(30, dist * 0.3)
+      const uX = (endX - startX) / dist
+      const uY = (endY - startY) / dist
+
       if (reverse) {
         setCoords({
-          x1: [endX, startX],
-          y1: [endY, startY],
-          x2: [endX + (endX - startX) * 0.2, startX - (endX - startX) * 0.2],
-          y2: [endY + (endY - startY) * 0.2, startY - (endY - startY) * 0.2],
+          x1: [endX, startX - uX * pulseLen],
+          y1: [endY, startY - uY * pulseLen],
+          x2: [endX + uX * pulseLen, startX],
+          y2: [endY + uY * pulseLen, startY],
         })
       } else {
         setCoords({
-          x1: [startX, endX],
-          y1: [startY, endY],
-          x2: [startX + (endX - startX) * 0.2, endX + (endX - startX) * 0.2],
-          y2: [startY + (endY - startY) * 0.2, endY + (endY - startY) * 0.2],
+          x1: [startX - uX * pulseLen, endX],
+          y1: [startY - uY * pulseLen, endY],
+          x2: [startX, endX + uX * pulseLen],
+          y2: [startY, endY + uY * pulseLen],
         })
       }
     }
@@ -129,6 +189,8 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
     startYOffset,
     endXOffset,
     endYOffset,
+    fromAnchor,
+    toAnchor,
   ])
 
   return (
