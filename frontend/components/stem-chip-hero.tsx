@@ -342,8 +342,8 @@ export function StemChipHero() {
         </div>
       </div>
 
-      {/* Animated Bended Beams connecting the chip pins to the 3 cards (made slightly bigger/bolder) */}
-      {/* 1. Chip Top Pin 2 -> Top Left Card */}
+      {/* Animated Bended Beams connecting the 3 cards to the chip (animation flowing from cards into chip) */}
+      {/* 1. Top Left Card (Robotics) -> Chip Top Pin 2 */}
       <AnimatedBeam
         duration={3}
         curveType="bended"
@@ -351,15 +351,15 @@ export function StemChipHero() {
         pathWidth={3}
         pathOpacity={0.25}
         containerRef={containerRef}
-        fromRef={pinTopLeftRef}
-        toRef={card1TargetRef}
-        fromAnchor="top"
-        toAnchor="bottom"
+        fromRef={card1TargetRef}
+        toRef={pinTopLeftRef}
+        fromAnchor="bottom"
+        toAnchor="top"
         gradientStartColor="#38bdf8"
         gradientStopColor="#0284c7"
       />
 
-      {/* 2. Chip Top Pin 6 -> Top Right Card */}
+      {/* 2. Top Right Card (AI & Coding) -> Chip Top Pin 6 */}
       <AnimatedBeam
         duration={3}
         curveType="bended"
@@ -367,16 +367,16 @@ export function StemChipHero() {
         pathWidth={3}
         pathOpacity={0.25}
         containerRef={containerRef}
-        fromRef={pinTopRightRef}
-        toRef={card2TargetRef}
-        fromAnchor="top"
-        toAnchor="bottom"
+        fromRef={card2TargetRef}
+        toRef={pinTopRightRef}
+        fromAnchor="bottom"
+        toAnchor="top"
         gradientStartColor="#34d399"
         gradientStopColor="#059669"
         delay={0.25}
       />
 
-      {/* 3. Chip Bottom Pin 4 -> Bottom Center Card */}
+      {/* 3. Bottom Center Card (IoT & Hardware) -> Chip Bottom Pin 4 */}
       <AnimatedBeam
         duration={3}
         curveType="bended"
@@ -384,10 +384,10 @@ export function StemChipHero() {
         pathWidth={3}
         pathOpacity={0.25}
         containerRef={containerRef}
-        fromRef={pinBottomCenterRef}
-        toRef={card3TargetRef}
-        fromAnchor="bottom"
-        toAnchor="top"
+        fromRef={card3TargetRef}
+        toRef={pinBottomCenterRef}
+        fromAnchor="top"
+        toAnchor="bottom"
         gradientStartColor="#fbbf24"
         gradientStopColor="#d97706"
         delay={0.5}
