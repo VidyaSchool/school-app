@@ -9,6 +9,7 @@ export const revalidate = 0
 
 async function ensureDeviceAuthTable() {
   try {
+    // Run each DDL statement separately for neon-http compatibility
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS "device_auth_request" (
         "id" text PRIMARY KEY,
@@ -23,13 +24,19 @@ async function ensureDeviceAuthTable() {
         "expires_at" timestamp NOT NULL,
         "created_at" timestamp NOT NULL DEFAULT NOW(),
         "updated_at" timestamp NOT NULL DEFAULT NOW()
-      );
-      CREATE INDEX IF NOT EXISTS "idx_device_auth_code" ON "device_auth_request" ("user_code");
-      CREATE INDEX IF NOT EXISTS "idx_device_auth_token" ON "device_auth_request" ("device_token");
+      )
     `)
-  } catch (err) {
-    console.error("Failed to ensure device_auth_request table exists:", err)
+  } catch (err: any) {
+    // Table might already exist, that's fine
+    console.log("Device auth table creation note:", err?.message || "unknown")
   }
+
+  try {
+    await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_device_auth_code" ON "device_auth_request" ("user_code")`)
+  } catch {}
+  try {
+    await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_device_auth_token" ON "device_auth_request" ("device_token")`)
+  } catch {}
 }
 
 function generateUserCode(): string {
@@ -52,20 +59,14 @@ export async function POST(req: NextRequest) {
     const id = `dev_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
-    const reqOrigin = req.headers.get("origin") || req.nextUrl.origin
     const configuredUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "production" ? "https://beta.vidyaschool.com" : "http://localhost:3000")
-    const baseUrl = (reqOrigin && !reqOrigin.includes("api.")) ? reqOrigin : configuredUrl
-    const verificationUri = `${baseUrl.replace(/\/+$/, "")}/auth/device?code=${userCode}`
+    const verificationUri = `${configuredUrl.replace(/\/+$/, "")}/auth/device?code=${userCode}`
 
-    await db.insert(deviceAuthRequest).values({
-      id,
-      userCode,
-      deviceToken,
-      status: "pending",
-      expiresAt,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
+    // Use raw SQL insert for maximum compatibility with neon-http
+    await db.execute(sql`
+      INSERT INTO "device_auth_request" ("id", "user_code", "device_token", "status", "expires_at", "created_at", "updated_at")
+      VALUES (${id}, ${userCode}, ${deviceToken}, 'pending', ${expiresAt.toISOString()}::timestamp, NOW(), NOW())
+    `)
 
     return NextResponse.json(
       {
@@ -78,14 +79,27 @@ export async function POST(req: NextRequest) {
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
         },
       }
     )
   } catch (err: any) {
-    console.error("Failed to generate device auth code:", err)
+    console.error("Failed to generate device auth code:", err?.message, err?.stack)
     return NextResponse.json(
-      { error: "Internal Server Error: Failed to generate device pairing code." },
+      { error: `Failed to generate device pairing code: ${err?.message || "Unknown error"}` },
       { status: 500 }
     )
   }
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  })
 }
