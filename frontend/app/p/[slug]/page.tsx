@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { getAllStaticSlugs, getStaticPage } from "@/lib/static-pages"
 import { StaticPageRenderer } from "@/components/static-page-renderer"
 import { DynamicPublicPageFallback } from "./dynamic-fallback"
+import { StemChipHero } from "@/components/stem-chip-hero"
 
 // Pre-render all static public pages at build time
 export function generateStaticParams() {
@@ -35,6 +36,9 @@ export default async function PublicPageSlugRoute({
   const staticPage = getStaticPage(slug)
 
   if (staticPage) {
+    if (slug === "stem" || slug === "robotics") {
+      return <StaticPageRenderer page={staticPage} customHeader={<StemChipHero />} />
+    }
     return <StaticPageRenderer page={staticPage} />
   }
 
