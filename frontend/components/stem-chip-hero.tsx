@@ -57,7 +57,7 @@ export function StemChipHero() {
           viewBox="0 0 261 118"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-56 sm:w-64 h-auto select-none pointer-events-none drop-shadow-sm"
+          className="w-56 sm:w-64 h-auto select-none pointer-events-none drop-shadow-sm overflow-visible"
         >
           {/* Top Metallic Pins (Pin 2 connects to Top Left Card, Pin 6 connects to Top Right Card) */}
           <rect x="54.5" y="0" width="8" height="14" rx="2" fill="#71717a" />
@@ -149,11 +149,127 @@ export function StemChipHero() {
           >
             ROBOTICS &amp; STEM
           </text>
+
+          {/* Circuit Test Traces with Hollow Circular Terminals on remaining ports */}
+          <g className="text-zinc-400 dark:text-zinc-500">
+            {/* Top Pin 1: Steps up and bends left */}
+            <path
+              d="M 58.5,0 L 58.5,-12 L 40,-12"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.4"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="36"
+              cy="-12"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Top Pin 4: Central test trace going straight up */}
+            <path
+              d="M 130.5,0 L 130.5,-18"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.4"
+              fill="none"
+              strokeLinecap="round"
+            />
+            <circle
+              cx="130.5"
+              cy="-22"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Bottom Pin 2: Steps down and bends left */}
+            <path
+              d="M 82.5,112 L 82.5,124 L 66,124"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.4"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="62"
+              cy="124"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Bottom Pin 6: Steps down and bends right */}
+            <path
+              d="M 178.5,112 L 178.5,124 L 195,124"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.4"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="199"
+              cy="124"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Left Pin 1: Steps left and bends up */}
+            <path
+              d="M 6,42 L -14,42 L -14,28"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.4"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="-14"
+              cy="24"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Right Pin 2: Steps right and bends down */}
+            <path
+              d="M 255,70 L 275,70 L 275,84"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.4"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="275"
+              cy="88"
+              r="3"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="hsl(var(--background))"
+            />
+          </g>
         </svg>
       </div>
 
-      {/* Spacing between chip and bottom card */}
-      <div className="h-20 sm:h-28 w-full" />
+      {/* Spacing between chip and bottom card (closer distance) */}
+      <div className="h-12 sm:h-16 w-full" />
 
       {/* 3. Bottom: One card below the chip */}
       <div className="relative z-10 flex justify-center w-full max-w-xs px-4">
