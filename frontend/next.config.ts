@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
     qualities: [75, 85],
   },
@@ -44,7 +48,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/:slug((?!api|_next|assets|student|teacher|librarian|admin|accounts|community|contact|dashboard|docs|downloads|gallery|login|login-accounts|signup|mandatory-public-disclosure|circulars|monitoring|p|favicon\\.ico).*)',
+        source: '/uploads/:path*',
+        destination: `${process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'}/uploads/:path*`,
+      },
+      {
+        source: '/:slug((?!api|_next|assets|uploads|student|teacher|librarian|admin|accounts|community|contact|dashboard|docs|downloads|gallery|login|login-accounts|signup|mandatory-public-disclosure|circulars|monitoring|p|favicon\\.ico).*)',
         destination: '/p/:slug',
       },
     ];

@@ -151,6 +151,16 @@ export async function POST(req: NextRequest) {
     const filePath = path.join(uploadDir, uniqueFilename)
 
     await writeFile(filePath, buffer)
+
+    // In local development monorepo, also sync to sibling frontend/public/uploads/gallery
+    try {
+      const siblingFrontendDir = path.resolve(process.cwd(), "..", "frontend", "public", "uploads", "gallery")
+      await mkdir(siblingFrontendDir, { recursive: true })
+      await writeFile(path.join(siblingFrontendDir, uniqueFilename), buffer)
+    } catch {
+      // Non-fatal if sibling directory does not exist in standalone environment
+    }
+
     const localUrl = `/uploads/gallery/${uniqueFilename}`
 
     return NextResponse.json({

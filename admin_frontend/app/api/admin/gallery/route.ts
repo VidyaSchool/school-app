@@ -1,19 +1,38 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { galleryImage } from "@/lib/schema"
-import { eq, desc, asc, sql } from "drizzle-orm"
+import { eq, desc, asc, sql, or } from "drizzle-orm"
 import { getAuthenticatedSession } from "@/lib/auth-helpers"
 import { deleteFromS3 } from "@/lib/s3"
 import crypto from "crypto"
 
-const ALLOWED_CATEGORIES = [
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
+export const ALLOWED_CATEGORIES = [
   "Campus & Life",
   "Academics & Labs",
-  "Sports & Athletics",
+  "Arts & Music",
   "Cultural & Arts",
-  "Events & Celebrations",
+  "STEM & Robotics",
   "Robotics & STEM",
+  "Sports & Athletics",
+  "Leadership",
+  "Events & Celebrations",
 ]
+
+export function normalizeCategory(cat: string): string {
+  const c = (cat || "").trim()
+  const lower = c.toLowerCase()
+  if (lower === "cultural & arts" || lower === "cultural and arts" || lower === "arts & music" || lower === "arts and music") {
+    return "Arts & Music"
+  }
+  if (lower === "robotics & stem" || lower === "robotics and stem" || lower === "stem & robotics" || lower === "stem and robotics") {
+    return "STEM & Robotics"
+  }
+  const found = ALLOWED_CATEGORIES.find((k) => k.toLowerCase() === lower)
+  return found || "Campus & Life"
+}
 
 const ALLOWED_ASPECT_RATIOS = [
   "aspect-[4/3]",
@@ -109,7 +128,13 @@ export async function GET(req: NextRequest) {
     let query = db.select().from(galleryImage)
 
     const images = category && category !== "All"
-      ? await query.where(eq(galleryImage.category, category)).orderBy(asc(galleryImage.order), desc(galleryImage.createdAt))
+      ? await query.where(
+          category === "Arts & Music" || category === "Cultural & Arts"
+            ? or(eq(galleryImage.category, "Arts & Music"), eq(galleryImage.category, "Cultural & Arts"))
+            : category === "STEM & Robotics" || category === "Robotics & STEM"
+            ? or(eq(galleryImage.category, "STEM & Robotics"), eq(galleryImage.category, "Robotics & STEM"))
+            : eq(galleryImage.category, normalizeCategory(category))
+        ).orderBy(asc(galleryImage.order), desc(galleryImage.createdAt))
       : await query.orderBy(asc(galleryImage.order), desc(galleryImage.createdAt))
 
     return NextResponse.json(
@@ -167,7 +192,7 @@ export async function POST(req: NextRequest) {
       const title = sanitizeString(item.title, 150) || "Campus Photograph"
       const description = sanitizeString(item.description, 1000)
       const rawCategory = sanitizeString(item.category, 50)
-      const category = ALLOWED_CATEGORIES.includes(rawCategory) ? rawCategory : "Campus & Life"
+      const category = normalizeCategory(rawCategory)
       const rawAspectRatio = sanitizeString(item.aspectRatio, 30)
       const aspectRatio = ALLOWED_ASPECT_RATIOS.includes(rawAspectRatio) ? rawAspectRatio : "aspect-[4/3]"
       const location = sanitizeString(item.location, 100) || "Main Campus, Gurugram"
@@ -235,7 +260,7 @@ export async function PUT(req: NextRequest) {
     if (description !== undefined) updateFields.description = sanitizeString(description, 1000)
     if (category !== undefined) {
       const cat = sanitizeString(category, 50)
-      if (ALLOWED_CATEGORIES.includes(cat)) updateFields.category = cat
+      updateFields.category = normalizeCategory(cat)
     }
     if (aspectRatio !== undefined) {
       const ar = sanitizeString(aspectRatio, 30)

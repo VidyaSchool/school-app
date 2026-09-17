@@ -1,16 +1,35 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { galleryImage } from "@/lib/schema"
-import { asc, desc, eq, sql } from "drizzle-orm"
+import { asc, desc, eq, sql, or } from "drizzle-orm"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 const ALLOWED_CATEGORIES = [
   "Campus & Life",
   "Academics & Labs",
-  "Sports & Athletics",
+  "Arts & Music",
   "Cultural & Arts",
-  "Events & Celebrations",
+  "STEM & Robotics",
   "Robotics & STEM",
+  "Sports & Athletics",
+  "Leadership",
+  "Events & Celebrations",
 ]
+
+function normalizeCategory(cat: string): string {
+  const c = (cat || "").trim()
+  const lower = c.toLowerCase()
+  if (lower === "cultural & arts" || lower === "cultural and arts" || lower === "arts & music" || lower === "arts and music") {
+    return "Arts & Music"
+  }
+  if (lower === "robotics & stem" || lower === "robotics and stem" || lower === "stem & robotics" || lower === "stem and robotics") {
+    return "STEM & Robotics"
+  }
+  const found = ALLOWED_CATEGORIES.find((k) => k.toLowerCase() === lower)
+  return found || "Campus & Life"
+}
 
 async function ensureTableExists() {
   try {
@@ -43,15 +62,21 @@ export async function GET(req: NextRequest) {
 
     let query = db.select().from(galleryImage)
 
-    const images = category && category !== "All" && ALLOWED_CATEGORIES.includes(category)
-      ? await query.where(eq(galleryImage.category, category)).orderBy(asc(galleryImage.order), desc(galleryImage.createdAt)).limit(100)
+    const images = category && category !== "All"
+      ? await query.where(
+          category === "Arts & Music" || category === "Cultural & Arts"
+            ? or(eq(galleryImage.category, "Arts & Music"), eq(galleryImage.category, "Cultural & Arts"))
+            : category === "STEM & Robotics" || category === "Robotics & STEM"
+            ? or(eq(galleryImage.category, "STEM & Robotics"), eq(galleryImage.category, "Robotics & STEM"))
+            : eq(galleryImage.category, normalizeCategory(category))
+        ).orderBy(asc(galleryImage.order), desc(galleryImage.createdAt)).limit(100)
       : await query.orderBy(asc(galleryImage.order), desc(galleryImage.createdAt)).limit(100)
 
     return NextResponse.json(
       { success: true, images },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
           "X-Content-Type-Options": "nosniff",
           "X-Frame-Options": "SAMEORIGIN",
         },

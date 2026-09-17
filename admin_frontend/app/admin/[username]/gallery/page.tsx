@@ -63,10 +63,12 @@ export interface GalleryPhoto {
 
 const CATEGORIES = [
   "Campus & Life",
+  "Academics & Labs",
   "Arts & Music",
   "STEM & Robotics",
-  "Leadership",
   "Sports & Athletics",
+  "Leadership",
+  "Events & Celebrations",
 ]
 
 const ASPECT_RATIOS = [
@@ -397,10 +399,14 @@ export default function AdminGalleryPage() {
           </Button>
 
           <Button asChild variant="outline" size="sm" className="gap-1.5 cursor-pointer text-xs">
-            <Link href="/gallery" target="_blank">
+            <a
+              href={`${process.env.NEXT_PUBLIC_MAIN_URL || "http://localhost:3000"}/gallery`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <ExternalLink className="size-3.5" />
               View Public Gallery
-            </Link>
+            </a>
           </Button>
 
           <Button

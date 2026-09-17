@@ -185,18 +185,22 @@ export function CustomSearchDialog(props: SharedProps) {
       open={isDialogOpen}
       onOpenChange={handleOpenChange}
     >
-      {/* Overlay — same as sidebar backdrop */}
-      <SearchDialogOverlay className="backdrop-blur-md bg-black/50" />
+      {/* Overlay — at the very top of all elements above sticky navbar */}
+      <SearchDialogOverlay className="!z-[99998] backdrop-blur-md bg-black/60" />
 
-      {/* Dialog container — solid white in light mode, sidebar-glass in dark */}
+      {/* Dialog container — elevated above navbar on all viewports */}
       <SearchDialogContent
-        className="max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl focus:outline-none
+        className="!z-[99999] top-3 sm:top-6 md:top-[calc(50%-250px)] max-h-[85vh] overflow-hidden flex flex-col p-0 rounded-xl shadow-2xl focus:outline-none
                    border border-border/80
-                   bg-sidebar/90 backdrop-blur-md
+                   bg-sidebar/95 backdrop-blur-md
                    text-muted-foreground"
       >
-        {/* Shimmer — same gradient for both modes using CSS vars */}
+        {/* Shimmer & Portal Top Stacking */}
         <style>{`
+          [data-radix-portal] {
+            z-index: 99999 !important;
+            position: relative;
+          }
           @keyframes text-shimmer {
             0%   { background-position: 200% 0; }
             100% { background-position: -200% 0; }
