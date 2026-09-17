@@ -22,7 +22,7 @@ export function StemChipHero() {
       className="relative flex w-full flex-col items-center justify-center overflow-hidden py-10 sm:py-16"
     >
       {/* 1. Top: Two cards above the chip */}
-      <div className="relative z-10 grid grid-cols-2 gap-6 sm:gap-16 w-full max-w-lg px-4">
+      <div className="relative z-10 grid grid-cols-2 gap-8 sm:gap-28 w-full max-w-2xl px-4">
         {/* Card 1: Robotics (Top Left) */}
         <div className="relative flex items-center justify-center py-4 px-4 sm:py-5 sm:px-6 rounded-xl border border-border/80 bg-card text-center shadow-xs transition-colors hover:border-foreground/30">
           <div
@@ -246,9 +246,9 @@ export function StemChipHero() {
               fill="hsl(var(--background))"
             />
 
-            {/* Left Pin 1: Steps left and bends up */}
+            {/* Left Pin 1: Steps left much further and bends up */}
             <path
-              d="M 6,42 L -20,42 L -20,24"
+              d="M 6,42 L -85,42 L -85,20"
               stroke="currentColor"
               strokeWidth="2"
               strokeOpacity="0.65"
@@ -257,17 +257,17 @@ export function StemChipHero() {
               strokeLinejoin="round"
             />
             <circle
-              cx="-20"
-              cy="18"
-              r="4"
+              cx="-85"
+              cy="14"
+              r="4.5"
               stroke="currentColor"
               strokeWidth="2"
               fill="hsl(var(--background))"
             />
 
-            {/* Right Pin 2: Steps right and bends down */}
+            {/* Left Pin 2: Steps left much further and bends down */}
             <path
-              d="M 255,70 L 280,70 L 280,88"
+              d="M 6,70 L -70,70 L -70,92"
               stroke="currentColor"
               strokeWidth="2"
               strokeOpacity="0.65"
@@ -276,9 +276,47 @@ export function StemChipHero() {
               strokeLinejoin="round"
             />
             <circle
-              cx="280"
-              cy="94"
-              r="4"
+              cx="-70"
+              cy="98"
+              r="4.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Right Pin 1: Steps right much further and bends up */}
+            <path
+              d="M 255,42 L 346,42 L 346,20"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeOpacity="0.65"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="346"
+              cy="14"
+              r="4.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="hsl(var(--background))"
+            />
+
+            {/* Right Pin 2: Steps right much further and bends down */}
+            <path
+              d="M 255,70 L 331,70 L 331,92"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeOpacity="0.65"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="331"
+              cy="98"
+              r="4.5"
               stroke="currentColor"
               strokeWidth="2"
               fill="hsl(var(--background))"
