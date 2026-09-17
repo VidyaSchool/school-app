@@ -157,6 +157,7 @@ const CATEGORIES = ["All", "Campus & Life", "Arts & Music", "STEM & Robotics", "
 const CHUNK_SIZE = 6 // Batch size per chunk load
 
 export default function GalleryPage() {
+  const [galleryList, setGalleryList] = useState<GalleryItem[]>(GALLERY_ITEMS)
   const [activeCategory, setActiveCategory] = useState<string>("All")
   const [visibleCount, setVisibleCount] = useState<number>(CHUNK_SIZE)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -165,13 +166,42 @@ export default function GalleryPage() {
 
   useEffect(() => {
     setMounted(true)
+    fetch("/api/public/gallery")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data.images) && data.images.length > 0) {
+          const dbItems: GalleryItem[] = data.images
+            .filter((img: any) => {
+              if (!img?.src || typeof img.src !== "string") return false
+              const s = img.src.trim()
+              if (/^(javascript|data|vbscript):/i.test(s)) return false
+              return s.startsWith("/") || s.startsWith("https://") || s.startsWith("http://localhost")
+            })
+            .map((img: any) => ({
+              id: String(img.id).replace(/[^a-zA-Z0-9_-]/g, ""),
+              title: String(img.title || "Campus Photograph").replace(/<[^>]*>?/gm, "").slice(0, 150),
+              category: img.category || "Campus & Life",
+              src: img.src.trim(),
+              aspectRatio: img.aspectRatio || "aspect-[4/3]",
+              description: String(img.description || "").replace(/<[^>]*>?/gm, "").slice(0, 1000),
+              location: String(img.location || "Main Campus, Gurugram").replace(/<[^>]*>?/gm, "").slice(0, 100),
+              date: String(img.date || "2026").replace(/<[^>]*>?/gm, "").slice(0, 50),
+            }))
+          const existingSrcs = new Set(dbItems.map((i) => i.src))
+          const remainingStatic = GALLERY_ITEMS.filter((i) => !existingSrcs.has(i.src))
+          setGalleryList([...dbItems, ...remainingStatic])
+        }
+      })
+      .catch((err) => {
+        console.warn("Using default gallery items:", err)
+      })
   }, [])
 
   // Filter items based on active category
   const filteredItems = useMemo(() => {
-    if (activeCategory === "All") return GALLERY_ITEMS
-    return GALLERY_ITEMS.filter((item) => item.category === activeCategory)
-  }, [activeCategory])
+    if (activeCategory === "All") return galleryList
+    return galleryList.filter((item) => item.category === activeCategory)
+  }, [activeCategory, galleryList])
 
   // Reset chunk count when switching category
   const handleCategoryChange = (category: string) => {

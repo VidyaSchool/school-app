@@ -2,54 +2,465 @@
   "slug": "activities",
   "title": "Co-Curricular Activities",
   "widgets": {
-    "time": 1789273458831,
+    "time": 1789294782254,
     "blocks": [
       {
-        "id": "blk-h1",
+        "id": "act_h1_main",
         "type": "header",
         "data": {
-          "text": "Co-Curricular & Extra-Curricular Activities",
+          "text": "Co-Curricular Activities",
           "level": 1
         }
       },
       {
-        "id": "blk-p1",
-        "type": "paragraph",
+        "id": "act_h2_sub",
+        "type": "header",
         "data": {
-          "text": "Education extends far beyond textbooks. We offer a rich spectrum of experiential learning, field excursions, and cultural events."
+          "text": "Nurturing Talent, Character & Lifelong Passions",
+          "level": 2
         }
       },
       {
-        "id": "blk-cards",
-        "type": "card",
+        "id": "act_p_intro1",
+        "type": "paragraph",
         "data": {
-          "columns": 3,
+          "text": "At VIDYA School, Gurugram, education extends far beyond textbooks, examinations, and traditional classroom boundaries. We believe that authentic learning happens when academic curiosity is paired with creative expression, physical vitality, scientific experimentation, and social responsibility."
+        }
+      },
+      {
+        "id": "act_p_intro2",
+        "type": "paragraph",
+        "data": {
+          "text": "Founded on the conviction that every child possesses innate strengths waiting to be discovered, our co-curricular program provides an inclusive platform where students discover new passions, build resilience, develop collaborative leadership, and gain the self-assurance to step boldly into the world."
+        }
+      },
+      {
+        "id": "act_p_intro3",
+        "type": "paragraph",
+        "data": {
+          "text": "Every learner—from our foundational kindergarten classes through Senior Secondary—participates in structured activities spanning competitive sports, performing and fine arts, STEM robotics, literary discourse, and community stewardship."
+        }
+      },
+      {
+        "id": "act_d1",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_phil",
+        "type": "header",
+        "data": {
+          "text": "Our Co-Curricular Philosophy",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_phil",
+        "type": "header",
+        "data": {
+          "text": "Learning Beyond the Classroom",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_phil1",
+        "type": "paragraph",
+        "data": {
+          "text": "Co-curricular learning at VIDYA is never treated as an optional diversion; it is an indispensable pillar of our educational ethos. We embrace a holistic model that honors the emotional, physical, and moral dimensions of young people alongside their intellectual development."
+        }
+      },
+      {
+        "id": "act_p_phil2",
+        "type": "paragraph",
+        "data": {
+          "text": "Through active involvement in sports teams, theater ensembles, innovation labs, and debate chambers, students develop vital 21st-century life competencies: creative problem-solving, empathy, strategic communication, self-regulation, and the ability to work effectively across diverse teams."
+        }
+      },
+      {
+        "id": "act_p_phil3",
+        "type": "paragraph",
+        "data": {
+          "text": "Dedicated co-curricular activity periods are woven seamlessly into our weekly school timetable. This guarantees that every child receives equal access to professional coaching, modern facilities, and individualized guidance regardless of their socio-economic background or prior exposure."
+        }
+      },
+      {
+        "id": "act_d2",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_pillars",
+        "type": "header",
+        "data": {
+          "text": "Core Pillars of Co-Curricular Engagement",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_pillars",
+        "type": "header",
+        "data": {
+          "text": "A Spectrum of Multidimensional Growth",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_pillars1",
+        "type": "paragraph",
+        "data": {
+          "text": "Our programming is structured around six core pillars designed to engage every facet of student potential:"
+        }
+      },
+      {
+        "id": "act_list_pillars",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
           "items": [
             {
-              "id": "act-1",
-              "badge": "Exploration",
-              "title": "Educational Excursions",
-              "description": "Visits to the National Science Centre, Nehru Planetarium, National Museum of Natural History, and Sultanpur National Park.",
-              "linkUrl": "/p/get-involved"
+              "content": "<b>Sports & Physical Fitness</b>: Daily athletic instruction, team sports (football, basketball, cricket, volleyball, badminton, kho-kho), track and field events, table tennis, yoga, and gymnastics that build endurance, discipline, and sportsmanship.",
+              "meta": {},
+              "items": []
             },
             {
-              "id": "act-2",
-              "badge": "Industry Insight",
-              "title": "Corporate Office Visits",
-              "description": "Guided 2-3 hour exposure visits to leading corporate offices, inspiring students about modern career opportunities.",
-              "linkUrl": "/p/get-involved"
+              "content": "<b>Visual & Performing Arts</b>: Comprehensive training in Hindustani classical and contemporary vocal music, instrumental orchestra, classical and folk dance (Kathak, Bharatnatyam, regional folk), stage theatre, sketching, canvas painting, and sculpture.",
+              "meta": {},
+              "items": []
             },
             {
-              "id": "act-3",
-              "badge": "Traditions",
-              "title": "Cultural Celebrations",
-              "description": "Grand celebrations for Independence Day, Republic Day, Diwali, Christmas, Teacher's Day, and Earth Day.",
-              "linkUrl": "/p/events"
+              "content": "<b>STEM, Robotics & Innovation</b>: Practical robotics, Arduino microcontrollers, algorithmic coding, electronics engineering in our Atal Tinkering Lab (ATL), mathematics circles, and annual science exhibitions.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Literary Arts & Public Discourse</b>: Parliamentary debating societies, Model United Nations (MUN), bilingual elocution, creative writing workshops, editorial publication of the school newsletter, and library reading clubs.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Civic Engagement & Eco-Stewardship</b>: Environmental protection clubs (Tarumitra), campus cleanliness drives, tree-plantation drives, rainwater conservation monitoring, and disaster-preparedness drills.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Life Skills & Leadership</b>: Financial literacy modules, emotional well-being workshops, interpersonal communication masterclasses, career guidance, and student council governance.",
+              "meta": {},
+              "items": []
             }
           ]
         }
+      },
+      {
+        "id": "act_d3",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_clubs",
+        "type": "header",
+        "data": {
+          "text": "Student Clubs & Societies",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_clubs",
+        "type": "header",
+        "data": {
+          "text": "Collaborative Hubs of Discovery and Innovation",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_clubs1",
+        "type": "paragraph",
+        "data": {
+          "text": "Clubs at VIDYA School are student-led communities guided by dedicated teacher-mentors and visiting industry professionals. From Grade III onwards, students select and participate actively in two clubs per academic session:"
+        }
+      },
+      {
+        "id": "act_list_clubs",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Robotics & Computational Thinking Club</b>: Students design, build, and program autonomous robots using microcontrollers, sensors, and Scratch/Python, competing in regional and national robotics challenges.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Literary & Debating Society</b>: Fosters articulate public speaking, persuasive reasoning, and research into contemporary social, economic, and scientific issues through regular mock parliaments.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Tarumitra Eco-Club</b>: Champions environmental audits, vertical herb gardens, waste segregation, water conservation campaigns, and neighbourhood community cleanups across DLF Phase-3 and Nathupur.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Sargam Music Ensemble & Theatre Guild</b>: Provides rigorous training in Indian vocal music, choir harmonies, percussion, street theatre (Nukkad Natak), scriptwriting, and stage dramatics.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Atelier Fine Arts Guild</b>: Explores diverse artistic mediums ranging from charcoal sketching and acrylics to traditional folk arts such as Madhubani and Warli, alongside recycled materials sculpture.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Ramanujan Mathematics Circle</b>: Explores recreational mathematics, logic puzzles, origami geometry, Vedic mathematics shortcuts, and preparation for national mathematics olympiads.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Heritage & Cultural Preservation Guild</b>: Researches India's diverse heritage, organizes guided heritage walks, documents oral community histories, and curates cultural exhibitions.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Young Journalists & Media Forum</b>: Chronicles school life, interviews inspiring personalities, writes editorial commentaries, and produces the quarterly bilingual school newsletter.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "act_d4",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_house",
+        "type": "header",
+        "data": {
+          "text": "The House System & Leadership",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_house",
+        "type": "header",
+        "data": {
+          "text": "Building Camaraderie, Loyalty and Healthy Competition",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_house1",
+        "type": "paragraph",
+        "data": {
+          "text": "To cultivate institutional belonging, team spirit, and democratic leadership, every student upon enrollment is assigned to one of four School Houses named after noble elemental virtues:"
+        }
+      },
+      {
+        "id": "act_list_houses",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Agni House (Red)</b>: Symbolizing courage, fearless determination, passion, and the unyielding pursuit of excellence.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Prithvi House (Green)</b>: Symbolizing integrity, grounded resilience, environmental harmony, and steadfast dependability.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Vayu House (Yellow)</b>: Symbolizing intellectual agility, freedom of thought, wisdom, dynamic enthusiasm, and adaptability.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Jal House (Blue)</b>: Symbolizing empathy, calm perseverance, depth of character, and compassionate community service.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "act_p_house2",
+        "type": "paragraph",
+        "data": {
+          "text": "Throughout the academic year, Houses compete in weekly inter-house challenges spanning athletic leagues, quiz bowls, debates, cultural showcases, and campus cleanliness. The year concludes with the award of the prestigious VIDYA Rolling Champions Trophy during Annual Day."
+        }
+      },
+      {
+        "id": "act_d5",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_excursions",
+        "type": "header",
+        "data": {
+          "text": "Educational Excursions & Corporate Visits",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_excursions",
+        "type": "header",
+        "data": {
+          "text": "Connecting Classroom Concepts with the Wider World",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_excursions1",
+        "type": "paragraph",
+        "data": {
+          "text": "Experiential journeys beyond the school gates expand students' worldviews in ways that textbooks cannot replicate. Regularly scheduled field trips immerse students in scientific research hubs, ecological sanctuaries, cultural monuments, and corporate environments:"
+        }
+      },
+      {
+        "id": "act_list_excursions",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Scientific & Ecological Field Immersions</b>: Guided visits to the National Science Centre, Nehru Planetarium, Sultanpur National Bird Sanctuary, Yamuna Biodiversity Park, and the National Museum of Natural History.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Corporate & Workplace Exposure</b>: Senior students participate in 2–3 hour guided exposure visits to leading multinational corporate offices and technology centres in Gurugram, demystifying corporate careers and inspiring ambitious professional goals.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Cultural & Historical Heritage Walks</b>: Guided exploration of the Qutub Minar complex, Red Fort, Crafts Museum, and the National Gallery of Modern Art (NGMA), deepening appreciation of Indian architecture, history, and craft traditions.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Community Service Immersion</b>: Visits to elder care homes, community health clinics, and ecological restoration sites, nurturing empathy and active civic responsibility.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "act_d6",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_events",
+        "type": "header",
+        "data": {
+          "text": "Annual Traditions & Celebrations",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_events",
+        "type": "header",
+        "data": {
+          "text": "Milestones That Bring Our Entire Community Together",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_events1",
+        "type": "paragraph",
+        "data": {
+          "text": "Our annual calendar is punctuated by vibrant events that celebrate student accomplishment and welcome parents, alumni, and partner organizations:"
+        }
+      },
+      {
+        "id": "act_list_events",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Annual Day & Cultural Showcase</b>: A grand theatrical and musical gala featuring over 400 student performers presenting choir symphonies, classical dance ballets, and English and Hindi theatrical plays.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Khelotsav (Annual Sports Meet)</b>: A spirited track and field spectacle with torch lighting, march pasts, sprint heats, high jump, shot put, drill displays, and enthusiastic inter-house cheering.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Science, STEM & Innovation Expo</b>: An open campus exhibition where student innovators showcase working prototypes, robotics projects, automated irrigation models, and clean-energy demonstrations to visiting judges.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>National & Cultural Commemorations</b>: Solemn and joyful celebrations of Independence Day, Republic Day, Gandhi Jayanti, Diwali, Eid, Christmas, and Teachers' Day celebrating India's rich plurality.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "act_d7",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "act_h1_impact",
+        "type": "header",
+        "data": {
+          "text": "Impact & Lifelong Outcomes",
+          "level": 1
+        }
+      },
+      {
+        "id": "act_h2_impact",
+        "type": "header",
+        "data": {
+          "text": "Confidence, Leadership, and Boundless Possibility",
+          "level": 2
+        }
+      },
+      {
+        "id": "act_p_impact1",
+        "type": "paragraph",
+        "data": {
+          "text": "VIDYA students have represented the school with distinction at district, state, and national football tournaments, athletics meets, science olympiads, and inter-school debating championships, competing on equal terms with elite private institutions."
+        }
+      },
+      {
+        "id": "act_p_impact2",
+        "type": "paragraph",
+        "data": {
+          "text": "Yet the most profound impact is seen in the transformation of each individual child: a quiet student finding their voice on a debate podium, an anxious learner discovering self-belief on a football pitch, or an aspiring young coder building their first automated project. Co-curricular activities at VIDYA empower every student to dream without limits."
+        }
+      },
+      {
+        "id": "act_h3_closing",
+        "type": "header",
+        "data": {
+          "text": "The VIDYA Spirit",
+          "level": 3
+        }
+      },
+      {
+        "id": "act_p_closing",
+        "type": "paragraph",
+        "data": {
+          "text": "Discover. Participate. Excel. Lead."
+        }
       }
     ],
-    "version": "2.30.7"
+    "version": "2.31.6"
   }
 }

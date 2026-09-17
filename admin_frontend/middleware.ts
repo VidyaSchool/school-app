@@ -289,6 +289,28 @@ export async function middleware(request: NextRequest) {
       return applySecurityHeaders(NextResponse.redirect(new URL(dest, request.url)))
     }
 
+    const adminSubroutes = [
+      'gallery',
+      'slider',
+      'page-builder',
+      'notice',
+      'students',
+      'teacher',
+      'requests',
+      'fee-management',
+      'complaints',
+      'admins',
+      'account',
+    ]
+    const subrouteMatch = pathname.match(/^\/admin\/(gallery|slider|page-builder|notice|students|teacher|requests|fee-management|complaints|admins|account)(\/.*)?$/)
+    if (subrouteMatch) {
+      const dest = await resolveAdminDestination(user)
+      if (dest !== '/admin') {
+        const rest = subrouteMatch[2] || ''
+        return applySecurityHeaders(NextResponse.redirect(new URL(`${dest}/${subrouteMatch[1]}${rest}`, request.url)))
+      }
+    }
+
     return applySecurityHeaders(NextResponse.next())
   }
 

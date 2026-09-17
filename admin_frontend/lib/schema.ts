@@ -415,3 +415,17 @@ export const cmsPageVersions = pgTable('cms_page_versions', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+export const galleryImage = pgTable('gallery_image', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull().default('Gallery Photo'),
+  description: text('description').default(''),
+  category: text('category').notNull().default('Campus & Life'),
+  src: text('src').notNull(),
+  aspectRatio: text('aspect_ratio').notNull().default('aspect-[4/3]'),
+  location: text('location').default('Main Campus, Gurugram'),
+  date: text('date').default('2026'),
+  order: integer('order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+

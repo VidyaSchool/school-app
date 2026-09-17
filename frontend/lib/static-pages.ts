@@ -32,8 +32,9 @@ import page_principals_message from "../data/static-pages/principals-message.jso
 import page_pta from "../data/static-pages/pta.json"
 import page_results from "../data/static-pages/results.json"
 import page_school_management_committee from "../data/static-pages/school-management-committee.json"
+import page_robotics from "../data/static-pages/robotics.json"
 import page_sports from "../data/static-pages/sports.json"
-import page_stem from "../data/static-pages/stem.json"
+import page_stem from "../data/static-pages/robotics.json"
 import page_student_life from "../data/static-pages/student-life.json"
 import page_subjects from "../data/static-pages/subjects.json"
 import page_syllabus from "../data/static-pages/syllabus.json"
@@ -101,6 +102,7 @@ const STATIC_PAGES_REGISTRY: Record<string, StaticPageData> = {
   "principals-message": page_principals_message as unknown as StaticPageData,
   "pta": page_pta as unknown as StaticPageData,
   "results": page_results as unknown as StaticPageData,
+  "robotics": page_robotics as unknown as StaticPageData,
   "school-management-committee": page_school_management_committee as unknown as StaticPageData,
   "sports": page_sports as unknown as StaticPageData,
   "stem": page_stem as unknown as StaticPageData,

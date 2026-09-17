@@ -2,10 +2,10 @@
   "slug": "faqs",
   "title": "Frequently Asked Questions (FAQs)",
   "widgets": {
-    "time": 1789273458831,
+    "time": 1789294782254,
     "blocks": [
       {
-        "id": "blk-h1",
+        "id": "faq_h1_main",
         "type": "header",
         "data": {
           "text": "Frequently Asked Questions (FAQs)",
@@ -13,50 +13,378 @@
         }
       },
       {
-        "id": "blk-p1",
-        "type": "paragraph",
+        "id": "faq_h2_sub",
+        "type": "header",
         "data": {
-          "text": "Common questions regarding admissions, curriculum, academic support, school timings, and student facilities at The VIDYA School."
+          "text": "Comprehensive Guidance for Parents, Students & Community Partners",
+          "level": 2
         }
       },
       {
-        "id": "blk-cards",
-        "type": "card",
+        "id": "faq_p_intro1",
+        "type": "paragraph",
         "data": {
-          "columns": 2,
-          "items": [
-            {
-              "id": "faq-1",
-              "badge": "Affiliation",
-              "title": "What board is The VIDYA School affiliated with?",
-              "description": "The VIDYA School is fully affiliated with the Central Board of Secondary Education (CBSE), New Delhi, following the national NCERT curriculum framework up to Senior Secondary level.",
-              "linkUrl": "/p/affiliation"
-            },
-            {
-              "id": "faq-2",
-              "badge": "Timings",
-              "title": "What are the daily school operating hours?",
-              "description": "Primary Classes (I - V): 8:00 AM – 1:30 PM. Secondary & Senior Secondary: 8:00 AM – 2:30 PM. Remedial clinics and specialized sports clubs operate until 4:00 PM.",
-              "linkUrl": "/p/academic-calendar"
-            },
-            {
-              "id": "faq-3",
-              "badge": "Transport",
-              "title": "Does the school provide transportation?",
-              "description": "Yes, safe school buses and vans operate across designated routes covering communities in Sector 24, DLF Phase-3, Nathupur, and neighboring Delhi NCR borders.",
-              "linkUrl": "/p/contact"
-            },
-            {
-              "id": "faq-4",
-              "badge": "Mentorship",
-              "title": "How can volunteers get involved?",
-              "description": "Volunteers and corporate professionals can join the VIDYA MITR mentoring program, conduct workshops in STEM, career counseling, or sponsor student educational needs.",
-              "linkUrl": "/p/get-involved"
-            }
-          ]
+          "text": "Welcome to the official information directory of The VIDYA School, Sector 24, DLF Phase-3, Gurugram. Here you will find clear, transparent answers regarding our admission policies, CBSE academic curriculum, daily school schedule, fee structure, scholarships, student welfare, transportation, campus safety, and volunteer opportunities."
+        }
+      },
+      {
+        "id": "faq_p_intro2",
+        "type": "paragraph",
+        "data": {
+          "text": "Should you have specific inquiries not covered below, our administrative office is at your service. Please write to <b>admissions@vidyaschool.com</b> or call our front desk at <b>+91 (0124) 404-9559</b> during school working hours (Monday through Friday, 8:00 AM – 3:30 PM)."
+        }
+      },
+      {
+        "id": "faq_d1",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "faq_h1_adm",
+        "type": "header",
+        "data": {
+          "text": "Admissions & Eligibility",
+          "level": 1
+        }
+      },
+      {
+        "id": "faq_h2_adm",
+        "type": "header",
+        "data": {
+          "text": "Joining the VIDYA School Family",
+          "level": 2
+        }
+      },
+      {
+        "id": "faq_q1",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: Who is eligible for admission to The VIDYA School, Gurugram?</b>"
+        }
+      },
+      {
+        "id": "faq_a1",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Admissions are primarily open to children from economically disadvantaged households and underserved urban communities residing in Sector 24, DLF Phase-3, Nathupur, Sikanderpur, and adjacent localities of Gurugram. Priority is given to first-generation learners, children from low-income families, single-parent households, and girls who face socio-economic barriers to quality schooling."
+        }
+      },
+      {
+        "id": "faq_q2",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: At which grade levels are admissions conducted?</b>"
+        }
+      },
+      {
+        "id": "faq_a2",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Regular fresh admissions are announced annually for entry-level classes: Nursery, Kindergarten (KG), and Grade I between December and March for the session starting in April. Lateral admissions for Grades II through IX and Grade XI are strictly subject to seat vacancies, document verification, and baseline diagnostic assessments."
+        }
+      },
+      {
+        "id": "faq_q3",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What documents must be submitted during admission?</b>"
+        }
+      },
+      {
+        "id": "faq_a3",
+        "type": "paragraph",
+        "data": {
+          "text": "A: The required documentation includes: (1) Official Birth Certificate of the child issued by the Municipal Corporation or Gram Panchayat; (2) Aadhaar Cards of the child and both parents; (3) Valid Address Proof (Voter ID, Ration Card, or legal rental agreement); (4) Income Certificate or BPL Card; (5) Four recent passport-sized color photographs; and (6) Original Transfer Certificate (TC) and previous school report card for admissions into Grade II and above."
+        }
+      },
+      {
+        "id": "faq_q4",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: Is there an entrance examination or interview?</b>"
+        }
+      },
+      {
+        "id": "faq_a4",
+        "type": "paragraph",
+        "data": {
+          "text": "A: For Nursery and Grade I, there is no formal written test; an informal, friendly interaction is conducted with the child and parents to observe developmental readiness and language comfort. For Grade II upwards, a gentle diagnostic assessment in foundational English, Hindi, and Mathematics is administered solely to map the child's learning level and design personalized remedial support."
+        }
+      },
+      {
+        "id": "faq_d2",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "faq_h1_acad",
+        "type": "header",
+        "data": {
+          "text": "Curriculum & CBSE Affiliation",
+          "level": 1
+        }
+      },
+      {
+        "id": "faq_h2_acad",
+        "type": "header",
+        "data": {
+          "text": "Educational Standards and Academic Streams",
+          "level": 2
+        }
+      },
+      {
+        "id": "faq_q5",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What educational board is The VIDYA School affiliated with?</b>"
+        }
+      },
+      {
+        "id": "faq_a5",
+        "type": "paragraph",
+        "data": {
+          "text": "A: The VIDYA School is a recognized, fully affiliated co-educational Senior Secondary institution under the Central Board of Secondary Education (CBSE), New Delhi. We follow the national NCERT curriculum framework aligned with the progressive directives of the National Education Policy (NEP 2020)."
+        }
+      },
+      {
+        "id": "faq_q6",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What academic streams are offered in Senior Secondary (Classes XI & XII)?</b>"
+        }
+      },
+      {
+        "id": "faq_a6",
+        "type": "paragraph",
+        "data": {
+          "text": "A: We offer three comprehensive CBSE academic streams: (1) <b>Science Stream</b>: Physics, Chemistry, Mathematics, Biology, Computer Science; (2) <b>Commerce Stream</b>: Accountancy, Business Studies, Economics, Applied Mathematics; and (3) <b>Humanities / Arts Stream</b>: Political Science, History, Sociology, Economics, Psychology. All streams include English Core and vocational skill electives."
+        }
+      },
+      {
+        "id": "faq_q7",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What is the primary medium of instruction?</b>"
+        }
+      },
+      {
+        "id": "faq_a7",
+        "type": "paragraph",
+        "data": {
+          "text": "A: The primary medium of instruction across all classes is English. Hindi and Sanskrit are taught as core languages to ensure bilingual mastery, cultural pride, and linguistic versatility."
+        }
+      },
+      {
+        "id": "faq_q8",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: How does the school support children who enter with minimal English knowledge?</b>"
+        }
+      },
+      {
+        "id": "faq_a8",
+        "type": "paragraph",
+        "data": {
+          "text": "A: We operate intensive English Bridge and phonics clinics, interactive digital language laboratories, and buddy-reading systems. Our bilingual educators provide continuous scaffolding, enabling first-generation learners to achieve age-appropriate reading, writing, and conversational fluency within 12 to 18 months."
+        }
+      },
+      {
+        "id": "faq_d3",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "faq_h1_timings",
+        "type": "header",
+        "data": {
+          "text": "School Timings & Daily Routine",
+          "level": 1
+        }
+      },
+      {
+        "id": "faq_h2_timings",
+        "type": "header",
+        "data": {
+          "text": "Bell Schedules, Working Days, and Remedial Support",
+          "level": 2
+        }
+      },
+      {
+        "id": "faq_q9",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What are the daily operating hours for students?</b>"
+        }
+      },
+      {
+        "id": "faq_a9",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Pre-Primary & Primary Classes (Nursery to Grade V) operate from 8:00 AM to 1:30 PM, Monday through Friday. Middle, Secondary, and Senior Secondary (Grades VI to XII) operate from 8:00 AM to 2:30 PM. Specialized remedial clinics, sports coaching, and club activities operate between 2:30 PM and 4:00 PM on designated weekdays."
+        }
+      },
+      {
+        "id": "faq_q10",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: Does the school operate on Saturdays?</b>"
+        }
+      },
+      {
+        "id": "faq_a10",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Regular academic classes run from Monday to Friday. Alternate Saturdays are reserved for faculty professional development, parent-teacher interactions (PTMs), inter-house tournaments, and community enrichment workshops."
+        }
+      },
+      {
+        "id": "faq_d4",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "faq_h1_fees",
+        "type": "header",
+        "data": {
+          "text": "Fees, Scholarships & Student Welfare",
+          "level": 1
+        }
+      },
+      {
+        "id": "faq_h2_fees",
+        "type": "header",
+        "data": {
+          "text": "Accessible, Philanthropic and Transparent Education",
+          "level": 2
+        }
+      },
+      {
+        "id": "faq_q11",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What is the fee structure at VIDYA School?</b>"
+        }
+      },
+      {
+        "id": "faq_a11",
+        "type": "paragraph",
+        "data": {
+          "text": "A: The VIDYA School operates as a philanthropic, non-profit educational institution. The actual cost of delivering high-quality education is heavily subsidized through corporate CSR partnerships and charitable donor sponsorships. For deserving students from low-income families, full 100% scholarship waivers are provided so that financial constraints never prevent a child from learning."
+        }
+      },
+      {
+        "id": "faq_q12",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: Does the school provide meals and healthcare checkups?</b>"
+        }
+      },
+      {
+        "id": "faq_a12",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Yes. All students up to Grade VIII receive a warm, fresh, and nutritious mid-day meal prepared daily on campus under strict hygienic supervision. The school also maintains a fully equipped medical infirmary with a full-time certified nurse, conducting bi-annual health screenings (pediatric, dental, ophthalmic, and audiometric) for every enrolled child."
+        }
+      },
+      {
+        "id": "faq_d5",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "faq_h1_safety",
+        "type": "header",
+        "data": {
+          "text": "Transport, Safety & Campus Facilities",
+          "level": 1
+        }
+      },
+      {
+        "id": "faq_h2_safety",
+        "type": "header",
+        "data": {
+          "text": "A Secure, Inspiring and Well-Equipped Campus",
+          "level": 2
+        }
+      },
+      {
+        "id": "faq_q13",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: Does the school provide transportation?</b>"
+        }
+      },
+      {
+        "id": "faq_a13",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Yes. Supervised school vans and buses operate across designated cluster routes covering DLF Phase-3, Sector 24, Nathupur, Sikanderpur, and nearby Delhi-Gurugram borders. Each transport vehicle is equipped with GPS tracking, first-aid equipment, and a trained female attendant."
+        }
+      },
+      {
+        "id": "faq_q14",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: How does the school ensure student safety and security?</b>"
+        }
+      },
+      {
+        "id": "faq_a14",
+        "type": "paragraph",
+        "data": {
+          "text": "A: Student safety is our foremost priority. The campus is monitored by comprehensive 24/7 CCTV surveillance across all corridors, entry gates, and outdoor play areas. Security personnel enforce strict visitor identification protocols. The school complies fully with POCSO and POSH guidelines, supported by an active Child Protection Committee and anti-bullying squads."
+        }
+      },
+      {
+        "id": "faq_q15",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: What science and digital facilities are available on campus?</b>"
+        }
+      },
+      {
+        "id": "faq_a15",
+        "type": "paragraph",
+        "data": {
+          "text": "A: VIDYA School houses fully equipped Physics, Chemistry, and Biology laboratories, two high-speed computer labs with 1:1 student-to-PC ratios, an Atal Tinkering Lab (ATL) for robotics, smart classrooms with interactive projection, a sound-dampened music and dance studio, an open-air amphitheatre, a spacious sports ground, and a well-curated central library."
+        }
+      },
+      {
+        "id": "faq_d6",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "faq_h1_community",
+        "type": "header",
+        "data": {
+          "text": "Volunteering, Mentorship & Corporate CSR",
+          "level": 1
+        }
+      },
+      {
+        "id": "faq_h2_community",
+        "type": "header",
+        "data": {
+          "text": "Collaborating to Expand Horizons for Every Learner",
+          "level": 2
+        }
+      },
+      {
+        "id": "faq_q16",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>Q: How can individuals or corporates volunteer and support VIDYA?</b>"
+        }
+      },
+      {
+        "id": "faq_a16",
+        "type": "paragraph",
+        "data": {
+          "text": "A: We welcome professionals and corporate partners through our VIDYA MITR mentorship program. Volunteers can conduct conversational English sessions, host career seminars, lead STEM and coding workshops, sponsor annual student educational kits, or organize workplace exposure visits. Please visit our <b>/p/get-involved</b> page or contact <b>volunteer@vidyaschool.com</b> to get started."
         }
       }
     ],
-    "version": "2.30.7"
+    "version": "2.31.6"
   }
 }

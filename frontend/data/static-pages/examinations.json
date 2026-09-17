@@ -2,63 +2,419 @@
   "slug": "examinations",
   "title": "Examinations & Assessments",
   "widgets": {
-    "time": 1789273458831,
+    "time": 1789294782254,
     "blocks": [
       {
-        "id": "blk-h1",
+        "id": "exam_h1_main",
         "type": "header",
         "data": {
-          "text": "Examinations, Assessments & Evaluations",
+          "text": "Examinations & Assessments",
           "level": 1
         }
       },
       {
-        "id": "blk-p1",
+        "id": "exam_h2_sub",
+        "type": "header",
+        "data": {
+          "text": "Formative Growth, Academic Rigour & Evaluative Integrity",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_intro1",
         "type": "paragraph",
         "data": {
-          "text": "Our examination framework balances continuous formative feedback with standardized summative evaluations, nurturing critical thinking over rote memorization."
+          "text": "At The VIDYA School, Gurugram, our assessment philosophy is designed to empower, evaluate, and guide student learning rather than induce anxiety. Fully aligned with the Central Board of Secondary Education (CBSE) mandates and the forward-looking vision of the National Education Policy (NEP 2020), our evaluation framework balances continuous formative feedback with structured summative milestones."
         }
       },
       {
-        "id": "blk-stats",
-        "type": "stats",
+        "id": "exam_p_intro2",
+        "type": "paragraph",
         "data": {
-          "stat": "100%",
-          "label": "CBSE Board Pass Rate",
-          "subtext": "Exemplary performance across Class X and Class XII examinations"
+          "text": "We view assessments not as high-pressure ranking mechanisms, but as constructive milestones that diagnose conceptual learning gaps, celebrate individual progress, cultivate critical reasoning, and build resilient study habits that prepare students for board examinations and lifelong intellectual achievement."
         }
       },
       {
-        "id": "blk-cards",
-        "type": "card",
+        "id": "exam_d1",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "exam_h1_phil",
+        "type": "header",
         "data": {
-          "columns": 3,
+          "text": "Assessment Philosophy & CBSE Alignment",
+          "level": 1
+        }
+      },
+      {
+        "id": "exam_h2_phil",
+        "type": "header",
+        "data": {
+          "text": "Evaluating Knowledge, Application, and Character",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_phil1",
+        "type": "paragraph",
+        "data": {
+          "text": "Our pedagogical evaluation is rooted in the Comprehensive and Continuous Evaluation (CCE) framework. By assessing both scholastic and co-scholastic domains throughout the entire school year, we ensure that a student's worth is never judged by a single high-stakes examination."
+        }
+      },
+      {
+        "id": "exam_p_phil2",
+        "type": "paragraph",
+        "data": {
+          "text": "Our multi-tiered evaluations focus on three interconnected domains of learning:"
+        }
+      },
+      {
+        "id": "exam_list_domains",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
           "items": [
             {
-              "id": "exam-1",
-              "badge": "Formative Reviews",
-              "title": "Periodic Tests (PT 1, 2, 3)",
-              "description": "Regular unit checks assessing student conceptual grasp, assignments, notebook upkeep, and subject enrichment.",
-              "linkUrl": "/p/academic-calendar"
+              "content": "<b>Cognitive Competence & Knowledge Application</b>: Conceptual clarity, analytical reasoning, mathematical problem solving, scientific inquiry, and bilingual written communication across disciplines.",
+              "meta": {},
+              "items": []
             },
             {
-              "id": "exam-2",
-              "badge": "Summative Milestones",
-              "title": "Term-End Examinations",
-              "description": "Mid-term and annual comprehensive assessments formatted in full alignment with official CBSE question blueprints.",
-              "linkUrl": "/p/results"
+              "content": "<b>Practical & Experiential Proficiency</b>: Hands-on laboratory experiments, computational programming, mathematical model-making, viva voce, and investigatory project presentations.",
+              "meta": {},
+              "items": []
             },
             {
-              "id": "exam-3",
-              "badge": "Board Simulation",
-              "title": "Pre-Board Assessments",
-              "description": "Three rigorous simulation cycles for board-appearing classes with personalized remedial clinics and answer analysis.",
-              "linkUrl": "/p/results"
+              "content": "<b>Co-Scholastic & Social-Emotional Development</b>: Team collaboration, leadership, empathy, environmental consciousness, discipline, sportsmanship, and creative arts expression.",
+              "meta": {},
+              "items": []
             }
           ]
         }
+      },
+      {
+        "id": "exam_d2",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "exam_h1_stages",
+        "type": "header",
+        "data": {
+          "text": "Evaluation Structure Across Academic Stages",
+          "level": 1
+        }
+      },
+      {
+        "id": "exam_h2_stages",
+        "type": "header",
+        "data": {
+          "text": "Developmentally Tailored Assessment Frameworks",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_stages_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "Assessment methods at VIDYA School are calibrated carefully according to the developmental maturity and cognitive readiness of learners across four educational stages:"
+        }
+      },
+      {
+        "id": "exam_list_stages",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Foundational Stage (Nursery, KG & Grades I–II)</b>: Zero formal pen-and-paper examinations. Assessment is entirely observational, play-based, and diagnostic. Teachers maintain detailed developmental portfolios tracking motor development, phonics recognition, numeracy, language comprehension, and social interactions. Comprehensive anecdotal progress reports are shared quarterly with parents.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Preparatory Stage (Grades III–V)</b>: A gentle transition into structured assessments. Students undertake two formal assessment terms (Mid-Term and Annual) alongside continuous monthly class assessments, reading fluency checks, mental maths drills, and collaborative project presentations.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Middle Stage (Grades VI–VIII)</b>: Follows the uniform CBSE assessment pattern divided into two terms. Each term includes Periodic Assessments (10 marks pen-paper test, 5 marks notebook maintenance, 5 marks subject enrichment activity) and a Term-End Examination (80 marks) evaluating cumulative conceptual mastery.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Secondary Stage (Grades IX–X)</b>: Direct preparation for the CBSE Class X All India Secondary School Examination (AISSE). The annual assessment comprises an 80-mark Annual Board / School Examination and a 20-mark Internal Assessment (Pen-Paper Tests, Multiple Assessments, Portfolios, and Subject Enrichment Activities including science practicals and listening/speaking skills).",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Senior Secondary Stage (Grades XI–XII)</b>: Aligned with the rigorous All India Senior School Certificate Examination (AISSCE). Theory papers (70/80 marks) are complemented by practical examinations, research project dossiers, and viva voce (20/30 marks) conducted under external CBSE-appointed examiners.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "exam_d3",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "exam_h1_calendar",
+        "type": "header",
+        "data": {
+          "text": "Annual Evaluative Milestones & Calendar",
+          "level": 1
+        }
+      },
+      {
+        "id": "exam_h2_calendar",
+        "type": "header",
+        "data": {
+          "text": "A Transparent and Structured Assessment Cycle",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_cal_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "The school academic year runs from April to March and is structured into two balanced evaluative terms to ensure consistent learning without eleventh-hour cramming:"
+        }
+      },
+      {
+        "id": "exam_list_calendar",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Term 1 (April to September)</b>: Periodic Test 1 (PT-1) conducted in July/August covering foundational quarter syllabus; Subject Enrichment and Portfolio Audits (science journals, speaking/listening assessments, and art integration) evaluated in August; Half-Yearly / Mid-Term Examinations conducted in late September covering the cumulative first-term curriculum.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Term 2 (October to March)</b>: Periodic Test 2 (PT-2) conducted in November/December tracking post-midterm topics; Pre-Board Cycles 1 & 2 for Classes X and XII conducted in December and January under strict CBSE examination hall conditions; CBSE Board Practical Examinations conducted in January/February by external examiners; Annual Final Examinations for Classes I–IX and XI in late February / early March; and CBSE Board Examinations for Classes X and XII in February, March, and April.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "exam_d4",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "exam_h1_scale",
+        "type": "header",
+        "data": {
+          "text": "CBSE Scholastic Grading Scale",
+          "level": 1
+        }
+      },
+      {
+        "id": "exam_h2_scale",
+        "type": "header",
+        "data": {
+          "text": "Standardized Eight-Point Grading Benchmark",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_scale_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "In accordance with CBSE guidelines, scholastic achievements in Middle and Secondary school (Grades VI to X) are evaluated using a standardized 8-point grading scale reflecting absolute marks:"
+        }
+      },
+      {
+        "id": "exam_list_scale",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>A1 (91% – 100%)</b>: Exceptional conceptual mastery, analytical rigor, and sophisticated subject application.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>A2 (81% – 90%)</b>: Excellent performance, comprehensive subject understanding, and sound problem-solving skill.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>B1 (71% – 80%)</b>: Very good performance with strong foundational grasp and minor application gaps.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>B2 (61% – 70%)</b>: Good performance demonstrating consistent effort and dependable understanding of core concepts.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>C1 (51% – 60%)</b>: Fair performance; basic concepts grasped, requires guided practice and systematic revision.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>C2 (41% – 50%)</b>: Average performance; foundational reinforcement and steady teacher monitoring required.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>D (33% – 40%)</b>: Minimum qualifying pass benchmark; mandatory remedial clinics assigned to bridge conceptual deficits.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>E (32% and below)</b>: Unsatisfactory performance; requires intensive remedial intervention, personalized coaching, and re-evaluation.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "exam_d5",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "exam_h1_remedial",
+        "type": "header",
+        "data": {
+          "text": "Remedial Clinics & Board Support",
+          "level": 1
+        }
+      },
+      {
+        "id": "exam_h2_remedial",
+        "type": "header",
+        "data": {
+          "text": "Ensuring Every Learner Reaches Their Potential",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_remedial_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "Examinations at VIDYA are not endpoints; they are diagnostic indicators that trigger proactive, personalized academic support:"
+        }
+      },
+      {
+        "id": "exam_list_remedial",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Detailed Error Analysis</b>: Following every test cycle, subject teachers perform granular item-response audits, categorizing errors into conceptual misunderstandings, calculation slips, or comprehension oversights.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Small-Group Remedial Clinics</b>: Students who score below qualifying benchmarks receive targeted daily reinforcement in small cohorts (6 to 8 students) with customized worksheets and bilingual scaffolding.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Pre-Board Intensive Mentorship</b>: Class X and XII students undergo one-on-one answer script review sessions, masterclasses on CBSE marking schemes, and time-management simulations.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Mental Health & Wellness Counseling</b>: Our dedicated school psychologist and counselors conduct stress-alleviation workshops, breathing techniques, and mindfulness sessions to eliminate exam anxiety.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "exam_d6",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "exam_h1_rules",
+        "type": "header",
+        "data": {
+          "text": "Examination Rules & Integrity",
+          "level": 1
+        }
+      },
+      {
+        "id": "exam_h2_rules",
+        "type": "header",
+        "data": {
+          "text": "Upholding Uncompromising Standards of Ethics",
+          "level": 2
+        }
+      },
+      {
+        "id": "exam_p_rules_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "Academic honesty is a sacred institutional value. The following regulations are strictly enforced across all assessment cycles:"
+        }
+      },
+      {
+        "id": "exam_list_rules",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>75% Mandatory Attendance</b>: Under CBSE regulations, a minimum of 75% attendance throughout the academic session is compulsory for any student to be eligible to sit for annual school and board examinations.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Zero-Tolerance for Unfair Means</b>: Possession of unauthorized notes, electronic gadgets, mobile devices, smartwatches, or copying during examinations leads to immediate paper cancellation, disciplinary committee hearing, and parental notification.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Punctuality & Admit Cards</b>: Students must arrive in full school uniform with official admit cards and approved stationery at least 20 minutes before scheduled examination commencement. Late entries beyond 15 minutes are strictly disallowed.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Medical Absence Protocol</b>: In cases of genuine illness during scheduled examinations, a valid medical certificate issued by a registered medical practitioner must be submitted to the Principal's office within 48 hours for consideration of re-test eligibility.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "exam_h3_closing",
+        "type": "header",
+        "data": {
+          "text": "Excellence with Empathy",
+          "level": 3
+        }
+      },
+      {
+        "id": "exam_p_closing",
+        "type": "paragraph",
+        "data": {
+          "text": "Assess. Understand. Improve. Excel."
+        }
       }
     ],
-    "version": "2.30.7"
+    "version": "2.31.6"
   }
 }

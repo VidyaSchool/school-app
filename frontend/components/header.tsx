@@ -3,7 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTheme } from "@/components/theme-provider"
-import { Sun, Moon, Menu, X } from "lucide-react"
+import { Sun, Moon, Menu, X, Search } from "lucide-react"
+import { useSearchContext } from "fumadocs-ui/contexts/search"
 
 import {
   NavigationMenu,
@@ -40,6 +41,41 @@ const ThemeToggle = React.memo(function ThemeToggle() {
     >
       <Sun className="h-4.5 w-4.5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground" />
       <Moon className="absolute h-4.5 w-4.5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground" />
+    </Button>
+  )
+})
+
+const SearchButton = React.memo(function SearchButton() {
+  const { setOpenSearch } = useSearchContext()
+
+  const handleOpenSearch = React.useCallback(() => {
+    try {
+      setOpenSearch(true)
+    } catch {
+      // Fallback
+    }
+    // Also dispatch keydown event to ensure any listener catches it
+    window.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "k",
+        code: "KeyK",
+        ctrlKey: true,
+        metaKey: true,
+        bubbles: true,
+      })
+    )
+  }, [setOpenSearch])
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={handleOpenSearch}
+      className="cursor-pointer"
+      aria-label="Search (Ctrl + K)"
+      title="Search (Ctrl + K)"
+    >
+      <Search className="h-4.5 w-4.5 text-foreground" />
     </Button>
   )
 })
@@ -143,7 +179,7 @@ export function Header() {
                     <ListItem href="/p/sports" title="Sports & Physical Ed">
                       Football, cricket pitches, basketball courts, and athletics training.
                     </ListItem>
-                    <ListItem href="/p/stem" title="STEM & Robotics Hub">
+                    <ListItem href="/p/robotics" title="Robotics & STEM Hub">
                       Lego STEM arena, micro-controllers, coding, and annual Tech Fest.
                     </ListItem>
                     <ListItem href="/p/arts-and-music" title="Arts, Dance & Music">
@@ -252,6 +288,7 @@ export function Header() {
 
         {/* Right Controls */}
         <div className="hidden md:flex items-center gap-3">
+          <SearchButton />
           <ThemeToggle />
           <Button variant="ghost" asChild>
             <Link id="header-student-portal-btn" href="/login">
@@ -267,6 +304,7 @@ export function Header() {
 
         {/* Mobile Hamburg Trigger & Controls */}
         <div className="flex md:hidden items-center gap-2">
+          <SearchButton />
           <ThemeToggle />
           <Button
             variant="outline"
@@ -351,8 +389,8 @@ export function Header() {
               <Link href="/p/sports" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Sports &amp; Athletics
               </Link>
-              <Link href="/p/stem" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                STEM &amp; Robotics Hub
+              <Link href="/p/robotics" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Robotics &amp; STEM Hub
               </Link>
               <Link href="/p/arts-and-music" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Arts, Dance &amp; Music

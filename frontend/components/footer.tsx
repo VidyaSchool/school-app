@@ -87,7 +87,7 @@ export function Footer() {
                 <Link href="/p/sports" className="hover:text-foreground transition-colors">Sports &amp; Physical Ed</Link>
               </li>
               <li>
-                <Link href="/p/stem" className="hover:text-foreground transition-colors">STEM &amp; Robotics Hub</Link>
+                <Link href="/p/robotics" className="hover:text-foreground transition-colors">Robotics &amp; STEM Hub</Link>
               </li>
               <li>
                 <Link href="/p/arts-and-music" className="hover:text-foreground transition-colors">Arts, Dance &amp; Music</Link>

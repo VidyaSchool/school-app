@@ -2,75 +2,367 @@
   "slug": "vision-and-mission",
   "title": "Vision & Mission",
   "widgets": {
-    "time": 1789273458831,
+    "time": 1789294782254,
     "blocks": [
       {
-        "id": "blk-h1",
+        "id": "vm_h1_main",
         "type": "header",
         "data": {
-          "text": "Vision & Mission of The VIDYA School",
+          "text": "Vision & Mission",
           "level": 1
         }
       },
       {
-        "id": "blk-p1",
-        "type": "paragraph",
+        "id": "vm_h2_sub",
+        "type": "header",
         "data": {
-          "text": "At The VIDYA School, our foundational mission is to educate, empower, and transform young lives through holistic education, cutting-edge infrastructure, and moral grounding."
+          "text": "Our Guiding Compass and Foundational Ethos",
+          "level": 2
         }
       },
       {
-        "id": "blk-cards",
-        "type": "card",
+        "id": "vm_p_intro1",
+        "type": "paragraph",
         "data": {
-          "columns": 3,
+          "text": "At The VIDYA School, Gurugram, our vision is rooted in a simple but revolutionary conviction that began four decades ago: every child, regardless of socioeconomic circumstance, deserves access to high-quality education, compassionate mentorship, and the opportunities needed to build a dignified, successful future."
+        }
+      },
+      {
+        "id": "vm_p_intro2",
+        "type": "paragraph",
+        "data": {
+          "text": "Inaugurated in November 2009 in Sector 24, DLF Phase-3, Gurugram, VIDYA School is a CBSE-accredited K–12 institution currently educating more than 1,200 students from underserved urban communities. Our vision and mission are not mere words on paper; they serve as our operational compass guiding our classroom teaching, pastoral care, infrastructural investments, and institutional partnerships every single day."
+        }
+      },
+      {
+        "id": "vm_d1",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "vm_h1_vision",
+        "type": "header",
+        "data": {
+          "text": "Our Vision",
+          "level": 1
+        }
+      },
+      {
+        "id": "vm_h2_vision",
+        "type": "header",
+        "data": {
+          "text": "Educating. Empowering. Transforming.",
+          "level": 2
+        }
+      },
+      {
+        "id": "vm_p_vision_quote",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>\"To empower and transform the lives of children, youth, and communities through high-quality, holistic, and value-based education, enabling every individual to realize their fullest human potential and become self-reliant, ethical, and proactive global citizens.\"</b>"
+        }
+      },
+      {
+        "id": "vm_p_vision_exp",
+        "type": "paragraph",
+        "data": {
+          "text": "We envision an inclusive, equitable society where a child's birth circumstances never determine their destiny. In our vision, every student leaves our school equipped with the academic mastery to compete, the practical skills to innovate, the emotional resilience to navigate adversity, and the moral compass to contribute constructively to nation-building."
+        }
+      },
+      {
+        "id": "vm_p_vision_dimensions",
+        "type": "paragraph",
+        "data": {
+          "text": "Our vision unfolds across five interconnected dimensions of human development:"
+        }
+      },
+      {
+        "id": "vm_list_vision",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
           "items": [
             {
-              "id": "vm1",
-              "badge": "Our Vision",
-              "title": "Educate, Empower & Transform",
-              "description": "To nurture a generation of empowered, socially responsible, and intellectually curious young leaders capable of thriving in India's emerging global knowledge economy.",
-              "linkUrl": "/p/about-vidyaschool"
+              "content": "<b>Academic Rigour with Compassion</b>: Fostering deep conceptual understanding, bilingual communication fluency in English and Hindi, and an analytical scientific temper in every learner.",
+              "meta": {},
+              "items": []
             },
             {
-              "id": "vm2",
-              "badge": "Our Mission",
-              "title": "Equal Opportunities for All",
-              "description": "To provide equal access to world-class English-medium education, digital literacy, life skills, and character building for children from underprivileged backgrounds.",
-              "linkUrl": "/p/about-vidyaschool"
+              "content": "<b>Moral Character & Social Conscience</b>: Inculcating honesty, empathy, civic responsibility, and an enduring dedication to democratic values and community service.",
+              "meta": {},
+              "items": []
             },
             {
-              "id": "vm3",
-              "badge": "Core Values",
-              "title": "Integrity, Empathy & Excellence",
-              "description": "Fostering academic curiosity, moral leadership, resilient spirit, gender equality, and lifelong civic responsibility.",
-              "linkUrl": "/p/student-life"
+              "content": "<b>Technological & Future Readiness</b>: Democratizing access to digital literacy, computational programming, robotics, and problem-solving skills for an evolving global economy.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Gender Parity & Female Leadership</b>: Championing equal opportunities for girls, dismantling socio-cultural barriers, and nurturing self-confident female leaders and changemakers.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Lifelong Self-Reliance</b>: Creating sustainable educational and vocational pathways from early childhood through university degrees, professional careers, and economic independence.",
+              "meta": {},
+              "items": []
             }
           ]
         }
       },
       {
-        "id": "blk-quote",
-        "type": "quote",
+        "id": "vm_d2",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "vm_h1_mission",
+        "type": "header",
         "data": {
-          "text": "The difference between who you are and who you want to be is what you do.",
-          "caption": "The VIDYA Guiding Principle"
+          "text": "Our Mission",
+          "level": 1
         }
       },
       {
-        "id": "blk-list",
+        "id": "vm_h2_mission",
+        "type": "header",
+        "data": {
+          "text": "Delivering Excellence and Equity in Education",
+          "level": 2
+        }
+      },
+      {
+        "id": "vm_p_mission_quote",
+        "type": "paragraph",
+        "data": {
+          "text": "<b>\"To provide transformative, world-class English-medium CBSE K–12 education, complemented by cutting-edge digital infrastructure, comprehensive sports, expressive arts, and life skills, ensuring that students from underserved communities achieve academic excellence and personal empowerment.\"</b>"
+        }
+      },
+      {
+        "id": "vm_p_mission_exp",
+        "type": "paragraph",
+        "data": {
+          "text": "We translate this mission into daily practice through five operational commitments:"
+        }
+      },
+      {
+        "id": "vm_list_mission",
         "type": "list",
         "data": {
           "style": "unordered",
+          "meta": {},
           "items": [
-            "Deliver high-standard CBSE education with complete learning resources provided to all students.",
-            "Equip every learner with modern STEM, robotics, computer science, and English conversational fluency.",
-            "Foster vibrant artistic expression through classical music, fine arts, and physical education.",
-            "Engage institutional partners and mentors to bridge the digital and corporate opportunities divide."
+            {
+              "content": "<b>Equitable Access to Total Learning Resources</b>: Providing tuition-free or heavily subsidized schooling, textbooks, stationery, nutritious mid-day meals, uniforms, digital devices, and healthcare checkups to every enrolled student.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Learner-Centred Pedagogy</b>: Implementing experiential, inquiry-based, and interdisciplinary teaching methodologies aligned with the National Education Policy (NEP 2020) and CBSE frameworks.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Whole-Child Development</b>: Balancing rigorous scholastic learning with extensive training in competitive sports, performing arts, robotics, social-emotional learning, and civic action.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Community & Parental Partnership</b>: Actively engaging families through regular counseling, adult literacy programs, health initiatives, and community outreach to create supportive home environments.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Sustainable Transition Pathways</b>: Mentoring students through career guidance, scholarship matching, college admissions counseling, and vocational linkages to ensure successful progression into higher education and productive careers.",
+              "meta": {},
+              "items": []
+            }
           ]
+        }
+      },
+      {
+        "id": "vm_d3",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "vm_h1_values",
+        "type": "header",
+        "data": {
+          "text": "Our Core Values",
+          "level": 1
+        }
+      },
+      {
+        "id": "vm_h2_values",
+        "type": "header",
+        "data": {
+          "text": "The Principles That Guide Our Daily Actions",
+          "level": 2
+        }
+      },
+      {
+        "id": "vm_p_values_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "The soul of VIDYA School is anchored by six enduring core values that unite our teachers, students, administrators, and volunteer mentors:"
+        }
+      },
+      {
+        "id": "vm_list_values",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>Integrity (Satya & Nishtha)</b>: Uncompromising adherence to truth, honesty, transparency, and moral courage in all thoughts, words, and deeds—doing the right thing even when no one is watching.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Empathy & Compassion (Karuna)</b>: Cultivating deep sensitivity to the lived experiences of others, embracing diversity, and actively working to alleviate hardship in our community.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Excellence & Perseverance (Shreshthata & Dhairya)</b>: Striving continuously for personal bests in academics and character, viewing challenges as stepping stones to growth, and demonstrating resilient fortitude.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Respect & Inclusivity (Samman)</b>: Honoring individual human dignity, celebrating cultural and gender plurality, and maintaining an environment completely free of prejudice and discrimination.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Social Responsibility & Service (Seva)</b>: Recognizing that education carries the sacred obligation to give back, uplift the underprivileged, and contribute actively to nation-building.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Curiosity & Innovation (Jigyasa)</b>: Nurturing questioning minds, embracing creative experimentation, and welcoming technological progress to solve societal challenges.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "vm_d4",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "vm_h1_objectives",
+        "type": "header",
+        "data": {
+          "text": "Strategic Institutional Objectives",
+          "level": 1
+        }
+      },
+      {
+        "id": "vm_h2_objectives",
+        "type": "header",
+        "data": {
+          "text": "Milestones for 2025–2030",
+          "level": 2
+        }
+      },
+      {
+        "id": "vm_p_objectives_intro",
+        "type": "paragraph",
+        "data": {
+          "text": "To ensure that our educational model remains dynamic and impactful in an era of rapid technological and societal change, VIDYA School is committed to five multi-year strategic priorities:"
+        }
+      },
+      {
+        "id": "vm_list_objectives",
+        "type": "list",
+        "data": {
+          "style": "unordered",
+          "meta": {},
+          "items": [
+            {
+              "content": "<b>100% Transition to Higher Education & Skilled Vocations</b>: Expanding scholarship funds and college placement partnerships to ensure that every Class XII graduate transitions directly into degree colleges, polytechnics, or professional employment.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>AI & Advanced STEM Hub</b>: Expanding our Atal Tinkering Lab into a premier community centre for machine learning, robotics, and clean-energy prototyping.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Comprehensive Student Health & Well-being</b>: Institutionalizing daily physical fitness, mental wellness counseling, preventive pediatric healthcare, and nutritional enrichment for all learners.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Green Sustainable Campus Initiative</b>: Transforming VIDYA School into a model eco-campus with rooftop solar generation, 100% rainwater harvesting, and zero-waste composting managed by students.",
+              "meta": {},
+              "items": []
+            },
+            {
+              "content": "<b>Alumni Mentorship Guild</b>: Formalizing an active alumni network that connects successful graduates across engineering, medicine, finance, and entrepreneurship with current students.",
+              "meta": {},
+              "items": []
+            }
+          ]
+        }
+      },
+      {
+        "id": "vm_d5",
+        "type": "delimiter",
+        "data": {}
+      },
+      {
+        "id": "vm_h1_promise",
+        "type": "header",
+        "data": {
+          "text": "The VIDYA Promise",
+          "level": 1
+        }
+      },
+      {
+        "id": "vm_h2_promise",
+        "type": "header",
+        "data": {
+          "text": "Where Every Child Discovers Their Boundless Worth",
+          "level": 2
+        }
+      },
+      {
+        "id": "vm_p_promise1",
+        "type": "paragraph",
+        "data": {
+          "text": "Four decades ago, VIDYA began with five girls being taught on the IIT Delhi campus. Today, that small act of faith has touched tens of thousands of lives across India."
+        }
+      },
+      {
+        "id": "vm_p_promise2",
+        "type": "paragraph",
+        "data": {
+          "text": "At The VIDYA School, Gurugram, we renew that promise with every student who walks through our gates. We pledge to stand beside them, nurture their gifts, illuminate their minds, and empower them to step boldly into the world as confident, compassionate leaders."
+        }
+      },
+      {
+        "id": "vm_h3_closing",
+        "type": "header",
+        "data": {
+          "text": "Educate. Empower. Transform.",
+          "level": 3
+        }
+      },
+      {
+        "id": "vm_p_closing",
+        "type": "paragraph",
+        "data": {
+          "text": "This is our vision. This is our mission. This is VIDYA."
         }
       }
     ],
-    "version": "2.30.7"
+    "version": "2.31.6"
   }
 }
