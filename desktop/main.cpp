@@ -10,6 +10,8 @@
 #include <chrono>
 #include <algorithm>
 #include <cctype>
+#include <fstream>
+#include <sys/stat.h>
 
 // Cross-Platform OS Headers
 #ifdef _WIN32
@@ -52,6 +54,14 @@ std::string current_verification_uri;
 
 // Production Backend API Base URL
 std::string api_base_url = "https://beta.vidyaschool.com";
+
+// Session persistence file path
+std::string get_session_file_path() {
+    const char* home = getenv("HOME");
+    if (!home) home = getenv("USERPROFILE"); // Windows fallback
+    if (!home) return ".vs_session.json";
+    return std::string(home) + "/.vidyaschool_session";
+}
 
 struct AuthUserData {
     std::string name;
@@ -141,6 +151,52 @@ std::string extract_json_value(const std::string &json, const std::string &key) 
         }
     }
     return "";
+}
+
+// Save session to local file
+void save_session(const std::string &name, const std::string &email, const std::string &role, const std::string &token) {
+    std::string path = get_session_file_path();
+    std::ofstream f(path);
+    if (f.is_open()) {
+        // Simple JSON format
+        f << "{" << std::endl;
+        f << "  \"name\": \"" << name << "\"," << std::endl;
+        f << "  \"email\": \"" << email << "\"," << std::endl;
+        f << "  \"role\": \"" << role << "\"," << std::endl;
+        f << "  \"session_token\": \"" << token << "\"" << std::endl;
+        f << "}" << std::endl;
+        f.close();
+        // Set file permissions to user-only (600) on Linux/Mac
+        #ifndef _WIN32
+        chmod(path.c_str(), 0600);
+        #endif
+    }
+}
+
+// Load session from local file, returns true if valid session found
+bool load_saved_session(AuthUserData &out) {
+    std::string path = get_session_file_path();
+    std::ifstream f(path);
+    if (!f.is_open()) return false;
+
+    std::string content((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+    f.close();
+
+    if (content.empty()) return false;
+
+    out.name = extract_json_value(content, "name");
+    out.email = extract_json_value(content, "email");
+    out.role = extract_json_value(content, "role");
+    out.session_token = extract_json_value(content, "session_token");
+
+    // Must have at least a session token
+    return !out.session_token.empty();
+}
+
+// Clear saved session file
+void clear_saved_session() {
+    std::string path = get_session_file_path();
+    std::remove(path.c_str());
 }
 
 // Toggle Sidebar Fold/Unfold Event Handler
@@ -234,6 +290,9 @@ void poll_device_status_thread(std::string device_token) {
             std::string role = extract_json_value(res, "role");
             std::string token = extract_json_value(res, "session_token");
 
+            // Persist session locally
+            save_session(name, email, role, token);
+
             AuthUserData *ud = new AuthUserData{name, email, role, token};
             g_idle_add(update_ui_on_auth_success, ud);
             break;
@@ -298,6 +357,7 @@ void on_login_button_clicked(GtkWidget *widget, gpointer data) {
 // Logout button click handler
 void on_logout_button_clicked(GtkWidget *widget, gpointer data) {
     is_polling = false;
+    clear_saved_session();
     current_verification_uri = "";
     gtk_label_set_markup(GTK_LABEL(lbl_code_display), "<span size='medium' font_family='Monospace' foreground='#71717a'>No Active Code</span>");
     gtk_label_set_text(GTK_LABEL(lbl_status), "Click below to authorize via beta.vidyaschool.com");
@@ -669,6 +729,13 @@ int main(int argc, char *argv[]) {
 
     // Add Stack to Window
     gtk_container_add(GTK_CONTAINER(main_window), stack);
+
+    // Try to restore saved session
+    AuthUserData saved;
+    if (load_saved_session(saved)) {
+        AuthUserData *ud = new AuthUserData{saved.name, saved.email, saved.role, saved.session_token};
+        g_idle_add(update_ui_on_auth_success, ud);
+    }
 
     gtk_widget_show_all(main_window);
 

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { deviceAuthRequest } from "@/lib/schema"
 import { sql } from "drizzle-orm"
 import crypto from "crypto"
 
@@ -55,7 +54,7 @@ export async function POST(req: NextRequest) {
     await ensureDeviceAuthTable()
 
     const userCode = generateUserCode()
-    const deviceToken = crypto.randomUUID()
+    const deviceToken = crypto.randomBytes(32).toString("hex")
     const id = `dev_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
@@ -79,27 +78,15 @@ export async function POST(req: NextRequest) {
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
         },
       }
     )
   } catch (err: any) {
     console.error("Failed to generate device auth code:", err?.message, err?.stack)
+    const errorMsg = process.env.NODE_ENV !== "production" ? err?.message : "Internal error"
     return NextResponse.json(
-      { error: `Failed to generate device pairing code: ${err?.message || "Unknown error"}` },
+      { error: `Failed to generate device pairing code: ${errorMsg}` },
       { status: 500 }
     )
   }
-}
-
-export async function OPTIONS() {
-  return NextResponse.json({}, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
-  })
 }

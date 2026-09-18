@@ -13,14 +13,7 @@ export async function POST(req: NextRequest) {
     if (!rawToken || typeof rawToken !== "string") {
       return NextResponse.json(
         { status: "expired", message: "Device token required" },
-        {
-          status: 400,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type",
-          },
-        }
+        { status: 400 }
       )
     }
 
@@ -34,75 +27,30 @@ export async function POST(req: NextRequest) {
     const record = (records as any)?.rows?.[0] || (Array.isArray(records) ? records[0] : null)
 
     if (!record) {
-      return NextResponse.json(
-        { status: "expired", message: "Device token not found or expired." },
-        {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      )
+      return NextResponse.json({ status: "expired", message: "Device token not found or expired." })
     }
 
     if (new Date() > new Date(record.expires_at)) {
       await db.execute(sql`DELETE FROM "device_auth_request" WHERE "id" = ${record.id}`)
-      return NextResponse.json(
-        { status: "expired", message: "Device pairing code has expired." },
-        {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      )
+      return NextResponse.json({ status: "expired", message: "Device pairing code has expired." })
     }
 
     if (record.status === "approved") {
-      // Consume record
+      // Consume record (one-time use)
       await db.execute(sql`DELETE FROM "device_auth_request" WHERE "id" = ${record.id}`)
 
-      return NextResponse.json(
-        {
-          status: "approved",
-          name: record.name || "Teacher User",
-          email: record.email || "teacher@vidyaschool.com",
-          role: record.role || "teacher",
-          session_token: record.session_token || "",
-        },
-        {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      )
+      return NextResponse.json({
+        status: "approved",
+        name: record.name || "",
+        email: record.email || "",
+        role: record.role || "",
+        session_token: record.session_token || "",
+      })
     }
 
-    return NextResponse.json(
-      { status: "pending" },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      }
-    )
+    return NextResponse.json({ status: "pending" })
   } catch (err: any) {
     console.error("Device poll error:", err?.message, err?.stack)
-    return NextResponse.json(
-      { status: "pending" },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      }
-    )
+    return NextResponse.json({ status: "pending" })
   }
-}
-
-export async function OPTIONS() {
-  return NextResponse.json({}, {
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
-  })
 }
