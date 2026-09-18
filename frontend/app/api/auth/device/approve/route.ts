@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Device pairing code has expired. Please try again." }, { status: 410 })
     }
 
-    // 2. Identify logged-in user — NO FALLBACK CREDENTIALS ALLOWED
+    // 2. Identify logged in user
     let userObj: any = null
 
     try {
@@ -70,29 +70,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // SECURITY: Reject if no authenticated user found
     if (!userObj) {
       return NextResponse.json({ error: "You must be logged in to approve a device." }, { status: 401 })
     }
 
-    // SECURITY: Only use DB-sourced values — never from request body
+    // Determine final user credentials safely without body injection
     const userId = userObj.id
     const name = userObj.name || ""
     const email = userObj.email || ""
     const role = userObj.role || ""
 
-    // SECURITY: Generate a dedicated desktop session token (not shared with browser)
-    const desktopToken = crypto.randomBytes(32).toString("hex")
-    const desktopSessionId = `desktop_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`
+    // Generate a dedicated desktop session token
+    const desktopToken = crypto.randomBytes(32).toString('hex')
+    const desktopSessionId = `desktop_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`
     const desktopExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-
-    // Insert a new dedicated session for the desktop app
+    
+    // Insert new session into the 'session' table
     await db.execute(sql`
       INSERT INTO "session" ("id", "token", "user_id", "expires_at", "created_at", "updated_at", "user_agent", "ip_address")
       VALUES (${desktopSessionId}, ${desktopToken}, ${userId}, ${desktopExpiry.toISOString()}::timestamp, NOW(), NOW(), 'VidyaSchool Desktop App', 'device-auth')
     `)
 
-    // 3. Mark device auth request as approved
+    // 3. Mark as approved using raw SQL
     await db.execute(sql`
       UPDATE "device_auth_request"
       SET "status" = 'approved',
@@ -113,7 +112,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (err: any) {
     console.error("Device approval error:", err?.message, err?.stack)
-    const errorMsg = process.env.NODE_ENV !== "production" ? err?.message : "Internal error"
+    const errorMsg = process.env.NODE_ENV !== 'production' ? err?.message : 'Internal error'
     return NextResponse.json(
       { error: `Failed to approve device code: ${errorMsg}` },
       { status: 500 }

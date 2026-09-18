@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     await ensureDeviceAuthTable()
 
     const userCode = generateUserCode()
-    const deviceToken = crypto.randomBytes(32).toString("hex")
+    const deviceToken = crypto.randomBytes(32).toString('hex')
     const id = `dev_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     )
   } catch (err: any) {
     console.error("Failed to generate device auth code:", err?.message, err?.stack)
-    const errorMsg = process.env.NODE_ENV !== "production" ? err?.message : "Internal error"
+    const errorMsg = process.env.NODE_ENV !== 'production' ? err?.message : 'Internal error'
     return NextResponse.json(
       { error: `Failed to generate device pairing code: ${errorMsg}` },
       { status: 500 }

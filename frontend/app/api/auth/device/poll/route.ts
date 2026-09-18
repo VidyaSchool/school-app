@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (record.status === "approved") {
-      // Consume record (one-time use)
+      // Consume record
       await db.execute(sql`DELETE FROM "device_auth_request" WHERE "id" = ${record.id}`)
 
       return NextResponse.json({

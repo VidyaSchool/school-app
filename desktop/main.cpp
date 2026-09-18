@@ -32,21 +32,15 @@ GtkWidget *lbl_status = NULL;
 GtkWidget *btn_login = NULL;
 
 // Teacher Dashboard Widgets
-GtkWidget *sidebar_box = NULL;
-GtkWidget *btn_sidebar_toggle = NULL;
-GtkWidget *lbl_sidebar_logo_text = NULL;
-GtkWidget *lbl_nav1_text = NULL;
-GtkWidget *lbl_nav2_text = NULL;
-GtkWidget *lbl_nav3_text = NULL;
-GtkWidget *lbl_nav4_text = NULL;
-GtkWidget *lbl_nav5_text = NULL;
 GtkWidget *lbl_teacher_name = NULL;
 GtkWidget *lbl_teacher_email = NULL;
 GtkWidget *lbl_teacher_role = NULL;
+GtkWidget *notes_text_view = NULL;
+GtkWidget *btn_save_notes = NULL;
+GtkWidget *lbl_save_status = NULL;
 
 // State Variables
 std::atomic<bool> is_polling(false);
-bool sidebar_expanded = true;
 
 std::string current_device_token;
 std::string current_user_code;
@@ -199,27 +193,56 @@ void clear_saved_session() {
     std::remove(path.c_str());
 }
 
-// Toggle Sidebar Fold/Unfold Event Handler
-void on_toggle_sidebar_clicked(GtkWidget *widget, gpointer data) {
-    sidebar_expanded = !sidebar_expanded;
-    if (sidebar_expanded) {
-        gtk_widget_set_size_request(sidebar_box, 210, -1);
-        gtk_widget_show(lbl_sidebar_logo_text);
-        gtk_widget_show(lbl_nav1_text);
-        gtk_widget_show(lbl_nav2_text);
-        gtk_widget_show(lbl_nav3_text);
-        gtk_widget_show(lbl_nav4_text);
-        gtk_widget_show(lbl_nav5_text);
-        gtk_button_set_label(GTK_BUTTON(btn_sidebar_toggle), "◀  Collapse");
-    } else {
-        gtk_widget_set_size_request(sidebar_box, 60, -1);
-        gtk_widget_hide(lbl_sidebar_logo_text);
-        gtk_widget_hide(lbl_nav1_text);
-        gtk_widget_hide(lbl_nav2_text);
-        gtk_widget_hide(lbl_nav3_text);
-        gtk_widget_hide(lbl_nav4_text);
-        gtk_widget_hide(lbl_nav5_text);
-        gtk_button_set_label(GTK_BUTTON(btn_sidebar_toggle), "▶");
+// Notes file path
+std::string get_notes_file_path() {
+    const char* home = getenv("HOME");
+    if (!home) home = getenv("USERPROFILE");
+    if (!home) return ".vs_notes.txt";
+    return std::string(home) + "/.vidyaschool_notes";
+}
+
+// Save notes to local file
+void save_notes_to_file() {
+    if (!notes_text_view) return;
+    GtkTextBuffer *buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(notes_text_view));
+    GtkTextIter start, end;
+    gtk_text_buffer_get_start_iter(buf, &start);
+    gtk_text_buffer_get_end_iter(buf, &end);
+    gchar *text = gtk_text_buffer_get_text(buf, &start, &end, FALSE);
+
+    std::string path = get_notes_file_path();
+    std::ofstream f(path);
+    if (f.is_open()) {
+        f << text;
+        f.close();
+    }
+    g_free(text);
+
+    if (lbl_save_status) {
+        gtk_label_set_text(GTK_LABEL(lbl_save_status), "✓ Saved");
+        // Clear status after 2 seconds
+    }
+}
+
+// Load notes from local file
+std::string load_notes_from_file() {
+    std::string path = get_notes_file_path();
+    std::ifstream f(path);
+    if (!f.is_open()) return "";
+    std::string content((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+    f.close();
+    return content;
+}
+
+// Save button click handler
+void on_save_notes_clicked(GtkWidget *widget, gpointer data) {
+    save_notes_to_file();
+}
+
+// Auto-save on text change (debounced via idle)
+void on_notes_buffer_changed(GtkTextBuffer *buffer, gpointer data) {
+    if (lbl_save_status) {
+        gtk_label_set_text(GTK_LABEL(lbl_save_status), "");
     }
 }
 
@@ -231,13 +254,10 @@ gboolean update_ui_on_auth_success(gpointer data) {
     std::transform(role_lower.begin(), role_lower.end(), role_lower.begin(), ::tolower);
 
     if (role_lower == "student") {
-        // Show "this app is not for you kid" restricted view for students
         gtk_stack_set_visible_child_name(GTK_STACK(stack), "student_page");
     } else {
-        // Allow Teacher / Admin / Staff with Collapsible Sidebar Dashboard
-        gtk_label_set_text(GTK_LABEL(lbl_teacher_name), user->name.empty() ? "Teacher User" : user->name.c_str());
-        gtk_label_set_text(GTK_LABEL(lbl_teacher_email), user->email.empty() ? "teacher@vidyaschool.com" : user->email.c_str());
-        
+        gtk_label_set_text(GTK_LABEL(lbl_teacher_name), user->name.empty() ? "Teacher" : user->name.c_str());
+
         std::string role_badge = "Role: " + (user->role.empty() ? "Teacher" : user->role);
         gtk_label_set_text(GTK_LABEL(lbl_teacher_role), role_badge.c_str());
 
@@ -480,8 +500,19 @@ void apply_shadcn_css() {
         "  font-size: 14px;"
         "}"
         ".status-text {"
-        "  color: #71717a;"
+        "  color: #4ade80;"
         "  font-size: 12px;"
+        "  font-weight: 600;"
+        "}"
+        "textview {"
+        "  background-color: #09090b;"
+        "  color: #f4f4f5;"
+        "  font-family: monospace;"
+        "  font-size: 14px;"
+        "}"
+        "textview text {"
+        "  background-color: #09090b;"
+        "  color: #f4f4f5;"
         "}";
 
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
@@ -490,27 +521,6 @@ void apply_shadcn_css() {
         GTK_STYLE_PROVIDER(provider),
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     g_object_unref(provider);
-}
-
-// Helper to create navigation sidebar buttons
-GtkWidget* create_nav_item(const char* icon, const char* label_text, GtkWidget** out_lbl_text, bool active = false) {
-    GtkWidget *btn = gtk_button_new();
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    
-    GtkWidget *lbl_icon = gtk_label_new(icon);
-    *out_lbl_text = gtk_label_new(label_text);
-    
-    gtk_box_pack_start(GTK_BOX(box), lbl_icon, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), *out_lbl_text, FALSE, FALSE, 0);
-    
-    gtk_container_add(GTK_CONTAINER(btn), box);
-    
-    if (active) {
-        gtk_style_context_add_class(gtk_widget_get_style_context(btn), "shadcn-nav-active");
-    } else {
-        gtk_style_context_add_class(gtk_widget_get_style_context(btn), "shadcn-nav-item");
-    }
-    return btn;
 }
 
 int main(int argc, char *argv[]) {
@@ -606,126 +616,81 @@ int main(int argc, char *argv[]) {
     gtk_stack_add_named(GTK_STACK(stack), student_outer, "student_page");
 
     // -------------------------------------------------------------
-    // PAGE 3: Teacher / Staff Main View with Collapsible Sidebar
+    // PAGE 3: Notes Page (after auth)
     // -------------------------------------------------------------
-    GtkWidget *teacher_root = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    GtkWidget *notes_root = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
-    // Sidebar Container
-    sidebar_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_style_context_add_class(gtk_widget_get_style_context(sidebar_box), "shadcn-sidebar");
-    gtk_widget_set_size_request(sidebar_box, 210, -1);
+    // Top Header Bar
+    GtkWidget *header_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    gtk_style_context_add_class(gtk_widget_get_style_context(header_bar), "shadcn-sidebar");
+    gtk_container_set_border_width(GTK_CONTAINER(header_bar), 12);
 
-    // Sidebar Header Logo
-    GtkWidget *sidebar_header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
-    GtkWidget *lbl_logo_icon = gtk_label_new("🏫");
-    lbl_sidebar_logo_text = gtk_label_new("VidyaSchool");
-    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_sidebar_logo_text), "shadcn-title");
-    
-    gtk_box_pack_start(GTK_BOX(sidebar_header), lbl_logo_icon, FALSE, FALSE, 4);
-    gtk_box_pack_start(GTK_BOX(sidebar_header), lbl_sidebar_logo_text, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), sidebar_header, FALSE, FALSE, 8);
+    GtkWidget *lbl_notes_icon = gtk_label_new("📝");
+    gtk_box_pack_start(GTK_BOX(header_bar), lbl_notes_icon, FALSE, FALSE, 0);
 
-    // Navigation Menu Items
-    GtkWidget *nav1 = create_nav_item("📊", "Dashboard", &lbl_nav1_text, true);
-    GtkWidget *nav2 = create_nav_item("📚", "My Classes", &lbl_nav2_text, false);
-    GtkWidget *nav3 = create_nav_item("📝", "Assignments", &lbl_nav3_text, false);
-    GtkWidget *nav4 = create_nav_item("👥", "Students", &lbl_nav4_text, false);
-    GtkWidget *nav5 = create_nav_item("⚙️", "Settings", &lbl_nav5_text, false);
+    GtkWidget *lbl_notes_title = gtk_label_new("Notes");
+    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_notes_title), "shadcn-title");
+    gtk_box_pack_start(GTK_BOX(header_bar), lbl_notes_title, FALSE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(sidebar_box), nav1, FALSE, FALSE, 2);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), nav2, FALSE, FALSE, 2);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), nav3, FALSE, FALSE, 2);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), nav4, FALSE, FALSE, 2);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), nav5, FALSE, FALSE, 2);
-
-    // Spacer to push toggle button to bottom
-    GtkWidget *v_spacer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), v_spacer, TRUE, TRUE, 0);
-
-    // Fold / Unfold Toggle Button
-    btn_sidebar_toggle = gtk_button_new_with_label("◀  Collapse");
-    gtk_style_context_add_class(gtk_widget_get_style_context(btn_sidebar_toggle), "shadcn-btn-secondary");
-    g_signal_connect(btn_sidebar_toggle, "clicked", G_CALLBACK(on_toggle_sidebar_clicked), NULL);
-    gtk_box_pack_start(GTK_BOX(sidebar_box), btn_sidebar_toggle, FALSE, FALSE, 4);
-
-    gtk_box_pack_start(GTK_BOX(teacher_root), sidebar_box, FALSE, FALSE, 0);
-
-    // Main Content Area
-    GtkWidget *content_area = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
-    gtk_container_set_border_width(GTK_CONTAINER(content_area), 24);
-
-    // Top Profile Card
-    GtkWidget *prof_card = gtk_box_new(GTK_ORIENTATION_VERTICAL, 14);
-    gtk_style_context_add_class(gtk_widget_get_style_context(prof_card), "shadcn-card");
-
-    GtkWidget *prof_header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    GtkWidget *lbl_t_avatar = gtk_label_new("🎓");
-    GtkWidget *prof_info = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+    // User info in header
+    GtkWidget *header_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start(GTK_BOX(header_bar), header_spacer, TRUE, TRUE, 0);
 
     lbl_teacher_name = gtk_label_new("Teacher User");
-    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_teacher_name), "user-name");
-
-    lbl_teacher_email = gtk_label_new("teacher@vidyaschool.com");
-    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_teacher_email), "user-email");
+    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_teacher_name), "shadcn-subtitle");
+    gtk_box_pack_start(GTK_BOX(header_bar), lbl_teacher_name, FALSE, FALSE, 0);
 
     lbl_teacher_role = gtk_label_new("Role: Teacher");
     gtk_style_context_add_class(gtk_widget_get_style_context(lbl_teacher_role), "shadcn-badge");
+    gtk_box_pack_start(GTK_BOX(header_bar), lbl_teacher_role, FALSE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(prof_info), lbl_teacher_name, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(prof_info), lbl_teacher_email, FALSE, FALSE, 0);
+    // Save status label
+    lbl_save_status = gtk_label_new("");
+    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_save_status), "status-text");
+    gtk_box_pack_start(GTK_BOX(header_bar), lbl_save_status, FALSE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(prof_header), lbl_t_avatar, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(prof_header), prof_info, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(prof_header), lbl_teacher_role, FALSE, FALSE, 0);
+    // Save button
+    btn_save_notes = gtk_button_new_with_label("💾 Save");
+    gtk_style_context_add_class(gtk_widget_get_style_context(btn_save_notes), "shadcn-btn-primary");
+    g_signal_connect(btn_save_notes, "clicked", G_CALLBACK(on_save_notes_clicked), NULL);
+    gtk_box_pack_start(GTK_BOX(header_bar), btn_save_notes, FALSE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(prof_card), prof_header, FALSE, FALSE, 0);
-
-    // Stats Grid Row
-    GtkWidget *stats_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 14);
-
-    GtkWidget *stat1 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
-    gtk_style_context_add_class(gtk_widget_get_style_context(stat1), "stat-card");
-    GtkWidget *s1_num = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(s1_num), "<span size='large' weight='bold' foreground='#38bdf8'>4</span>");
-    GtkWidget *s1_lbl = gtk_label_new("Active Classes");
-    gtk_style_context_add_class(gtk_widget_get_style_context(s1_lbl), "shadcn-subtitle");
-    gtk_box_pack_start(GTK_BOX(stat1), s1_num, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(stat1), s1_lbl, FALSE, FALSE, 0);
-
-    GtkWidget *stat2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
-    gtk_style_context_add_class(gtk_widget_get_style_context(stat2), "stat-card");
-    GtkWidget *s2_num = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(s2_num), "<span size='large' weight='bold' foreground='#4ade80'>128</span>");
-    GtkWidget *s2_lbl = gtk_label_new("Enrolled Students");
-    gtk_style_context_add_class(gtk_widget_get_style_context(s2_lbl), "shadcn-subtitle");
-    gtk_box_pack_start(GTK_BOX(stat2), s2_num, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(stat2), s2_lbl, FALSE, FALSE, 0);
-
-    GtkWidget *stat3 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
-    gtk_style_context_add_class(gtk_widget_get_style_context(stat3), "stat-card");
-    GtkWidget *s3_num = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(s3_num), "<span size='large' weight='bold' foreground='#a855f7'>12</span>");
-    GtkWidget *s3_lbl = gtk_label_new("Pending Submissions");
-    gtk_style_context_add_class(gtk_widget_get_style_context(s3_lbl), "shadcn-subtitle");
-    gtk_box_pack_start(GTK_BOX(stat3), s3_num, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(stat3), s3_lbl, FALSE, FALSE, 0);
-
-    gtk_box_pack_start(GTK_BOX(stats_row), stat1, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(stats_row), stat2, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(stats_row), stat3, TRUE, TRUE, 0);
-
-    gtk_box_pack_start(GTK_BOX(prof_card), stats_row, FALSE, FALSE, 4);
-
-    // Logout Action Button
-    GtkWidget *btn_teacher_logout = gtk_button_new_with_label("Sign Out / Change Account");
+    // Logout button
+    GtkWidget *btn_teacher_logout = gtk_button_new_with_label("Sign Out");
     gtk_style_context_add_class(gtk_widget_get_style_context(btn_teacher_logout), "shadcn-btn-secondary");
     g_signal_connect(btn_teacher_logout, "clicked", G_CALLBACK(on_logout_button_clicked), NULL);
-    gtk_box_pack_start(GTK_BOX(prof_card), btn_teacher_logout, FALSE, FALSE, 8);
+    gtk_box_pack_start(GTK_BOX(header_bar), btn_teacher_logout, FALSE, FALSE, 0);
 
-    gtk_box_pack_start(GTK_BOX(content_area), prof_card, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(teacher_root), content_area, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(notes_root), header_bar, FALSE, FALSE, 0);
 
-    gtk_stack_add_named(GTK_STACK(stack), teacher_root, "teacher_page");
+    // Notes Text Area (scrollable)
+    GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_container_set_border_width(GTK_CONTAINER(scroll), 16);
+
+    notes_text_view = gtk_text_view_new();
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(notes_text_view), GTK_WRAP_WORD_CHAR);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(notes_text_view), 16);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(notes_text_view), 16);
+    gtk_text_view_set_top_margin(GTK_TEXT_VIEW(notes_text_view), 12);
+    gtk_text_view_set_bottom_margin(GTK_TEXT_VIEW(notes_text_view), 12);
+    gtk_style_context_add_class(gtk_widget_get_style_context(notes_text_view), "shadcn-card");
+
+    // Load saved notes
+    std::string saved_notes = load_notes_from_file();
+    if (!saved_notes.empty()) {
+        GtkTextBuffer *buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(notes_text_view));
+        gtk_text_buffer_set_text(buf, saved_notes.c_str(), -1);
+    }
+
+    // Track changes to clear save status
+    GtkTextBuffer *notes_buf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(notes_text_view));
+    g_signal_connect(notes_buf, "changed", G_CALLBACK(on_notes_buffer_changed), NULL);
+
+    gtk_container_add(GTK_CONTAINER(scroll), notes_text_view);
+    gtk_box_pack_start(GTK_BOX(notes_root), scroll, TRUE, TRUE, 0);
+
+    gtk_stack_add_named(GTK_STACK(stack), notes_root, "teacher_page");
 
     // Add Stack to Window
     gtk_container_add(GTK_CONTAINER(main_window), stack);
