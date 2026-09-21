@@ -75,8 +75,47 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur-md border-b border-border shadow-xs">
-      <div className="mx-auto flex h-14 w-full max-w-[1380px] items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full relative">
+      {/* Linear Gradient Progressive Blur Background — pure blur linear gradient (max at top, minimum at bottom), no color gradient, no bottom border */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-full -z-10 overflow-hidden select-none"
+        aria-hidden="true"
+      >
+        {/* Layer 1: Base subtle blur tapering to bottom */}
+        <div
+          className="absolute inset-0 backdrop-blur-[3px]"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 40%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 40%, transparent 100%)",
+          }}
+        />
+        {/* Layer 2: Medium blur */}
+        <div
+          className="absolute inset-0 backdrop-blur-[8px]"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 25%, transparent 75%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 25%, transparent 75%)",
+          }}
+        />
+        {/* Layer 3: Strong blur */}
+        <div
+          className="absolute inset-0 backdrop-blur-[16px]"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 15%, transparent 55%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 15%, transparent 55%)",
+          }}
+        />
+        {/* Layer 4: Maximum blur concentrated at the top */}
+        <div
+          className="absolute inset-0 backdrop-blur-[28px]"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 8%, transparent 35%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 8%, transparent 35%)",
+          }}
+        />
+      </div>
+
+      <div className="mx-auto flex w-full max-w-[1380px] items-center justify-between px-4 sm:px-6 lg:px-8 pt-2.5 pb-5 md:pt-3 md:pb-6">
         
         {/* Brand/Logo */}
         <div className="flex items-center gap-6">
