@@ -238,6 +238,7 @@ export function HeroSection() {
     try {
       const saved = localStorage.getItem("antigravity_hero_slider_playing")
       if (saved !== null) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsPlaying(saved === "true")
       }
     } catch {
@@ -445,8 +446,9 @@ export function HeroSection() {
       aria-label="Welcome to VidyaSchool"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative flex min-h-[92svh] lg:h-[95dvh] lg:min-h-[95dvh] w-full flex-col justify-center items-center overflow-x-clip py-4 sm:py-6 lg:py-0"
+      className="relative flex min-h-screen lg:h-[100dvh] lg:min-h-[100dvh] w-full flex-col justify-center items-center overflow-x-clip -mt-[66px] md:-mt-[72px] pt-[76px] sm:pt-[82px] lg:pt-[72px] pb-4 sm:pb-6 lg:pb-0"
     >
+
       {/* Full Width Hero Carousel Track Container */}
       <div className="relative z-10 mx-auto max-w-[1480px] w-full px-2 sm:px-4 md:px-6 lg:px-8 h-full flex flex-col justify-center select-none">
         {/* Carousel Viewport: strictly overflow-hidden with zero horizontal padding so adjacent slides are 100% clipped */}

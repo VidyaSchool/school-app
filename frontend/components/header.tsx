@@ -28,24 +28,24 @@ const ThemeToggle = React.memo(function ThemeToggle() {
   }, [])
 
   if (!mounted) {
-    return <div className="h-8 w-8 rounded-md bg-muted/20 border border-border" />
+    return <div className="h-8 w-8 rounded-full bg-muted/20 border border-border" />
   }
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="cursor-pointer"
+      className="cursor-pointer rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/15"
       aria-label="Toggle theme"
     >
-      <Sun className="h-4.5 w-4.5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground" />
-      <Moon className="absolute h-4.5 w-4.5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground" />
+      <Sun className="h-4.5 w-4.5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground dark:text-white" />
+      <Moon className="absolute h-4.5 w-4.5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground dark:text-white" />
     </Button>
   )
 })
 
-const SearchButton = React.memo(function SearchButton() {
+const SearchButton = React.memo(function SearchButton({ onSearchClick }: { onSearchClick?: () => void }) {
   const { setOpenSearch } = useSearchContext()
 
   const handleOpenSearch = React.useCallback(() => {
@@ -55,18 +55,19 @@ const SearchButton = React.memo(function SearchButton() {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("open-vidya-search"))
     }
-  }, [setOpenSearch])
+    onSearchClick?.()
+  }, [setOpenSearch, onSearchClick])
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={handleOpenSearch}
-      className="cursor-pointer"
+      className="cursor-pointer rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/15"
       aria-label="Search (Ctrl + K)"
       title="Search (Ctrl + K)"
     >
-      <Search className="h-4.5 w-4.5 text-foreground" />
+      <Search className="h-4.5 w-4.5 text-foreground dark:text-white" />
     </Button>
   )
 })
@@ -74,11 +75,54 @@ const SearchButton = React.memo(function SearchButton() {
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 
+  // Prevent background scrolling when mobile menu is open
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = "hidden"
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [mobileMenuOpen])
+
+  // Auto close mobile menu on desktop resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [mobileMenuOpen])
+
+  // Close on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [mobileMenuOpen])
+
   return (
-    <header className="sticky top-0 z-50 w-full relative">
+    <header
+      className={cn(
+        "z-50 w-full transition-colors",
+        mobileMenuOpen
+          ? "fixed inset-0 h-screen h-[100dvh] flex flex-col bg-background"
+          : "sticky top-0"
+      )}
+    >
       {/* Linear Gradient Progressive Blur Background — pure blur linear gradient (max at top, minimum at bottom), no color gradient, no bottom border */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-full -z-10 overflow-hidden select-none"
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-full -z-10 overflow-hidden select-none",
+          mobileMenuOpen && "hidden"
+        )}
         aria-hidden="true"
       >
         {/* Layer 1: Base subtle blur tapering to bottom */}
@@ -115,23 +159,33 @@ export function Header() {
         />
       </div>
 
-      <div className="mx-auto flex w-full max-w-[1380px] items-center justify-between px-4 sm:px-6 lg:px-8 pt-2.5 pb-5 md:pt-3 md:pb-6">
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-[1380px] items-center justify-between px-4 sm:px-6 lg:px-8 shrink-0",
+          mobileMenuOpen ? "pt-2.5 pb-2.5 md:pt-3 md:pb-6" : "pt-2.5 pb-5 md:pt-3 md:pb-6"
+        )}
+      >
         
         {/* Brand/Logo */}
         <div className="flex items-center gap-6">
-          <Link id="header-brand-logo" href="/" className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground hover:opacity-90">
-            <span className="font-semibold text-sm">VidyaSchool</span>
+          <Link
+            id="header-brand-logo"
+            href="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground dark:text-white px-3.5 py-1.5 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs hover:opacity-90 transition-all"
+          >
+            <span className="font-semibold text-sm">VIDYA SCHOOL</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-center flex-1 px-8">
           <NavigationMenu>
-            <NavigationMenuList className="gap-1">
+            <NavigationMenuList className="gap-1 p-1 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs">
               
               {/* About Us Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   About
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -160,7 +214,7 @@ export function Header() {
 
               {/* Academics Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Academics
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -192,7 +246,7 @@ export function Header() {
 
               {/* Campus & Life Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Campus & Life
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -227,7 +281,7 @@ export function Header() {
 
               {/* Admissions Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Admissions
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -250,7 +304,7 @@ export function Header() {
 
               {/* Disclosures Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Disclosures
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -285,7 +339,7 @@ export function Header() {
 
               {/* Community & Get Involved Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-foreground/80 hover:text-foreground text-sm font-medium">
+                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Community
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -317,15 +371,15 @@ export function Header() {
         </div>
 
         {/* Right Controls */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2 p-1 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs">
           <SearchButton />
           <ThemeToggle />
-          <Button variant="ghost" asChild>
+          <Button variant="ghost" size="sm" asChild className="rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/10">
             <Link id="header-student-portal-btn" href="/login">
               Login
             </Link>
           </Button>
-          <Button variant="default" asChild>
+          <Button variant="default" size="sm" asChild className="rounded-full">
             <Link id="header-teacher-portal-btn" href="/signup">
               Signup
             </Link>
@@ -333,14 +387,14 @@ export function Header() {
         </div>
 
         {/* Mobile Hamburg Trigger & Controls */}
-        <div className="flex md:hidden items-center gap-2">
-          <SearchButton />
+        <div className="flex md:hidden items-center gap-1.5 p-1 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs">
+          <SearchButton onSearchClick={() => setMobileMenuOpen(false)} />
           <ThemeToggle />
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="cursor-pointer"
+            className="cursor-pointer rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/10"
             aria-label="Toggle mobile menu"
           >
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -351,7 +405,7 @@ export function Header() {
 
       {/* Mobile Drawer Panel */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background px-4 py-4 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div className="md:hidden flex-1 border-t border-border bg-background px-4 py-4 space-y-4 overflow-y-auto min-h-0 overscroll-contain pb-10">
           
           {/* About Us Panel */}
           <div>
