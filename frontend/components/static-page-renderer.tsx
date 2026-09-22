@@ -36,6 +36,12 @@ import { cn } from "@/lib/utils"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import type { StaticPageData, EditorJsBlock, ElementorWidget } from "@/lib/static-pages"
+import {
+  useGalleryImages,
+  SideGalleryColumn,
+  MobileGalleryStrip,
+  GalleryLightboxModal,
+} from "@/components/page-side-gallery"
 
 // ── Security Helpers: URL Sanitization, Video Whitelisting & HTML Guard ─────
 
@@ -1059,6 +1065,8 @@ export interface StaticPageRendererProps {
   showBreadcrumbs?: boolean
   customHeader?: React.ReactNode
   containerClassName?: string
+  enableSideGallery?: boolean
+  galleryCategory?: string
 }
 
 export function StaticPageRenderer({
@@ -1066,12 +1074,31 @@ export function StaticPageRenderer({
   showBreadcrumbs = true,
   customHeader,
   containerClassName,
+  enableSideGallery,
+  galleryCategory = "Campus & Life",
 }: StaticPageRendererProps) {
   const [activeModal, setActiveModal] = React.useState<{
     type: "pdf" | "video"
     url: string
     title: string
   } | null>(null)
+
+  const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(null)
+
+  const shouldShowSideGallery = enableSideGallery ?? (page.slug === "about-vidyaschool")
+  const { images: sideImages } = useGalleryImages(galleryCategory)
+
+  const leftImages = React.useMemo(() => {
+    return sideImages
+      .map((img, originalIndex) => ({ ...img, originalIndex }))
+      .filter((_, idx) => idx % 2 === 0)
+  }, [sideImages])
+
+  const rightImages = React.useMemo(() => {
+    return sideImages
+      .map((img, originalIndex) => ({ ...img, originalIndex }))
+      .filter((_, idx) => idx % 2 !== 0)
+  }, [sideImages])
 
   const raw = page.widgets
   let editorBlocks: EditorJsBlock[] | null = null
@@ -1088,64 +1115,111 @@ export function StaticPageRenderer({
   const hasTable = Boolean(editorBlocks?.some((b) => b.type === "table"))
   const defaultContainerWidth = hasTable ? "max-w-6xl" : "max-w-4xl"
 
+  const mainArticleContent = (
+    <>
+      {/* Breadcrumb Bar */}
+      {showBreadcrumbs && (
+        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground pb-2">
+          <Link href="/" className="flex items-center gap-1 hover:text-foreground transition-colors">
+            <Home className="size-3.5" />
+            <span>Home</span>
+          </Link>
+          <ChevronRight className="size-3 text-muted-foreground/60" />
+          <span className="text-foreground font-medium truncate">{page.title}</span>
+        </nav>
+      )}
+
+      {/* Custom Header if supplied, otherwise standard title heading */}
+      {customHeader ? (
+        customHeader
+      ) : (
+        <div className="pb-4 mb-4 border-b border-border/40">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+            {page.title}
+          </h1>
+        </div>
+      )}
+
+      {/* Blocks rendering */}
+      {editorBlocks ? (
+        editorBlocks
+          .filter((block, idx) => {
+            if (idx === 0 && block.type === "header") {
+              const headerText = typeof block.data?.text === "string" ? block.data.text.trim().toLowerCase() : ""
+              if (headerText === page.title.trim().toLowerCase()) {
+                return false
+              }
+            }
+            return true
+          })
+          .map((block, idx) => (
+            <PublicEditorJsBlockRenderer
+              key={idx}
+              block={block}
+              onTriggerModal={(m) => setActiveModal(m)}
+            />
+          ))
+      ) : (
+        legacyWidgets.map((widget) => (
+          <PublicWidgetRenderer key={widget.id} widget={widget} />
+        ))
+      )}
+    </>
+  )
+
   return (
     <div className="min-h-screen w-full bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground flex flex-col">
       <Header />
 
-      <main
-        className={cn(
-          "flex-1 mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-4",
-          containerClassName || defaultContainerWidth
-        )}
-      >
-        {/* Breadcrumb Bar */}
-        {showBreadcrumbs && (
-          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground pb-2">
-            <Link href="/" className="flex items-center gap-1 hover:text-foreground transition-colors">
-              <Home className="size-3.5" />
-              <span>Home</span>
-            </Link>
-            <ChevronRight className="size-3 text-muted-foreground/60" />
-            <span className="text-foreground font-medium truncate">{page.title}</span>
-          </nav>
-        )}
+      {shouldShowSideGallery ? (
+        <main className="flex-1 mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="flex justify-center items-start gap-6 2xl:gap-10">
+            {/* Left Side Gallery Column */}
+            <SideGalleryColumn
+              side="left"
+              images={leftImages}
+              onSelectImage={(originalIdx) => setLightboxIndex(originalIdx)}
+            />
 
-        {/* Custom Header if supplied, otherwise standard title heading */}
-        {customHeader ? (
-          customHeader
-        ) : (
-          <div className="pb-4 mb-4 border-b border-border/40">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
-              {page.title}
-            </h1>
-          </div>
-        )}
+            {/* Central Article Content */}
+            <div className={cn("flex-1 max-w-4xl min-w-0 space-y-4", containerClassName)}>
+              {mainArticleContent}
 
-        {/* Blocks rendering */}
-        {editorBlocks ? (
-          editorBlocks
-            .filter((block, idx) => {
-              if (idx === 0 && block.type === "header") {
-                const headerText = typeof block.data?.text === "string" ? block.data.text.trim().toLowerCase() : ""
-                if (headerText === page.title.trim().toLowerCase()) {
-                  return false
-                }
-              }
-              return true
-            })
-            .map((block, idx) => (
-              <PublicEditorJsBlockRenderer
-                key={idx}
-                block={block}
-                onTriggerModal={(m) => setActiveModal(m)}
+              {/* Mobile / Tablet Gallery Section */}
+              <MobileGalleryStrip
+                images={sideImages}
+                onSelectImage={(idx) => setLightboxIndex(idx)}
               />
-            ))
-        ) : (
-          legacyWidgets.map((widget) => (
-            <PublicWidgetRenderer key={widget.id} widget={widget} />
-          ))
-        )}
-      </main>
+            </div>
+
+            {/* Right Side Gallery Column */}
+            <SideGalleryColumn
+              side="right"
+              images={rightImages}
+              onSelectImage={(originalIdx) => setLightboxIndex(originalIdx)}
+            />
+          </div>
+        </main>
+      ) : (
+        <main
+          className={cn(
+            "flex-1 mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-4",
+            containerClassName || defaultContainerWidth
+          )}
+        >
+          {mainArticleContent}
+        </main>
+      )}
+
+      {/* Lightbox for Gallery Photos */}
+      {shouldShowSideGallery && (
+        <GalleryLightboxModal
+          images={sideImages}
+          selectedIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onSelectIndex={(idx) => setLightboxIndex(idx)}
+        />
+      )}
 
       {/* Modal Dialog for Table Button actions */}
       <Dialog open={Boolean(activeModal)} onOpenChange={(open) => !open && setActiveModal(null)}>

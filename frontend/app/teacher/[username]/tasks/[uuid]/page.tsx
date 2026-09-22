@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit } from "lucide-react"
+import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -235,8 +235,10 @@ export default function TeacherTaskChatPage() {
   const activeReaderRef = React.useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
   const localIntervalRef = React.useRef<NodeJS.Timeout | null>(null)
 
-  // ── Model toggle: thinking vs fast ──
-  const [useThinking, setUseThinking] = React.useState(true)
+  // ── Model selector: Sarvam AI 105B vs Thinking vs Fast ──
+  type ChatModelType = "sarvam-105b-conversations" | "thinking" | "fast"
+  const [selectedModel, setSelectedModel] = React.useState<ChatModelType>("sarvam-105b-conversations")
+  const useThinking = selectedModel === "thinking"
 
   // ── File attachment state ──
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -350,7 +352,8 @@ export default function TeacherTaskChatPage() {
           uuid: roomUuid,
           title: roomTitle,
           message: userMsgText,
-          use_thinking: useThinking,
+          model: selectedModel,
+          use_thinking: selectedModel === "thinking",
           ...(attachmentDataUrl ? { attachment_data_url: attachmentDataUrl, attachment_mime: attachmentMime } : {})
         }),
         signal: controller.signal,
@@ -674,7 +677,8 @@ export default function TeacherTaskChatPage() {
         body: JSON.stringify({
           message: finalMessageText,
           title: currentTitle,
-          use_thinking: useThinking,
+          model: selectedModel,
+          use_thinking: selectedModel === "thinking",
           ...(attachmentDataUrl ? { attachment_data_url: attachmentDataUrl, attachment_mime: attachmentMime } : {})
         }),
         signal: controller.signal,
@@ -1105,27 +1109,56 @@ export default function TeacherTaskChatPage() {
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1 shrink-0 rounded-xl px-2.5 py-1.5 text-[10px] sm:text-[11px] font-semibold tracking-tight border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 select-none cursor-pointer"
+                    className="inline-flex items-center gap-1.5 shrink-0 rounded-xl px-2.5 py-1.5 text-[10px] sm:text-[11px] font-semibold tracking-tight border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 select-none cursor-pointer"
                   >
-                    {useThinking
-                      ? <><BrainCircuit className="size-3 shrink-0 text-violet-500" /><span>Thinking</span></>
-                      : <><Zap className="size-3 shrink-0 text-amber-500" /><span>Fast</span></>}
+                    {selectedModel === "sarvam-105b-conversations" && (
+                      <><Sparkles className="size-3 shrink-0 text-orange-500" /><span>Sarvam AI</span></>
+                    )}
+                    {selectedModel === "thinking" && (
+                      <><BrainCircuit className="size-3 shrink-0 text-violet-500" /><span>Thinking</span></>
+                    )}
+                    {selectedModel === "fast" && (
+                      <><Zap className="size-3 shrink-0 text-amber-500" /><span>Fast</span></>
+                    )}
                     <ChevronDown className="size-2.5 shrink-0 text-zinc-400" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent
                   align="start"
                   side="top"
-                  className="w-56 p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl"
+                  className="w-64 p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl"
                 >
-                  <p className="px-2 pb-1.5 pt-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">Model Mode</p>
+                  <p className="px-2 pb-1.5 pt-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">Model Engine</p>
+                  {/* Sarvam AI 105B option */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedModel("sarvam-105b-conversations")}
+                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                      selectedModel === "sarvam-105b-conversations"
+                        ? "bg-orange-50 dark:bg-orange-500/10 border border-orange-200/60 dark:border-orange-500/20"
+                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                    }`}
+                  >
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-500/20">
+                      <Sparkles className="size-3.5 text-orange-600 dark:text-orange-400" />
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Sarvam 105B</span>
+                        <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">Default</span>
+                      </span>
+                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Indic & Multilingual · High Quality</span>
+                    </span>
+                    {selectedModel === "sarvam-105b-conversations" && <Check className="size-3.5 mt-1 text-orange-500 shrink-0" />}
+                  </button>
+
                   {/* Thinking option */}
                   <button
                     type="button"
-                    onClick={() => setUseThinking(true)}
-                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                      useThinking
-                        ? "bg-violet-50 dark:bg-violet-500/10"
+                    onClick={() => setSelectedModel("thinking")}
+                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors mt-1 ${
+                      selectedModel === "thinking"
+                        ? "bg-violet-50 dark:bg-violet-500/10 border border-violet-200/60 dark:border-violet-500/20"
                         : "hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
                     }`}
                   >
@@ -1134,17 +1167,18 @@ export default function TeacherTaskChatPage() {
                     </span>
                     <span className="flex-1 min-w-0">
                       <span className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">Thinking</span>
-                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Deep reasoning · slower</span>
+                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Gemma 26B · Deep reasoning trace</span>
                     </span>
-                    {useThinking && <Check className="size-3.5 mt-1 text-violet-500 shrink-0" />}
+                    {selectedModel === "thinking" && <Check className="size-3.5 mt-1 text-violet-500 shrink-0" />}
                   </button>
+
                   {/* Fast option */}
                   <button
                     type="button"
-                    onClick={() => setUseThinking(false)}
-                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                      !useThinking
-                        ? "bg-amber-50 dark:bg-amber-500/10"
+                    onClick={() => setSelectedModel("fast")}
+                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors mt-1 ${
+                      selectedModel === "fast"
+                        ? "bg-amber-50 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20"
                         : "hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
                     }`}
                   >
@@ -1153,9 +1187,9 @@ export default function TeacherTaskChatPage() {
                     </span>
                     <span className="flex-1 min-w-0">
                       <span className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">Fast</span>
-                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Instant replies · no reasoning</span>
+                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Llama 70B · Instant replies</span>
                     </span>
-                    {!useThinking && <Check className="size-3.5 mt-1 text-amber-500 shrink-0" />}
+                    {selectedModel === "fast" && <Check className="size-3.5 mt-1 text-amber-500 shrink-0" />}
                   </button>
                 </PopoverContent>
               </Popover>

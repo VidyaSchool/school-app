@@ -15,6 +15,8 @@ export default function AboutVidyaschoolStaticPage() {
   return (
     <StaticPageRenderer
       page={page}
+      enableSideGallery={true}
+      galleryCategory="Campus & Life"
       customHeader={
         <div className="space-y-3 pb-6 mb-6 border-b border-border/40">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">

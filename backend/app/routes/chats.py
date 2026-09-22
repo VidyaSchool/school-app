@@ -34,24 +34,60 @@ router = APIRouter()
 from typing import Optional
 
 class ChatInitRequest(BaseModel):
-    uuid: str
-    title: str
+    uuid: Optional[str] = None
+    title: Optional[str] = None
     message: str
-    use_thinking: bool = True
+    model: Optional[str] = "sarvam-105b-conversations"
+    use_thinking: bool = False
     attachment_data_url: Optional[str] = None
     attachment_mime: Optional[str] = None
 
 
 class ChatMessageRequest(BaseModel):
     message: str
-    title: str = None
-    use_thinking: bool = True
+    title: Optional[str] = None
+    model: Optional[str] = "sarvam-105b-conversations"
+    use_thinking: bool = False
     attachment_data_url: Optional[str] = None
     attachment_mime: Optional[str] = None
 
 
+class SarvamDirectChatRequest(BaseModel):
+    message: str
+    messages: Optional[list] = None
+    model: str = "sarvam-105b-conversations"
+    temperature: float = 0.2
+    top_p: float = 1.0
+    max_tokens: int = 2000
+    stream: bool = False
+
+
 from dotenv import load_dotenv
 load_dotenv(override=False)
+
+# ── Sarvam AI config ───────────────────────────────────────────────────────────
+SARVAM_API_KEY = (os.getenv("SARVAM_API") or os.getenv("SARVAM_API_KEY") or "").strip()
+SARVAM_CHAT_MODEL = "sarvam-105b-conversations"
+SARVAM_TEMPERATURE = 0.2
+SARVAM_TOP_P = 1.0
+SARVAM_MAX_TOKENS = 2000
+
+_sarvam_client_instance = None
+
+def get_sarvam_client():
+    global _sarvam_client_instance
+    key = (os.getenv("SARVAM_API") or os.getenv("SARVAM_API_KEY") or "").strip()
+    if not key:
+        return None
+    if _sarvam_client_instance is None:
+        try:
+            from sarvamai import SarvamAI
+            _sarvam_client_instance = SarvamAI(api_subscription_key=key)
+        except Exception as e:
+            print(f"[Sarvam AI Init Error]: {e}")
+            return None
+    return _sarvam_client_instance
+
 
 # ── NVIDIA API config ──────────────────────────────────────────────────────────
 
@@ -1140,6 +1176,142 @@ async def response_stream_generator(messages_payload: list, room_id: str, use_th
     yield "data: [DONE]\n\n"
 
 
+def sanitize_messages_for_sarvam(messages: list) -> list:
+    """
+    Ensure messages for Sarvam AI have string content and valid alternating roles.
+    Flattens any multimodal list parts into readable text.
+    """
+    sanitized = []
+    for msg in messages:
+        role = msg.get("role")
+        content = msg.get("content")
+        # In Sarvam AI, tool messages should be converted to user/assistant context
+        if role == "tool":
+            role = "user"
+            content = f"[Database Tool Output]: {content}"
+        elif role not in ("system", "user", "assistant"):
+            role = "user"
+
+        if isinstance(content, list):
+            parts = []
+            for p in content:
+                if isinstance(p, dict):
+                    if p.get("type") == "text":
+                        parts.append(p.get("text", ""))
+                    elif p.get("type") == "image_url":
+                        parts.append("[Attached Image]")
+                elif isinstance(p, str):
+                    parts.append(p)
+            content_str = "\n".join(parts).strip()
+        else:
+            content_str = str(content or "").strip()
+
+        if not content_str and role != "assistant":
+            continue
+
+        if sanitized and sanitized[-1]["role"] == role:
+            sanitized[-1]["content"] += f"\n\n{content_str}"
+        else:
+            sanitized.append({"role": role, "content": content_str})
+    return sanitized
+
+
+async def sarvam_stream_generator(
+    messages_payload: list,
+    room_id: str,
+    model: str = SARVAM_CHAT_MODEL,
+    temperature: float = SARVAM_TEMPERATURE,
+    top_p: float = SARVAM_TOP_P,
+    max_tokens: int = SARVAM_MAX_TOKENS,
+):
+    """
+    Stream response using official SarvamAI SDK (sarvamai) in a thread executor.
+    Yields Server-Sent Events (SSE):
+      data: {"content": "..."}\n\n
+      data: {"thinking": "..."}\n\n
+      data: [DONE]\n\n
+    Persists the final assistant message to the database upon completion.
+    """
+    client = get_sarvam_client()
+    if not client:
+        yield f"data: {json.dumps({'content': 'Sarvam AI API key is not configured. Please set SARVAM_API in backend/.env.'})}\n\n"
+        yield "data: [DONE]\n\n"
+        return
+
+    clean_messages = sanitize_messages_for_sarvam(messages_payload)
+
+    loop = asyncio.get_event_loop()
+    queue: asyncio.Queue = asyncio.Queue()
+    full_content = ""
+
+    def stream_in_thread():
+        try:
+            stream_resp = client.chat.completions(
+                model=model,
+                messages=clean_messages,
+                temperature=temperature,
+                top_p=top_p,
+                max_tokens=max_tokens,
+                stream=True,
+            )
+            for chunk in stream_resp:
+                if not chunk.choices:
+                    continue
+                delta = chunk.choices[0].delta
+                reasoning = getattr(delta, "reasoning_content", None) or getattr(delta, "reasoning", None)
+                content = getattr(delta, "content", None) or ""
+
+                if reasoning:
+                    loop.call_soon_threadsafe(queue.put_nowait, {"thinking": reasoning})
+                if content:
+                    nonlocal full_content
+                    full_content += content
+                    loop.call_soon_threadsafe(queue.put_nowait, {"content": content})
+        except Exception as e:
+            print(f"[Sarvam AI Stream Error]: {e}")
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                {"error": f"Sarvam AI error: {str(e)}"},
+            )
+        finally:
+            loop.call_soon_threadsafe(queue.put_nowait, None)
+
+    thread = threading.Thread(target=stream_in_thread, daemon=True)
+    thread.start()
+
+    while True:
+        event = await queue.get()
+        if event is None:
+            break
+        if "error" in event:
+            yield f"data: {json.dumps({'content': event['error']})}\n\n"
+        elif "thinking" in event:
+            yield f"data: {json.dumps({'thinking': event['thinking']})}\n\n"
+        elif "content" in event:
+            yield f"data: {json.dumps({'content': event['content']})}\n\n"
+
+    # Persist assistant message in a new DB session
+    if full_content and room_id:
+        try:
+            with Session(engine) as new_db:
+                assistant_msg = ChatMessage(
+                    id=f"msg_ai_{uuid.uuid4()}",
+                    room_id=room_id,
+                    role="assistant",
+                    content=full_content,
+                    created_at=datetime.utcnow(),
+                )
+                new_db.add(assistant_msg)
+                room = new_db.query(ChatRoom).filter(ChatRoom.id == room_id).first()
+                if room:
+                    room.updated_at = datetime.utcnow()
+                new_db.commit()
+        except Exception as ex:
+            print(f"[Persist Error]: {ex}")
+
+    yield "data: [DONE]\n\n"
+
+
 async def simulated_stream_generator(content: str, room_id: str):
     """Word-by-word simulated stream as fallback."""
     words = content.split(" ")
@@ -1170,12 +1342,28 @@ async def simulated_stream_generator(content: str, room_id: str):
 
 # ── Agent loop: tool detection + execution ─────────────────────────────────────
 
-async def run_agent_loop(messages_payload: list, room_id: str, current_user: User, db: Session, use_thinking: bool = True):
+async def run_agent_loop(
+    messages_payload: list,
+    room_id: str,
+    current_user: User,
+    db: Session,
+    use_thinking: bool = False,
+    model: Optional[str] = None,
+):
     """
-    1. Detect if the user message requires a tool call (using fast TOOL_MODEL).
+    1. Detect if the user message requires a tool call.
     2. Execute tool and inject result into history.
-    3. Stream final answer from DiffusionGemma.
+    3. Stream final answer using Sarvam AI (sarvam-105b-conversations) or NVIDIA models.
     """
+    chosen_model = (model or "").strip()
+    sarvam_key = (os.getenv("SARVAM_API") or os.getenv("SARVAM_API_KEY") or "").strip()
+
+    # Determine whether to use Sarvam AI:
+    is_sarvam = (
+        chosen_model.startswith("sarvam")
+        or (sarvam_key and chosen_model not in ("thinking", "fast", "google/diffusiongemma-26b-a4b-it", "meta/llama-3.1-70b-instruct") and not use_thinking)
+    )
+
     clean_history = sanitize_messages_payload(messages_payload)
     system_msg = _build_system_message(current_user)
     full_history = [system_msg] + clean_history
@@ -1187,10 +1375,6 @@ async def run_agent_loop(messages_payload: list, room_id: str, current_user: Use
             last_user_msg_raw = (msg.get("content") or "")
             break
 
-    # ── Key fix: if the message has an attached file prefix, only scan the
-    # actual user intent (after "User message:") — NOT the extracted file content.
-    # This prevents words like "push", "send", "notification" inside image/PDF
-    # descriptions from accidentally triggering tool calls.
     USER_MSG_MARKER = "User message:"
     if USER_MSG_MARKER in last_user_msg_raw:
         last_user_msg = last_user_msg_raw.split(USER_MSG_MARKER, 1)[1].strip().lower()
@@ -1233,90 +1417,158 @@ async def run_agent_loop(messages_payload: list, room_id: str, current_user: Use
                     {"role": "user", "content": f"Yes, confirmed. Please send this exact message:\n\n{drafted_content}"}
                 ]
 
-    if needs_tool_check:
-        yield f"data: {json.dumps({'thinking': 'Analyzing request & inspecting portal database...'})}\n\n"
-        tool_payload = {
-            "model": TOOL_MODEL,
-            "messages": full_history,
-            "temperature": 0.3,
-            "top_p": 1,
-            "max_tokens": 1024,
-            "tools": NVIDIA_TOOLS,
-            "stream": False,
-        }
-        try:
-            loop = asyncio.get_event_loop()
-            tool_resp = await loop.run_in_executor(
-                None,
-                lambda: requests.post(
-                    NVIDIA_BASE_URL,
-                    headers=get_nvidia_headers(stream=False),
-                    json=tool_payload,
-                    timeout=20,
-                ),
-            )
-            if tool_resp.status_code == 200:
-                tool_data = tool_resp.json()
-                choice_message = tool_data["choices"][0]["message"]
-                tool_calls = choice_message.get("tool_calls")
+    if is_sarvam:
+        # ── Sarvam AI Branch ──
+        if needs_tool_check:
+            yield f"data: {json.dumps({'thinking': 'Analyzing request & inspecting portal database via Sarvam AI...'})}\n\n"
+            client = get_sarvam_client()
+            if client:
+                try:
+                    loop = asyncio.get_event_loop()
+                    sarvam_check_msgs = sanitize_messages_for_sarvam(full_history)
+                    tool_resp = await loop.run_in_executor(
+                        None,
+                        lambda: client.chat.completions(
+                            model=SARVAM_CHAT_MODEL,
+                            messages=sarvam_check_msgs,
+                            tools=NVIDIA_TOOLS,
+                            tool_choice="auto",
+                            temperature=0.2,
+                        ),
+                    )
+                    if tool_resp and tool_resp.choices:
+                        choice_msg = tool_resp.choices[0].message
+                        tool_calls = getattr(choice_msg, "tool_calls", None)
+                        if tool_calls:
+                            for tc in tool_calls:
+                                fn = getattr(tc, "function", None) or tc["function"]
+                                t_name = getattr(fn, "name", None) or fn["name"]
+                                t_args_raw = getattr(fn, "arguments", None) or fn["arguments"]
+                                t_args = json.loads(t_args_raw) if isinstance(t_args_raw, str) else t_args_raw
+                                t_result = execute_tool_call(t_name, t_args, current_user, db)
+                                full_history.append({
+                                    "role": "user",
+                                    "content": f"[Tool Result]: Real performance data retrieved from database:\n\n{t_result}\n\nAnswer the user's question directly using this real database data."
+                                })
+                            yield f"data: {json.dumps({'thinking': 'Database records retrieved. Generating final response with Sarvam AI...'})}\n\n"
+                except Exception as err:
+                    print(f"[Sarvam AI Tool Error]: {err}")
 
-                if tool_calls:
-                    full_history.append(choice_message)
-                    for tc in tool_calls:
-                        t_name = tc["function"]["name"]
-                        t_args = json.loads(tc["function"]["arguments"])
-                        t_result = execute_tool_call(t_name, t_args, current_user, db)
-                        full_history.append({
-                            "role": "tool",
-                            "tool_call_id": tc["id"],
-                            "name": t_name,
-                            "content": t_result,
-                        })
-                        full_history.append({
-                            "role": "user",
-                            "content": f"[Tool Result]: Real performance data retrieved from database:\n\n{t_result}\n\nAnswer the user's question directly using this real database data."
-                        })
-                    yield f"data: {json.dumps({'thinking': 'Database records retrieved. Generating final response...'})}\n\n"
-        except Exception as err:
-            print(f"[Agent Tool Error]: {err}")
+        sarvam_model_name = chosen_model if chosen_model.startswith("sarvam") else SARVAM_CHAT_MODEL
+        async for chunk in sarvam_stream_generator(full_history, room_id, model=sarvam_model_name):
+            yield chunk
 
-    async for chunk in response_stream_generator(full_history, room_id, use_thinking):
-        yield chunk
+    else:
+        # ── NVIDIA Branch ──
+        if needs_tool_check:
+            yield f"data: {json.dumps({'thinking': 'Analyzing request & inspecting portal database...'})}\n\n"
+            tool_payload = {
+                "model": TOOL_MODEL,
+                "messages": full_history,
+                "temperature": 0.3,
+                "top_p": 1,
+                "max_tokens": 1024,
+                "tools": NVIDIA_TOOLS,
+                "stream": False,
+            }
+            try:
+                loop = asyncio.get_event_loop()
+                tool_resp = await loop.run_in_executor(
+                    None,
+                    lambda: requests.post(
+                        NVIDIA_BASE_URL,
+                        headers=get_nvidia_headers(stream=False),
+                        json=tool_payload,
+                        timeout=20,
+                    ),
+                )
+                if tool_resp.status_code == 200:
+                    tool_data = tool_resp.json()
+                    choice_message = tool_data["choices"][0]["message"]
+                    tool_calls = choice_message.get("tool_calls")
+
+                    if tool_calls:
+                        full_history.append(choice_message)
+                        for tc in tool_calls:
+                            t_name = tc["function"]["name"]
+                            t_args = json.loads(tc["function"]["arguments"])
+                            t_result = execute_tool_call(t_name, t_args, current_user, db)
+                            full_history.append({
+                                "role": "tool",
+                                "tool_call_id": tc["id"],
+                                "name": t_name,
+                                "content": t_result,
+                            })
+                            full_history.append({
+                                "role": "user",
+                                "content": f"[Tool Result]: Real performance data retrieved from database:\n\n{t_result}\n\nAnswer the user's question directly using this real database data."
+                            })
+                        yield f"data: {json.dumps({'thinking': 'Database records retrieved. Generating final response...'})}\n\n"
+            except Exception as err:
+                print(f"[Agent Tool Error]: {err}")
+
+        async for chunk in response_stream_generator(full_history, room_id, use_thinking):
+            yield chunk
 
 
 # ── AI title generation ────────────────────────────────────────────────────────
 
 def generate_ai_chat_title(user_message: str) -> str:
-    """Generate a short 3-6 word title using the fast model."""
+    """Generate a short 3-6 word title using Sarvam AI (or fast fallback model)."""
     if not user_message or not user_message.strip():
         return "New AI Chat"
     clean_msg = user_message.strip()
-    payload = {
-        "model": TOOL_MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": "You generate short 3-6 word titles for chat sessions based on the user's initial prompt. Output ONLY the title, no quotes, no period.",
-            },
-            {"role": "user", "content": f"Title for: {clean_msg[:150]}"},
-        ],
-        "max_tokens": 15,
-        "temperature": 0.3,
-        "stream": False,
-    }
-    try:
-        resp = requests.post(
-            NVIDIA_BASE_URL,
-            headers=get_nvidia_headers(stream=False),
-            json=payload,
-            timeout=4,
-        )
-        if resp.status_code == 200:
-            title = resp.json()["choices"][0]["message"]["content"].strip().strip('"').strip("'")
-            if title and len(title) > 2:
-                return title[:60]
-    except Exception:
-        pass
+
+    client = get_sarvam_client()
+    if client:
+        try:
+            resp = client.chat.completions(
+                model=SARVAM_CHAT_MODEL,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You generate short 3-5 word titles for chat sessions based on the user's initial prompt. Output ONLY the title, no quotes, no period.",
+                    },
+                    {"role": "user", "content": f"Title for: {clean_msg[:150]}"},
+                ],
+                max_tokens=20,
+                temperature=0.2,
+            )
+            if resp and resp.choices:
+                t = resp.choices[0].message.content.strip().strip('"').strip("'")
+                if t and len(t) > 2:
+                    return t[:60]
+        except Exception:
+            pass
+
+    if NVIDIA_API_KEY:
+        payload = {
+            "model": TOOL_MODEL,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You generate short 3-6 word titles for chat sessions based on the user's initial prompt. Output ONLY the title, no quotes, no period.",
+                },
+                {"role": "user", "content": f"Title for: {clean_msg[:150]}"},
+            ],
+            "max_tokens": 15,
+            "temperature": 0.3,
+            "stream": False,
+        }
+        try:
+            resp = requests.post(
+                NVIDIA_BASE_URL,
+                headers=get_nvidia_headers(stream=False),
+                json=payload,
+                timeout=4,
+            )
+            if resp.status_code == 200:
+                title = resp.json()["choices"][0]["message"]["content"].strip().strip('"').strip("'")
+                if title and len(title) > 2:
+                    return title[:60]
+        except Exception:
+            pass
+
     words = clean_msg.split()
     return " ".join(words[:5]).capitalize()[:50]
 
@@ -1333,8 +1585,9 @@ async def start_chat(
     Create a new chat room and start the first AI response stream.
     Auth: session cookie OR Authorization: Bearer <token>
     """
-    room = db.query(ChatRoom).filter(ChatRoom.id == req.uuid).first()
-    ai_title = generate_ai_chat_title(req.message)
+    room_uuid = req.uuid or str(uuid.uuid4())
+    room = db.query(ChatRoom).filter(ChatRoom.id == room_uuid).first()
+    ai_title = req.title or generate_ai_chat_title(req.message)
 
     if room:
         if room.user_id != current_user.id:
@@ -1344,7 +1597,7 @@ async def start_chat(
             db.commit()
     else:
         room = ChatRoom(
-            id=req.uuid,
+            id=room_uuid,
             user_id=current_user.id,
             title=ai_title,
             created_at=datetime.utcnow(),
@@ -1364,12 +1617,26 @@ async def start_chat(
     db.add(user_msg)
     db.commit()
 
-    # Build NVIDIA payload — multimodal if image attached
-    nvidia_payload = [{
+    # Build payload — multimodal if image attached
+    msg_payload = [{
         "role": "user",
         "content": build_user_content(req.message, req.attachment_data_url, req.attachment_mime)
     }]
-    return await run_agent_loop(nvidia_payload, room.id, current_user, db, req.use_thinking)
+    return StreamingResponse(
+        run_agent_loop(
+            msg_payload,
+            room.id,
+            current_user,
+            db,
+            use_thinking=req.use_thinking,
+            model=req.model,
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get("/api/chats")
@@ -1429,6 +1696,62 @@ def check_widget_status(
         return {"status": "pending", "executed": False}
 
     return {"status": "pending", "executed": False}
+
+
+@router.post("/api/chats/sarvam")
+async def sarvam_direct_completion(
+    req: SarvamDirectChatRequest,
+    current_user: User = Depends(require_role(authorized_roles)),
+):
+    """
+    Direct completions endpoint using Sarvam AI (sarvam-105b-conversations).
+    Supports single message or conversation history, with optional streaming.
+    """
+    client = get_sarvam_client()
+    if not client:
+        raise HTTPException(
+            status_code=500,
+            detail="Sarvam AI is not configured. Please set SARVAM_API in backend/.env.",
+        )
+
+    msgs = req.messages if req.messages else [{"role": "user", "content": req.message}]
+    clean_msgs = sanitize_messages_for_sarvam(msgs)
+
+    if req.stream:
+        return StreamingResponse(
+            sarvam_stream_generator(
+                clean_msgs,
+                room_id="",
+                model=req.model,
+                temperature=req.temperature,
+                top_p=req.top_p,
+                max_tokens=req.max_tokens,
+            ),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+
+    try:
+        loop = asyncio.get_event_loop()
+        resp = await loop.run_in_executor(
+            None,
+            lambda: client.chat.completions(
+                model=req.model,
+                messages=clean_msgs,
+                temperature=req.temperature,
+                top_p=req.top_p,
+                max_tokens=req.max_tokens,
+            ),
+        )
+        content = resp.choices[0].message.content
+        return {
+            "model": req.model,
+            "choices": [{"message": {"role": "assistant", "content": content}}],
+            "content": content,
+            "response": content,
+        }
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=f"Sarvam AI Error: {str(err)}")
 
 
 @router.get("/api/chats/{uuid_val}")
@@ -1537,7 +1860,21 @@ async def send_chat_message(
                 )
                 break
 
-    return await run_agent_loop(messages_payload, room.id, current_user, db, req.use_thinking)
+    return StreamingResponse(
+        run_agent_loop(
+            messages_payload,
+            room.id,
+            current_user,
+            db,
+            use_thinking=req.use_thinking,
+            model=req.model,
+        ),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.delete("/api/chats/{uuid_val}")
@@ -1561,3 +1898,4 @@ def delete_chat(
     db.commit()
 
     return {"success": True, "id": uuid_val}
+

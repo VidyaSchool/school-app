@@ -145,7 +145,7 @@ export function TeacherAIInput() {
               handleSubmit()
             }
           }}
-          placeholder={attachedFile ? `Ask about ${attachedFile.name}...` : "Message AI Assistant..."}
+          placeholder={attachedFile ? `Ask about ${attachedFile.name}...` : "Message Sarvam AI Assistant..."}
           className="flex-1 bg-transparent text-xs sm:text-sm text-foreground focus:outline-none placeholder:text-muted-foreground/60 px-1 sm:px-2 py-1.5 sm:py-2 resize-none max-h-24 sm:max-h-32 min-h-[30px] sm:min-h-[36px] my-auto scrollbar-none"
         />
 
