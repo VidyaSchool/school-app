@@ -13,14 +13,12 @@ const client =
   globalForDb.conn ??
   postgres(connectionString, {
     ssl: 'require',
-    max: 10,
-    idle_timeout: 30,
-    connect_timeout: 15,
+    max: process.env.NODE_ENV === 'production' ? 1 : 5,
+    idle_timeout: 20,
+    connect_timeout: 10,
     prepare: false,
   })
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForDb.conn = client
-}
+globalForDb.conn = client
 
 export const db = drizzle(client, { schema })
