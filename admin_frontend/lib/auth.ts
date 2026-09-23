@@ -26,6 +26,13 @@ export const auth = betterAuth({
     provider: 'pg',
     schema,
   }),
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ['google', 'github'],
+      allowDifferentEmails: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,

@@ -15,15 +15,40 @@ export default async function TeacherUsernameLayout({
   const { username } = (await params) as { username: string }
   const user = await requireRole(['teacher', 'librarian', 'admin'])
 
-  // Fetch profiles concurrently to optimize latency
-  const [currentProfile, requestedProfile] = await Promise.all([
-    db.query.userProfile.findFirst({
-      where: eq(userProfile.userId, user.id)
-    }),
-    db.query.userProfile.findFirst({
-      where: eq(userProfile.username, username)
+  // Fetch current user profile first to optimize connection pool and eliminate duplicate queries
+  let currentProfile: any = null
+  let requestedProfile: any = null
+
+  try {
+    currentProfile = await db.query.userProfile.findFirst({
+      where: eq(userProfile.userId, user.id),
     })
-  ])
+
+    if (currentProfile?.username === username) {
+      requestedProfile = currentProfile
+    } else {
+      requestedProfile = await db.query.userProfile.findFirst({
+        where: eq(userProfile.username, username),
+      })
+    }
+  } catch (err) {
+    console.error('[TeacherUsernameLayout DB query error]:', err)
+    // Transient pool/network retry
+    try {
+      currentProfile = await db.query.userProfile.findFirst({
+        where: eq(userProfile.userId, user.id),
+      })
+      if (currentProfile?.username === username) {
+        requestedProfile = currentProfile
+      } else {
+        requestedProfile = await db.query.userProfile.findFirst({
+          where: eq(userProfile.username, username),
+        })
+      }
+    } catch (retryErr) {
+      console.error('[TeacherUsernameLayout DB retry failed]:', retryErr)
+    }
+  }
 
 
 

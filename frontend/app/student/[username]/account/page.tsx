@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { formatDate } from "@/lib/date-formatter"
 import { ProfileAvatarUpload } from "@/components/profile-avatar-upload"
 import { DocumentUploadManager, DocumentSlot } from "@/components/document-upload-manager"
+import { ConnectedAccountsManager } from "@/components/connected-accounts-manager"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
@@ -18,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Loader2Icon, UserIcon, UploadCloudIcon, BusIcon, FootprintsIcon } from "lucide-react"
+import { Loader2Icon, UserIcon, UploadCloudIcon, BusIcon, FootprintsIcon, Link2Icon } from "lucide-react"
 
 const STUDENT_DOCUMENT_SLOTS: DocumentSlot[] = [
   {
@@ -59,8 +60,16 @@ export default function StudentAccountPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
-  const [activeTab, setActiveTab] = useState("profile")
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [activeTab, setActiveTab] = useState(searchParams?.get("tab") || "profile")
+
+  useEffect(() => {
+    const tab = searchParams?.get("tab")
+    if (tab && (tab === "profile" || tab === "upload" || tab === "connect")) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     fetchData()
@@ -152,7 +161,7 @@ export default function StudentAccountPage() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg">
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <UserIcon className="h-4 w-4" />
             Profile Details
@@ -160,6 +169,10 @@ export default function StudentAccountPage() {
           <TabsTrigger value="upload" className="flex items-center gap-2">
             <UploadCloudIcon className="h-4 w-4" />
             Upload Documents
+          </TabsTrigger>
+          <TabsTrigger value="connect" className="flex items-center gap-2">
+            <Link2Icon className="h-4 w-4" />
+            Connect
           </TabsTrigger>
         </TabsList>
 
@@ -426,6 +439,10 @@ export default function StudentAccountPage() {
             documentSlots={STUDENT_DOCUMENT_SLOTS}
             userId={user.id}
           />
+        </TabsContent>
+
+        <TabsContent value="connect">
+          <ConnectedAccountsManager />
         </TabsContent>
       </Tabs>
     </div>

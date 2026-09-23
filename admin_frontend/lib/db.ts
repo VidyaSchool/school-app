@@ -13,9 +13,9 @@ const client =
   globalForDb.conn ??
   postgres(connectionString, {
     ssl: 'require',
-    max: process.env.NODE_ENV === 'production' ? 10 : 3,
-    idle_timeout: 20,
-    connect_timeout: 10,
+    max: 10,
+    idle_timeout: 30,
+    connect_timeout: 15,
     prepare: false,
   })
 
