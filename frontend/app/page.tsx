@@ -25,7 +25,7 @@ import {
 
 export const metadata: Metadata = {
   title: 'VidyaSchool | Empowering Minds, Shaping Futures',
-  description: 'Welcome to VidyaSchool - academic excellence meets holistic development with modern labs, arts programs, and vibrant student community.',
+  description: 'Welcome to VIDYA School - academic excellence meets holistic development with modern labs, arts programs, and vibrant student community.',
 }
 
 function ChemistryBackgroundIcons() {
