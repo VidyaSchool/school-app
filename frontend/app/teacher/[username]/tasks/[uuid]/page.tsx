@@ -2,10 +2,11 @@
 
 import * as React from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit, Sparkles } from "lucide-react"
+import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useSidebar } from "@/components/ui/sidebar"
 import { Marker, MarkerContent, MarkerIcon, MarkerLabel } from "@/components/ui/marker"
 import { Spinner } from "@/components/ui/spinner"
 import { AiToolCard, AiToolCall, useAutoDetectTools } from "@/components/ui/ai-tool-card"
@@ -220,8 +221,15 @@ function AssistantMessageContent({ content, userMsg = "" }: { content: string; u
 export default function TeacherTaskChatPage() {
   const params = useParams()
   const router = useRouter()
+  const { setOpen, setOpenMobile, isMobile } = useSidebar()
   const username = params?.username as string
   const uuid = params?.uuid as string
+
+  // Automatically fold sidebar on Agent/task page
+  React.useEffect(() => {
+    setOpen(false)
+    if (isMobile) setOpenMobile(false)
+  }, [setOpen, setOpenMobile, isMobile])
 
   const [session, setSession] = React.useState<ChatSession | null>(null)
   const [input, setInput] = React.useState("")
@@ -230,6 +238,7 @@ export default function TeacherTaskChatPage() {
   const [isLocalMode, setIsLocalMode] = React.useState(false)
   const [authError, setAuthError] = React.useState(false)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  const chatViewportRef = React.useRef<HTMLDivElement>(null)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
   const [showScrollButton, setShowScrollButton] = React.useState(false)
   const activeReaderRef = React.useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
@@ -307,10 +316,13 @@ export default function TeacherTaskChatPage() {
     }
   }
 
+  const isNearBottomRef = React.useRef(true)
+
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget
-    const isFar = target.scrollHeight - target.scrollTop - target.clientHeight > 300
-    setShowScrollButton(isFar)
+    const distanceToBottom = target.scrollHeight - target.scrollTop - target.clientHeight
+    isNearBottomRef.current = distanceToBottom < 60
+    setShowScrollButton(distanceToBottom > 120)
   }
 
   // Auto-expand textarea on content growth (Shift + Enter)
@@ -323,8 +335,17 @@ export default function TeacherTaskChatPage() {
   }, [input])
 
   // Scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  const scrollToBottom = (behavior: ScrollBehavior = "auto") => {
+    if (chatViewportRef.current) {
+      if (behavior === "smooth") {
+        chatViewportRef.current.scrollTo({
+          top: chatViewportRef.current.scrollHeight,
+          behavior: "smooth",
+        })
+      } else {
+        chatViewportRef.current.scrollTop = chatViewportRef.current.scrollHeight
+      }
+    }
   }
 
   const searchParams = useSearchParams()
@@ -482,6 +503,22 @@ export default function TeacherTaskChatPage() {
       return
     }
 
+    if (uuid === "new") {
+      setSession({
+        id: "new",
+        title: "AI Chat Assistant",
+        messages: [
+          {
+            role: "assistant",
+            content: "Hello! I am your VidyaSchool AI assistant. How can I help you today?",
+            createdAt: new Date().toISOString()
+          }
+        ],
+        createdAt: new Date().toISOString()
+      })
+      return
+    }
+
     fetch(`/api/backend/api/chats/${uuid}`)
       .then(async (res) => {
         if (res.status === 401) {
@@ -496,23 +533,36 @@ export default function TeacherTaskChatPage() {
       .catch((err) => {
         console.error("Failed to load chat from backend:", err)
         setIsLocalMode(true)
+        setSession({
+          id: uuid,
+          title: "AI Chat Assistant",
+          messages: [
+            {
+              role: "assistant",
+              content: "Hello! I am your VidyaSchool AI assistant. How can I help you today?",
+              createdAt: new Date().toISOString()
+            }
+          ],
+          createdAt: new Date().toISOString()
+        })
       })
 
     autoSentRef.current = false
   }, [uuid])
 
-  // Scroll to bottom on message change and loading updates
+  // Scroll to bottom on message change and loading updates (only if user is at bottom)
   React.useEffect(() => {
-    scrollToBottom()
-    const t = setTimeout(scrollToBottom, 50)
-    return () => clearTimeout(t)
+    if (isNearBottomRef.current) {
+      scrollToBottom("auto")
+    }
   }, [session?.messages, isTyping, genStatus])
 
   // Land at bottom when first loaded
   React.useEffect(() => {
     if (session) {
-      scrollToBottom()
-      const t = setTimeout(scrollToBottom, 150)
+      isNearBottomRef.current = true
+      scrollToBottom("auto")
+      const t = setTimeout(() => scrollToBottom("auto"), 100)
       return () => clearTimeout(t)
     }
   }, [session?.id])
@@ -658,9 +708,25 @@ export default function TeacherTaskChatPage() {
     }
 
     setSession(updatedSession)
+    isNearBottomRef.current = true
+    setShowScrollButton(false)
+    setTimeout(() => scrollToBottom("auto"), 20)
 
     if (isLocalMode) {
       handleLocalSimulation(userMessageText, updatedMessages, updatedSession)
+      return
+    }
+
+    if (uuid === "new") {
+      const generatedId = crypto.randomUUID()
+      startNewBackendChat(
+        generatedId,
+        currentTitle,
+        finalMessageText,
+        { ...updatedSession, id: generatedId },
+        attachmentDataUrl,
+        attachmentMime
+      )
       return
     }
 
@@ -830,12 +896,17 @@ export default function TeacherTaskChatPage() {
     <div className="relative flex flex-col h-full max-h-full flex-1 bg-background text-foreground w-full overflow-hidden">
       
       {/* ── Chat Messages Pane ── */}
-      <div className="relative flex-1 min-h-0">
+      <div className="relative flex-1 min-h-0 w-full overflow-hidden">
         {/* top fade */}
         <div className="pointer-events-none absolute top-0 inset-x-0 h-8 bg-gradient-to-b from-background to-transparent z-20" />
         {/* bottom fade */}
         <div className="pointer-events-none absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-background to-transparent z-20" />
-        <ScrollArea onScroll={handleScroll} className="h-full px-2.5 sm:px-5 pt-2.5 sm:pt-5 relative z-10" viewportClassName="pb-6">
+        <ScrollArea
+          ref={chatViewportRef}
+          onScroll={handleScroll}
+          className="h-full w-full"
+          viewportClassName="px-2.5 sm:px-5 pt-3 sm:pt-5 pb-8"
+        >
         <div className="space-y-3.5 sm:space-y-4 max-w-4xl mx-auto w-full">
           {session.messages.map((msg, index) => {
             const isUser = msg.role === "user"
@@ -999,7 +1070,11 @@ export default function TeacherTaskChatPage() {
       {/* ── Scroll to Bottom Float Trigger ── */}
       {showScrollButton && (
         <button
-          onClick={scrollToBottom}
+          onClick={() => {
+            isNearBottomRef.current = true
+            setShowScrollButton(false)
+            scrollToBottom("smooth")
+          }}
           className="absolute bottom-24 right-3 sm:right-8 z-40 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 shadow-xl transition-all cursor-pointer hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-2 duration-200"
         >
           <ArrowDown className="size-3.5 sm:size-4" />
@@ -1008,7 +1083,7 @@ export default function TeacherTaskChatPage() {
 
       {/* ── Bottom-pinned Chat Input (in-flow, sidebar-aware) ── */}
       <div className="w-full shrink-0 px-2.5 sm:px-5 pb-3 sm:pb-4 pt-1 bg-gradient-to-t from-background via-background/95 to-transparent">
-        <div className="max-w-4xl mx-auto w-full">
+        <div className="max-w-3xl mx-auto w-full">
 
         {/* ── Rich file attachment preview ── */}
         {attachedFile && (
@@ -1061,7 +1136,7 @@ export default function TeacherTaskChatPage() {
 
         <form
           onSubmit={handleSend}
-          className="w-full flex flex-col justify-between p-2.5 sm:p-3 rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-black shadow-lg dark:shadow-2xl focus-within:border-zinc-500 dark:focus-within:border-zinc-600 min-h-[96px] sm:min-h-[108px] transition-all"
+          className="w-full flex flex-col justify-between p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-black shadow-lg dark:shadow-2xl min-h-[96px] sm:min-h-[108px] transition-all"
         >
           {/* Textarea field (Doubled height) */}
           <textarea
@@ -1080,7 +1155,7 @@ export default function TeacherTaskChatPage() {
           />
 
           {/* Bottom Toolbar - Buttons sticked to bottom */}
-          <div className="flex items-center justify-between pt-1.5 border-t border-zinc-100 dark:border-zinc-900/60 mt-1">
+          <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Hidden file input */}
               <input
@@ -1097,102 +1172,20 @@ export default function TeacherTaskChatPage() {
                 disabled={isUploading}
                 onClick={() => fileInputRef.current?.click()}
                 title="Attach image, PDF, or video"
-                className="flex h-8 w-8 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40 transition-all active:scale-95 cursor-pointer"
+                className="flex h-8 w-8 sm:h-8.5 sm:w-8.5 shrink-0 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/80 disabled:opacity-40 transition-all active:scale-95 cursor-pointer"
               >
                 {isUploading
                   ? <Loader2 className="h-4 w-4 animate-spin" />
-                  : <Paperclip className="h-4 w-4" />}
+                  : <Plus className="h-4 w-4" />}
               </button>
 
-              {/* Model combobox selector */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1.5 shrink-0 rounded-xl px-2.5 py-1.5 text-[10px] sm:text-[11px] font-semibold tracking-tight border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 select-none cursor-pointer"
-                  >
-                    {selectedModel === "sarvam-105b-conversations" && (
-                      <><Sparkles className="size-3 shrink-0 text-orange-500" /><span>Sarvam AI</span></>
-                    )}
-                    {selectedModel === "thinking" && (
-                      <><BrainCircuit className="size-3 shrink-0 text-violet-500" /><span>Thinking</span></>
-                    )}
-                    {selectedModel === "fast" && (
-                      <><Zap className="size-3 shrink-0 text-amber-500" /><span>Fast</span></>
-                    )}
-                    <ChevronDown className="size-2.5 shrink-0 text-zinc-400" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  side="top"
-                  className="w-64 p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl"
-                >
-                  <p className="px-2 pb-1.5 pt-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">Model Engine</p>
-                  {/* Sarvam AI 105B option */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedModel("sarvam-105b-conversations")}
-                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                      selectedModel === "sarvam-105b-conversations"
-                        ? "bg-orange-50 dark:bg-orange-500/10 border border-orange-200/60 dark:border-orange-500/20"
-                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
-                    }`}
-                  >
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-500/20">
-                      <Sparkles className="size-3.5 text-orange-600 dark:text-orange-400" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Sarvam 105B</span>
-                        <span className="text-[9px] font-medium px-1.5 py-0.2 rounded-full bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300">Default</span>
-                      </span>
-                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Indic & Multilingual · High Quality</span>
-                    </span>
-                    {selectedModel === "sarvam-105b-conversations" && <Check className="size-3.5 mt-1 text-orange-500 shrink-0" />}
-                  </button>
-
-                  {/* Thinking option */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedModel("thinking")}
-                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors mt-1 ${
-                      selectedModel === "thinking"
-                        ? "bg-violet-50 dark:bg-violet-500/10 border border-violet-200/60 dark:border-violet-500/20"
-                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
-                    }`}
-                  >
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-100 dark:bg-violet-500/20">
-                      <BrainCircuit className="size-3.5 text-violet-600 dark:text-violet-400" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">Thinking</span>
-                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Gemma 26B · Deep reasoning trace</span>
-                    </span>
-                    {selectedModel === "thinking" && <Check className="size-3.5 mt-1 text-violet-500 shrink-0" />}
-                  </button>
-
-                  {/* Fast option */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedModel("fast")}
-                    className={`w-full flex items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors mt-1 ${
-                      selectedModel === "fast"
-                        ? "bg-amber-50 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20"
-                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
-                    }`}
-                  >
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20">
-                      <Zap className="size-3.5 text-amber-600 dark:text-amber-400" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-xs font-semibold text-zinc-900 dark:text-zinc-100">Fast</span>
-                      <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">Llama 70B · Instant replies</span>
-                    </span>
-                    {selectedModel === "fast" && <Check className="size-3.5 mt-1 text-amber-500 shrink-0" />}
-                  </button>
-                </PopoverContent>
-              </Popover>
+              {/* Sarvam AI model label (default, no change option) */}
+              <div
+                className="inline-flex items-center gap-1.5 shrink-0 rounded-xl px-2.5 py-1.5 text-[10px] sm:text-[11px] font-medium tracking-tight border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 select-none"
+              >
+                <Sparkles className="size-3 shrink-0 text-orange-500" />
+                <span>Sarvam AI</span>
+              </div>
             </div>
 
             {/* Send / Pause button sticked to bottom right */}

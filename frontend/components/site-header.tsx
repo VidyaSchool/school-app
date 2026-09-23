@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { HeaderComplaintButton } from "@/components/header-complaint-button"
-import { Mail, Plus } from "lucide-react"
+import { Mail, Plus, PanelLeft } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 import {
   Dialog,
   DialogContent,
@@ -20,12 +21,14 @@ interface SiteHeaderProps {
   title?: string
   children?: React.ReactNode
   actions?: React.ReactNode
+  onToggleChatSidebar?: () => void
+  isChatSidebarOpen?: boolean
 }
 
-export function SiteHeader({ title, children, actions }: SiteHeaderProps) {
+export function SiteHeader({ title, children, actions, onToggleChatSidebar, isChatSidebarOpen }: SiteHeaderProps) {
   const pathname = usePathname()
   const [mailOpen, setMailOpen] = React.useState(false)
-  const isChatPage = pathname?.includes("/tasks/")
+  const isChatPage = pathname?.includes("/tasks")
 
   const displayTitle = React.useMemo(() => {
     if (title) return title
@@ -85,8 +88,24 @@ export function SiteHeader({ title, children, actions }: SiteHeaderProps) {
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="relative flex w-full items-center gap-2 px-4 lg:gap-2 lg:px-6">
-        <SidebarTrigger className="-ml-1" />
+      <div className={cn(
+        "relative flex w-full items-center gap-2",
+        onToggleChatSidebar ? "pl-2 pr-4 lg:pr-6" : "px-4 lg:gap-2 lg:px-6"
+      )}>
+        {onToggleChatSidebar ? (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="size-7 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
+            onClick={onToggleChatSidebar}
+            title={isChatSidebarOpen ? "Fold chat sidebar" : "Unfold chat sidebar"}
+          >
+            <PanelLeft className="size-4" />
+            <span className="sr-only">Toggle Chat Sidebar</span>
+          </Button>
+        ) : (
+          <SidebarTrigger className="-ml-1" />
+        )}
         <Separator
           orientation="vertical"
           className="mx-2 h-4! self-center!"
@@ -99,7 +118,7 @@ export function SiteHeader({ title, children, actions }: SiteHeaderProps) {
               <h1 className="text-base font-medium">{displayTitle}</h1>
               <div className="absolute left-1/2 -translate-x-1/2 hidden sm:block">
                 <Button asChild variant="link" size="sm">
-                  <Link href={`/teacher/${pathname.split("/").filter(Boolean)[1]}/tasks/${crypto.randomUUID()}`}>
+                  <Link href={`/teacher/${pathname.split("/").filter(Boolean)[1]}/tasks/new`}>
                     <Plus className="size-3.5" />
                     New Chat
                   </Link>

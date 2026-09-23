@@ -3,36 +3,14 @@ import { SectionCards } from "@/components/section-cards"
 import { StudentCalendar } from "@/components/student-calendar"
 import { TeacherComplaintsWidget } from "@/components/teacher-complaints-widget"
 import { requireRole } from "@/lib/auth-helpers"
-import { headers } from "next/headers"
-
-async function getClassAveragePerformance() {
-  try {
-    const hdrs = await headers()
-    const cookie = hdrs.get("cookie") || ""
-
-    // Determine base URL for internal server-side fetch
-    const host = hdrs.get("host") || "localhost:3000"
-    const proto = process.env.NODE_ENV === "production" ? "https" : "http"
-    const baseUrl = process.env.NEXTAUTH_URL || `${proto}://${host}`
-
-    const res = await fetch(`${baseUrl}/api/teacher/class/average-performance`, {
-      headers: { cookie },
-      cache: "no-store",
-    })
-
-    if (!res.ok) return null
-    return await res.json()
-  } catch {
-    return null
-  }
-}
+import { getClassAveragePerformanceData } from "@/app/api/teacher/class/average-performance/route"
 
 export default async function TeacherDashboardPage() {
   const user = await requireRole(['teacher', 'librarian', 'admin'])
-  const perf = await getClassAveragePerformance()
+  const perf = await getClassAveragePerformanceData(user.id)
 
   // ── SectionCards data ────────────────────────────────────────────────────
-  const card1 = perf
+  const card1 = perf && perf.totalStudents > 0
     ? {
         title: "Class Avg. Score",
         value: `${perf.overallAverage}%`,
@@ -43,7 +21,7 @@ export default async function TeacherDashboardPage() {
       }
     : undefined
 
-  const card2 = perf
+  const card2 = perf && perf.totalStudents > 0
     ? {
         title: "Total Students",
         value: String(perf.totalStudents ?? 0),
@@ -54,9 +32,7 @@ export default async function TeacherDashboardPage() {
       }
     : undefined
 
-  const topSubject = perf?.subjectAverages?.sort(
-    (a: { average: number }, b: { average: number }) => b.average - a.average
-  )[0]
+  const topSubject = perf?.subjectAverages?.[0]
   const card3 = perf && topSubject
     ? {
         title: "Top Subject",
@@ -68,9 +44,10 @@ export default async function TeacherDashboardPage() {
       }
     : undefined
 
-  const weakSubject = perf?.subjectAverages?.sort(
-    (a: { average: number }, b: { average: number }) => a.average - b.average
-  )[0]
+  const weakSubject = perf?.subjectAverages && perf.subjectAverages.length > 1
+    ? perf.subjectAverages[perf.subjectAverages.length - 1]
+    : undefined
+
   const card4 = perf && weakSubject
     ? {
         title: "Needs Improvement",
@@ -90,13 +67,17 @@ export default async function TeacherDashboardPage() {
       label: "Class Avg %",
       color: "var(--primary)",
     },
+    highest: {
+      label: "Top Score %",
+      color: "#10b981",
+    },
   }
 
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <div className="px-4 lg:px-6">
-        <h2 className="text-lg font-semibold mb-2">Teacher Dashboard - Welcome, {user.name}!</h2>
-        <p className="text-sm text-muted-foreground">Role: {user.role}</p>
+        <h2 className="text-lg font-medium mb-2">Teacher Dashboard - Welcome, {user.name}!</h2>
+        <p className="text-sm text-muted-foreground font-normal">Role: {user.role}</p>
       </div>
       <SectionCards card1={card1} card2={card2} card3={card3} card4={card4} />
       <StudentCalendar apiUrl="/api/teacher/timetable/today" title="Today's Classes" />
@@ -105,16 +86,17 @@ export default async function TeacherDashboardPage() {
         <ChartAreaInteractive
           title="Class Average Performance"
           descriptionLine1={
-            perf
-              ? `${perf.class ? `Class ${perf.class}` : "Your class"} – Section ${perf.section ?? "—"} · ${perf.totalStudents ?? 0} students`
+            perf && perf.totalStudents > 0
+              ? `${perf.class ? `Class ${perf.class}` : "Your class"} – Section ${perf.section ?? "—"} · ${perf.totalStudents} students`
               : "Average score (%) across all exams"
           }
           descriptionLine2="Avg score by exam"
           data={chartData.length > 0 ? chartData : undefined}
           config={chartData.length > 0 ? chartConfig : undefined}
           xAxisKey="date"
-          dataKey1={chartData.length > 0 ? "average" : "mobile"}
-          dataKey2={chartData.length > 0 ? "average" : "desktop"}
+          dataKey1="average"
+          dataKey2={chartData.length > 0 && chartData[0]?.highest !== undefined ? "highest" : undefined}
+          hideTimeRangeToggle={true}
         />
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { ArrowUp, Paperclip, X, FileText, ImageIcon, Video, Loader2 } from "lucide-react"
+import { ArrowUp, Paperclip, Plus, X, FileText, ImageIcon, Video, Loader2 } from "lucide-react"
 
 export function TeacherAIInput() {
   const router = useRouter()
@@ -34,7 +34,7 @@ export function TeacherAIInput() {
   }, [message])
 
   // Hide the floating bar on chat room and email pages
-  if (pathname?.includes("/tasks/") || pathname?.includes("/email")) {
+  if (pathname?.includes("/tasks") || pathname?.includes("/email")) {
     return null
   }
 
@@ -131,7 +131,7 @@ export function TeacherAIInput() {
         >
           {isUploading
             ? <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
-            : <Paperclip className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+            : <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
         </button>
 
         <textarea

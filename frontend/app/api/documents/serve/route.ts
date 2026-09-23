@@ -51,6 +51,8 @@ async function getAuthenticatedSession() {
   return session
 }
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   // Step 1: Enforce Session Authentication
   const session = await getAuthenticatedSession()
@@ -170,7 +172,7 @@ export async function GET(req: NextRequest) {
       ]
       for (const candidate of candidates) {
         try {
-          await stat(candidate)
+          await stat(/*turbopackIgnore: true*/ candidate)
           filePath = candidate
           break
         } catch {}

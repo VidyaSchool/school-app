@@ -33,7 +33,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, MessageSquare, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail, Terminal } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, MessageSquare, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail, Terminal, Bot } from "lucide-react"
 import { useSession, signOut, logoutUser } from "@/lib/auth-client"
 import { io } from "socket.io-client"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -292,7 +292,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const router = useRouter()
   const { data: session, isPending } = useSession()
-  const { isMobile, setOpenMobile } = useSidebar()
+  const { isMobile, setOpenMobile, setOpen } = useSidebar()
   const [profileLoading, setProfileLoading] = React.useState(true)
   const [isQrOpen, setIsQrOpen] = React.useState(false)
   const [appVersion, setAppVersion] = React.useState<string>("v1.0.52")
@@ -815,34 +815,47 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       title: "Mobile App",
       url: "/downloads",
       icon: <Smartphone />,
-    }
+    },
+    ...(isTeacher
+      ? [
+          {
+            title: "Agent",
+            url: `/teacher/${profileUsername || "username"}/tasks/${teacherChats[0]?.id || "new"}`,
+            icon: <Bot />,
+            onClick: () => {
+              setOpen(false)
+              if (isMobile) setOpenMobile(false)
+            },
+          },
+        ]
+      : []),
   ]
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader className="p-3 flex flex-col gap-5">
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader className="p-3 group-data-[collapsible=icon]:p-1.5 flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
         {isLoading ? (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
             {/* Avatar row: h-8 avatar + name + chevron icon */}
-            <div className="flex items-center justify-between px-1 py-1.5 w-full">
-              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center px-1 py-1.5 w-full">
+              <div className="flex items-center gap-2.5 flex-1 min-w-0 group-data-[collapsible=icon]:justify-center">
                 <Skeleton className="h-8 w-8 rounded-lg shrink-0 bg-muted-foreground/15" />
-                <Skeleton className="h-3.5 w-28 rounded bg-muted-foreground/15" />
+                <Skeleton className="h-3.5 w-28 rounded bg-muted-foreground/15 group-data-[collapsible=icon]:hidden" />
               </div>
-              <Skeleton className="size-4 rounded shrink-0 bg-muted-foreground/10" />
+              <Skeleton className="size-4 rounded shrink-0 bg-muted-foreground/10 group-data-[collapsible=icon]:hidden" />
             </div>
             {/* Quick Search button placeholder: h-9, full width, rounded-xl */}
-            <Skeleton className="h-9 w-full rounded-xl bg-muted-foreground/10" />
-            <div className="h-px bg-sidebar-border/60 w-full" />
+            <Skeleton className="h-9 w-full group-data-[collapsible=icon]:size-9! rounded-xl bg-muted-foreground/10" />
+            <div className="h-px bg-sidebar-border/60 w-full group-data-[collapsible=icon]:hidden" />
           </div>
         ) : (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
             {/* User Card Dropdown */}
             <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
               <PopoverTrigger asChild>
                 <button
                   onClick={() => setIsCommandOpen(true)}
-                  className="group w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none"
+                  className="group w-full flex items-center justify-start group-data-[collapsible=icon]:justify-center gap-2.5 px-2 group-data-[collapsible=icon]:px-0 py-1.5 rounded-lg cursor-pointer focus:outline-none"
                 >
                   <div className="relative shrink-0">
                     <Avatar className="h-8 w-8 rounded-lg">
@@ -853,12 +866,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Avatar>
                     <span className="absolute -bottom-0.5 -right-0.5 block size-2 rounded-full bg-green-500 ring-2 ring-sidebar dark:ring-[#1c1c1e]" />
                   </div>
-                  <div className="flex flex-col items-start min-w-0 flex-1">
+                  <div className="flex flex-col items-start min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
                     <span className="truncate text-sm font-semibold text-foreground leading-tight">
                       {userToDisplay?.name || "VidyaSchool User"}
                     </span>
                   </div>
-                  <ChevronsUpDown className="size-3.5 text-muted-foreground/60 shrink-0 group-hover:text-muted-foreground transition-colors" />
+                  <ChevronsUpDown className="size-3.5 text-muted-foreground/60 shrink-0 group-hover:text-muted-foreground transition-colors group-data-[collapsible=icon]:hidden" />
                 </button>
               </PopoverTrigger>
 
@@ -970,17 +983,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   setOpenMobile(false)
                 }
               }}
-              className="w-full h-9 flex items-center justify-between px-3 py-1.5 rounded-xl border border-border/80 bg-sidebar-foreground/5 hover:bg-sidebar-foreground/10 text-muted-foreground transition-all duration-150 text-xs cursor-pointer focus:outline-none"
+              className="w-full h-9 flex items-center justify-between group-data-[collapsible=icon]:justify-center px-3 group-data-[collapsible=icon]:px-0 rounded-xl border border-border/80 bg-sidebar-foreground/5 hover:bg-sidebar-foreground/10 text-muted-foreground transition-all duration-150 text-xs cursor-pointer focus:outline-none"
             >
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
                 <SearchIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
-                <span className="text-muted-foreground/80 font-normal">Quick Search</span>
+                <span className="text-muted-foreground/80 font-normal group-data-[collapsible=icon]:hidden">Quick Search</span>
               </div>
-              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded-md border border-border bg-transparent dark:bg-transparent px-1.5 font-mono text-[9px] font-medium text-muted-foreground/60 shadow-none">
+              <kbd className="pointer-events-none inline-flex group-data-[collapsible=icon]:hidden h-5 select-none items-center gap-0.5 rounded-md border border-border bg-transparent dark:bg-transparent px-1.5 font-mono text-[9px] font-medium text-muted-foreground/60 shadow-none">
                 <span>⌘</span><span>F</span>
               </kbd>
             </button>
-            <div className="h-px bg-sidebar-border/60 w-full" />
+            <div className="h-px bg-sidebar-border/60 w-full group-data-[collapsible=icon]:hidden" />
           </div>
         )}
       </SidebarHeader>
@@ -1012,7 +1025,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <>
             <NavMain items={navMain} />
             {!isAdmin && (
-              <div className="px-3 py-2">
+              <div className="px-3 py-2 group-data-[collapsible=icon]:hidden">
                 <OnboardingAlert isTeacher={isTeacher} />
               </div>
             )}
@@ -1025,9 +1038,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {/* Secondary nav: Sessions / Get Help */}
                 {[{ w: "w-14" }, { w: "w-16" }].map(({ w }, i) => (
                   <SidebarMenuItem key={i} className="pointer-events-none">
-                    <SidebarMenuButton className="gap-2">
+                    <SidebarMenuButton className="gap-2 group-data-[collapsible=icon]:justify-center">
                       <Skeleton className="size-4 shrink-0 rounded bg-muted-foreground/15" />
-                      <Skeleton className={`h-3.5 rounded bg-muted-foreground/15 ${w}`} />
+                      <Skeleton className={`h-3.5 rounded bg-muted-foreground/15 ${w} group-data-[collapsible=icon]:hidden`} />
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -1035,43 +1048,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarGroupContent>
           </SidebarGroup>
         ) : (
-          <>
-            {/* AI Chat History group for Teacher */}
-            {isTeacher && (
-              <SidebarGroup className="pt-0 mt-1">
-                <div className="h-px bg-sidebar-border/60 mx-0 mb-3" />
-                
-                <SidebarGroupContent>
-                  <SidebarMenu className="max-h-[160px] overflow-y-auto scrollbar-none gap-0.5">
-                    {teacherChats.length === 0 ? (
-                      <div className="px-3 py-2 text-[11px] text-muted-foreground italic">
-                        No active chat threads
-                      </div>
-                    ) : (
-                      teacherChats.map((chat) => (
-                        <SidebarMenuItem key={chat.id}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={pathname === `/teacher/${profileUsername}/tasks/${chat.id}`}
-                            className="py-1 h-7.5 px-3 rounded-lg"
-                          >
-                            <Link href={`/teacher/${profileUsername || 'username'}/tasks/${chat.id}`} className="flex items-center gap-2">
-                              <MessageSquare className="size-3.5 shrink-0 text-muted-foreground" />
-                              <span className="truncate text-xs font-normal">{chat.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))
-                    )}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            )}
-            <NavSecondary items={data.navSecondary} className="mt-auto" />
-          </>
+          <NavSecondary items={data.navSecondary} className="mt-auto" />
         )}
       </SidebarContent>
-      <SidebarFooter className="px-2 pt-0 pb-1.5">
+      <SidebarFooter className="px-2 pt-0 pb-1.5 group-data-[collapsible=icon]:hidden">
         <div className="flex items-center justify-start gap-1 text-[10px] text-muted-foreground/80 font-normal w-full pl-1.5">
           <span>© {new Date().getFullYear()} VidyaSchool</span>
           <span>•</span>

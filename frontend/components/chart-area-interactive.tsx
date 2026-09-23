@@ -290,11 +290,16 @@ export function ChartAreaInteractive({
               cursor={false}
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => {
+                  labelFormatter={(value, payload) => {
+                    const item = payload?.[0]?.payload
+                    if (item?.exam) {
+                      return item.exam
+                    }
                     if (xAxisKey === "date") {
                       return new Date(value).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
+                        year: "numeric",
                       })
                     }
                     return value
@@ -305,18 +310,18 @@ export function ChartAreaInteractive({
             />
             <Area
               dataKey={dataKey1}
-              type="natural"
+              type="monotone"
               fill="url(#fillMobile)"
               stroke={`var(--color-${dataKey1})`}
-              stackId={xAxisKey === "date" ? "a" : undefined}
             />
-            <Area
-              dataKey={dataKey2}
-              type="natural"
-              fill="url(#fillDesktop)"
-              stroke={`var(--color-${dataKey2})`}
-              stackId={xAxisKey === "date" ? "a" : undefined}
-            />
+            {dataKey2 && dataKey2 !== dataKey1 && (
+              <Area
+                dataKey={dataKey2}
+                type="monotone"
+                fill="url(#fillDesktop)"
+                stroke={`var(--color-${dataKey2})`}
+              />
+            )}
           </AreaChart>
         </ChartContainer>
       </CardContent>

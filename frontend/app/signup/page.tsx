@@ -1,36 +1,117 @@
 "use client"
 
+import * as React from "react"
 import { useState, useEffect } from "react"
+import Link from "next/link"
+import Image from "next/image"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, ArrowLeft, MailCheck, Loader2, RotateCw, ShieldCheck, Lock, Phone, Mail, ArrowRight } from "lucide-react"
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Loader2,
+  MailCheck,
+  RotateCw,
+  AtSign,
+  AlertCircle,
+  GraduationCap,
+  UserCheck,
+  User,
+  Mail,
+  Lock,
+  Phone,
+  Home
+} from "lucide-react"
+
+type RoleOption = "student" | "teacher"
+
+const CLASS_OPTIONS = [
+  { value: "Nursery", label: "Nursery" },
+  { value: "KG", label: "Kindergarten (KG)" },
+  ...Array.from({ length: 12 }, (_, i) => ({
+    value: String(i + 1),
+    label: `Class ${i + 1}`,
+  })),
+]
+
+const STATES_AND_CITIES: Record<string, string[]> = {
+  "Haryana": ["Gurugram", "Faridabad", "Panipat", "Ambala", "Karnal", "Hisar", "Rohtak", "Sonipat", "Panchkula", "Other"],
+  "Delhi (NCT)": ["New Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi", "Central Delhi", "Dwarka", "Rohini", "Other"],
+  "Uttar Pradesh": ["Noida", "Greater Noida", "Ghaziabad", "Lucknow", "Kanpur", "Agra", "Varanasi", "Prayagraj", "Meerut", "Other"],
+  "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Bikaner", "Ajmer", "Alwar", "Bhiwadi", "Other"],
+  "Punjab": ["Chandigarh", "Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Mohali", "Bathinda", "Other"],
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Navi Mumbai", "Aurangabad", "Other"],
+  "Karnataka": ["Bengaluru", "Mysuru", "Mangaluru", "Hubballi", "Belagavi", "Other"],
+  "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar", "Other"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain", "Other"],
+  "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri", "Asansol", "Other"],
+  "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Other"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Other"],
+  "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Other"],
+  "Uttarakhand": ["Dehradun", "Haridwar", "Roorkee", "Haldwani", "Rishikesh", "Other"],
+  "Himachal Pradesh": ["Shimla", "Dharamshala", "Mandi", "Solan", "Kullu", "Other"],
+  "Other State": ["Other City"],
+}
 
 export default function SignUpPage() {
-  // Public registration is disabled by default for institutional security per school audit
-  const allowPublicSignup = process.env.NEXT_PUBLIC_ENABLE_PUBLIC_SIGNUP === "true"
+  // Steps: 1 = Credentials, 2 = OTP Verification, 3 = Onboarding Details, 4 = Username Selection
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
+  const [submitting, setSubmitting] = useState(false)
 
+  // ── Step 1: Credentials ──
+  const [role, setRole] = useState<RoleOption>("student")
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [role, setRole] = useState<"student" | "teacher">("student")
-  const [agreeConsent, setAgreeConsent] = useState(false)
-
-  // OTP State
-  const [otpSent, setOtpSent] = useState(false)
-  const [otp, setOtp] = useState("")
   const [sendingOtp, setSendingOtp] = useState(false)
+
+  // ── Step 2: OTP State ──
+  const [otp, setOtp] = useState("")
   const [verifyingOtp, setVerifyingOtp] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
 
-  // Timer for resend cooldown
+  // ── Step 3: Onboarding Details ──
+  const [admissionNumber, setAdmissionNumber] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [studentClass, setStudentClass] = useState("10")
+  const [section, setSection] = useState("A")
+
+  // Parent Info
+  const [parentName, setParentName] = useState("")
+  const [parentPhone, setParentPhone] = useState("")
+  const [parentEmail, setParentEmail] = useState("")
+
+  // Address: House Number, State, City, Pincode
+  const [houseNumber, setHouseNumber] = useState("")
+  const [stateName, setStateName] = useState("Haryana")
+  const [city, setCity] = useState("Gurugram")
+  const [pincode, setPincode] = useState("122001")
+
+  // Teacher specific
+  const [teacherCategory, setTeacherCategory] = useState("TGT")
+
+  // ── Step 4: Username Selection ──
+  const [username, setUsername] = useState("")
+  const [checkingUsername, setCheckingUsername] = useState(false)
+  const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
+
+  // Resend OTP Countdown Timer
   useEffect(() => {
     if (resendCooldown <= 0) return
     const timer = setInterval(() => {
@@ -39,14 +120,62 @@ export default function SignUpPage() {
     return () => clearInterval(timer)
   }, [resendCooldown])
 
-  // Step 1: Send OTP to Email
+  // Suggested Username generation when entering Step 4
+  useEffect(() => {
+    if (step === 4 && !username && name.trim()) {
+      const suggested = name
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "")
+        .slice(0, 12)
+      if (suggested.length >= 3) {
+        setUsername(suggested)
+      }
+    }
+  }, [step, name, username])
+
+  // Real-time Debounced Username Availability Check
+  useEffect(() => {
+    if (step !== 4 || !username.trim()) {
+      setUsernameAvailable(null)
+      setUsernameError(null)
+      return
+    }
+
+    const clean = username.trim().toLowerCase()
+    if (!/^[a-zA-Z0-9_-]{3,15}$/.test(clean)) {
+      setUsernameAvailable(false)
+      setUsernameError("Must be 3-15 alphanumeric characters")
+      return
+    }
+
+    setCheckingUsername(true)
+    setUsernameError(null)
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/profile/check-username?username=${encodeURIComponent(clean)}`)
+        const data = await res.json()
+        if (data.available) {
+          setUsernameAvailable(true)
+          setUsernameError(null)
+        } else {
+          setUsernameAvailable(false)
+          setUsernameError(data.error || "Username is already taken")
+        }
+      } catch {
+        setUsernameAvailable(null)
+      } finally {
+        setCheckingUsername(false)
+      }
+    }, 350)
+
+    return () => clearTimeout(timer)
+  }, [step, username])
+
+  // ── Step 1 Handler: Send OTP ──
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!agreeConsent) {
-      toast.error("Please agree to the Terms of Service and Privacy Policy to proceed")
-      return
-    }
     if (!name.trim()) {
       toast.error("Please enter your full name")
       return
@@ -66,7 +195,7 @@ export default function SignUpPage() {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       })
 
       const data = await res.json()
@@ -77,7 +206,7 @@ export default function SignUpPage() {
         return
       }
 
-      setOtpSent(true)
+      setStep(2)
       setResendCooldown(30)
       toast.success(data.message || `Verification code sent to ${email}`)
     } catch {
@@ -89,18 +218,17 @@ export default function SignUpPage() {
 
   // Resend OTP
   const handleResendOtp = async () => {
-    if (resendCooldown > 0) return
+    if (resendCooldown > 0 || sendingOtp) return
     setSendingOtp(true)
     try {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       })
-
       const data = await res.json()
       if (!res.ok) {
-        toast.error(data.error || "Failed to resend verification code")
+        toast.error(data.error || "Failed to resend code")
       } else {
         setResendCooldown(30)
         toast.success(`A new verification code has been sent to ${email}`)
@@ -112,8 +240,8 @@ export default function SignUpPage() {
     }
   }
 
-  // Step 2: Verify OTP & Create Account
-  const handleVerifyOtpAndSignUp = async (e: React.FormEvent) => {
+  // ── Step 2 Handler: Verify OTP ──
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!otp.trim() || otp.trim().length !== 6) {
@@ -124,61 +252,163 @@ export default function SignUpPage() {
     setVerifyingOtp(true)
 
     try {
-      const verifyRes = await fetch("/api/auth/verify-otp", {
+      const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), otp: otp.trim() }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), otp: otp.trim() }),
       })
 
-      const verifyData = await verifyRes.json()
+      const data = await res.json()
 
-      if (!verifyRes.ok) {
-        toast.error(verifyData.error || "Invalid verification code")
+      if (!res.ok) {
+        toast.error(data.error || "Invalid verification code")
         setVerifyingOtp(false)
         return
       }
 
-      const { error } = await authClient.signUp.email({
-        name,
-        email,
-        password,
-      })
-
-      if (error) {
-        toast.error(error.message || "Failed to finalize account creation", {
-          description: "Please try again.",
-        })
-        setVerifyingOtp(false)
-        return
-      }
-
-      toast.success("Email verified successfully! Opening onboarding...")
-      window.location.href = "/signup/onboarding"
+      toast.success("Email verified successfully!")
+      setStep(3)
     } catch {
       toast.error("Verification failed. Please try again.")
+    } finally {
       setVerifyingOtp(false)
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/signup/onboarding",
-    })
+  // ── Step 3 Handler: Validate Onboarding Form ──
+  const handleProceedToUsername = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!admissionNumber.trim()) {
+      toast.error(role === "student" ? "Please enter your Admission Number" : "Please enter your Staff / Teacher ID")
+      return
+    }
+    if (!phoneNumber.trim() || phoneNumber.trim().length < 10) {
+      toast.error("Please enter a valid 10-digit contact number")
+      return
+    }
+
+    if (role === "student") {
+      if (!parentName.trim()) {
+        toast.error("Please enter parent or guardian name")
+        return
+      }
+      if (!parentPhone.trim() || parentPhone.trim().length < 10) {
+        toast.error("Please enter a valid parent contact number")
+        return
+      }
+    }
+
+    if (!houseNumber.trim()) {
+      toast.error("Please enter house number or street address")
+      return
+    }
+    if (!stateName.trim()) {
+      toast.error("Please select your state")
+      return
+    }
+    if (!city.trim()) {
+      toast.error("Please select your city")
+      return
+    }
+    if (!pincode.trim() || pincode.trim().length < 6) {
+      toast.error("Please enter a valid 6-digit pincode")
+      return
+    }
+
+    setStep(4)
   }
 
-  const handleGitHubSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "github",
-      callbackURL: "/signup/onboarding",
-    })
+  // ── Step 4 Handler: Complete Registration ──
+  const handleCompleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const cleanUsername = username.trim().toLowerCase()
+    if (!/^[a-zA-Z0-9_-]{3,15}$/.test(cleanUsername)) {
+      toast.error("Username must be 3-15 characters (letters, numbers, hyphens, underscores)")
+      return
+    }
+
+    if (usernameAvailable === false) {
+      toast.error(usernameError || "Please choose an available username")
+      return
+    }
+
+    setSubmitting(true)
+
+    try {
+      // 1. Create account via Better-Auth
+      const { error: signUpError } = await authClient.signUp.email({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+        preferredRole: role,
+      } as any)
+
+      if (signUpError) {
+        toast.error(signUpError.message || "Failed to create account")
+        setSubmitting(false)
+        return
+      }
+
+      // 2. Persist onboarding profile data into AWS PostgreSQL
+      const profilePayload = {
+        role,
+        username: cleanUsername,
+        admissionNumber: admissionNumber.trim(),
+        phoneNumber: phoneNumber.trim(),
+        parentName: role === "student" ? parentName.trim() : undefined,
+        parentPhone: role === "student" ? parentPhone.trim() : undefined,
+        parentEmail: role === "student" && parentEmail.trim() ? parentEmail.trim() : undefined,
+        address: houseNumber.trim(),
+        state: stateName.trim(),
+        city: city.trim(),
+        pincode: pincode.trim(),
+        class: role === "student" ? studentClass : undefined,
+        section: role === "student" ? section : undefined,
+        designation: role === "teacher" ? teacherCategory : undefined,
+      }
+
+      const res = await fetch("/api/onboarding/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profilePayload),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || "Failed to finalize profile")
+      }
+
+      toast.success("Account created successfully!")
+
+      setTimeout(() => {
+        if (role === "teacher") {
+          window.location.href = `/teacher/${cleanUsername}`
+        } else {
+          window.location.href = `/student/${cleanUsername}`
+        }
+      }, 1000)
+    } catch (err: any) {
+      console.error("[SignUp] Finalize error:", err)
+      toast.error(err.message || "Failed to complete account registration")
+      setSubmitting(false)
+    }
+  }
+
+  // Handle State Change -> Auto-select first city of new state
+  const handleStateChange = (newState: string) => {
+    setStateName(newState)
+    const availableCities = STATES_AND_CITIES[newState] || ["Other"]
+    setCity(availableCities[0] || "Other")
   }
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2 bg-background text-foreground">
+      {/* ── Left Column: Form ── */}
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <Link href="/" className="flex items-center gap-2 font-semibold text-lg tracking-tight">
+          <Link href="/" className="flex items-center gap-2 text-lg tracking-tight font-medium">
             <Image
               src="/assets/vidyaschool/Logo/no_title.svg"
               alt="VidyaSchool Logo"
@@ -189,289 +419,533 @@ export default function SignUpPage() {
             VidyaSchool
           </Link>
         </div>
+
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-sm">
 
-            {/* CASE A: PUBLIC REGISTRATION DISABLED (INSTITUTIONAL ACCESS NOTICE) */}
-            {!allowPublicSignup ? (
-              <div className="space-y-6 animate-fade-in">
-                <div className="flex flex-col items-center gap-2 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-1">
-                    <ShieldCheck className="h-6 w-6" />
-                  </div>
-                  <Badge variant="outline" className="text-xs font-semibold px-2.5 py-0.5 border-primary/30 text-primary">
-                    Institutional Account Access
-                  </Badge>
-                  <h1 className="text-2xl font-bold tracking-tight">School Provisioned Access</h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    Direct public self-registration is restricted for student data privacy and child safety.
+            {/* ════════════════════════════════════════════════════════════
+               STEP 1: Name, Email, Password, Role
+               ════════════════════════════════════════════════════════════ */}
+            {step === 1 && (
+              <form onSubmit={handleSendOtp} className="space-y-5 animate-fade-in">
+                <div className="flex flex-col gap-1 text-center">
+                  <h1 className="text-2xl font-medium tracking-tight">Create an account</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Enter your details to register
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-border/80 bg-muted/30 p-4 space-y-3.5 text-xs text-muted-foreground leading-relaxed">
-                  <div className="flex items-start gap-2.5">
-                    <Lock className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block text-xs">Enrolled Students & Guardians</strong>
-                      Portal accounts and credentials are issued by the School Administration Office upon enrollment.
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5 border-t border-border/50 pt-3">
-                    <ShieldCheck className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-foreground block text-xs">Teachers & Administrative Staff</strong>
-                      Please sign in using your official institutional account (<code className="text-foreground">@vidya-india.org</code>).
-                    </div>
+                {/* Role Switcher */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground font-normal">Select Role</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRole("student")}
+                      className={cn(
+                        "flex items-center justify-center gap-2 px-3 py-2 text-xs rounded-lg border transition-colors cursor-pointer font-normal",
+                        role === "student"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      <GraduationCap className="h-4 w-4" />
+                      Student
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole("teacher")}
+                      className={cn(
+                        "flex items-center justify-center gap-2 px-3 py-2 text-xs rounded-lg border transition-colors cursor-pointer font-normal",
+                        role === "teacher"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      <UserCheck className="h-4 w-4" />
+                      Teacher
+                    </button>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <Button asChild className="w-full font-semibold gap-2">
-                    <Link href="/login">
-                      <span>Sign In to Portal</span>
+                {/* Name */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-xs font-normal">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="e.g. John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-9 text-sm font-normal"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-xs font-normal">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-9 text-sm font-normal"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-xs font-normal">Password (8+ characters)</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-9 pr-10 text-sm font-normal"
+                      minLength={8}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full gap-2 cursor-pointer font-normal" disabled={sendingOtp}>
+                  {sendingOtp ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Sending OTP...
+                    </>
+                  ) : (
+                    <>
+                      <span>Send Verification Code</span>
                       <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                    </>
+                  )}
+                </Button>
 
-                  <Button variant="outline" asChild className="w-full text-xs">
-                    <Link href="/p/admission-process">
-                      Admissions Information
-                    </Link>
-                  </Button>
+                <div className="text-center pt-2 text-xs text-muted-foreground font-normal">
+                  Already have an account?{" "}
+                  <Link href="/login" className="underline underline-offset-4 text-foreground hover:text-primary">
+                    Sign in
+                  </Link>
+                </div>
+              </form>
+            )}
+
+            {/* ════════════════════════════════════════════════════════════
+               STEP 2: OTP Verification
+               ════════════════════════════════════════════════════════════ */}
+            {step === 2 && (
+              <form onSubmit={handleVerifyOtp} className="space-y-5 animate-fade-in">
+                <div className="flex flex-col gap-2 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
+                    <MailCheck className="h-6 w-6" />
+                  </div>
+                  <h1 className="text-2xl font-medium tracking-tight">Verify Your Email</h1>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    We sent a 6-digit code to <span className="text-foreground font-medium">{email}</span>
+                  </p>
                 </div>
 
-                <div className="border-t border-border/60 pt-4 text-center space-y-2 text-xs text-muted-foreground">
-                  <p>Need your portal credentials issued or password reset?</p>
-                  <div className="flex items-center justify-center gap-4 text-xs font-medium text-foreground">
-                    <a href="tel:+918130672281" className="inline-flex items-center gap-1 hover:text-primary transition-colors">
-                      <Phone className="h-3.5 w-3.5 text-primary" />
-                      +91-8130672281
-                    </a>
-                    <span>•</span>
-                    <a href="mailto:info.vidyaschool@vidya-india.org" className="inline-flex items-center gap-1 hover:text-primary transition-colors">
-                      <Mail className="h-3.5 w-3.5 text-primary" />
-                      Email Office
-                    </a>
+                <div className="space-y-1.5">
+                  <Label htmlFor="otp" className="text-center block text-xs font-normal">Enter Verification Code</Label>
+                  <Input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    placeholder="••••••"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                    className="text-center text-xl font-mono tracking-[0.5em] placeholder:tracking-[0.5em] h-12 font-normal"
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer font-normal"
+                  disabled={verifyingOtp || otp.length !== 6}
+                >
+                  {verifyingOtp ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...
+                    </>
+                  ) : (
+                    "Verify & Continue"
+                  )}
+                </Button>
+
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="inline-flex items-center text-muted-foreground hover:text-foreground cursor-pointer font-normal"
+                  >
+                    <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Edit Email
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={resendCooldown > 0 || sendingOtp}
+                    className="inline-flex items-center text-primary hover:underline cursor-pointer disabled:text-muted-foreground font-normal"
+                  >
+                    <RotateCw className={cn("mr-1 h-3.5 w-3.5", sendingOtp && "animate-spin")} />
+                    {resendCooldown > 0 ? `Resend (${resendCooldown}s)` : "Resend Code"}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* ════════════════════════════════════════════════════════════
+               STEP 3: Onboarding Form (Admission, Contact, Class & Section, Parent, Address)
+               ════════════════════════════════════════════════════════════ */}
+            {step === 3 && (
+              <form onSubmit={handleProceedToUsername} className="space-y-3.5 animate-fade-in">
+                <div className="flex flex-col gap-1 text-center">
+                  <h1 className="text-xl font-medium tracking-tight">Onboarding Details</h1>
+                  <p className="text-xs text-muted-foreground">
+                    Please provide your enrollment, parent, and address details
+                  </p>
+                </div>
+
+                <div className="space-y-2.5 pt-1">
+                  {/* 1. Admission Number */}
+                  <div className="space-y-1">
+                    <Label htmlFor="idNum" className="text-xs font-normal">
+                      {role === "student" ? "Admission Number *" : "Teacher / Staff ID *"}
+                    </Label>
+                    <Input
+                      id="idNum"
+                      type="text"
+                      placeholder={role === "student" ? "e.g. VS-2026-001" : "e.g. TCH-102"}
+                      value={admissionNumber}
+                      onChange={(e) => setAdmissionNumber(e.target.value)}
+                      className="text-xs font-normal h-9"
+                      required
+                    />
+                  </div>
+
+                  {/* 2. Contact Number */}
+                  <div className="space-y-1">
+                    <Label htmlFor="phone" className="text-xs font-normal">Contact Number *</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        className="pl-8 text-xs font-normal h-9"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* 3. Class & Section (shadcn Select dropdowns including Nursery & KG) */}
+                  {role === "student" && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs font-normal">Class *</Label>
+                        <Select value={studentClass} onValueChange={setStudentClass}>
+                          <SelectTrigger className="w-full h-9 text-xs font-normal">
+                            <SelectValue placeholder="Select Class" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CLASS_OPTIONS.map((c) => (
+                              <SelectItem key={c.value} value={c.value} className="text-xs font-normal">
+                                {c.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs font-normal">Section *</Label>
+                        <Select value={section} onValueChange={setSection}>
+                          <SelectTrigger className="w-full h-9 text-xs font-normal">
+                            <SelectValue placeholder="Select Section" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {["A", "B", "C", "D", "E"].map((s) => (
+                              <SelectItem key={s} value={s} className="text-xs font-normal">
+                                Section {s}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Teacher Category (shadcn Select) */}
+                  {role === "teacher" && (
+                    <div className="space-y-1">
+                      <Label className="text-xs font-normal">Teacher Category *</Label>
+                      <Select value={teacherCategory} onValueChange={setTeacherCategory}>
+                        <SelectTrigger className="w-full h-9 text-xs font-normal">
+                          <SelectValue placeholder="Select Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PRT" className="text-xs font-normal">PRT (Primary Teacher)</SelectItem>
+                          <SelectItem value="TGT" className="text-xs font-normal">TGT (Trained Graduate Teacher)</SelectItem>
+                          <SelectItem value="PGT" className="text-xs font-normal">PGT (Post Graduate Teacher)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* 4. Parent Info (for Student) */}
+                  {role === "student" && (
+                    <>
+                      <div className="space-y-1">
+                        <Label htmlFor="pName" className="text-xs font-normal">Parent / Guardian Name *</Label>
+                        <Input
+                          id="pName"
+                          type="text"
+                          placeholder="Father or Mother name"
+                          value={parentName}
+                          onChange={(e) => setParentName(e.target.value)}
+                          className="text-xs font-normal h-9"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <Label htmlFor="pPhone" className="text-xs font-normal">Parent Phone *</Label>
+                          <Input
+                            id="pPhone"
+                            type="tel"
+                            placeholder="10-digit mobile"
+                            value={parentPhone}
+                            onChange={(e) => setParentPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                            className="text-xs font-normal h-9"
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label htmlFor="pEmail" className="text-xs font-normal">Parent Email</Label>
+                          <Input
+                            id="pEmail"
+                            type="email"
+                            placeholder="parent@example.com"
+                            value={parentEmail}
+                            onChange={(e) => setParentEmail(e.target.value)}
+                            className="text-xs font-normal h-9"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* 5. Address Details: House Number / Street */}
+                  <div className="space-y-1">
+                    <Label htmlFor="houseNumber" className="text-xs font-normal">House Number / Street *</Label>
+                    <div className="relative">
+                      <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                      <Input
+                        id="houseNumber"
+                        type="text"
+                        placeholder="House / Flat No., Building, Street"
+                        value={houseNumber}
+                        onChange={(e) => setHouseNumber(e.target.value)}
+                        className="pl-8 text-xs font-normal h-9"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* 6. State, City, Pincode (shadcn Select for State & City) */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs font-normal">State *</Label>
+                      <Select value={stateName} onValueChange={handleStateChange}>
+                        <SelectTrigger className="w-full h-9 text-xs font-normal">
+                          <SelectValue placeholder="State" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-56">
+                          {Object.keys(STATES_AND_CITIES).map((st) => (
+                            <SelectItem key={st} value={st} className="text-xs font-normal">
+                              {st}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-xs font-normal">City *</Label>
+                      <Select value={city} onValueChange={setCity}>
+                        <SelectTrigger className="w-full h-9 text-xs font-normal">
+                          <SelectValue placeholder="City" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-56">
+                          {(STATES_AND_CITIES[stateName] || ["Other"]).map((ct) => (
+                            <SelectItem key={ct} value={ct} className="text-xs font-normal">
+                              {ct}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="pincode" className="text-xs font-normal">Pincode *</Label>
+                      <Input
+                        id="pincode"
+                        type="text"
+                        placeholder="6 digits"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        className="text-xs font-normal h-9"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              /* CASE B: PUBLIC REGISTRATION ENABLED VIA ENV WITH ROLES & CONSENT */
-              <div className="space-y-6">
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className={cn("flex flex-col gap-5 animate-fade-in")}>
-                    <FieldGroup>
-                      <div className="flex flex-col gap-1.5 text-center">
-                        <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
-                        <p className="text-sm text-muted-foreground">
-                          Institutional verification will be required
-                        </p>
-                      </div>
 
-                      <Field>
-                        <FieldLabel htmlFor="role">Account Role</FieldLabel>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setRole("student")}
-                            className={cn(
-                              "px-3 py-2 text-xs font-medium rounded-lg border transition-colors cursor-pointer",
-                              role === "student"
-                                ? "border-primary bg-primary/10 text-primary font-semibold"
-                                : "border-border text-muted-foreground hover:bg-muted"
-                            )}
-                          >
-                            Student / Parent
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setRole("teacher")}
-                            className={cn(
-                              "px-3 py-2 text-xs font-medium rounded-lg border transition-colors cursor-pointer",
-                              role === "teacher"
-                                ? "border-primary bg-primary/10 text-primary font-semibold"
-                                : "border-border text-muted-foreground hover:bg-muted"
-                            )}
-                          >
-                            Faculty / Staff
-                          </button>
-                        </div>
-                      </Field>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(1)}
+                    className="w-1/3 cursor-pointer font-normal"
+                  >
+                    Back
+                  </Button>
+                  <Button type="submit" className="flex-1 gap-2 cursor-pointer font-normal">
+                    <span>Continue to Username</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </form>
+            )}
 
-                      <Field>
-                        <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                        <Input
-                          id="name"
-                          type="text"
-                          placeholder="John Doe"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          required
-                        />
-                      </Field>
+            {/* ════════════════════════════════════════════════════════════
+               STEP 4: Username Selection & Account Finalization
+               ════════════════════════════════════════════════════════════ */}
+            {step === 4 && (
+              <form onSubmit={handleCompleteAccount} className="space-y-5 animate-fade-in">
+                <div className="flex flex-col gap-1 text-center">
+                  <h1 className="text-2xl font-medium tracking-tight">Choose Username</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Select a unique handle for your portal
+                  </p>
+                </div>
 
-                      <Field>
-                        <FieldLabel htmlFor="email">Email Address</FieldLabel>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="name@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          required
-                        />
-                      </Field>
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-xs font-normal">Username</Label>
+                  <div className="relative">
+                    <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+                      className={cn(
+                        "pl-9 pr-10 font-mono text-sm font-normal",
+                        usernameAvailable === true && "border-green-500 focus-visible:ring-green-500",
+                        usernameAvailable === false && "border-destructive focus-visible:ring-destructive"
+                      )}
+                      maxLength={15}
+                      required
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {checkingUsername ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      ) : usernameAvailable === true ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : usernameAvailable === false ? (
+                        <AlertCircle className="h-4 w-4 text-destructive" />
+                      ) : null}
+                    </div>
+                  </div>
 
-                      <Field>
-                        <FieldLabel htmlFor="password">Password (8+ characters)</FieldLabel>
-                        <div className="relative">
-                          <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="pr-10"
-                            required
-                            minLength={8}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </Field>
+                  {usernameError ? (
+                    <p className="text-xs text-destructive flex items-center gap-1 font-normal">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      {usernameError}
+                    </p>
+                  ) : usernameAvailable === true ? (
+                    <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1 font-normal">
+                      <Check className="h-3.5 w-3.5" />
+                      @{username} is available
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground font-normal">
+                      3-15 characters (letters, numbers, hyphens, underscores)
+                    </p>
+                  )}
+                </div>
 
-                      <div className="flex items-start gap-2 pt-1 text-xs text-muted-foreground">
-                        <input
-                          type="checkbox"
-                          id="consent"
-                          checked={agreeConsent}
-                          onChange={(e) => setAgreeConsent(e.target.checked)}
-                          className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                          required
-                        />
-                        <label htmlFor="consent" className="cursor-pointer leading-snug">
-                          I confirm that I am an enrolled student, guardian, or employee of VIDYA School and agree to the{" "}
-                          <Link href="/docs/terms-of-service" className="underline hover:text-foreground">
-                            Terms
-                          </Link>{" "}
-                          and{" "}
-                          <Link href="/docs/privacy-policy" className="underline hover:text-foreground">
-                            Privacy Policy
-                          </Link>.
-                        </label>
-                      </div>
+                {/* Clean URL Preview */}
+                <div className="rounded-lg border border-border/70 bg-muted/40 p-3 text-xs font-normal">
+                  <span className="text-muted-foreground">Your Portal URL: </span>
+                  <span className="font-mono text-foreground font-normal">
+                    /{role}/{username || "username"}
+                  </span>
+                </div>
 
-                      <Field>
-                        <Button type="submit" className="w-full cursor-pointer font-semibold" disabled={sendingOtp}>
-                          {sendingOtp ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending OTP...
-                            </>
-                          ) : (
-                            "Send Verification Code"
-                          )}
-                        </Button>
-                      </Field>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(3)}
+                    disabled={submitting}
+                    className="w-1/3 cursor-pointer font-normal"
+                  >
+                    Back
+                  </Button>
 
-                      <div className="flex flex-col gap-4 pt-4 mt-2">
-                        <FieldSeparator>Or sign in with</FieldSeparator>
-                        <div className="grid grid-cols-2 gap-3">
-                          <Button variant="outline" type="button" onClick={handleGoogleSignIn}>
-                            Google
-                          </Button>
-                          <Button variant="outline" type="button" onClick={handleGitHubSignIn}>
-                            GitHub
-                          </Button>
-                        </div>
-
-                        <FieldDescription className="text-center pt-2 text-xs">
-                          Already have an account?{" "}
-                          <Link href="/login" className="underline underline-offset-4 font-medium text-foreground">
-                            Sign in
-                          </Link>
-                        </FieldDescription>
-                      </div>
-                    </FieldGroup>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyOtpAndSignUp} className={cn("flex flex-col gap-6 animate-fade-in")}>
-                    <FieldGroup>
-                      <div className="flex flex-col gap-2 text-center">
-                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-1">
-                          <MailCheck className="h-6 w-6" />
-                        </div>
-                        <h1 className="text-2xl font-bold">Verify Your Email</h1>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
-                          We&apos;ve sent a 6-digit verification code to <strong className="text-foreground">{email}</strong>
-                        </p>
-                      </div>
-
-                      <Field>
-                        <FieldLabel htmlFor="otp" className="text-center w-full block">6-Digit Verification OTP Code</FieldLabel>
-                        <Input
-                          id="otp"
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          maxLength={6}
-                          placeholder="••••••"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                          className="text-center text-xl font-mono tracking-[0.5em] placeholder:tracking-[0.5em] font-bold h-12"
-                          autoFocus
-                          required
-                        />
-                      </Field>
-
-                      <Field>
-                        <Button type="submit" className="w-full cursor-pointer font-semibold" disabled={verifyingOtp || otp.length !== 6}>
-                          {verifyingOtp ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying Code...
-                            </>
-                          ) : (
-                            "Verify & Continue"
-                          )}
-                        </Button>
-                      </Field>
-
-                      <div className="flex items-center justify-between text-xs pt-2">
-                        <button
-                          type="button"
-                          onClick={() => setOtpSent(false)}
-                          className="inline-flex items-center text-muted-foreground hover:text-foreground cursor-pointer font-medium"
-                        >
-                          <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Edit Email
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={handleResendOtp}
-                          disabled={resendCooldown > 0 || sendingOtp}
-                          className="inline-flex items-center text-primary hover:underline cursor-pointer disabled:text-muted-foreground font-medium"
-                        >
-                          <RotateCw className={cn("mr-1 h-3.5 w-3.5", sendingOtp && "animate-spin")} />
-                          {resendCooldown > 0 ? `Resend code (${resendCooldown}s)` : "Resend Code"}
-                        </button>
-                      </div>
-                    </FieldGroup>
-                  </form>
-                )}
-              </div>
+                  <Button
+                    type="submit"
+                    disabled={submitting || usernameAvailable === false}
+                    className="flex-1 cursor-pointer font-normal"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : (
+                      "Complete Registration"
+                    )}
+                  </Button>
+                </div>
+              </form>
             )}
 
           </div>
         </div>
       </div>
+
+      {/* ── Right Column: Clean Illustration (Matching Login Page) ── */}
       <div className="relative hidden bg-muted lg:block">
         <div className="absolute inset-0 flex items-center justify-center">
           <Image

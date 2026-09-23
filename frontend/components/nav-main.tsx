@@ -42,6 +42,7 @@ export function NavMain({
     url: string
     icon?: React.ReactNode
     hasNotification?: boolean
+    onClick?: () => void
   }[]
 }) {
   const pathname = usePathname()
@@ -50,10 +51,11 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarGroupContent>
-        <SidebarMenu className="space-y-1 pl-1">
+        <SidebarMenu className="space-y-1 pl-1 group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:space-y-1">
           {items.map((item) => {
             const isActive = (() => {
               if (!pathname) return false
+              if (item.title === "Agent" && pathname.includes("/tasks")) return true
               if (pathname === item.url) return true
               const isDashboardRoot = /^\/(student|teacher|admin)(?:\/[^/]+)?$/.test(item.url)
               if (isDashboardRoot) return false
@@ -66,7 +68,7 @@ export function NavMain({
                   tooltip={item.title}
                   isActive={isActive}
                   className={cn(
-                    "transition-all duration-150 font-medium h-9 rounded-xl pl-2",
+                    "transition-all duration-150 font-medium h-9 rounded-xl pl-2 group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-9!",
                     isActive 
                       ? "bg-sidebar-foreground/5! text-foreground! border-none! shadow-none" 
                       : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/40"
@@ -75,20 +77,21 @@ export function NavMain({
                   <Link 
                     href={item.url} 
                     onClick={() => {
+                      item.onClick?.()
                       if (isMobile) {
                         setOpenMobile(false)
                       }
                     }}
-                    className="relative flex items-center justify-between w-full"
+                    className="relative flex items-center justify-between w-full group-data-[collapsible=icon]:justify-center"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
                       <div className="relative flex shrink-0">
                         {item.icon}
                         {item.hasNotification && (
                           <span className="absolute -top-0.5 -right-0.5 block h-2 w-2 rounded-full bg-blue-500 ring-1 ring-sidebar dark:ring-sidebar" />
                         )}
                       </div>
-                      <span>{item.title}</span>
+                      <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                     </div>
                   </Link>
                 </SidebarMenuButton>

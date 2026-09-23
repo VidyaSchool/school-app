@@ -28,10 +28,14 @@ export function NavSecondary({
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
-        <SidebarMenu className="pl-1">
+        <SidebarMenu className="pl-1 group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:space-y-1">
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild className="text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/40 transition-all duration-150 h-9 rounded-xl pl-2">
+              <SidebarMenuButton 
+                asChild 
+                tooltip={item.title}
+                className="text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/40 transition-all duration-150 h-9 rounded-xl pl-2 group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-9!"
+              >
                 <Link 
                   href={item.url} 
                   onClick={(e) => {
@@ -42,9 +46,10 @@ export function NavSecondary({
                       setOpenMobile(false)
                     }
                   }}
+                  className="flex items-center gap-2 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center"
                 >
                   {item.icon}
-                  <span>{item.title}</span>
+                  <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

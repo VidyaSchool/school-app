@@ -88,7 +88,7 @@ export default async function RootLayout({
               <PWARegister />
               {children}
               <Analytics />
-              <Toaster richColors position="top-right" />
+              <Toaster richColors position="bottom-right" />
             </RootProvider>
           </TooltipProvider>
         </ThemeProvider>

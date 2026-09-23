@@ -11,6 +11,8 @@ const BACKEND_URL = (
   (process.env.NODE_ENV === 'production' ? 'https://api.vidyaschool.com' : 'http://localhost:8000')
 ).replace(/\/+$/, '')
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   const hdrs = await headers()
   const cookieHeader = hdrs.get('cookie') || ''
