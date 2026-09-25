@@ -8,6 +8,23 @@ const BACKEND_URL = (
   (process.env.NODE_ENV === 'production' ? 'https://api.vidyaschool.com' : 'http://localhost:8000')
 ).replace(/\/+$/, '')
 
+function extractBearerToken(req: NextRequest): string {
+  const authHeader = req.headers.get('authorization') || ''
+  if (authHeader) return authHeader
+
+  const cookieHeader = req.headers.get('cookie') || ''
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:__Secure-better-auth\.session_token|better-auth\.session_token)=([^;]+)/)
+    if (match && match[1]) {
+      const cleanToken = decodeURIComponent(match[1]).split('.')[0]
+      if (cleanToken) {
+        return `Bearer ${cleanToken}`
+      }
+    }
+  }
+  return ''
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params
   const pathStr = path.join('/')
@@ -16,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
   
   try {
     const cookieHeader = req.headers.get('cookie') || ''
-    const authHeader = req.headers.get('authorization') || ''
+    const authHeader = extractBearerToken(req)
     const res = await fetch(url, {
       headers: {
         'cookie': cookieHeader,
@@ -62,7 +79,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
 
   try {
     const cookieHeader = req.headers.get('cookie') || ''
-    const authHeader = req.headers.get('authorization') || ''
+    const authHeader = extractBearerToken(req)
     const contentType = req.headers.get('content-type') || ''
 
     let fetchBody: BodyInit
@@ -146,7 +163,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pa
   
   try {
     const cookieHeader = req.headers.get('cookie') || ''
-    const authHeader = req.headers.get('authorization') || ''
+    const authHeader = extractBearerToken(req)
     const body = await req.json()
     
     const res = await fetch(url, {
@@ -187,7 +204,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ path
   
   try {
     const cookieHeader = req.headers.get('cookie') || ''
-    const authHeader = req.headers.get('authorization') || ''
+    const authHeader = extractBearerToken(req)
     const body = await req.json()
     
     const res = await fetch(url, {
@@ -228,7 +245,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
   
   try {
     const cookieHeader = req.headers.get('cookie') || ''
-    const authHeader = req.headers.get('authorization') || ''
+    const authHeader = extractBearerToken(req)
     const res = await fetch(url, {
       method: 'DELETE',
       headers: {

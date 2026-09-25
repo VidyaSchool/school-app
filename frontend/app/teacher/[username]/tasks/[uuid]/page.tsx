@@ -4,6 +4,7 @@ import * as React from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { logoutUser } from "@/lib/auth-client"
 import Link from "next/link"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useSidebar } from "@/components/ui/sidebar"
@@ -873,8 +874,8 @@ export default function TeacherTaskChatPage() {
           <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-1">Session Expired</p>
           <p className="text-xs text-red-600/80 dark:text-red-500/80 mb-4">Your login session has expired. Please sign in again to continue.</p>
           <button
-            onClick={() => router.push("/login")}
-            className="rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-4 py-2 transition-colors"
+            onClick={() => logoutUser()}
+            className="rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-4 py-2 transition-colors cursor-pointer"
           >
             Sign In Again
           </button>
