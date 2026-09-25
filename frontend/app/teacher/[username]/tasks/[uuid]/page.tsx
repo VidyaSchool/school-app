@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit, Sparkles } from "lucide-react"
+import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logoutUser } from "@/lib/auth-client"
 import Link from "next/link"
@@ -101,19 +101,18 @@ function ThinkingBlock({ content, isStreaming }: { content: string; isStreaming:
   const cleanContent = (content || "").trim()
 
   return (
-    <div className="mb-3">
-      {/* ── Pill trigger button ── */}
+    <div className="mb-2.5">
+      {/* ── Trigger button (no background, no border) ── */}
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         className="
-          group inline-flex items-center gap-2 rounded-full px-3 py-1.5
-          border border-zinc-200 dark:border-zinc-800
-          bg-zinc-100 dark:bg-zinc-900/80
-          text-zinc-600 dark:text-zinc-400
-          hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-200
+          group inline-flex items-center gap-1.5 py-0.5 px-0
+          bg-transparent border-0
+          text-zinc-500 dark:text-zinc-400
+          hover:text-zinc-900 dark:hover:text-zinc-100
           text-[11px] font-medium tracking-tight select-none cursor-pointer
-          transition-all duration-200
+          transition-colors duration-200
         "
       >
         {/* Spinner for streaming / static dot for finished */}
@@ -130,27 +129,14 @@ function ThinkingBlock({ content, isStreaming }: { content: string; isStreaming:
         </span>
 
         {/* Expand / collapse icon */}
-        <ChevronsUpDown className="size-3 shrink-0 text-zinc-400 dark:text-zinc-500 transition-transform duration-200" />
+        <ChevronsUpDown className="size-3 shrink-0 text-zinc-400 dark:text-zinc-500 transition-transform duration-200 group-hover:text-zinc-700 dark:group-hover:text-zinc-300" />
       </button>
 
-      {/* ── Expandable reasoning panel ── */}
+      {/* ── Expandable reasoning panel (no bg, no box border) ── */}
       {open && (
-        <div className="
-          mt-2 rounded-xl border border-zinc-200 dark:border-zinc-800
-          bg-zinc-50 dark:bg-zinc-950/90
-          overflow-hidden shadow-sm
-          animate-in fade-in slide-in-from-top-1 duration-200
-        ">
-          {/* Panel header */}
-          <div className="flex items-center gap-2 px-3.5 py-2 border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-100/60 dark:bg-zinc-900/40">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Reasoning</span>
-            {!isStreaming && elapsed > 0 && (
-              <span className="ml-auto text-[10px] text-zinc-400 dark:text-zinc-500">{durationLabel}</span>
-            )}
-          </div>
-          {/* Scrollable content */}
-          <div className="max-h-64 overflow-y-auto px-3.5 py-3 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800">
-            <pre className="text-[11px] leading-relaxed text-zinc-700 dark:text-zinc-300 font-mono whitespace-pre-wrap break-words select-text">
+        <div className="mt-1.5 pl-3 border-l-2 border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="max-h-64 overflow-y-auto py-1 scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-800">
+            <pre className="text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400 font-mono whitespace-pre-wrap break-words select-text">
               {cleanContent || "(No reasoning trace available for this response)"}
             </pre>
           </div>
@@ -908,14 +894,14 @@ export default function TeacherTaskChatPage() {
           className="h-full w-full"
           viewportClassName="px-2.5 sm:px-5 pt-3 sm:pt-5 pb-8"
         >
-        <div className="space-y-3.5 sm:space-y-4 max-w-4xl mx-auto w-full">
+        <div className="space-y-3.5 sm:space-y-4 max-w-3xl mx-auto w-full">
           {session.messages.map((msg, index) => {
             const isUser = msg.role === "user"
             return (
               <div
                 key={index}
                 className={`flex gap-2 sm:gap-3 w-full min-w-0 ${
-                  isUser ? "max-w-[88%] sm:max-w-[85%] ml-auto flex-row-reverse" : "max-w-full sm:max-w-[85%] mr-auto"
+                  isUser ? "flex-row-reverse" : ""
                 }`}
               >
                 {/* Avatar */}
@@ -1033,24 +1019,19 @@ export default function TeacherTaskChatPage() {
           })}
 
           {/* Shimmer loading / Generation Status */}
-          {genStatus !== "idle" ? (
-            <div className="max-w-[95%] sm:max-w-[80%] mr-auto w-full space-y-2.5 py-1">
-              {liveThinking && genStatus === "thinking" && (
-                <ThinkingBlock content={liveThinking} isStreaming={true} />
+          {genStatus !== "idle" && (!liveThinking || genStatus !== "thinking") ? (
+            <div className="w-full max-w-full mr-auto space-y-2.5 py-1">
+              {/* Row 1 — spinner + dynamic status label (shown before stream begins or when not live thinking) */}
+              {(genStatus === "sending" || (genStatus === "thinking" && !liveThinking)) && (
+                <Marker role="status">
+                  <MarkerIcon>
+                    <Spinner size="sm" className="border-t-primary border-primary/20" />
+                  </MarkerIcon>
+                  <MarkerLabel className="shimmer text-muted-foreground">
+                    {genStatus === "sending" ? "Sending\u2026" : "Thinking\u2026"}
+                  </MarkerLabel>
+                </Marker>
               )}
-              {/* Row 1 — spinner + dynamic status label */}
-              <Marker role="status">
-                <MarkerIcon>
-                  <Spinner size="sm" className="border-t-primary border-primary/20" />
-                </MarkerIcon>
-                <MarkerLabel className="shimmer text-muted-foreground">
-                  {genStatus === "sending"
-                    ? "Sending\u2026"
-                    : genStatus === "thinking"
-                    ? "Thinking\u2026"
-                    : "Generating\u2026"}
-                </MarkerLabel>
-              </Marker>
               {/* Row 2 — separator shimmer (only while actively generating) */}
               {genStatus === "generating" && (
                 <Marker variant="separator" role="status">
@@ -1083,7 +1064,7 @@ export default function TeacherTaskChatPage() {
       )}
 
       {/* ── Bottom-pinned Chat Input (in-flow, sidebar-aware) ── */}
-      <div className="w-full shrink-0 px-2.5 sm:px-5 pb-3 sm:pb-4 pt-1 bg-gradient-to-t from-background via-background/95 to-transparent">
+      <div className="w-full shrink-0 px-2.5 sm:px-5 pb-1 sm:pb-1.5 pt-1 bg-gradient-to-t from-background via-background/95 to-transparent">
         <div className="max-w-3xl mx-auto w-full">
 
         {/* ── Rich file attachment preview ── */}
@@ -1179,14 +1160,6 @@ export default function TeacherTaskChatPage() {
                   ? <Loader2 className="h-4 w-4 animate-spin" />
                   : <Plus className="h-4 w-4" />}
               </button>
-
-              {/* Sarvam AI model label (default, no change option) */}
-              <div
-                className="inline-flex items-center gap-1.5 shrink-0 rounded-xl px-2.5 py-1.5 text-[10px] sm:text-[11px] font-medium tracking-tight border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 select-none"
-              >
-                <Sparkles className="size-3 shrink-0 text-orange-500" />
-                <span>Sarvam AI</span>
-              </div>
             </div>
 
             {/* Send / Pause button sticked to bottom right */}
@@ -1209,7 +1182,19 @@ export default function TeacherTaskChatPage() {
             )}
           </div>
         </form>
-        </div>{/* /max-w-4xl */}
+
+        <p className="text-[10px] sm:text-xs text-muted-foreground/60 text-center mt-1.5 select-none leading-normal">
+          AI may generate wrong information, make sure to double check. All this AI is powered by{" "}
+          <a
+            href="https://www.sarvam.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground text-muted-foreground font-medium transition-colors"
+          >
+            Sarvam AI
+          </a>
+        </p>
+        </div>{/* /max-w-3xl */}
       </div>
 
     </div>
