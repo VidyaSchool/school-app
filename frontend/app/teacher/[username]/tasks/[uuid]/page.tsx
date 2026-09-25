@@ -147,18 +147,45 @@ function ThinkingBlock({ content, isStreaming }: { content: string; isStreaming:
 }
 
 
+function cleanAssistantMessageText(rawContent: string, hasTools: boolean): string {
+  if (!rawContent) return ""
+  let text = rawContent
+    // Remove action code blocks: ```action { ... } ```
+    .replace(/```(?:action|json)?\s*\{[\s\S]*?"action"[\s\S]*?\}\s*```/gi, "")
+    // Remove inline raw JSON action objects
+    .replace(/\{[^{}]*"action"\s*:\s*"[^"]+"[^{}]*\}/gi, "")
+
+  if (hasTools) {
+    // Strip redundant drafting boilerplate when interactive card is active
+    text = text
+      .replace(/I can help you send a notice to students or staff[^.\n]*?\.\s*Before I send anything[^.\n]*?\.\s*/gi, "")
+      .replace(/(?:📢\s*)?\*?\*?Draft Message:?\*?\*?[\s\S]*?(?:Shall I go ahead and send this\?.*|Reply ['"]yes['"].*|$)/gi, "")
+      .replace(/Shall I go ahead and send this\?.*?(?:changes\.)?/gi, "")
+      .replace(/Reply ['"]yes['"].*?changes\./gi, "")
+      .trim()
+
+    if (!text || text.length < 5) {
+      return "I have prepared the formal draft for you. Please review the details in the card above and confirm to send:"
+    }
+  }
+
+  return text
+}
+
 // ── Per-message component: tool cards + markdown ─────────────────
 function AssistantMessageContent({ content, userMsg = "" }: { content: string; userMsg?: string }) {
   const tools = useAutoDetectTools(userMsg, content)
+  const displayContent = cleanAssistantMessageText(content, tools.length > 0)
 
   return (
     <>
       {tools.map((tool, i) => (
         <AiToolCard key={i} tool={tool} className="mb-3" />
       ))}
-      <div className="text-zinc-800 dark:text-zinc-100 py-1 leading-relaxed text-sm">
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
+      {displayContent ? (
+        <div className="text-zinc-800 dark:text-zinc-100 py-1 leading-relaxed text-sm">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
           components={{
             p: ({ children }) => <p className="mb-2.5 last:mb-0">{children}</p>,
             ul: ({ children }) => <ul className="list-disc pl-5 mb-3 space-y-1">{children}</ul>,
@@ -198,9 +225,10 @@ function AssistantMessageContent({ content, userMsg = "" }: { content: string; u
             td: ({ children }) => <td className="px-3.5 py-2 sm:px-4 sm:py-2.5 border-b border-zinc-200 dark:border-zinc-800/40 whitespace-nowrap">{children}</td>,
           }}
         >
-          {content}
+          {displayContent}
         </ReactMarkdown>
       </div>
+      ) : null}
     </>
   )
 }
@@ -590,6 +618,10 @@ export default function TeacherTaskChatPage() {
           }
         }
       } catch (e) {}
+    }
+
+    if (!fullAnswer && (lower.includes("push") || lower.includes("notification") || lower.includes("notice") || lower.includes("broadcast"))) {
+      fullAnswer = `I have drafted the notification for you. Please review the details below and confirm to send:\n\n\`\`\`action\n{"action": "send_push", "title": "Application Notice: Test Mode Active", "message": "Please be advised that the application is currently operating in test mode. Some features may experience temporary maintenance or testing. We appreciate your patience and cooperation.", "targetRole": "all"}\n\`\`\``
     }
 
     if (!fullAnswer) {
