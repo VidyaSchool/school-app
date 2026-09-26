@@ -146,15 +146,6 @@ export const studentSubjectMarks = pgTable('student_subject_marks', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
-export const communityMessage = pgTable('community_message', {
-  id: text('id').primaryKey(),
-  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  content: text('content').notNull(),
-  replyTo: text('reply_to'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-})
-
 export const teacherRequest = pgTable('teacher_request', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),

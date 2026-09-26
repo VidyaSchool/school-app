@@ -33,7 +33,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, MessageSquare, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail, Terminal, Bot } from "lucide-react"
+import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail, Terminal, Bot } from "lucide-react"
 import { useSession, signOut, logoutUser } from "@/lib/auth-client"
 import { io } from "socket.io-client"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -396,7 +396,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   // Notification states
-  const [unreadCommunity, setUnreadCommunity] = React.useState(false)
   const [unreadRequests, setUnreadRequests] = React.useState(false)
   const [unreadNotices, setUnreadNotices] = React.useState(false)
   const [unreadComplaints, setUnreadComplaints] = React.useState(false)
@@ -430,9 +429,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Clear notifications when visiting pages
   React.useEffect(() => {
     if (!pathname) return
-    if (pathname === "/community") {
-      setUnreadCommunity(false)
-    }
     if (pathname.includes("/requests")) {
       setUnreadRequests(false)
     }
@@ -484,12 +480,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // 3. Setup Socket.IO — single persistent connection, reads pathname via ref
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000'), {
       transports: ["websocket", "polling"]
-    })
-
-    socket.on("new_message", () => {
-      if (pathnameRef.current !== "/community") {
-        setUnreadCommunity(true)
-      }
     })
 
     socket.on("teacher_request_created", () => {
@@ -644,12 +634,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: <BellIcon />,
           hasNotification: unreadNotices,
         },
-        {
-          title: "Community Chat",
-          url: "/community",
-          icon: <MessageSquare />,
-          hasNotification: unreadCommunity,
-        },
       ]
     : isTeacher
     ? [
@@ -696,12 +680,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           hasNotification: unreadNotices,
         },
         {
-          title: "Community Chat",
-          url: "/community",
-          icon: <MessageSquare />,
-          hasNotification: unreadCommunity,
-        },
-        {
           title: "Complaints",
           url: `${teacherUrls.dashboard}/complaints`,
           icon: <AlertTriangle />,
@@ -735,12 +713,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: "Fee Management",
           url: adminUrls.feeManagement,
           icon: <DatabaseIcon />,
-        },
-        {
-          title: "Community Chat",
-          url: "/community",
-          icon: <MessageSquare />,
-          hasNotification: unreadCommunity,
         },
         {
           title: "Complaints",

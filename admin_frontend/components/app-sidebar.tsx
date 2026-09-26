@@ -62,7 +62,6 @@ interface CachedUserData {
 }
 
 interface CachedNotifsData {
-  unreadCommunity: boolean
   unreadRequests: boolean
   unreadNotices: boolean
   unreadComplaints: boolean
@@ -128,7 +127,6 @@ function getStoredNotifs(): CachedNotifsData | null {
 function setStoredNotifs(data: Partial<CachedNotifsData>) {
   if (typeof window === "undefined") return
   const current = getStoredNotifs() || {
-    unreadCommunity: false,
     unreadRequests: false,
     unreadNotices: false,
     unreadComplaints: false,
@@ -535,7 +533,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [session?.user?.id, profileUsername])
 
   // Notification states — initialized synchronously from sessionStorage cache
-  const [unreadCommunity, setUnreadCommunity] = React.useState(() => getStoredNotifs()?.unreadCommunity ?? false)
   const [unreadRequests, setUnreadRequests] = React.useState(() => getStoredNotifs()?.unreadRequests ?? false)
   const [unreadNotices, setUnreadNotices] = React.useState(() => getStoredNotifs()?.unreadNotices ?? false)
   const [unreadComplaints, setUnreadComplaints] = React.useState(() => getStoredNotifs()?.unreadComplaints ?? false)
@@ -569,10 +566,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Clear notifications when visiting pages & persist clear to cache
   React.useEffect(() => {
     if (!pathname) return
-    if (pathname === "/community") {
-      setUnreadCommunity(false)
-      setStoredNotifs({ unreadCommunity: false })
-    }
     if (pathname.includes("/requests")) {
       setUnreadRequests(false)
       setStoredNotifs({ unreadRequests: false })
@@ -643,13 +636,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
     const socket = _sharedSocket
 
-    const handleNewMessage = () => {
-      if (pathnameRef.current !== "/community") {
-        setUnreadCommunity(true)
-        setStoredNotifs({ unreadCommunity: true })
-      }
-    }
-
     const handleTeacherRequest = () => {
       if (isAdmin && !pathnameRef.current?.includes("/requests")) {
         setUnreadRequests(true)
@@ -664,16 +650,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
     }
 
-    socket.off("new_message", handleNewMessage)
     socket.off("teacher_request_created", handleTeacherRequest)
     socket.off("complaint_created", handleComplaint)
 
-    socket.on("new_message", handleNewMessage)
     socket.on("teacher_request_created", handleTeacherRequest)
     socket.on("complaint_created", handleComplaint)
 
     return () => {
-      socket.off("new_message", handleNewMessage)
       socket.off("teacher_request_created", handleTeacherRequest)
       socket.off("complaint_created", handleComplaint)
     }
@@ -814,12 +797,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: <BellIcon />,
           hasNotification: unreadNotices,
         },
-        {
-          title: "Community Chat",
-          url: "/community",
-          icon: <MessageSquare />,
-          hasNotification: unreadCommunity,
-        },
       ]
     : isTeacher
     ? [
@@ -866,12 +843,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           hasNotification: unreadNotices,
         },
         {
-          title: "Community Chat",
-          url: "/community",
-          icon: <MessageSquare />,
-          hasNotification: unreadCommunity,
-        },
-        {
           title: "Complaints",
           url: `${teacherUrls.dashboard}/complaints`,
           icon: <AlertTriangle />,
@@ -905,12 +876,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: "Fee Management",
           url: adminUrls.feeManagement,
           icon: <DatabaseIcon />,
-        },
-        {
-          title: "Community Chat",
-          url: "/community",
-          icon: <MessageSquare />,
-          hasNotification: unreadCommunity,
         },
         {
           title: "Complaints",

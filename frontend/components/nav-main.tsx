@@ -103,21 +103,3 @@ export function NavMain({
     </SidebarGroup>
   )
 }
-
-export function NavFooterActions() {
-  const router = useRouter()
-  return (
-    <div className="flex items-center gap-2 px-3 py-2 w-full">
-      <Button
-        className="w-full h-9 rounded-xl border border-border bg-transparent hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-muted-foreground justify-start px-3 text-xs gap-2 font-medium"
-        variant="outline"
-        onClick={() => {
-          router.push("/community")
-        }}
-      >
-        <MailIcon className="size-4 shrink-0" />
-        <span>Inbox</span>
-      </Button>
-    </div>
-  )
-}

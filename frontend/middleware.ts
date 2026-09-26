@@ -23,7 +23,6 @@ const roleDashboardMap: Record<string, string> = {
 
 // FIREWALL: Protected routes with required roles
 const protectedRoutes = {
-  '/community': ['admin', 'teacher', 'librarian'],
   '/student': ['student'],
   '/teacher': ['teacher', 'admin', 'librarian'],
   '/librarian': ['librarian', 'admin'],

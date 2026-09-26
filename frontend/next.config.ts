@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
         destination: `${process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001'}/uploads/:path*`,
       },
       {
-        source: '/:slug((?!api|_next|assets|uploads|student|teacher|librarian|admin|accounts|community|contact|dashboard|docs|downloads|gallery|login|login-accounts|signup|mandatory-public-disclosure|circulars|monitoring|p|favicon\\.ico).*)',
+        source: '/:slug((?!api|_next|assets|uploads|student|teacher|librarian|admin|accounts|contact|dashboard|docs|downloads|gallery|login|login-accounts|signup|mandatory-public-disclosure|circulars|monitoring|p|favicon\\.ico).*)',
         destination: '/p/:slug',
       },
     ];

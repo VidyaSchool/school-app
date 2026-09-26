@@ -52,7 +52,6 @@ const tree: PageTree.Root = {
         { type: "page", name: "3. Notice Publishing", url: "/docs/teacher/notices" },
         { type: "page", name: "4. Requests & Leaves", url: "/docs/teacher/escalations" },
         { type: "page", name: "5. Educator Complaints", url: "/docs/teacher/complaints" },
-        { type: "page", name: "6. Community & Messaging", url: "/docs/teacher/community" },
       ],
     },
     {

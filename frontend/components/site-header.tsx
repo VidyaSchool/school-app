@@ -61,7 +61,6 @@ export function SiteHeader({ title, children, actions, onToggleChatSidebar, isCh
       slider: "Slider Banners",
       books: "Manage Books",
       borrowings: "Book Issues",
-      community: "Community Chat",
       downloads: "Mobile App Downloads",
       notes: "Notes",
     }
@@ -152,9 +151,9 @@ export function SiteHeader({ title, children, actions, onToggleChatSidebar, isCh
           <div className="size-12 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center mb-2">
             <Mail className="size-6 animate-pulse" />
           </div>
-          <DialogTitle className="text-base font-semibold">Inbox & Chat</DialogTitle>
+          <DialogTitle className="text-base font-semibold">Inbox</DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-            The direct messaging and community chat feature is coming soon! Stay tuned for updates.
+            The direct messaging and inbox feature is coming soon! Stay tuned for updates.
           </DialogDescription>
           <Button onClick={() => setMailOpen(false)} className="mt-4 w-full h-8 text-xs font-semibold rounded-lg">
             Got it

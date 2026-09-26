@@ -316,20 +316,6 @@ export async function middleware(request: NextRequest) {
     return applySecurityHeaders(NextResponse.next())
   }
 
-  // Firewall for /community
-  if (pathname === '/community' || pathname.startsWith('/community/')) {
-    if (!session?.user) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('from', pathname)
-      return applySecurityHeaders(NextResponse.redirect(loginUrl))
-    }
-    const user = session.user as any
-    if (user.role !== 'admin' && user.role !== 'teacher') {
-      return applySecurityHeaders(NextResponse.redirect(new URL('/unauthorized', request.url)))
-    }
-    return applySecurityHeaders(NextResponse.next())
-  }
-
   // Redirect /docs to external documentation portal
   if (pathname === '/docs' || pathname.startsWith('/docs/')) {
     return NextResponse.redirect(new URL('https://beta.blazeneuro.com/docs'))

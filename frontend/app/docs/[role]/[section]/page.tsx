@@ -878,29 +878,6 @@ const ARTICLES: Record<string, Record<string, GuideArticle>> = {
           a: "Critical IT issues (portal outage, assessment submission failures) are treated as high priority and addressed within 4 business hours. Standard IT issues are resolved within 1–2 business days."
         }
       ]
-    },
-    community: {
-      title: "Community & Staff Messaging",
-      badge: "Communication",
-      description: "How to use the community channels for staff collaboration, class group discussions, and school-wide announcements.",
-      details: [
-        {
-          title: "Community Channels",
-          body: "The Community section provides structured group messaging channels for:\n• Staff Lounge: School-wide teacher and staff channel for general updates, resource sharing, and professional discussions.\n• Class Channels: Dedicated channels for each class (e.g., Class 10-A Teachers), allowing coordinated planning between subject teachers of the same class.\n• Department Channels: Subject department groups (Science Dept., Humanities Dept., etc.) for curriculum coordination."
-        },
-        {
-          title: "Direct Messaging",
-          body: "Send direct messages to any staff member or student from the Community section. Click 'New Message', search by name, and start a conversation. Direct messages are private and not visible to other users."
-        },
-        {
-          title: "Posting in a Channel",
-          body: "Click on a channel, type your message in the input field, and press Enter or click Send. You can format messages with bold, italics, lists, and code blocks using markdown shortcuts. Attach files by clicking the paperclip icon."
-        }
-      ],
-      tips: [
-        "Use class channels to coordinate exam schedules and avoid clashes across subjects.",
-        "Pin important messages in channels so they're easily found — right-click a message and select 'Pin'."
-      ]
     }
   },
   admissions: {
@@ -1178,7 +1155,7 @@ const ARTICLES: Record<string, Record<string, GuideArticle>> = {
       details: [
         {
           title: "Core Technology Stack",
-          body: "VidyaSchool is built using a modern, resilient technology stack:\n• Frontend Framework: Next.js 16 (React 19, App Router) with Server Components & Edge Middleware.\n• Design System: Custom Vanilla CSS tokens + Tailwind CSS with Glassmorphism aesthetic and automatic dark mode.\n• Documentation: Fumadocs UI with PageTree navigation and custom Markdown theme overrides.\n• Primary Database: PostgreSQL (Neon Serverless / Docker Postgres) shared by Node.js and Python runtimes.\n• Frontend ORM: Drizzle ORM for type-safe database queries and migrations.\n• Python Backend: FastAPI (Python 3.12+) running an ASGI server with SQLModel / SQLAlchemy ORM.\n• Realtime Gateway: Socket.IO AsyncServer for instant community chat, online user counts, and admin notifications.\n• Authentication: Better-Auth with session token cookie synchronization across Node.js & Python.\n• Telemetry & Monitoring: Sentry SDK for client and server error tracing."
+          body: "VidyaSchool is built using a modern, resilient technology stack:\n• Frontend Framework: Next.js 16 (React 19, App Router) with Server Components & Edge Middleware.\n• Design System: Custom Vanilla CSS tokens + Tailwind CSS with Glassmorphism aesthetic and automatic dark mode.\n• Documentation: Fumadocs UI with PageTree navigation and custom Markdown theme overrides.\n• Primary Database: PostgreSQL (Neon Serverless / Docker Postgres) shared by Node.js and Python runtimes.\n• Frontend ORM: Drizzle ORM for type-safe database queries and migrations.\n• Python Backend: FastAPI (Python 3.12+) running an ASGI server with SQLModel / SQLAlchemy ORM.\n• Realtime Gateway: Socket.IO AsyncServer for instant notifications, online presence, and administrative alerts.\n• Authentication: Better-Auth with session token cookie synchronization across Node.js & Python.\n• Telemetry & Monitoring: Sentry SDK for client and server error tracing."
         },
         {
           title: "Dual-Engine Hybrid Proxy Architecture",
@@ -1238,11 +1215,11 @@ const ARTICLES: Record<string, Record<string, GuideArticle>> = {
         },
         {
           title: "Domain Routers & Modules",
-          body: "The backend is partitioned into dedicated domain routers:\n• app/routes/fees.py: Fee calculation engine, itemized installment ledgers, Razorpay payment webhooks, and account profile CRUD.\n• app/routes/chats.py: Socket.IO community messaging, leaderboard engine, and class marks processing.\n• app/routes/page_builder_ai.py: Streaming AI page builder with elementor templates.\n• app/routes/teacher.py: Faculty rosters, subject assignments, and leave requests."
+          body: "The backend is partitioned into dedicated domain routers:\n• app/routes/fees.py: Fee calculation engine, itemized installment ledgers, Razorpay payment webhooks, and account profile CRUD.\n• app/routes/chats.py: AI chat assistance, leaderboard engine, and class marks processing.\n• app/routes/page_builder_ai.py: Streaming AI page builder with elementor templates.\n• app/routes/teacher.py: Faculty rosters, subject assignments, and leave requests."
         },
         {
           title: "Realtime Socket.IO Events",
-          body: "The realtime server broadcasts live events:\n• join: Client joins 'community' room and receives active online user rosters.\n• approval_status & request_updated: Broadcasts teacher approval status updates to admin rooms.\n• online_users: Emits connected client lists in real time."
+          body: "The realtime server broadcasts live events:\n• join: Client establishes active presence and room connectivity.\n• approval_status & request_updated: Broadcasts teacher approval status updates to admin rooms.\n• substitution_updated: Emits real-time faculty substitution updates."
         }
       ],
       tips: [
