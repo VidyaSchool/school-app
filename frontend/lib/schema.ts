@@ -35,6 +35,8 @@ export const userProfile = pgTable('user_profile', {
   classSectionChanges: text('class_section_changes'),
   secondaryRole: text('secondary_role'),
   transportMode: text('transport_mode'),
+  isMailEnabled: boolean('is_mail_enabled').notNull().default(true),
+  mailRedirectEmail: text('mail_redirect_email'),
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

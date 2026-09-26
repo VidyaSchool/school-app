@@ -5,7 +5,8 @@ import hashlib
 import base64
 import json
 import re
-from datetime import datetime
+import random
+from datetime import datetime, timedelta
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -15,7 +16,7 @@ import requests
 
 from app.core.auth import get_current_user, require_role
 from app.core.database import get_db
-from models import User, UserProfile, TeacherEmail
+from models import User, UserProfile, TeacherEmail, Verification
 
 router = APIRouter()
 
@@ -78,11 +79,14 @@ def get_teacher_emails(
     query = (
         db.query(TeacherEmail)
         .filter(TeacherEmail.user_id == current_user.id)
-        .filter(TeacherEmail.folder == query_folder)
     )
 
     if folder == "starred":
-        query = query.filter(TeacherEmail.is_starred == True)
+        query = query.filter(TeacherEmail.folder == "inbox", TeacherEmail.is_starred == True)
+    elif folder == "inbox":
+        query = query.filter(TeacherEmail.folder.in_(["inbox", "forwarded"]))
+    else:
+        query = query.filter(TeacherEmail.folder == query_folder)
 
     emails = query.order_by(TeacherEmail.created_at.desc()).all()
 
@@ -113,6 +117,8 @@ def get_teacher_emails(
     return {
         "emails": result_emails,
         "address": f"{profile.username}@{EMAIL_DOMAIN}",
+        "isMailEnabled": profile.is_mail_enabled if profile.is_mail_enabled is not None else True,
+        "mailRedirectEmail": profile.mail_redirect_email,
     }
 
 
@@ -260,6 +266,181 @@ def delete_teacher_email(
     return {"success": True}
 
 
+@router.post("/api/teacher/email/forwarding/send-otp")
+def send_forwarding_otp(
+    data: dict,
+    current_user: User = Depends(require_role(["teacher", "admin", "librarian"])),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+    if not profile or not profile.username:
+        raise HTTPException(status_code=400, detail="Profile not set up. Username missing.")
+
+    target_email = (data.get("email") or "").strip().lower()
+    if not target_email:
+        raise HTTPException(status_code=400, detail="Redirection email address is required")
+
+    email_regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    if not re.match(email_regex, target_email):
+        raise HTTPException(status_code=400, detail="Invalid email address format")
+
+    school_email = f"{profile.username.lower()}@{EMAIL_DOMAIN}"
+    if target_email == school_email or target_email.endswith(f"@{EMAIL_DOMAIN}"):
+        raise HTTPException(status_code=400, detail="Cannot redirect to your school email address or an internal domain address")
+
+    otp = f"{random.randint(100000, 999999)}"
+    expires_at = datetime.utcnow() + timedelta(minutes=10)
+    identifier = f"mail_redirect:{current_user.id}:{target_email}"
+
+    existing_ver = db.query(Verification).filter(Verification.identifier == identifier).first()
+    if existing_ver:
+        existing_ver.value = otp
+        existing_ver.expires_at = expires_at
+        existing_ver.updated_at = datetime.utcnow()
+        db.add(existing_ver)
+    else:
+        new_ver = Verification(
+            id=str(uuid.uuid4()),
+            identifier=identifier,
+            value=otp,
+            expires_at=expires_at,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        )
+        db.add(new_ver)
+    db.commit()
+
+    # Send OTP via Resend
+    resend_api_key = os.getenv("RESEND_API_KEY")
+    if resend_api_key:
+        try:
+            payload = {
+                "from": f"VidyaSchool Verification <noreply@{EMAIL_DOMAIN}>",
+                "to": [target_email],
+                "subject": f"{otp} is your VidyaSchool email redirection verification code",
+                "html": f"""
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: #0f172a; margin: 0; font-size: 22px; font-weight: 700;">VidyaSchool Email Redirection</h2>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 6px;">You requested to turn off your school inbox and redirect incoming messages for <strong>{school_email}</strong> to this email address.</p>
+                    </div>
+                    <div style="background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+                        <span style="font-size: 32px; font-weight: 800; color: #2563eb; letter-spacing: 6px; font-family: monospace;">{otp}</span>
+                        <p style="color: #94a3b8; font-size: 12px; margin: 8px 0 0 0;">Expires in 10 minutes</p>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 12px; text-align: center; margin: 0;">If you didn't request this verification code, you can safely ignore this email.</p>
+                </div>
+                """
+            }
+            headers = {
+                "Authorization": f"Bearer {resend_api_key}",
+                "Content-Type": "application/json"
+            }
+            resp = requests.post("https://api.resend.com/emails", json=payload, headers=headers)
+            if resp.status_code >= 400:
+                print(f"[Send Forwarding OTP Error] Resend returned {resp.status_code}: {resp.text}")
+                raise HTTPException(status_code=500, detail=f"Failed to dispatch email: {resp.text}")
+        except HTTPException:
+            raise
+        except Exception as e:
+            print(f"[Send Forwarding OTP Exception] {e}")
+            raise HTTPException(status_code=500, detail="Failed to dispatch verification email")
+    else:
+        print(f"[DEV MODE Forwarding OTP] Verification code for {target_email}: {otp}")
+
+    return {
+        "success": True,
+        "message": f"Verification code sent to {target_email}",
+        "expiresInMinutes": 10
+    }
+
+
+@router.post("/api/teacher/email/forwarding/verify-otp")
+def verify_forwarding_otp(
+    data: dict,
+    current_user: User = Depends(require_role(["teacher", "admin", "librarian"])),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+    if not profile or not profile.username:
+        raise HTTPException(status_code=400, detail="Profile not set up. Username missing.")
+
+    target_email = (data.get("email") or "").strip().lower()
+    otp = (data.get("otp") or "").strip()
+
+    if not target_email or not otp:
+        raise HTTPException(status_code=400, detail="Both target email and verification code are required")
+
+    identifier = f"mail_redirect:{current_user.id}:{target_email}"
+    ver_record = db.query(Verification).filter(Verification.identifier == identifier).first()
+
+    if not ver_record:
+        raise HTTPException(status_code=400, detail="Verification code not found or expired. Please request a new code.")
+
+    if ver_record.value != otp:
+        raise HTTPException(status_code=400, detail="Invalid verification code. Please check and try again.")
+
+    if ver_record.expires_at < datetime.utcnow():
+        db.delete(ver_record)
+        db.commit()
+        raise HTTPException(status_code=400, detail="Verification code has expired. Please request a new code.")
+
+    # Valid OTP! Clean up verification record
+    db.delete(ver_record)
+
+    # Turn off mail and set redirection
+    profile.is_mail_enabled = False
+    profile.mail_redirect_email = target_email
+    profile.updated_at = datetime.utcnow()
+    db.add(profile)
+    db.commit()
+
+    return {
+        "success": True,
+        "isMailEnabled": False,
+        "mailRedirectEmail": target_email,
+        "message": f"Mail turned off. All future emails will be redirected to {target_email}."
+    }
+
+
+@router.post("/api/teacher/email/forwarding/toggle")
+def toggle_mail_status(
+    data: dict,
+    current_user: User = Depends(require_role(["teacher", "admin", "librarian"])),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+    if not profile or not profile.username:
+        raise HTTPException(status_code=400, detail="Profile not set up. Username missing.")
+
+    enabled = data.get("enabled", True)
+    if enabled:
+        profile.is_mail_enabled = True
+        profile.updated_at = datetime.utcnow()
+        db.add(profile)
+        db.commit()
+        return {
+            "success": True,
+            "isMailEnabled": True,
+            "mailRedirectEmail": profile.mail_redirect_email,
+            "message": "Mail service turned back on. Incoming emails will be delivered to your school inbox."
+        }
+    else:
+        # Turning off requires an already verified email
+        if not profile.mail_redirect_email:
+            raise HTTPException(status_code=400, detail="No verified redirection email found. Please configure and verify an email first.")
+        profile.is_mail_enabled = False
+        profile.updated_at = datetime.utcnow()
+        db.add(profile)
+        db.commit()
+        return {
+            "success": True,
+            "isMailEnabled": False,
+            "mailRedirectEmail": profile.mail_redirect_email,
+            "message": f"Mail turned off. Emails redirected to {profile.mail_redirect_email}."
+        }
+
+
 @router.post("/api/teacher/email/inbound")
 async def resend_inbound_webhook(request: Request, db: Session = Depends(get_db)):
     raw_body = await request.body()
@@ -366,11 +547,52 @@ async def resend_inbound_webhook(request: Request, db: Session = Depends(get_db)
         print(f"[Inbound Webhook Error] No suitable user found for recipient: '{recipient}'")
         return {"ok": True}
 
+    if not profile and user_id:
+        profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+
+    is_redirected = False
+    if profile and (profile.is_mail_enabled is False) and profile.mail_redirect_email:
+        forward_target = profile.mail_redirect_email
+        print(f"[Inbound Webhook Forwarding] Mail turned off for user {user_id} ({username}). Forwarding to: {forward_target}")
+        is_redirected = True
+
+        if resend_api_key:
+            try:
+                forward_subject = f"[Forwarded] {subject}" if not subject.startswith("[Forwarded]") else subject
+                forward_banner = (
+                    f'<div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 14px 18px; margin-bottom: 24px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; font-size: 13px; color: #1e3a8a; border-radius: 6px;">'
+                    f'<div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">Forwarded VidyaSchool Email</div>'
+                    f'<div>This message was sent to <strong>{recipient}</strong> and forwarded because school mail is turned off.</div>'
+                    f'<div style="margin-top: 6px; font-size: 12px; color: #64748b;">'
+                    f'<strong>Original Sender:</strong> {from_addr} &bull; <strong>Date:</strong> {datetime.utcnow().strftime("%B %d, %Y, %I:%M %p UTC")}'
+                    f'</div>'
+                    f'</div>'
+                )
+                forward_html = f"{forward_banner}{html or f'<p>{text}</p>'}"
+                forward_text = f"--- Forwarded VidyaSchool Email ---\nTo: {recipient}\nOriginal Sender: {from_addr}\nSubject: {subject}\n\n{text}"
+
+                fwd_payload = {
+                    "from": f"{username} via VidyaSchool <noreply@{EMAIL_DOMAIN}>",
+                    "to": [forward_target],
+                    "reply_to": from_addr,
+                    "subject": forward_subject,
+                    "html": forward_html,
+                    "text": forward_text,
+                }
+                fwd_headers = {
+                    "Authorization": f"Bearer {resend_api_key}",
+                    "Content-Type": "application/json"
+                }
+                fwd_resp = requests.post("https://api.resend.com/emails", json=fwd_payload, headers=fwd_headers)
+                print(f"[Inbound Forwarding Success] Resend status {fwd_resp.status_code}: {fwd_resp.text}")
+            except Exception as fwd_err:
+                print(f"[Inbound Forwarding Error] Failed forwarding to {forward_target}: {fwd_err}")
+
     email_id = f"em-{uuid.uuid4()}"
     new_email = TeacherEmail(
         id=email_id,
         user_id=user_id,
-        folder="inbox",
+        folder="forwarded" if is_redirected else "inbox",
         from_address=str(from_addr),
         to_address=str(recipient),
         cc_address=None,
@@ -378,7 +600,7 @@ async def resend_inbound_webhook(request: Request, db: Session = Depends(get_db)
         body_html=html,
         body_text=text,
         resend_id=data_obj.get("email_id") or data_obj.get("id") or payload.get("id"),
-        is_read=False,
+        is_read=is_redirected,
         is_starred=False,
         raw_payload=raw_body.decode("utf-8")[:10000],
         created_at=datetime.utcnow(),
@@ -387,5 +609,5 @@ async def resend_inbound_webhook(request: Request, db: Session = Depends(get_db)
     db.add(new_email)
     db.commit()
 
-    print(f"[Inbound Webhook Success] Saved email ID {email_id} for user {user_id} (recipient: {recipient})")
+    print(f"[Inbound Webhook Success] Saved email ID {email_id} for user {user_id} (recipient: {recipient}, redirected: {is_redirected})")
     return {"ok": True}

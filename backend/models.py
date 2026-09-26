@@ -61,6 +61,8 @@ class UserProfile(SQLModel, table=True):
     teacher_category: Optional[str] = Field(default=None, alias="teacher_category")  # 'PRT', 'TGT', 'PGT'
     activity_skills: Optional[str] = Field(default=None, alias="activity_skills")  # JSON list string e.g. ["Games / Sports", "Computer"]
     is_available_for_substitution: bool = Field(default=True, alias="is_available_for_substitution")
+    is_mail_enabled: bool = Field(default=True, alias="is_mail_enabled")
+    mail_redirect_email: Optional[str] = Field(default=None, alias="mail_redirect_email")
     onboarding_completed: bool = Field(default=False, alias="onboarding_completed")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -119,15 +121,6 @@ class StudentSubjectMarks(SQLModel, table=True):
     max_score: float = Field(default=100.0)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-class CommunityMessage(SQLModel, table=True):
-    __tablename__ = "community_message"
-    id: str = Field(primary_key=True)
-    user_id: str = Field(alias="userId", foreign_key="user.id")
-    content: str
-    reply_to: Optional[str] = Field(default=None, alias="replyTo")
-    created_at: datetime = Field(default_factory=datetime.utcnow, alias="createdAt")
-    updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updatedAt")
 
 class TeacherRequest(SQLModel, table=True):
     __tablename__ = "teacher_request"
@@ -391,4 +384,14 @@ class CustomPage(SQLModel, table=True):
     status: str = Field(default="published")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class Verification(SQLModel, table=True):
+    __tablename__ = "verification"
+    id: str = Field(primary_key=True)
+    identifier: str = Field(index=True)
+    value: str
+    expires_at: datetime = Field(alias="expires_at")
+    created_at: datetime = Field(default_factory=datetime.utcnow, alias="created_at")
+    updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updated_at")
 

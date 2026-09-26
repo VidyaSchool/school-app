@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  ArrowRightLeft,
   ArrowUpDown,
   Bot,
   ChevronDown,
@@ -11,12 +12,15 @@ import {
   ChevronsRight,
   Copy,
   FileText,
+  Mail,
+  MailX,
   MoreHorizontal,
   Plus,
   RefreshCw,
   Reply,
   Search,
   Send,
+  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   Star,
@@ -86,6 +90,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Spinner } from "@/components/ui/spinner"
+import { Switch } from "@/components/ui/switch"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import {
   Table,
@@ -399,6 +404,29 @@ export default function TeacherEmailClient() {
   const [aiResponse, setAiResponse] = React.useState("")
   const [aiLoading, setAiLoading] = React.useState(false)
 
+  // Mail Active / Redirection State
+  const [isMailEnabled, setIsMailEnabled] = React.useState<boolean>(true)
+  const [mailRedirectEmail, setMailRedirectEmail] = React.useState<string | null>(null)
+  const [isTogglingMail, setIsTogglingMail] = React.useState<boolean>(false)
+
+  // Turn Off / Forwarding Dialog State
+  const [isRedirectDialogOpen, setIsRedirectDialogOpen] = React.useState<boolean>(false)
+  const [redirectStep, setRedirectStep] = React.useState<"input" | "verify">("input")
+  const [targetEmail, setTargetEmail] = React.useState<string>("")
+  const [otpCode, setOtpCode] = React.useState<string>("")
+  const [otpSending, setOtpSending] = React.useState<boolean>(false)
+  const [otpVerifying, setOtpVerifying] = React.useState<boolean>(false)
+  const [resendCountdown, setResendCountdown] = React.useState<number>(0)
+
+  // Countdown timer for resending OTP
+  React.useEffect(() => {
+    if (resendCountdown <= 0) return
+    const timer = setInterval(() => {
+      setResendCountdown((prev) => prev - 1)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [resendCountdown])
+
   const fetchEmails = React.useCallback(async (f: Folder) => {
     setLoading(true)
     try {
@@ -410,6 +438,8 @@ export default function TeacherEmailClient() {
       }
       const data = await res.json()
       setAddress(data.address || "")
+      setIsMailEnabled(data.isMailEnabled !== undefined ? data.isMailEnabled : true)
+      setMailRedirectEmail(data.mailRedirectEmail || null)
       let list: Email[] = data.emails || []
       if (f === "starred") {
         list = list.filter((e) => e.isStarred)
@@ -421,6 +451,110 @@ export default function TeacherEmailClient() {
       setLoading(false)
     }
   }, [])
+
+  const handleToggleMail = async (checked: boolean) => {
+    if (!checked) {
+      // User wants to turn OFF mail -> open dialog to input forwarding address
+      setTargetEmail(mailRedirectEmail || "")
+      setOtpCode("")
+      setRedirectStep("input")
+      setIsRedirectDialogOpen(true)
+    } else {
+      // User wants to turn ON mail -> call toggle endpoint
+      setIsTogglingMail(true)
+      try {
+        const res = await fetch("/api/backend/api/teacher/email/forwarding/toggle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enabled: true }),
+        })
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}))
+          throw new Error(errData.detail || errData.error || "Failed to turn on mail")
+        }
+        setIsMailEnabled(true)
+        toast.success("School inbox turned back on. Incoming emails will arrive here.")
+        fetchEmails(folder)
+      } catch (err: any) {
+        toast.error(err.message || "Failed to turn on mail")
+      } finally {
+        setIsTogglingMail(false)
+      }
+    }
+  }
+
+  const handleSendForwardingOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    const cleanEmail = targetEmail.trim().toLowerCase()
+    if (!cleanEmail) {
+      toast.error("Please enter a valid redirection email address")
+      return
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(cleanEmail)) {
+      toast.error("Please enter a valid email format (e.g. name@gmail.com)")
+      return
+    }
+    if (address && cleanEmail === address.toLowerCase()) {
+      toast.error("Cannot redirect to your own school email address")
+      return
+    }
+
+    setOtpSending(true)
+    try {
+      const res = await fetch("/api/backend/api/teacher/email/forwarding/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: cleanEmail }),
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.detail || errData.error || "Failed to send verification code")
+      }
+      toast.success(`Verification code sent to ${cleanEmail}`)
+      setRedirectStep("verify")
+      setResendCountdown(60)
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send verification code")
+    } finally {
+      setOtpSending(false)
+    }
+  }
+
+  const handleVerifyForwardingOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    const cleanOtp = otpCode.trim()
+    if (cleanOtp.length < 6) {
+      toast.error("Please enter the complete 6-digit verification code")
+      return
+    }
+
+    setOtpVerifying(true)
+    try {
+      const res = await fetch("/api/backend/api/teacher/email/forwarding/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: targetEmail.trim().toLowerCase(),
+          otp: cleanOtp,
+        }),
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.detail || errData.error || "Invalid verification code")
+      }
+      const data = await res.json()
+      setIsMailEnabled(false)
+      setMailRedirectEmail(data.mailRedirectEmail || targetEmail.trim().toLowerCase())
+      setIsRedirectDialogOpen(false)
+      toast.success(`Mail turned off! All incoming emails will now be redirected to ${targetEmail.trim().toLowerCase()}.`)
+      fetchEmails(folder)
+    } catch (err: any) {
+      toast.error(err.message || "Verification failed")
+    } finally {
+      setOtpVerifying(false)
+    }
+  }
 
   React.useEffect(() => {
     fetchEmails(folder)
@@ -892,8 +1026,8 @@ export default function TeacherEmailClient() {
           </div>
         )}
 
-        {/* Action buttons row */}
-        <div className="flex items-center justify-between sm:justify-start gap-2 mb-2 sm:mb-3 shrink-0">
+        {/* Action buttons and Mail Status row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 mb-2 sm:mb-3 shrink-0">
           <div className="flex items-center gap-2">
             <Button
               onClick={() => fetchEmails(folder)}
@@ -919,7 +1053,110 @@ export default function TeacherEmailClient() {
               Compose
             </Button>
           </div>
+
+          {/* Mail Status & Forwarding Toggle */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 px-3 py-1.5 rounded-lg border border-border/70 bg-card/80 shadow-xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className={cn(
+                "p-1.5 rounded-md shrink-0",
+                isMailEnabled
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+              )}>
+                {isMailEnabled ? <Mail className="h-3.5 w-3.5" /> : <ArrowRightLeft className="h-3.5 w-3.5" />}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-medium text-foreground">
+                    {isMailEnabled ? "School Mail" : "Mail Turned Off"}
+                  </span>
+                  {isMailEnabled ? (
+                    <Badge variant="outline" className="text-[10px] h-4 px-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 font-medium">
+                      Active
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] h-4 px-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 font-medium">
+                      Redirected
+                    </Badge>
+                  )}
+                </div>
+                {!isMailEnabled && mailRedirectEmail && (
+                  <span className="text-[10px] text-muted-foreground truncate max-w-[160px] sm:max-w-[220px]" title={mailRedirectEmail}>
+                    Redirecting to: {mailRedirectEmail}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {!isMailEnabled && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setTargetEmail(mailRedirectEmail || "")
+                    setOtpCode("")
+                    setRedirectStep("input")
+                    setIsRedirectDialogOpen(true)
+                  }}
+                  className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                  title="Change redirection email"
+                >
+                  Edit
+                </Button>
+              )}
+              <Switch
+                checked={isMailEnabled}
+                onCheckedChange={handleToggleMail}
+                disabled={isTogglingMail}
+                className="cursor-pointer"
+                title={isMailEnabled ? "Click to turn off school mail and redirect incoming emails" : "Click to turn school mail back on"}
+              />
+            </div>
+          </div>
         </div>
+
+        {/* Informational Banner when Mail is Turned Off */}
+        {!isMailEnabled && mailRedirectEmail && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 mb-1 shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0">
+                <ArrowRightLeft className="h-4 w-4" />
+              </div>
+              <div className="text-xs">
+                <div className="font-semibold text-amber-950 dark:text-amber-100">
+                  School Mail Inbox is Turned Off
+                </div>
+                <div className="text-amber-800/90 dark:text-amber-300/80 mt-0.5">
+                  All incoming emails sent to <span className="font-mono text-[11px] underline decoration-amber-400/50">{address}</span> are automatically redirected to <strong className="font-semibold text-amber-950 dark:text-amber-100">{mailRedirectEmail}</strong>.
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setTargetEmail(mailRedirectEmail || "")
+                  setOtpCode("")
+                  setRedirectStep("input")
+                  setIsRedirectDialogOpen(true)
+                }}
+                className="h-7 text-xs border-amber-500/30 hover:bg-amber-500/10 cursor-pointer"
+              >
+                Change Redirection
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleToggleMail(true)}
+                disabled={isTogglingMail}
+                className="h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+              >
+                Turn On Mail
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Split View Container: Table Left, Selected Email Detail Right */}
         <div className="flex-1 flex gap-4 min-h-0 min-w-0">
@@ -1381,6 +1618,191 @@ export default function TeacherEmailClient() {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Turn Off Mail & Redirection Dialog */}
+        <Dialog
+          open={isRedirectDialogOpen}
+          onOpenChange={(open) => {
+            if (!open && !otpSending && !otpVerifying) {
+              setIsRedirectDialogOpen(false)
+              setOtpCode("")
+              setRedirectStep("input")
+            }
+          }}
+        >
+          <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden border border-border shadow-xl">
+            {redirectStep === "input" ? (
+              <form onSubmit={handleSendForwardingOtp}>
+                <div className="p-6 pb-4">
+                  <div className="flex items-start gap-3.5 mb-4">
+                    <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0 border border-amber-500/20">
+                      <MailX className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <DialogTitle className="text-base font-semibold text-foreground">
+                        Turn Off Mail & Set Redirection
+                      </DialogTitle>
+                      <DialogDescription className="text-xs text-muted-foreground mt-1">
+                        Turn off this school inbox and redirect all incoming emails directly to your personal or work email address.
+                      </DialogDescription>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-1">
+                    {/* Source School Mail notice */}
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/50 border border-border/60 text-xs">
+                      <span className="text-muted-foreground">Current School Inbox:</span>
+                      <span className="font-mono font-medium text-foreground">{address || "your-school@blazeneuro.com"}</span>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="redirect-email" className="text-xs font-semibold text-foreground">
+                        Forward incoming emails to:
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="redirect-email"
+                          type="email"
+                          placeholder="e.g. yourname@gmail.com"
+                          value={targetEmail}
+                          onChange={(e) => setTargetEmail(e.target.value)}
+                          className="h-9 text-xs pl-8 rounded-lg"
+                          required
+                          autoFocus
+                          disabled={otpSending}
+                        />
+                        <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        We will send a 6-digit verification code to this address to verify ownership before redirecting.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="px-6 py-3 bg-muted/30 border-t border-border flex items-center justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs cursor-pointer"
+                    onClick={() => {
+                      setIsRedirectDialogOpen(false)
+                      setOtpCode("")
+                    }}
+                    disabled={otpSending}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="h-8 text-xs cursor-pointer gap-1.5"
+                    disabled={otpSending || !targetEmail.trim()}
+                  >
+                    {otpSending ? <Spinner className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
+                    {otpSending ? "Sending OTP..." : "Send Verification Code"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyForwardingOtp}>
+                <div className="p-6 pb-4">
+                  <div className="flex items-start gap-3.5 mb-4">
+                    <div className="p-3 rounded-xl bg-primary/10 text-primary shrink-0 border border-primary/20">
+                      <ShieldCheck className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <DialogTitle className="text-base font-semibold text-foreground">
+                        Verify Redirection Address
+                      </DialogTitle>
+                      <DialogDescription className="text-xs text-muted-foreground mt-1">
+                        We've sent a 6-digit code to <strong className="text-foreground">{targetEmail}</strong>. Enter it below to turn off this mail and redirect incoming emails.
+                      </DialogDescription>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-1">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="otp-code" className="text-xs font-semibold text-foreground">
+                          6-Digit Verification Code
+                        </Label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRedirectStep("input")
+                            setOtpCode("")
+                          }}
+                          className="text-[11px] text-primary hover:underline cursor-pointer"
+                        >
+                          Change Email
+                        </button>
+                      </div>
+                      <Input
+                        id="otp-code"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        placeholder="••••••"
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        className="h-11 text-center font-mono text-xl tracking-[0.5em] font-bold rounded-lg"
+                        required
+                        autoFocus
+                        disabled={otpVerifying}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pt-1">
+                      <span className="text-[11px] text-muted-foreground">Didn't receive the code?</span>
+                      {resendCountdown > 0 ? (
+                        <span className="text-[11px] text-muted-foreground font-mono">
+                          Resend in {resendCountdown}s
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleSendForwardingOtp()}
+                          disabled={otpSending}
+                          className="text-[11px] text-primary hover:underline font-medium cursor-pointer"
+                        >
+                          Resend Code
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="px-6 py-3 bg-muted/30 border-t border-border flex items-center justify-between sm:justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs cursor-pointer"
+                    onClick={() => {
+                      setRedirectStep("input")
+                      setOtpCode("")
+                    }}
+                    disabled={otpVerifying}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="h-8 text-xs cursor-pointer gap-1.5 bg-amber-600 hover:bg-amber-700 text-white"
+                    disabled={otpVerifying || otpCode.trim().length !== 6}
+                  >
+                    {otpVerifying && <Spinner className="h-3.5 w-3.5" />}
+                    {otpVerifying ? "Verifying..." : "Verify & Turn Off Mail"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
           </DialogContent>
         </Dialog>
 

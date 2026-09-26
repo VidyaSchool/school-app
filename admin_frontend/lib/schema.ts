@@ -38,6 +38,8 @@ export const userProfile = pgTable('user_profile', {
   teacherCategory: text('teacher_category'), // 'PRT', 'TGT', 'PGT'
   activitySkills: text('activity_skills'), // JSON string e.g. ["Games / Sports", "Computer"]
   isAvailableForSubstitution: boolean('is_available_for_substitution').notNull().default(true),
+  isMailEnabled: boolean('is_mail_enabled').notNull().default(true),
+  mailRedirectEmail: text('mail_redirect_email'),
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

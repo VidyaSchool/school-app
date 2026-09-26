@@ -447,16 +447,6 @@ SEARCH_INDEX: List[Dict[str, Any]] = [
         "roles": ["account"],
         "keywords": ["settings", "tax configuration", "late fine rate", "finance rules"]
     },
-
-    # --- Common Portal Pages ---
-    {
-        "id": "page-common-community",
-        "title": "Community Chat Room",
-        "content": "Join the live school community conversation, chat real-time, and read notices.",
-        "url": "/community",
-        "roles": ["student", "teacher", "librarian", "admin", "account"],
-        "keywords": ["chat", "community", "messages", "live talk", "group chat"]
-    },
 ]
 
 def extract_text_from_widgets(widgets_data: Any) -> str:

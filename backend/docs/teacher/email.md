@@ -64,3 +64,22 @@ The AI Assistant is designed to assist teachers with email management and commun
 - **Sending Email**: Dispatched via Resend API using the domain format `<username>@blazeneuro.com`.
 - **Inbound Emails**: Webhook received at `/api/teacher/email/inbound`.
 - **Body Fetching**: Inbound webhooks query `https://api.resend.com/emails/receiving/{email_id}` to retrieve complete HTML and plain text bodies.
+
+---
+
+## 5. Mail Turn-off & External Redirection (Forwarding)
+
+Teachers can turn off their school email inbox and redirect all incoming mail to an external email address (e.g. Gmail, Outlook).
+
+### Workflow:
+1. **Toggle Mail Status**:
+   - The user toggles the Mail switch on `/teacher/[username]/email`.
+   - If turning off, a modal dialog appears asking for the target email address where mail should be redirected.
+2. **OTP Verification**:
+   - Once submitted, a 6-digit verification code is generated with a 10-minute expiry and sent to the target email via Resend (`POST /api/teacher/email/forwarding/send-otp`).
+   - The user enters the code in the verification step (`POST /api/teacher/email/forwarding/verify-otp`).
+3. **Redirection Active**:
+   - `user_profile.is_mail_enabled` is set to `False` and `user_profile.mail_redirect_email` is set to the verified email.
+   - Any inbound webhook message received at `/api/teacher/email/inbound` is automatically forwarded via Resend to the verified external email with a forwarding banner and original reply-to header preserved.
+   - In the frontend, an alert banner displays the active forwarding address with options to turn the school inbox back on or update the destination email.
+

@@ -70,7 +70,6 @@ async def broadcast_substitution_update(date_str: str):
     """Notify all connected clients about substitution updates."""
     try:
         from main import sio
-        await sio.emit("substitution_updated", {"date": date_str}, room="community")
         await sio.emit("substitution_updated", {"date": date_str}, broadcast=True)
     except Exception as e:
         print(f"Socket emit substitution_updated error: {e}")
