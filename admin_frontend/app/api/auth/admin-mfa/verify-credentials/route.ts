@@ -89,13 +89,28 @@ export async function POST(req: NextRequest) {
       .from(verificationTable)
       .where(eq(verificationTable.identifier, `admin_device:${existingUser.id}`))
 
+    let savedCredentialId: string | null = null
+    let savedDeviceName: string | null = null
+
+    if (registeredDevices.length > 0 && registeredDevices[0]?.value) {
+      try {
+        const parsed = JSON.parse(registeredDevices[0].value)
+        savedCredentialId = parsed.credentialId || null
+        savedDeviceName = parsed.deviceName || null
+      } catch {
+        savedCredentialId = registeredDevices[0].value
+      }
+    }
+
     return NextResponse.json({
       success: true,
       requiresMfa: true,
       tempToken,
       email: existingUser.email,
       name: existingUser.name,
-      hasPasskey: registeredDevices.length > 0,
+      hasPasskey: Boolean(savedCredentialId),
+      credentialId: savedCredentialId,
+      deviceName: savedDeviceName,
     })
   } catch (err: any) {
     console.error("[verify-credentials] Internal error:", err)

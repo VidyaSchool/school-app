@@ -6,7 +6,7 @@ import crypto from "crypto"
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, tempToken, credentialId, deviceName } = await req.json()
+    const { email, tempToken, credentialId, deviceName, isRegistration } = await req.json()
 
     if (!email || !tempToken || !credentialId) {
       return NextResponse.json(
@@ -52,15 +52,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Access denied: Unauthorized role" }, { status: 403 })
     }
 
-    // 4. Save/Update physical device registration in verification table
+    // 4. Save/Verify physical device registration in verification table
     const deviceKey = `admin_device:${user.id}`
-    const deviceExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year
-    const devicePayload = JSON.stringify({
-      credentialId,
-      deviceName: deviceName || "Physical Security Key / Biometric Sensor",
-      verifiedAt: new Date().toISOString(),
-    })
-
     const existingDevice = await db
       .select()
       .from(verificationTable)
@@ -68,15 +61,49 @@ export async function POST(req: NextRequest) {
       .then((res) => res[0])
 
     if (existingDevice) {
-      await db
-        .update(verificationTable)
-        .set({
-          value: devicePayload,
-          expiresAt: deviceExpiresAt,
-          updatedAt: new Date(),
-        })
-        .where(eq(verificationTable.identifier, deviceKey))
+      let parsed: { credentialId?: string; deviceName?: string } = {}
+      try {
+        parsed = JSON.parse(existingDevice.value)
+      } catch {
+        parsed = { credentialId: existingDevice.value }
+      }
+
+      if (!isRegistration) {
+        // Authenticating existing device: verify presented credential matches stored credential
+        if (parsed.credentialId && parsed.credentialId !== credentialId) {
+          return NextResponse.json(
+            { error: "Security key verification mismatch. Please authenticate with your registered device." },
+            { status: 401 }
+          )
+        }
+        // Do NOT overwrite existing registered credential - keep it safe!
+      } else {
+        // Only set if not already registered
+        if (!parsed.credentialId) {
+          const deviceExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+          const devicePayload = JSON.stringify({
+            credentialId,
+            deviceName: deviceName || "Physical Security Key / Biometric Sensor",
+            verifiedAt: new Date().toISOString(),
+          })
+          await db
+            .update(verificationTable)
+            .set({
+              value: devicePayload,
+              expiresAt: deviceExpiresAt,
+              updatedAt: new Date(),
+            })
+            .where(eq(verificationTable.identifier, deviceKey))
+        }
+      }
     } else {
+      // First-time registration: store and keep it safe
+      const deviceExpiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+      const devicePayload = JSON.stringify({
+        credentialId,
+        deviceName: deviceName || "Physical Security Key / Biometric Sensor",
+        verifiedAt: new Date().toISOString(),
+      })
       await db.insert(verificationTable).values({
         id: crypto.randomUUID(),
         identifier: deviceKey,

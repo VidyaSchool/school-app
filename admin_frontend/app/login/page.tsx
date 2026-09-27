@@ -32,6 +32,17 @@ const QR_TTL = 180 // seconds
 type QRStatus = "idle" | "generating" | "active" | "scanned" | "confirmed" | "expired"
 type AuthStep = "credentials" | "mfa_select" | "mfa_otp"
 
+function base64UrlToBuffer(base64url: string): ArrayBuffer {
+  const padding = "=".repeat((4 - (base64url.length % 4)) % 4)
+  const base64 = (base64url + padding).replace(/-/g, "+").replace(/_/g, "/")
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray.buffer
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -44,6 +55,8 @@ export default function LoginPage() {
   const [tempToken, setTempToken] = useState<string | null>(null)
   const [adminName, setAdminName] = useState<string>("")
   const [hasPasskey, setHasPasskey] = useState(false)
+  const [registeredCredentialId, setRegisteredCredentialId] = useState<string | null>(null)
+  const [registeredDeviceName, setRegisteredDeviceName] = useState<string | null>(null)
 
   // OTP State
   const [otp, setOtp] = useState("")
@@ -242,6 +255,8 @@ export default function LoginPage() {
       setTempToken(data.tempToken)
       setAdminName(data.name || "")
       setHasPasskey(Boolean(data.hasPasskey))
+      setRegisteredCredentialId(data.credentialId || null)
+      setRegisteredDeviceName(data.deviceName || null)
       setAuthStep("mfa_select")
       toast.info("Credentials verified. Please choose a secondary verification method.")
     } catch (err: any) {
@@ -325,24 +340,36 @@ export default function LoginPage() {
 
       let credential: any = null
 
-      // If user has a registered passkey, attempt to verify it first
-      if (hasPasskey) {
+      // If user has a registered passkey, ONLY verify it (do not recreate)
+      if (hasPasskey && registeredCredentialId) {
+        let allowCredentials: PublicKeyCredentialDescriptor[] | undefined
         try {
-          credential = await navigator.credentials.get({
-            publicKey: {
-              challenge: challengeBytes,
-              rpId: window.location.hostname,
-              userVerification: "preferred",
-              timeout: 60000,
+          const buffer = base64UrlToBuffer(registeredCredentialId)
+          allowCredentials = [
+            {
+              id: buffer,
+              type: "public-key",
             },
-          })
-        } catch (getErr) {
-          console.warn("Could not get existing device credential, attempting enrollment:", getErr)
+          ]
+        } catch {
+          allowCredentials = undefined
         }
-      }
 
-      // If no existing credential was matched, enroll & physically store the passkey on this device
-      if (!credential) {
+        credential = await navigator.credentials.get({
+          publicKey: {
+            challenge: challengeBytes,
+            rpId: window.location.hostname,
+            userVerification: "preferred",
+            timeout: 60000,
+            ...(allowCredentials ? { allowCredentials } : {}),
+          },
+        })
+
+        if (!credential) {
+          throw new Error("Device authentication was cancelled or failed.")
+        }
+      } else {
+        // First-time enrollment: create key once and keep it safe
         toast.info("Touch your sensor or security key to register this device...")
         const userIdBytes = new TextEncoder().encode(email)
         credential = await navigator.credentials.create({
@@ -369,10 +396,10 @@ export default function LoginPage() {
             timeout: 60000,
           },
         })
-      }
 
-      if (!credential) {
-        throw new Error("Device authentication cancelled or failed.")
+        if (!credential) {
+          throw new Error("Device registration was cancelled or failed.")
+        }
       }
 
       const deviceName = navigator.userAgent.includes("Mac")
@@ -389,6 +416,7 @@ export default function LoginPage() {
           tempToken,
           credentialId: credential.id,
           deviceName,
+          isRegistration: !hasPasskey,
         }),
       })
 
@@ -397,7 +425,11 @@ export default function LoginPage() {
         throw new Error(data.error || "Failed to verify physical device")
       }
 
-      toast.success("Physical device verified! Redirecting to Admin Portal...")
+      toast.success(
+        hasPasskey
+          ? "Hardware key verified! Redirecting to Admin Portal..."
+          : "Hardware key registered and verified! Redirecting to Admin Portal..."
+      )
       window.location.href = data.redirectUrl || "/admin"
     } catch (err: any) {
       if (err.name === "NotAllowedError") {
@@ -569,15 +601,7 @@ export default function LoginPage() {
                           </svg>
                         </Button>
 
-                        <Button
-                          variant="outline"
-                          type="button"
-                          onClick={enterQRMode}
-                          className="h-10 border-border bg-background hover:bg-muted text-foreground transition-all duration-200 cursor-pointer"
-                          title="Sign in with QR Code"
-                        >
-                          <Smartphone className="h-4 w-4" />
-                        </Button>
+
                       </div>
 
                       <div className="space-y-3">
@@ -602,13 +626,12 @@ export default function LoginPage() {
                 {authStep === "mfa_select" && (
                   <div className="space-y-6 animate-fade-in">
                     <div className="flex flex-col items-center text-center gap-2">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 shadow-inner">
-                        <ShieldCheck className="h-6 w-6" />
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs">
+                        <ShieldCheck className="h-5 w-5" />
                       </div>
-                      <h1 className="text-2xl font-bold tracking-tight">Verify Your Identity</h1>
-                      <p className="text-xs text-muted-foreground max-w-xs">
-                        Select a secondary verification method to complete your administrator sign in as{" "}
-                        <strong className="text-foreground">{email}</strong>
+                      <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Two-Factor Authentication</h1>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">
+                        Confirm identity for <strong className="text-zinc-900 dark:text-zinc-100 font-medium">{email}</strong>
                       </p>
                     </div>
 
@@ -617,28 +640,30 @@ export default function LoginPage() {
                       <div
                         onClick={!deviceAuthenticating ? handleDeviceAuth : undefined}
                         className={cn(
-                          "group relative flex items-start gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/40 hover:border-primary/50 transition-all cursor-pointer shadow-xs",
-                          deviceAuthenticating && "opacity-70 pointer-events-none border-primary bg-primary/5"
+                          "group relative flex items-start gap-3.5 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60 hover:border-zinc-900 dark:hover:border-zinc-100 transition-all duration-150 cursor-pointer shadow-2xs",
+                          deviceAuthenticating && "opacity-60 pointer-events-none border-zinc-900 dark:border-zinc-100"
                         )}
                       >
-                        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+                        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 group-hover:bg-zinc-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 transition-colors shadow-2xs">
                           {deviceAuthenticating ? (
-                            <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <Fingerprint className="h-5 w-5" />
+                            <Fingerprint className="h-4 w-4" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm text-foreground">
-                              {hasPasskey ? "Authenticate with Saved Device" : "Authenticate with Physical Device"}
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                              {hasPasskey ? "Hardware Authenticator" : "Setup Hardware Key"}
                             </span>
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                              Hardware
+                            <span className="text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300">
+                              {hasPasskey ? "SAVED" : "REGISTER"}
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            Use Touch ID, Windows Hello, Face ID, or a hardware security key (saved physically in your device&apos;s secure hardware).
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                            {hasPasskey
+                              ? (registeredDeviceName ? `Use ${registeredDeviceName}.` : "Touch ID, Windows Hello, or YubiKey.")
+                              : "Register your security key once to keep your account safe."}
                           </p>
                         </div>
                       </div>
@@ -647,26 +672,26 @@ export default function LoginPage() {
                       <div
                         onClick={!sendingOtp ? handleSendEmailOtp : undefined}
                         className={cn(
-                          "group relative flex items-start gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/40 hover:border-primary/50 transition-all cursor-pointer shadow-xs",
-                          sendingOtp && "opacity-70 pointer-events-none border-primary bg-primary/5"
+                          "group relative flex items-start gap-3.5 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60 hover:border-zinc-900 dark:hover:border-zinc-100 transition-all duration-150 cursor-pointer shadow-2xs",
+                          sendingOtp && "opacity-60 pointer-events-none border-zinc-900 dark:border-zinc-100"
                         )}
                       >
-                        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
+                        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 group-hover:bg-zinc-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 transition-colors shadow-2xs">
                           {sendingOtp ? (
-                            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            <Mail className="h-5 w-5" />
+                            <Mail className="h-4 w-4" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm text-foreground">Send OTP to Email</span>
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-                              Email Code
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Email Passcode</span>
+                            <span className="text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300">
+                              OTP
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                            Receive a 6-digit one-time verification passcode sent to {email}.
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 leading-relaxed">
+                            Send a 6-digit one-time code to {email}.
                           </p>
                         </div>
                       </div>
@@ -679,7 +704,7 @@ export default function LoginPage() {
                           setAuthStep("credentials")
                           setTempToken(null)
                         }}
-                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 font-medium transition-colors cursor-pointer"
                       >
                         <ArrowLeft className="h-3.5 w-3.5" />
                         Back to credentials
@@ -692,18 +717,18 @@ export default function LoginPage() {
                 {authStep === "mfa_otp" && (
                   <div className="space-y-6 animate-fade-in">
                     <div className="flex flex-col items-center text-center gap-2">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 border border-blue-500/20 shadow-inner">
-                        <MailCheck className="h-6 w-6" />
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xs">
+                        <MailCheck className="h-5 w-5" />
                       </div>
-                      <h1 className="text-2xl font-bold tracking-tight">Enter Verification Code</h1>
-                      <p className="text-xs text-muted-foreground max-w-xs">
-                        A 6-digit code has been sent to <strong className="text-foreground">{email}</strong>
+                      <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Enter Verification Code</h1>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xs">
+                        We sent a 6-digit code to <strong className="text-zinc-900 dark:text-zinc-100 font-medium">{email}</strong>
                       </p>
                     </div>
 
                     <form onSubmit={handleVerifyEmailOtp} className="space-y-5">
                       <Field>
-                        <FieldLabel htmlFor="otp" className="text-center block">
+                        <FieldLabel htmlFor="otp" className="text-center block text-xs font-medium text-zinc-600 dark:text-zinc-400">
                           6-Digit One-Time Passcode
                         </FieldLabel>
                         <Input
@@ -712,10 +737,10 @@ export default function LoginPage() {
                           inputMode="numeric"
                           autoComplete="one-time-code"
                           maxLength={6}
-                          placeholder="••••••"
+                          placeholder="000000"
                           value={otp}
                           onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                          className="text-center text-2xl tracking-[0.5em] font-mono font-bold h-12"
+                          className="text-center text-2xl tracking-[0.5em] font-mono font-medium h-12 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 text-zinc-900 dark:text-zinc-100 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
                           required
                           autoFocus
                         />
@@ -723,20 +748,26 @@ export default function LoginPage() {
 
                       <Button
                         type="submit"
-                        className="w-full font-semibold cursor-pointer"
+                        className="w-full font-medium h-10 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
                         disabled={verifyingOtp || otp.length !== 6}
                       >
-                        {verifyingOtp ? "Verifying..." : "Verify & Sign In"}
+                        {verifyingOtp ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" /> Verifying...
+                          </span>
+                        ) : (
+                          "Verify & Continue"
+                        )}
                       </Button>
 
-                      <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                      <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 pt-1">
                         <button
                           type="button"
                           onClick={() => setAuthStep("mfa_select")}
-                          className="hover:text-foreground inline-flex items-center gap-1 transition-colors cursor-pointer"
+                          className="hover:text-zinc-900 dark:hover:text-zinc-100 inline-flex items-center gap-1 transition-colors cursor-pointer"
                         >
                           <ArrowLeft className="h-3.5 w-3.5" />
-                          Choose another method
+                          Other methods
                         </button>
 
                         <button
@@ -744,11 +775,11 @@ export default function LoginPage() {
                           onClick={handleSendEmailOtp}
                           disabled={otpCooldown > 0 || sendingOtp}
                           className={cn(
-                            "hover:text-primary transition-colors cursor-pointer font-medium",
-                            otpCooldown > 0 && "cursor-not-allowed opacity-50"
+                            "hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer font-medium underline underline-offset-4",
+                            otpCooldown > 0 && "cursor-not-allowed opacity-50 no-underline"
                           )}
                         >
-                          {otpCooldown > 0 ? `Resend code in ${otpCooldown}s` : "Resend Code"}
+                          {otpCooldown > 0 ? `Resend in ${otpCooldown}s` : "Resend Code"}
                         </button>
                       </div>
                     </form>
