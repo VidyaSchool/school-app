@@ -32,6 +32,7 @@ import com.vidyaschool.app.ui.screens.TeacherScreen
 import com.vidyaschool.app.ui.screens.AccountsScreen
 import com.vidyaschool.app.ui.screens.LibraryHubScreen
 import com.vidyaschool.app.ui.screens.AdminScreen
+import com.vidyaschool.app.ui.screens.LibrarianScreen
 import com.vidyaschool.app.ui.screens.FeeReceiptScreen
 import com.vidyaschool.app.ui.screens.AcademicMarksScreen
 import com.vidyaschool.app.ui.theme.VidyaSchoolTheme
@@ -344,6 +345,7 @@ fun VidyaSchoolApp(viewModel: AuthViewModel, sessionManager: SessionManager) {
                 "admin" -> "admin"
                 "teacher" -> "teacher"
                 "accounts", "account" -> "accounts"
+                "librarian" -> "librarian"
                 else -> "student"
             }
         } else {
@@ -394,6 +396,7 @@ fun VidyaSchoolApp(viewModel: AuthViewModel, sessionManager: SessionManager) {
                             "admin" -> "admin"
                             "teacher" -> "teacher"
                             "accounts", "account" -> "accounts"
+                            "librarian" -> "librarian"
                             else -> "student"
                         }
                         navController.navigate(destination) {
@@ -470,6 +473,25 @@ fun VidyaSchoolApp(viewModel: AuthViewModel, sessionManager: SessionManager) {
             }
             composable("admin") {
                 AdminScreen(
+                    provider = sessionManager.getProvider() ?: "",
+                    email = sessionManager.getEmail() ?: "",
+                    name = sessionManager.getName() ?: "",
+                    avatarUrl = sessionManager.getAvatarUrl() ?: "",
+                    themeMode = themeMode,
+                    onThemeChange = { mode ->
+                        sessionManager.setThemeMode(mode)
+                        themeMode = mode
+                    },
+                    onLogout = {
+                        sessionManager.clearSession()
+                        navController.navigate("welcome") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable("librarian") {
+                LibrarianScreen(
                     provider = sessionManager.getProvider() ?: "",
                     email = sessionManager.getEmail() ?: "",
                     name = sessionManager.getName() ?: "",

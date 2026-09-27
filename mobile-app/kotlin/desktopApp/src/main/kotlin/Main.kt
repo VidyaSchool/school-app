@@ -60,6 +60,7 @@ fun main() = application {
                     "admin" -> "admin"
                     "teacher" -> "teacher"
                     "accounts", "account" -> "accounts"
+                    "librarian" -> "librarian"
                     else -> "student"
                 }
             }
@@ -77,6 +78,7 @@ fun main() = application {
                         "admin" -> "admin"
                         "teacher" -> "teacher"
                         "accounts", "account" -> "accounts"
+                        "librarian" -> "librarian"
                         else -> "student"
                     }
                 } else {
@@ -133,6 +135,7 @@ fun main() = application {
                                     "admin" -> "admin"
                                     "teacher" -> "teacher"
                                     "accounts", "account" -> "accounts"
+                                    "librarian" -> "librarian"
                                     else -> "student"
                                 }
                                 currentScreen = dest
@@ -217,6 +220,26 @@ fun main() = application {
                             provider = user?.provider ?: sessionStorage.getProvider() ?: "",
                             email = user?.email ?: sessionStorage.getEmail() ?: "",
                             name = user?.name ?: sessionStorage.getName() ?: "Administrator",
+                            avatarUrl = user?.avatarUrl ?: sessionStorage.getAvatarUrl() ?: "",
+                            themeMode = sessionStorage.getThemeMode(),
+                            onThemeChange = { mode ->
+                                sessionStorage.setThemeMode(mode)
+                                showToast("Theme changed to $mode")
+                            },
+                            onLogout = {
+                                sharedViewModel.logout()
+                                currentScreen = "welcome"
+                            },
+                            showToast = showToast
+                        )
+                    }
+                    
+                    "librarian" -> {
+                        val user = currentUser
+                        LibrarianScreen(
+                            provider = user?.provider ?: sessionStorage.getProvider() ?: "",
+                            email = user?.email ?: sessionStorage.getEmail() ?: "",
+                            name = user?.name ?: sessionStorage.getName() ?: "Librarian",
                             avatarUrl = user?.avatarUrl ?: sessionStorage.getAvatarUrl() ?: "",
                             themeMode = sessionStorage.getThemeMode(),
                             onThemeChange = { mode ->

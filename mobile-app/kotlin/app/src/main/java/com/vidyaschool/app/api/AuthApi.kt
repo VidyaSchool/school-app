@@ -12,6 +12,7 @@ import retrofit2.http.Query
 import retrofit2.http.Header
 import retrofit2.http.Streaming
 import retrofit2.http.DELETE
+import retrofit2.http.HTTP
 
 data class StudentNote(
     val id: String,
@@ -312,6 +313,60 @@ interface AuthApi {
         @Header("Authorization") authHeader: String,
         @Body request: StudentRenewRequest
     ): Response<Map<String, Any?>>
+
+    // Librarian Endpoints
+    @GET("api/librarian/books")
+    suspend fun getLibrarianBooks(
+        @Header("Authorization") authHeader: String,
+        @Query("search") search: String? = null
+    ): Response<List<LibraryBookItem>>
+
+    @GET("api/librarian/books/lookup")
+    suspend fun lookupBookByIsbn(
+        @Header("Authorization") authHeader: String,
+        @Query("isbn") isbn: String
+    ): Response<BookLookupResponse>
+
+    @POST("api/librarian/books")
+    suspend fun createBook(
+        @Header("Authorization") authHeader: String,
+        @Body request: CreateBookRequest
+    ): Response<Map<String, Any?>>
+
+    @PATCH("api/librarian/books")
+    suspend fun updateBook(
+        @Header("Authorization") authHeader: String,
+        @Body request: UpdateBookRequest
+    ): Response<Map<String, Any?>>
+
+    @HTTP(method = "DELETE", path = "api/librarian/books", hasBody = true)
+    suspend fun deleteBook(
+        @Header("Authorization") authHeader: String,
+        @Body request: DeleteBookRequest
+    ): Response<Map<String, Any?>>
+
+    @GET("api/librarian/borrowings")
+    suspend fun getLibrarianBorrowings(
+        @Header("Authorization") authHeader: String
+    ): Response<List<LibrarianBorrowingItem>>
+
+    @POST("api/librarian/borrowings")
+    suspend fun issueBook(
+        @Header("Authorization") authHeader: String,
+        @Body request: IssueBookRequest
+    ): Response<Map<String, Any?>>
+
+    @PATCH("api/librarian/borrowings")
+    suspend fun borrowingAction(
+        @Header("Authorization") authHeader: String,
+        @Body request: BorrowingActionRequest
+    ): Response<Map<String, Any?>>
+
+    @GET("api/librarian/resolve-user")
+    suspend fun resolveBorrower(
+        @Header("Authorization") authHeader: String,
+        @Query("q") query: String
+    ): Response<ResolveBorrowerResponse>
 
     @GET("api/notices")
     suspend fun getNotices(
@@ -706,4 +761,107 @@ data class WeatherResponse(
     @SerializedName("cache_type") val cacheType: String? = null,
     @SerializedName("cached_at") val cachedAt: String? = null,
     val message: String? = null
+)
+
+// ── Librarian Models ────────────────────────────────────────────────────────
+
+data class LibraryBookItem(
+    val id: String,
+    val title: String,
+    val author: String,
+    val isbn: String,
+    val category: String = "General",
+    val quantity: Int = 1,
+    @SerializedName("available_quantity") val availableQuantity: Int? = null,
+    @SerializedName("availableQuantity") val availableQuantityCamel: Int? = null,
+    val location: String? = null,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("updated_at") val updatedAt: String? = null,
+    @SerializedName("cover_url") val coverUrl: String? = null
+) {
+    val actualAvailable: Int
+        get() = availableQuantity ?: availableQuantityCamel ?: quantity
+}
+
+data class BookLookupResponse(
+    val found: Boolean = false,
+    val source: String? = null,
+    val book: LibraryBookItem? = null,
+    @SerializedName("in_library") val inLibrary: Boolean = false,
+    @SerializedName("auto_registered") val autoRegistered: Boolean = false,
+    @SerializedName("cover_url") val coverUrl: String? = null,
+    val message: String? = null
+)
+
+data class CreateBookRequest(
+    val title: String,
+    val author: String,
+    val isbn: String,
+    val category: String = "General",
+    val quantity: Int = 1,
+    val location: String? = null
+)
+
+data class UpdateBookRequest(
+    val id: String,
+    val title: String,
+    val author: String,
+    val isbn: String,
+    val category: String,
+    val quantity: Int,
+    val location: String? = null
+)
+
+data class DeleteBookRequest(
+    val id: String
+)
+
+data class LibrarianBorrowingItem(
+    val id: String,
+    val bookId: String,
+    val userId: String,
+    val issueDate: String,
+    val dueDate: String,
+    val returnDate: String? = null,
+    val renewalsCount: Int = 0,
+    val status: String,
+    val bookTitle: String,
+    val bookAuthor: String,
+    val bookIsbn: String,
+    val studentName: String,
+    val studentEmail: String,
+    val studentUsername: String? = null,
+    val studentClass: String? = null,
+    val studentSection: String? = null
+)
+
+data class IssueBookRequest(
+    val studentIdentifier: String,
+    val bookId: String,
+    val dueDate: String
+)
+
+data class BorrowingActionRequest(
+    val id: String,
+    val action: String // "return" or "renew"
+)
+
+data class ResolvedBorrowerUser(
+    val id: String,
+    val name: String,
+    val email: String,
+    val role: String,
+    val username: String? = null,
+    val admissionNumber: String? = null,
+    @SerializedName("class") val studentClass: String? = null,
+    val section: String? = null,
+    val activeLoansCount: Int = 0,
+    val overdueLoansCount: Int = 0,
+    val canBorrow: Boolean = true,
+    val statusNotice: String? = null
+)
+
+data class ResolveBorrowerResponse(
+    val found: Boolean = false,
+    val user: ResolvedBorrowerUser? = null
 )
