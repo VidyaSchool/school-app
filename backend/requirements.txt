@@ -46,3 +46,4 @@ base58==2.1.1
 qrcode[pil]
 boto3>=1.35.0
 sarvamai==0.1.31a4
+redis>=5.0.0

@@ -79,15 +79,18 @@ export default function LibrarianBorrowingsPage() {
   const [studentIdentifier, setStudentIdentifier] = React.useState("")
   const [resolvedUser, setResolvedUser] = React.useState<any>(null)
   const [selectedBookId, setSelectedBookId] = React.useState("")
+  const [selectedBookDetails, setSelectedBookDetails] = React.useState<any>(null)
   const [bookSearchQuery, setBookSearchQuery] = React.useState("")
   const [showBookRecommendations, setShowBookRecommendations] = React.useState(false)
+  const [isSearchingIsbn, setIsSearchingIsbn] = React.useState(false)
+  const [isbnNotice, setIsbnNotice] = React.useState<{ text: string; type: "success" | "info" | "error" } | null>(null)
   const [dueDate, setDueDate] = React.useState<Date | undefined>(undefined)
   const [isSaving, setIsSaving] = React.useState(false)
 
   // Actions states
   const [isActionProcessing, setIsActionProcessing] = React.useState<string | null>(null)
 
-  // Debounce hook to resolve student name or teacher name based on username/email
+  // Debounce hook to resolve student/teacher based on admission number, username, or email
   React.useEffect(() => {
     if (!studentIdentifier.trim()) {
       setResolvedUser(null)
@@ -95,7 +98,7 @@ export default function LibrarianBorrowingsPage() {
     }
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/backend/api/librarian/resolve-user?q=${encodeURIComponent(studentIdentifier)}`)
+        const res = await fetch(`/api/backend/api/librarian/resolve-user?q=${encodeURIComponent(studentIdentifier.trim())}`)
         if (res.ok) {
           const data = await res.json()
           if (data.found) {
@@ -108,6 +111,72 @@ export default function LibrarianBorrowingsPage() {
     }, 300)
     return () => clearTimeout(timer)
   }, [studentIdentifier])
+
+  // Lookup Book details by ISBN (scans Redis -> DB -> OpenLibrary API with auto-persistence)
+  const handleLookupIsbn = async (inputIsbn?: string) => {
+    const raw = (inputIsbn !== undefined ? inputIsbn : bookSearchQuery).trim()
+    const clean = raw.replace(/[^0-9X]/gi, '').toUpperCase()
+    if (!clean || clean.length < 8) {
+      setIsbnNotice({ text: "Please enter a valid 10 or 13-digit ISBN (e.g. 9780140328721).", type: "error" })
+      return
+    }
+
+    setIsSearchingIsbn(true)
+    setIsbnNotice(null)
+
+    try {
+      const res = await fetch(`/api/backend/api/librarian/books/lookup?isbn=${encodeURIComponent(clean)}`)
+      const data = await res.json()
+      if (res.ok && data.found && data.book) {
+        setSelectedBookId(data.book.id)
+        setSelectedBookDetails(data.book)
+        setShowBookRecommendations(false)
+
+        if (data.source === "openlibrary" || data.auto_registered) {
+          setIsbnNotice({
+            text: `Book fetched from OpenLibrary & stored in school DB! Ready to issue.`,
+            type: "success"
+          })
+          toast.success("Retrieved from OpenLibrary and saved to database!", {
+            description: `"${data.book.title}" by ${data.book.author}`
+          })
+        } else if (data.source === "redis_cache") {
+          setIsbnNotice({
+            text: `Retrieved from Redis Cache: in stock and ready to issue.`,
+            type: "info"
+          })
+        } else {
+          setIsbnNotice({
+            text: `Found in school catalog: ${data.book.available_quantity ?? data.book.availableQuantity ?? 1} copies available.`,
+            type: "info"
+          })
+        }
+      } else {
+        setIsbnNotice({
+          text: data.message || `No book found for ISBN ${clean} in database or OpenLibrary.`,
+          type: "error"
+        })
+      }
+    } catch (err: any) {
+      setIsbnNotice({
+        text: "Error searching book catalog. Please verify your connection.",
+        type: "error"
+      })
+    } finally {
+      setIsSearchingIsbn(false)
+    }
+  }
+
+  // Auto-detect ISBN entry (10 or 13 digits)
+  React.useEffect(() => {
+    const clean = bookSearchQuery.replace(/[^0-9X]/gi, '').toUpperCase()
+    if ((clean.length === 10 || clean.length === 13) && !selectedBookId) {
+      const timer = setTimeout(() => {
+        handleLookupIsbn(clean)
+      }, 400)
+      return () => clearTimeout(timer)
+    }
+  }, [bookSearchQuery, selectedBookId])
 
   // Filter available books based on search query
   const bookRecommendations = React.useMemo(() => {
@@ -138,8 +207,7 @@ export default function LibrarianBorrowingsPage() {
       const res = await fetch("/api/backend/api/librarian/books")
       if (res.ok) {
         const data = await res.json()
-        // Filter for books with available stock
-        setAvailableBooks(data.filter((b: any) => b.availableQuantity > 0))
+        setAvailableBooks(data.filter((b: any) => (b.available_quantity ?? b.availableQuantity) > 0))
       }
     } catch (err) {}
   }
@@ -152,8 +220,11 @@ export default function LibrarianBorrowingsPage() {
     setStudentIdentifier("")
     setResolvedUser(null)
     setSelectedBookId("")
+    setSelectedBookDetails(null)
     setBookSearchQuery("")
     setShowBookRecommendations(false)
+    setIsSearchingIsbn(false)
+    setIsbnNotice(null)
     
     // Default due date: 14 days from today
     const fourteenDaysLater = new Date()
@@ -167,8 +238,14 @@ export default function LibrarianBorrowingsPage() {
   const handleIssueBook = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!studentIdentifier.trim() || !selectedBookId || !dueDate) {
-      toast.error("Please fill in all fields")
+      toast.error("Please fill in all fields (Borrower, ISBN/Book, Due Date)")
       return
+    }
+
+    if (resolvedUser && resolvedUser.canBorrow === false) {
+      if (!confirm(`Warning: ${resolvedUser.statusNotice || "Student has borrowing restrictions"}. Proceed anyway?`)) {
+        return
+      }
     }
 
     setIsSaving(true)
@@ -186,7 +263,11 @@ export default function LibrarianBorrowingsPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || data.error || "Failed to issue book")
 
-      toast.success("Book issued successfully to student")
+      toast.success(
+        selectedBookDetails
+          ? `Issued "${selectedBookDetails.title}" to ${resolvedUser?.name || studentIdentifier}`
+          : "Book issued successfully to student"
+      )
       setIsFormOpen(false)
       fetchBorrowings()
     } catch (err: any) {
@@ -519,64 +600,183 @@ export default function LibrarianBorrowingsPage() {
 
               {/* Form Content */}
               <form onSubmit={handleIssueBook} className="space-y-4 pt-2">
+                {/* Borrower Resolution Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="student-id" className="text-xs font-semibold text-foreground flex items-center gap-1">
-                    Student/Teacher Username or Email *
+                  <label htmlFor="student-id" className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <span>Borrower (Admission No, Username, or Email) *</span>
+                    {resolvedUser && (
+                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                        VERIFIED
+                      </span>
+                    )}
                   </label>
-                  <Input
-                    id="student-id"
-                    type="text"
-                    placeholder="e.g. arjun_mehta or arjun@example.com"
-                    value={studentIdentifier}
-                    onChange={(e) => setStudentIdentifier(e.target.value)}
-                    className="h-10 rounded-lg border-border bg-card/60 text-xs"
-                    required
-                  />
+                  <div className="relative">
+                    <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
+                    <Input
+                      id="student-id"
+                      type="text"
+                      placeholder="e.g. ADM-2024-001 or arjun_mehta or student email..."
+                      value={studentIdentifier}
+                      onChange={(e) => setStudentIdentifier(e.target.value)}
+                      className="pl-9 h-10 rounded-lg border-border bg-card/60 text-xs"
+                      required
+                    />
+                  </div>
+
                   {resolvedUser && (
-                    <div className="mt-1.5 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
-                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                      Confirmed: {resolvedUser.name} ({resolvedUser.role === 'student' ? 'Student' : resolvedUser.role === 'teacher' ? 'Teacher' : resolvedUser.role})
+                    <div className="mt-1.5 p-2.5 rounded-lg bg-zinc-100/80 dark:bg-zinc-900/80 border border-border text-xs flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-foreground flex items-center gap-1.5">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          {resolvedUser.name}
+                        </span>
+                        <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                          {resolvedUser.role}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                        {resolvedUser.admissionNumber && (
+                          <span>ADM: {resolvedUser.admissionNumber}</span>
+                        )}
+                        {resolvedUser.class && (
+                          <span>• Class {resolvedUser.class}{resolvedUser.section ? `-${resolvedUser.section}` : ""}</span>
+                        )}
+                        <span>• Active Loans: {resolvedUser.activeLoansCount ?? 0}/5</span>
+                      </div>
+                      {resolvedUser.statusNotice && (
+                        <div className={cn(
+                          "text-[10px] font-semibold mt-0.5",
+                          resolvedUser.canBorrow ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+                        )}>
+                          {resolvedUser.statusNotice}
+                        </div>
+                      )}
                     </div>
                   )}
+
                   {!resolvedUser && studentIdentifier.trim() && (
                     <div className="mt-1.5 p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-600 dark:text-rose-400 font-medium">
-                      No registered user found with this username/email.
+                      No user found matching this admission number, username, or email.
                     </div>
                   )}
                 </div>
 
+                {/* Book ISBN Search & Lookup Input */}
                 <div className="space-y-1.5 flex flex-col relative">
-                  <label className="text-xs font-semibold text-foreground flex items-center gap-1">
-                    Select Available Book *
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                      Select Available Book *
+                    </label>
+                    {bookSearchQuery.trim() && !selectedBookId && (
+                      <button
+                        type="button"
+                        onClick={() => handleLookupIsbn()}
+                        disabled={isSearchingIsbn}
+                        className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                      >
+                        {isSearchingIsbn ? <Spinner className="h-3 w-3" /> : <Search className="h-3 w-3" />}
+                        Fetch ISBN
+                      </button>
+                    )}
+                  </div>
                   <div className="relative">
                     <BookOpen className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
                     <Input
                       type="text"
-                      placeholder="Type to search book title, author, or ISBN..."
+                      placeholder="ISBN (e.g. 9780140328721, 0451524934 or book title)..."
                       value={bookSearchQuery}
                       onChange={(e) => {
                         setBookSearchQuery(e.target.value)
                         setShowBookRecommendations(true)
-                        if (selectedBookId) setSelectedBookId("")
+                        if (selectedBookId) {
+                          setSelectedBookId("")
+                          setSelectedBookDetails(null)
+                        }
+                        setIsbnNotice(null)
                       }}
                       onFocus={() => setShowBookRecommendations(true)}
                       onBlur={() => {
-                        // Small timeout to allow mouse down on list items
                         setTimeout(() => setShowBookRecommendations(false), 200)
                       }}
-                      className="pl-9 pr-8 h-10 rounded-lg border-border bg-card/60 text-xs w-full"
-                      required
+                      className="pl-9 pr-16 h-10 rounded-lg border-border bg-card/60 text-xs w-full font-mono"
+                      required={!selectedBookId}
                     />
-                    {selectedBookId && (
-                      <div className="absolute right-3 top-2.5 text-emerald-600 dark:text-emerald-400">
-                        <CheckCircle2 className="h-4.5 w-4.5" />
-                      </div>
-                    )}
+                    <div className="absolute right-2 top-2.5 flex items-center gap-1.5">
+                      {isSearchingIsbn && <Spinner className="h-4 w-4 text-primary" />}
+                      {selectedBookDetails && !isSearchingIsbn && (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      )}
+                      {bookSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBookSearchQuery("")
+                            setSelectedBookId("")
+                            setSelectedBookDetails(null)
+                            setIsbnNotice(null)
+                          }}
+                          className="text-muted-foreground hover:text-foreground p-0.5 cursor-pointer"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
+                  {/* ISBN Notice */}
+                  {isbnNotice && (
+                    <div className={cn(
+                      "p-2 rounded-lg text-xs font-medium flex items-center gap-1.5 mt-1",
+                      isbnNotice.type === "success" && "bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
+                      isbnNotice.type === "info" && "bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400",
+                      isbnNotice.type === "error" && "bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400"
+                    )}>
+                      {isbnNotice.type === "success" && <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
+                      {isbnNotice.type === "info" && <Clock className="h-3.5 w-3.5 shrink-0" />}
+                      {isbnNotice.type === "error" && <AlertTriangle className="h-3.5 w-3.5 shrink-0" />}
+                      <span>{isbnNotice.text}</span>
+                    </div>
+                  )}
+
+                  {/* Selected Book Card Preview */}
+                  {selectedBookDetails && (
+                    <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 flex items-start gap-3 mt-1.5">
+                      {selectedBookDetails.cover_url ? (
+                        <img
+                          src={selectedBookDetails.cover_url}
+                          alt={selectedBookDetails.title}
+                          className="h-14 w-10 object-cover rounded shadow-xs shrink-0"
+                        />
+                      ) : (
+                        <div className="h-14 w-10 bg-zinc-200 dark:bg-zinc-800 rounded flex items-center justify-center shrink-0 text-muted-foreground">
+                          <BookOpen className="h-5 w-5" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <h4 className="font-bold text-xs text-foreground truncate">{selectedBookDetails.title}</h4>
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-border bg-card">
+                            ISBN: {selectedBookDetails.isbn}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate">by {selectedBookDetails.author}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            {selectedBookDetails.available_quantity ?? selectedBookDetails.availableQuantity ?? 1} Available
+                          </span>
+                          {selectedBookDetails.category && (
+                            <span className="text-[10px] text-muted-foreground">
+                              • {selectedBookDetails.category}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Recommendations Dropdown */}
-                  {showBookRecommendations && (
+                  {showBookRecommendations && !selectedBookId && (
                     <div className="absolute z-50 left-0 right-0 top-16 max-h-48 overflow-y-auto rounded-lg border border-border bg-card shadow-lg divide-y divide-border/60">
                       {bookRecommendations.length > 0 ? (
                         bookRecommendations.map((book) => (
@@ -585,7 +785,8 @@ export default function LibrarianBorrowingsPage() {
                             type="button"
                             onMouseDown={() => {
                               setSelectedBookId(book.id)
-                              setBookSearchQuery(`${book.title} (by ${book.author}) - ISBN: ${book.isbn}`)
+                              setSelectedBookDetails(book)
+                              setBookSearchQuery(`${book.title} (ISBN: ${book.isbn})`)
                               setShowBookRecommendations(false)
                             }}
                             className="w-full text-left px-4 py-2.5 text-xs hover:bg-muted transition-colors flex flex-col gap-0.5 cursor-pointer"
@@ -598,12 +799,37 @@ export default function LibrarianBorrowingsPage() {
                         ))
                       ) : (
                         <div className="px-4 py-3 text-xs text-muted-foreground text-center">
-                          No matching available books in stock
+                          {bookSearchQuery.trim() ? "No local stock match. Tap 'Fetch ISBN' to search OpenLibrary." : "No matching books in stock"}
                         </div>
                       )}
                     </div>
                   )}
                 </div>
+
+                {/* Smart Borrower-Book Link Preview */}
+                {resolvedUser && selectedBookDetails && (
+                  <div className="p-3 rounded-xl border border-primary/20 bg-primary/5 space-y-1.5">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-primary font-bold flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <GitPullRequest className="h-3 w-3" /> Smart Loan Link
+                      </span>
+                      <span className="text-emerald-600 dark:text-emerald-400">READY TO CHECKOUT</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs gap-2">
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-foreground truncate">{selectedBookDetails.title}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">ISBN: {selectedBookDetails.isbn}</span>
+                      </div>
+                      <span className="text-muted-foreground font-bold">&rarr;</span>
+                      <div className="flex flex-col items-end min-w-0">
+                        <span className="font-bold text-foreground truncate">{resolvedUser.name}</span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {resolvedUser.class ? `Class ${resolvedUser.class}` : resolvedUser.role}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-1.5 flex flex-col">
                   <label htmlFor="due-date" className="text-xs font-semibold text-foreground flex items-center gap-1 mb-1">

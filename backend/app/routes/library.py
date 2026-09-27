@@ -1,4 +1,7 @@
 import uuid
+import re
+import logging
+import httpx
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -7,7 +10,19 @@ from typing import Optional, List, Dict, Any
 
 from app.core.auth import require_role, get_current_user
 from app.core.database import get_db
+from app.core.cache import (
+    get_cached_book_by_isbn,
+    set_cached_book_by_isbn,
+    get_cached_book_by_title,
+    set_cached_book_by_title,
+    invalidate_books_cache,
+    normalize_isbn,
+    get_cache,
+    set_cache,
+)
 from models import User, UserProfile, LibraryBook, LibraryBookIssue
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["library"])
 
@@ -49,6 +64,11 @@ async def get_books(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    cache_key = f"books:search:{search.strip().lower()}" if search else "books:all"
+    cached = get_cache(cache_key)
+    if cached is not None:
+        return cached
+
     stmt = select(LibraryBook)
     if search:
         search_filter = f"%{search}%"
@@ -61,7 +81,172 @@ async def get_books(
             )
         )
     books = db.exec(stmt).all()
-    return books
+    result = [
+        {
+            "id": b.id,
+            "title": b.title,
+            "author": b.author,
+            "isbn": b.isbn,
+            "category": b.category,
+            "quantity": b.quantity,
+            "available_quantity": b.available_quantity,
+            "availableQuantity": b.available_quantity,
+            "location": b.location,
+            "created_at": b.created_at.isoformat() if b.created_at else None,
+            "updated_at": b.updated_at.isoformat() if b.updated_at else None,
+        }
+        for b in books
+    ]
+    set_cache(cache_key, result, ttl=300)
+    return result
+
+@router.get("/librarian/books/lookup")
+async def lookup_book_by_isbn(
+    isbn: str = Query(..., description="ISBN-10 or ISBN-13 of the book"),
+    current_user: User = Depends(require_role(["librarian", "admin"])),
+    db: Session = Depends(get_db)
+):
+    clean_isbn = normalize_isbn(isbn)
+    if not clean_isbn or len(clean_isbn) < 7:
+        raise HTTPException(status_code=400, detail="Invalid ISBN format")
+
+    # 1. First scan in Redis cache (blazing fast, zero DB scan)
+    cached = get_cached_book_by_isbn(clean_isbn)
+    if cached:
+        return {
+            "found": True,
+            "source": "redis_cache",
+            "book": cached,
+            "in_library": True
+        }
+
+    # 2. First scan in our API / DB
+    book = db.exec(
+        select(LibraryBook).where(
+            or_(
+                LibraryBook.isbn == clean_isbn,
+                LibraryBook.isbn == isbn.strip()
+            )
+        )
+    ).first()
+
+    if book:
+        book_data = {
+            "id": book.id,
+            "title": book.title,
+            "author": book.author,
+            "isbn": book.isbn,
+            "category": book.category,
+            "quantity": book.quantity,
+            "available_quantity": book.available_quantity,
+            "availableQuantity": book.available_quantity,
+            "location": book.location
+        }
+        set_cached_book_by_isbn(clean_isbn, book_data)
+        set_cached_book_by_title(book.title, book_data)
+        return {
+            "found": True,
+            "source": "database",
+            "book": book_data,
+            "in_library": True
+        }
+
+    # 3. Not in DB -> Query OpenLibrary API (https://openlibrary.org/search.json?isbn=...)
+    openlib_url = f"https://openlibrary.org/search.json?isbn={clean_isbn}"
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(openlib_url)
+            if resp.status_code == 200:
+                data = resp.json()
+                docs = data.get("docs", [])
+                if docs:
+                    doc = docs[0]
+                    title = doc.get("title", "Unknown Title")
+                    authors = doc.get("author_name", [])
+                    author = ", ".join(authors) if authors else "Unknown Author"
+                    subjects = doc.get("subject", [])
+                    category = subjects[0] if subjects else "General"
+                    if len(category) > 50:
+                        category = category[:50]
+                    cover_i = doc.get("cover_i")
+                    cover_url = f"https://covers.openlibrary.org/b/id/{cover_i}-M.jpg" if cover_i else None
+
+                    # Check if book title already exists under another edition/ISBN
+                    existing_title = db.exec(select(LibraryBook).where(LibraryBook.title == title)).first()
+                    if existing_title:
+                        b_data = {
+                            "id": existing_title.id,
+                            "title": existing_title.title,
+                            "author": existing_title.author,
+                            "isbn": existing_title.isbn,
+                            "category": existing_title.category,
+                            "quantity": existing_title.quantity,
+                            "available_quantity": existing_title.available_quantity,
+                            "availableQuantity": existing_title.available_quantity,
+                            "location": existing_title.location,
+                            "cover_url": cover_url
+                        }
+                        set_cached_book_by_isbn(clean_isbn, b_data)
+                        return {
+                            "found": True,
+                            "source": "database",
+                            "book": b_data,
+                            "in_library": True,
+                            "cover_url": cover_url
+                        }
+
+                    # Store in DB as instructed:
+                    # "once librarian put the ISBN store that detail in db also so in future if book info needed first scan in our api then go to this openlibrary one"
+                    book_id = f"bk-{uuid.uuid4()}"
+                    new_book = LibraryBook(
+                        id=book_id,
+                        title=title,
+                        author=author,
+                        isbn=clean_isbn,
+                        category=category,
+                        quantity=1,
+                        available_quantity=1,
+                        location="Main Library",
+                        created_at=datetime.utcnow(),
+                        updated_at=datetime.utcnow()
+                    )
+                    db.add(new_book)
+                    db.commit()
+                    db.refresh(new_book)
+
+                    book_data = {
+                        "id": new_book.id,
+                        "title": new_book.title,
+                        "author": new_book.author,
+                        "isbn": new_book.isbn,
+                        "category": new_book.category,
+                        "quantity": new_book.quantity,
+                        "available_quantity": new_book.available_quantity,
+                        "availableQuantity": new_book.available_quantity,
+                        "location": new_book.location,
+                        "cover_url": cover_url
+                    }
+
+                    # Cache in Redis for instant subsequent lookups
+                    set_cached_book_by_isbn(clean_isbn, book_data)
+                    set_cached_book_by_title(title, book_data)
+                    invalidate_books_cache()
+
+                    return {
+                        "found": True,
+                        "source": "openlibrary",
+                        "book": book_data,
+                        "in_library": True,
+                        "auto_registered": True,
+                        "cover_url": cover_url
+                    }
+    except Exception as e:
+        logger.warning(f"Error querying OpenLibrary for ISBN {clean_isbn}: {e}")
+
+    return {
+        "found": False,
+        "message": f"No book details found for ISBN {clean_isbn} in library or OpenLibrary"
+    }
 
 @router.post("/librarian/books")
 async def add_book(
@@ -69,7 +254,8 @@ async def add_book(
     current_user: User = Depends(require_role(["librarian", "admin"])),
     db: Session = Depends(get_db)
 ):
-    existing = db.exec(select(LibraryBook).where(LibraryBook.isbn == book_data.isbn)).first()
+    clean_isbn = normalize_isbn(book_data.isbn)
+    existing = db.exec(select(LibraryBook).where(LibraryBook.isbn == clean_isbn)).first()
     if existing:
         raise HTTPException(status_code=400, detail="Book with this ISBN already exists")
 
@@ -78,7 +264,7 @@ async def add_book(
         id=book_id,
         title=book_data.title,
         author=book_data.author,
-        isbn=book_data.isbn,
+        isbn=clean_isbn,
         category=book_data.category,
         quantity=book_data.quantity,
         available_quantity=book_data.quantity,
@@ -88,6 +274,22 @@ async def add_book(
     )
     db.add(new_book)
     db.commit()
+
+    saved_data = {
+        "id": book_id,
+        "title": new_book.title,
+        "author": new_book.author,
+        "isbn": new_book.isbn,
+        "category": new_book.category,
+        "quantity": new_book.quantity,
+        "available_quantity": new_book.available_quantity,
+        "availableQuantity": new_book.available_quantity,
+        "location": new_book.location
+    }
+    set_cached_book_by_isbn(clean_isbn, saved_data)
+    set_cached_book_by_title(new_book.title, saved_data)
+    invalidate_books_cache()
+
     return {"success": True, "id": book_id}
 
 @router.patch("/librarian/books")
@@ -100,8 +302,9 @@ async def update_book(
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
 
-    if book_data.isbn != book.isbn:
-        existing = db.exec(select(LibraryBook).where(LibraryBook.isbn == book_data.isbn)).first()
+    clean_isbn = normalize_isbn(book_data.isbn)
+    if clean_isbn != book.isbn:
+        existing = db.exec(select(LibraryBook).where(LibraryBook.isbn == clean_isbn)).first()
         if existing:
             raise HTTPException(status_code=400, detail="Another book with this ISBN already exists")
 
@@ -110,7 +313,7 @@ async def update_book(
 
     book.title = book_data.title
     book.author = book_data.author
-    book.isbn = book_data.isbn
+    book.isbn = clean_isbn
     book.category = book_data.category
     book.quantity = book_data.quantity
     book.available_quantity = new_available
@@ -119,6 +322,22 @@ async def update_book(
 
     db.add(book)
     db.commit()
+
+    saved_data = {
+        "id": book.id,
+        "title": book.title,
+        "author": book.author,
+        "isbn": book.isbn,
+        "category": book.category,
+        "quantity": book.quantity,
+        "available_quantity": book.available_quantity,
+        "availableQuantity": book.available_quantity,
+        "location": book.location
+    }
+    set_cached_book_by_isbn(clean_isbn, saved_data)
+    set_cached_book_by_title(book.title, saved_data)
+    invalidate_books_cache()
+
     return {"success": True}
 
 @router.delete("/librarian/books")
@@ -133,6 +352,7 @@ async def delete_book(
     
     db.delete(book)
     db.commit()
+    invalidate_books_cache()
     return {"success": True}
 
 @router.get("/librarian/borrowings")
@@ -181,22 +401,56 @@ async def issue_book(
     current_user: User = Depends(require_role(["librarian", "admin"])),
     db: Session = Depends(get_db)
 ):
+    clean_id = issue_data.studentIdentifier.strip()
     stmt = select(User).outerjoin(UserProfile, User.id == UserProfile.user_id).where(
         or_(
-            User.email == issue_data.studentIdentifier,
-            UserProfile.username == issue_data.studentIdentifier
+            User.id == clean_id,
+            User.email.ilike(clean_id),
+            UserProfile.username.ilike(clean_id),
+            UserProfile.admission_number.ilike(clean_id)
         )
     )
     student = db.exec(stmt).first()
     if not student:
-        raise HTTPException(status_code=400, detail="Student not found in system. Please verify username/email.")
+        raise HTTPException(
+            status_code=400, 
+            detail="Student/borrower not found. Please verify admission number, username, or email."
+        )
 
+    # Resolve book by ID or ISBN
     book = db.get(LibraryBook, issue_data.bookId)
     if not book:
-        raise HTTPException(status_code=400, detail="Book not found")
+        clean_isbn = normalize_isbn(issue_data.bookId)
+        book = db.exec(select(LibraryBook).where(LibraryBook.isbn == clean_isbn)).first()
+
+    if not book:
+        raise HTTPException(status_code=400, detail="Book not found in library catalog")
     
     if book.available_quantity <= 0:
         raise HTTPException(status_code=400, detail="Book is currently out of stock (no copies available)")
+
+    # Smart check: verify user doesn't already hold an active copy of this exact book
+    already_holding = db.query(LibraryBookIssue).filter(
+        LibraryBookIssue.user_id == student.id,
+        LibraryBookIssue.book_id == book.id,
+        LibraryBookIssue.status == "active"
+    ).first()
+    if already_holding:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"{student.name} already holds an active copy of '{book.title}'."
+        )
+
+    # Smart check: borrowing quota limit
+    active_count = db.query(LibraryBookIssue).filter(
+        LibraryBookIssue.user_id == student.id,
+        LibraryBookIssue.status == "active"
+    ).count()
+    if active_count >= 5:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{student.name} has reached the maximum borrowing limit of 5 active books."
+        )
 
     issue_id = f"iss-{uuid.uuid4()}"
     try:
@@ -206,7 +460,7 @@ async def issue_book(
 
     new_issue = LibraryBookIssue(
         id=issue_id,
-        book_id=issue_data.bookId,
+        book_id=book.id,
         user_id=student.id,
         issue_date=datetime.utcnow(),
         due_date=due_dt,
@@ -217,11 +471,32 @@ async def issue_book(
     )
     db.add(new_issue)
 
-    book.available_quantity -= 1
+    book.available_quantity = max(0, book.available_quantity - 1)
     db.add(book)
-
     db.commit()
-    return {"success": True, "id": issue_id}
+
+    # Synchronize Redis cache with fresh available stock
+    invalidate_books_cache()
+    cached_book = {
+        "id": book.id,
+        "title": book.title,
+        "author": book.author,
+        "isbn": book.isbn,
+        "category": book.category,
+        "quantity": book.quantity,
+        "available_quantity": book.available_quantity,
+        "availableQuantity": book.available_quantity,
+        "location": book.location
+    }
+    set_cached_book_by_isbn(book.isbn, cached_book)
+    set_cached_book_by_title(book.title, cached_book)
+
+    return {
+        "success": True, 
+        "id": issue_id,
+        "book": {"id": book.id, "title": book.title, "isbn": book.isbn},
+        "student": {"id": student.id, "name": student.name, "email": student.email}
+    }
 
 @router.patch("/librarian/borrowings")
 async def handle_borrowing_action(
@@ -250,6 +525,19 @@ async def handle_borrowing_action(
             db.add(book)
 
         db.commit()
+        invalidate_books_cache()
+        if book:
+            set_cached_book_by_isbn(book.isbn, {
+                "id": book.id,
+                "title": book.title,
+                "author": book.author,
+                "isbn": book.isbn,
+                "category": book.category,
+                "quantity": book.quantity,
+                "available_quantity": book.available_quantity,
+                "availableQuantity": book.available_quantity,
+                "location": book.location
+            })
         return {"success": True}
 
     elif data.action == "renew":
@@ -274,20 +562,34 @@ async def resolve_user(
     current_user: User = Depends(require_role(["librarian", "admin"])),
     db: Session = Depends(get_db)
 ):
-    if not q.strip():
+    clean_q = q.strip()
+    if not clean_q:
         return {"found": False}
 
     stmt = db.query(User, UserProfile).outerjoin(
         UserProfile, User.id == UserProfile.user_id
     ).filter(
         or_(
-            User.email == q.strip(),
-            UserProfile.username == q.strip()
+            User.email == clean_q,
+            UserProfile.username == clean_q,
+            UserProfile.admission_number == clean_q,
+            User.id == clean_q,
+            User.email.ilike(clean_q),
+            UserProfile.username.ilike(clean_q),
+            UserProfile.admission_number.ilike(clean_q)
         )
     ).first()
 
     if stmt:
         user_obj, profile = stmt
+        # Smart linking metrics
+        active_issues = db.query(LibraryBookIssue).filter(
+            LibraryBookIssue.user_id == user_obj.id,
+            LibraryBookIssue.status == "active"
+        ).all()
+        active_count = len(active_issues)
+        overdue_count = sum(1 for iss in active_issues if iss.due_date < datetime.utcnow())
+
         return {
             "found": True,
             "user": {
@@ -295,7 +597,18 @@ async def resolve_user(
                 "name": user_obj.name,
                 "email": user_obj.email,
                 "role": user_obj.role,
-                "username": profile.username if profile else None
+                "username": profile.username if profile else None,
+                "admissionNumber": profile.admission_number if profile else None,
+                "class": profile.class_ if profile else None,
+                "section": profile.section if profile else None,
+                "activeLoansCount": active_count,
+                "overdueLoansCount": overdue_count,
+                "canBorrow": active_count < 5 and overdue_count == 0,
+                "statusNotice": (
+                    f"Warning: {overdue_count} overdue book(s)" if overdue_count > 0 
+                    else "Borrowing quota full (5 books)" if active_count >= 5 
+                    else "Eligible for book issue"
+                )
             }
         }
     return {"found": False}
