@@ -34,7 +34,7 @@
     "date-fns": "^4.4.0",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",
-    "framer-motion": "^12.41.0",
+    "framer-motion": "^13.2.0",
     "fumadocs-core": "^16.10.5",
     "fumadocs-ui": "^16.10.5",
     "jspdf": "^4.2.1",
