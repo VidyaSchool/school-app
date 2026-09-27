@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useSWRFetch } from "@/hooks/use-swr-fetch"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { GraduationCap } from "lucide-react"
 
@@ -48,58 +49,59 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function AcademicPerformanceChart() {
-  const [chartData, setChartData] = React.useState<ChartDataPoint[]>([])
-  const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
+  const { data: rawData, error: fetchError, isLoading: loading } = useSWRFetch<Record<string, TermMarks>>("/api/backend/api/student/marks")
 
-  React.useEffect(() => {
-    fetch("/api/backend/api/student/marks")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load performance data")
-        return res.json()
-      })
-      .then((data: Record<string, TermMarks>) => {
-        const entries = Object.values(data)
+  const chartData = React.useMemo<ChartDataPoint[]>(() => {
+    if (!rawData) return []
+    const entries = Object.values(rawData)
+    if (!entries.length) return []
 
-        if (!entries.length) {
-          setChartData([])
-          setLoading(false)
-          return
+    return entries
+      .slice() // Don't mutate original
+      .reverse() // Oldest exam first → left-to-right trend
+      .map((term) => {
+        const totalScore = term.subjects.reduce((s, m) => s + m.score, 0)
+        const totalMax = term.subjects.reduce((s, m) => s + m.maxScore, 0)
+        const yourPct =
+          totalMax > 0 ? Math.round((totalScore / totalMax) * 1000) / 10 : 0
+
+        const avgClassScore = term.subjects.reduce(
+          (s, m) => s + m.classAverage,
+          0
+        )
+        const classAvgPct =
+          totalMax > 0
+            ? Math.round((avgClassScore / totalMax) * 1000) / 10
+            : 0
+
+        return {
+          exam: term.termName,
+          yourScore: yourPct,
+          classAverage: classAvgPct,
         }
-
-        // Transform each exam into a chart data point
-        const transformed: ChartDataPoint[] = entries
-          .reverse() // Oldest exam first → left-to-right trend
-          .map((term) => {
-            const totalScore = term.subjects.reduce((s, m) => s + m.score, 0)
-            const totalMax = term.subjects.reduce((s, m) => s + m.maxScore, 0)
-            const yourPct =
-              totalMax > 0 ? Math.round((totalScore / totalMax) * 1000) / 10 : 0
-
-            const avgClassScore = term.subjects.reduce(
-              (s, m) => s + m.classAverage,
-              0
-            )
-            const classAvgPct =
-              totalMax > 0
-                ? Math.round((avgClassScore / totalMax) * 1000) / 10
-                : 0
-
-            return {
-              exam: term.termName,
-              yourScore: yourPct,
-              classAverage: classAvgPct,
-            }
-          })
-
-        setChartData(transformed)
-        setLoading(false)
       })
-      .catch((err) => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [])
+  }, [rawData])
+
+  const error = fetchError?.message ?? null
+
+  if (loading) {
+    return (
+      <div className="px-4 lg:px-6 py-1.5">
+        <Card className="@container/card">
+          <CardHeader>
+            <CardTitle>Academic Performance</CardTitle>
+            <CardDescription>Overall score trend across exams</CardDescription>
+          </CardHeader>
+          <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-[250px] w-full rounded-lg" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   if (error || chartData.length === 0) {
     return (

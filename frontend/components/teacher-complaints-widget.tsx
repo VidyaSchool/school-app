@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { AlertTriangle, CheckCircle2, RefreshCw, Wifi, WifiOff, FileText, Download, Calendar } from "lucide-react"
 import { io, Socket } from "socket.io-client"
 import { toast } from "sonner"
+import { useSWRFetch } from "@/hooks/use-swr-fetch"
 
 interface Complaint {
   id: string
@@ -23,30 +24,16 @@ interface Complaint {
 }
 
 export function TeacherComplaintsWidget() {
-  const [complaints, setComplaints] = React.useState<Complaint[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const { data: fetchedComplaints, isLoading: swrLoading, mutate } = useSWRFetch<Complaint[]>("/api/complaints?role=teacher")
+  const [localComplaints, setLocalComplaints] = React.useState<Complaint[]>([])
   const [resolving, setResolving] = React.useState<string | null>(null)
   const [connected, setConnected] = React.useState(false)
   const [newIds, setNewIds] = React.useState<Set<string>>(new Set())
   const socketRef = React.useRef<Socket | null>(null)
 
-  const fetchComplaints = React.useCallback(async () => {
-    try {
-      const res = await fetch("/api/complaints?role=teacher")
-      if (!res.ok) throw new Error("Failed to fetch")
-      const data: Complaint[] = await res.json()
-      setComplaints(data)
-    } catch {
-      // silent — socket will retry
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  // Initial fetch
-  React.useEffect(() => {
-    fetchComplaints()
-  }, [fetchComplaints])
+  // Merge SWR data with local optimistic updates
+  const complaints = localComplaints.length > 0 ? localComplaints : (fetchedComplaints ?? [])
+  const loading = swrLoading && localComplaints.length === 0
 
   // Socket.IO for real-time new complaints
   React.useEffect(() => {
@@ -59,34 +46,32 @@ export function TeacherComplaintsWidget() {
     socket.on("connect", () => setConnected(true))
     socket.on("disconnect", () => setConnected(false))
 
-    socket.on("complaint_created", async () => {
-      // Fetch fresh list, then highlight new entries
-      try {
-        const res = await fetch("/api/complaints?role=teacher")
-        if (!res.ok) return
-        const fresh: Complaint[] = await res.json()
-        setComplaints(prev => {
-          const prevIds = new Set(prev.map(c => c.id))
-          const incoming = fresh.filter(c => !prevIds.has(c.id))
-          if (incoming.length > 0) {
-            const inIds = new Set(incoming.map(c => c.id))
-            setNewIds(ids => new Set([...ids, ...inIds]))
-            // Clear highlight after 4s
-            setTimeout(() => {
-              setNewIds(ids => {
-                const next = new Set(ids)
-                inIds.forEach(id => next.delete(id))
-                return next
-              })
-            }, 4000)
-            toast("New complaint received", {
-              description: incoming[0].title,
-              icon: <AlertTriangle className="h-4 w-4 text-rose-500" />,
-            })
-          }
-          return fresh
+    socket.on("complaint_created", (payload: Complaint | undefined) => {
+      if (payload && payload.id) {
+        // Append from socket payload instead of re-fetching
+        setLocalComplaints(prev => {
+          const current = prev.length > 0 ? prev : (fetchedComplaints ?? [])
+          if (current.some(c => c.id === payload.id)) return current
+          return [payload, ...current]
         })
-      } catch { /* ignore */ }
+        setNewIds(ids => new Set([...ids, payload.id]))
+        setTimeout(() => {
+          setNewIds(ids => {
+            const next = new Set(ids)
+            next.delete(payload.id)
+            return next
+          })
+        }, 4000)
+        toast("New complaint received", {
+          description: payload.title,
+          icon: <AlertTriangle className="h-4 w-4 text-rose-500" />,
+        })
+        // Revalidate SWR cache in background
+        mutate()
+      } else {
+        // Fallback: if payload is missing, revalidate via SWR
+        mutate()
+      }
     })
 
     return () => {
@@ -103,9 +88,10 @@ export function TeacherComplaintsWidget() {
         body: JSON.stringify({ id, status: "resolved" }),
       })
       if (!res.ok) throw new Error("Failed")
-      setComplaints(prev =>
-        prev.map(c => c.id === id ? { ...c, status: "resolved" } : c)
-      )
+      setLocalComplaints(prev => {
+        const current = prev.length > 0 ? prev : (fetchedComplaints ?? [])
+        return current.map(c => c.id === id ? { ...c, status: "resolved" as const } : c)
+      })
       toast.success("Complaint marked as resolved")
     } catch {
       toast.error("Failed to resolve complaint")
@@ -142,7 +128,7 @@ export function TeacherComplaintsWidget() {
           </div>
 
           <button
-            onClick={() => { setLoading(true); fetchComplaints() }}
+            onClick={() => { setLocalComplaints([]); mutate() }}
             disabled={loading}
             className="p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
             title="Refresh"

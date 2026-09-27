@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { GraduationCapIcon, BookOpenIcon, UserIcon } from "lucide-react"
+import { useSWRFetch } from "@/hooks/use-swr-fetch"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,14 +16,7 @@ interface ClassInfo {
 }
 
 export function ClassInfoWidget() {
-  const [info, setInfo] = React.useState<ClassInfo | null>(null)
-
-  React.useEffect(() => {
-    fetch("/api/student/class-info")
-      .then(r => r.json())
-      .then(setInfo)
-      .catch(() => setInfo(null))
-  }, [])
+  const { data: info } = useSWRFetch<ClassInfo>("/api/student/class-info")
 
   return (
     <div className="mx-4 lg:mx-6">

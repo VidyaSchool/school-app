@@ -37,7 +37,7 @@ export default async function AdminDashboardPage({ params }: PageProps) {
   // Fetch stats and performance in parallel to significantly reduce latency!
   try {
     const [statsRes, perfRes] = await Promise.all([
-      fetch("http://localhost:8000/api/admin/stats", {
+      fetch(`${process.env.BACKEND_URL || "http://localhost:8000"}/api/admin/stats`, {
         headers: {
           "cookie": cookieHeader,
         },
@@ -46,7 +46,7 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         console.error("Stats fetch error:", err)
         return null
       }),
-      fetch("http://localhost:8000/api/admin/performance", {
+      fetch(`${process.env.BACKEND_URL || "http://localhost:8000"}/api/admin/performance`, {
         headers: {
           "cookie": cookieHeader,
         },

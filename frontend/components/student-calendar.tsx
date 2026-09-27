@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useSWRFetch } from "@/hooks/use-swr-fetch"
 import {
   Tooltip,
   TooltipContent,
@@ -47,29 +48,8 @@ export function StudentCalendar({
   const [activeTab, setActiveTab] = React.useState<Tab>("Today")
   const [playheadLeft, setPlayheadLeft] = React.useState<number | null>(null)
   const [playheadTime, setPlayheadTime] = React.useState<string>("")
-  const [events, setEvents] = React.useState<CalendarEvent[]>([])
-  const [loading, setLoading] = React.useState<boolean>(true)
-
-  React.useEffect(() => {
-    setLoading(true)
-    fetch(apiUrl)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to load")
-        return res.json()
-      })
-      .then(data => {
-        if (data.events && Array.isArray(data.events)) {
-          setEvents(data.events)
-        } else {
-          setEvents([])
-        }
-        setLoading(false)
-      })
-      .catch(() => {
-        setEvents([])
-        setLoading(false)
-      })
-  }, [apiUrl])
+  const { data: calendarData, isLoading: loading } = useSWRFetch<{ events: CalendarEvent[] }>(apiUrl)
+  const events = calendarData?.events ?? []
 
   React.useEffect(() => {
     function updatePlayhead() {

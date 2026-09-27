@@ -63,13 +63,15 @@ export function StudentWidgets() {
     }
   }, [tasks, isLoaded])
 
-  // Save scratchpad text to localStorage
+  // Save scratchpad text to localStorage (debounced to avoid I/O on every keystroke)
   React.useEffect(() => {
-    if (isLoaded) {
+    if (!isLoaded) return
+    const timeout = setTimeout(() => {
       try {
         localStorage.setItem(SCRATCHPAD_STORAGE_KEY, scratchText)
       } catch (e) {}
-    }
+    }, 500)
+    return () => clearTimeout(timeout)
   }, [scratchText, isLoaded])
 
   const toggleTask = (id: string) => {

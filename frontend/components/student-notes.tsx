@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
+import { useSWRFetch } from "@/hooks/use-swr-fetch"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
 import {
   Card,
@@ -61,45 +62,18 @@ export function StudentNotes() {
   const params = useParams<{ username: string }>()
   const username = params?.username || ""
 
-  const [notebooks, setNotebooks] = React.useState<NotebookCardData[]>([])
-  const [loading, setLoading] = React.useState(true)
   const [selectedNote, setSelectedNote] = React.useState<NotebookCardData | null>(null)
 
-  // Fetch real student notes from backend API
-  React.useEffect(() => {
-    fetch("/api/backend/api/student/notes")
-      .then(res => {
-        if (!res.ok) throw new Error("Backend endpoint failed")
-        return res.json()
-      })
-      .then(data => {
-        if (data.notes && Array.isArray(data.notes) && data.notes.length > 0) {
-          const parsed = parseApiNotes(data.notes)
-          setNotebooks(parsed)
-        } else {
-          return fetch("/api/student/notes")
-            .then(res => res.json())
-            .then(fallbackData => {
-              if (fallbackData.notes && Array.isArray(fallbackData.notes) && fallbackData.notes.length > 0) {
-                setNotebooks(parseApiNotes(fallbackData.notes))
-              }
-            })
-        }
-      })
-      .catch(() => {
-        fetch("/api/student/notes")
-          .then(res => res.json())
-          .then(data => {
-            if (data.notes && Array.isArray(data.notes) && data.notes.length > 0) {
-              setNotebooks(parseApiNotes(data.notes))
-            }
-          })
-          .catch(() => {})
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [])
+  const { data: notesData, isLoading: loading } = useSWRFetch<{ notes: any[] }>(
+    "/api/backend/api/student/notes"
+  )
+
+  const notebooks = React.useMemo<NotebookCardData[]>(() => {
+    if (!notesData?.notes || !Array.isArray(notesData.notes) || notesData.notes.length === 0) {
+      return []
+    }
+    return parseApiNotes(notesData.notes)
+  }, [notesData])
 
   const parseApiNotes = (apiNotes: any[]): NotebookCardData[] => {
     return apiNotes.map((note: any, idx: number) => {
