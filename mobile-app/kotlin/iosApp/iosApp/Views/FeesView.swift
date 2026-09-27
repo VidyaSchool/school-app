@@ -18,7 +18,7 @@ struct FeesView: View {
                         VStack(spacing: AppTheme.Spacing.md) {
                             // Total Outstanding Glass Card
                             let unpaid = viewModel.installments.filter { $0.status.lowercased() != "paid" }
-                            let totalUnpaid = unpaid.reduce(0.0) { $0 + $1.amount }
+                            let totalUnpaid: Double = unpaid.reduce(0.0) { $0 + $1.amount }
 
                             GlassCard {
                                 VStack(spacing: 8) {

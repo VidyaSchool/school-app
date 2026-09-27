@@ -180,10 +180,18 @@ final class StudentDashboardViewModel: ObservableObject {
                 var lList: [String] = []
                 for (_, exam) in examMap {
                     if let subs = exam.subjects, !subs.isEmpty {
-                        let total = subs.map { Float($0.score ?? Float($0.marksObtained)) / Float($0.maxScore ?? Float($0.maxMarks)) * 100.0 }.reduce(0, +)
-                        let avg = total / Float(subs.count)
+                        var totalScore: Float = 0.0
+                        for sub in subs {
+                            let obtained: Float = sub.score ?? Float(sub.marksObtained)
+                            let maxM: Float = sub.maxScore ?? Float(sub.maxMarks)
+                            if maxM > 0 {
+                                totalScore += (obtained / maxM) * 100.0
+                            }
+                        }
+                        let avg: Float = totalScore / Float(subs.count)
                         dList.append(avg)
-                        lList.append(exam.termName ?? exam.examName ?? "Exam")
+                        let labelName: String = exam.termName ?? exam.examName ?? "Exam"
+                        lList.append(labelName)
                     }
                 }
                 if !dList.isEmpty {
