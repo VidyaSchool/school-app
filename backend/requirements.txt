@@ -14,7 +14,7 @@ pluggy==1.6.0
 psycopg2-binary==2.9.12
 pydantic==2.13.4
 pydantic_core==2.46.4
-Pygments==2.20.0
+Pygments==2.21.0
 pytest==9.1.1
 python-dotenv==1.2.2
 python-engineio==4.13.3
