@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { user, userProfile } from '@/lib/schema'
-import { eq, or } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
+import { user, userProfile, libraryBookIssue } from '@/lib/schema'
+import { eq, or, and } from 'drizzle-orm'
+import { getAuthenticatedSession } from '@/lib/auth-helpers'
 
 export async function GET(req: NextRequest) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const session = await getAuthenticatedSession(req)
   if (!session?.user || (session.user.role !== 'librarian' && session.user.role !== 'admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -25,19 +24,52 @@ export async function GET(req: NextRequest) {
       email: user.email,
       role: user.role,
       username: userProfile.username,
+      admissionNumber: userProfile.admissionNumber,
+      class: userProfile.class,
+      section: userProfile.section,
     })
     .from(user)
     .leftJoin(userProfile, eq(user.id, userProfile.userId))
     .where(
       or(
         eq(user.email, q.trim()),
-        eq(userProfile.username, q.trim())
+        eq(userProfile.username, q.trim()),
+        eq(userProfile.admissionNumber, q.trim())
       )
     )
     .limit(1)
 
     if (matchedUser.length > 0) {
-      return NextResponse.json({ found: true, user: matchedUser[0] })
+      const u = matchedUser[0]
+      const issues = await db.select()
+        .from(libraryBookIssue)
+        .where(
+          and(
+            eq(libraryBookIssue.userId, u.id),
+            eq(libraryBookIssue.status, 'active')
+          )
+        )
+      const now = new Date()
+      const activeCount = issues.length
+      const overdueCount = issues.filter(iss => new Date(iss.dueDate) < now).length
+      const canBorrow = activeCount < 5 && overdueCount === 0
+
+      return NextResponse.json({
+        found: true,
+        user: {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          username: u.username,
+          admissionNumber: u.admissionNumber,
+          class: u.class,
+          section: u.section,
+          activeLoansCount: activeCount,
+          overdueLoansCount: overdueCount,
+          canBorrow
+        }
+      })
     } else {
       return NextResponse.json({ found: false })
     }

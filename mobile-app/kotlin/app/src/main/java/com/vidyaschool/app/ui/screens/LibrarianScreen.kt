@@ -2,17 +2,38 @@ package com.vidyaschool.app.ui.screens
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.ui.graphics.graphicsLayer
+import kotlinx.coroutines.Job
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import kotlin.math.abs
+import com.vidyaschool.app.ui.components.CustomTextField
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.vidyaschool.app.ui.theme.isAppDark
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,11 +47,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.vidyaschool.app.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,6 +76,27 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
+// ── In-Memory Cache for Instant 0ms Loading & Offline Performance ───────
+internal object LibrarianDataCache {
+    var cachedBooks: List<LibraryBookItem> = emptyList()
+    var cachedBorrowings: List<LibrarianBorrowingItem> = emptyList()
+    var lastFetchTime: Long = 0L
+    private const val CACHE_TTL_MS = 120_000L // 2 minutes warm cache
+
+    fun isCacheValid(): Boolean =
+        cachedBooks.isNotEmpty() && (System.currentTimeMillis() - lastFetchTime < CACHE_TTL_MS)
+
+    fun updateBooks(newBooks: List<LibraryBookItem>) {
+        cachedBooks = newBooks
+        lastFetchTime = System.currentTimeMillis()
+    }
+
+    fun updateBorrowings(newBorrowings: List<LibrarianBorrowingItem>) {
+        cachedBorrowings = newBorrowings
+        lastFetchTime = System.currentTimeMillis()
+    }
+}
+
 @Composable
 fun LibrarianScreen(
     provider: String = "",
@@ -68,14 +114,14 @@ fun LibrarianScreen(
     val authHeader = remember(sessionToken) { if (!sessionToken.isNullOrEmpty()) "Bearer $sessionToken" else "" }
 
     // ── Main UI state ─────────────────────────────────────────────────────────
-    var selectedSection by remember { mutableIntStateOf(0) } // 0: Overview, 1: Borrowings, 2: Books, 3: ISBN Tool
-    val sectionTitles = listOf("Overview", "Circulation", "Catalog", "ISBN Lookup")
+    var selectedSection by remember { mutableIntStateOf(0) } // 0: Overview, 1: Borrowings, 2: ISBN Tool
+    val sectionTitles = listOf("Overview", "Circulation", "ISBN Lookup")
 
-    // ── Data states ───────────────────────────────────────────────────────────
-    var books by remember { mutableStateOf<List<LibraryBookItem>>(emptyList()) }
-    var borrowings by remember { mutableStateOf<List<LibrarianBorrowingItem>>(emptyList()) }
-    var isLoadingBooks by remember { mutableStateOf(false) }
-    var isLoadingBorrowings by remember { mutableStateOf(false) }
+    // ── Data states (Instant 0ms UI with Cache) ──────────────────────────────
+    var books by remember { mutableStateOf(LibrarianDataCache.cachedBooks) }
+    var borrowings by remember { mutableStateOf(LibrarianDataCache.cachedBorrowings) }
+    var isLoadingBooks by remember { mutableStateOf(LibrarianDataCache.cachedBooks.isEmpty()) }
+    var isLoadingBorrowings by remember { mutableStateOf(LibrarianDataCache.cachedBorrowings.isEmpty()) }
 
     // ── Filter & Search states ───────────────────────────────────────────────
     var bookSearchQuery by remember { mutableStateOf("") }
@@ -90,16 +136,20 @@ fun LibrarianScreen(
     var bookToDelete by remember { mutableStateOf<LibraryBookItem?>(null) }
 
     // ── Fetchers ─────────────────────────────────────────────────────────────
-    fun fetchBooks(query: String? = null) {
+    fun fetchBooks(query: String? = null, isBackground: Boolean = false) {
         if (authHeader.isEmpty()) return
         scope.launch {
-            isLoadingBooks = true
+            if (!isBackground && books.isEmpty()) {
+                isLoadingBooks = true
+            }
             try {
                 val res = withContext(Dispatchers.IO) {
                     RetrofitClient.authApi.getLibrarianBooks(authHeader, query?.takeIf { it.isNotBlank() })
                 }
                 if (res.isSuccessful) {
-                    books = res.body() ?: emptyList()
+                    val newBooks = res.body() ?: emptyList()
+                    books = newBooks
+                    LibrarianDataCache.updateBooks(newBooks)
                 } else {
                     android.util.Log.e("LibrarianScreen", "Fetch books failed: ${res.code()}")
                 }
@@ -111,16 +161,20 @@ fun LibrarianScreen(
         }
     }
 
-    fun fetchBorrowings() {
+    fun fetchBorrowings(isBackground: Boolean = false) {
         if (authHeader.isEmpty()) return
         scope.launch {
-            isLoadingBorrowings = true
+            if (!isBackground && borrowings.isEmpty()) {
+                isLoadingBorrowings = true
+            }
             try {
                 val res = withContext(Dispatchers.IO) {
                     RetrofitClient.authApi.getLibrarianBorrowings(authHeader)
                 }
                 if (res.isSuccessful) {
-                    borrowings = res.body() ?: emptyList()
+                    val newBorrowings = res.body() ?: emptyList()
+                    borrowings = newBorrowings
+                    LibrarianDataCache.updateBorrowings(newBorrowings)
                 } else {
                     android.util.Log.e("LibrarianScreen", "Fetch borrowings failed: ${res.code()}")
                 }
@@ -132,14 +186,18 @@ fun LibrarianScreen(
         }
     }
 
-    fun refreshAll() {
-        fetchBooks(bookSearchQuery)
-        fetchBorrowings()
+    fun refreshAll(isBackground: Boolean = false) {
+        fetchBooks(bookSearchQuery, isBackground)
+        fetchBorrowings(isBackground)
     }
 
     LaunchedEffect(authHeader) {
         if (authHeader.isNotEmpty()) {
-            refreshAll()
+            if (LibrarianDataCache.isCacheValid()) {
+                refreshAll(isBackground = true)
+            } else {
+                refreshAll(isBackground = false)
+            }
         }
     }
 
@@ -184,8 +242,36 @@ fun LibrarianScreen(
         avatarUrl = avatarUrl.takeIf { it.isNotEmpty() },
         themeMode = themeMode,
         onThemeChange = onThemeChange,
-        onLogout = onLogout
+        onLogout = onLogout,
+        booksContent = { onNotifClick, hasUnreadNotif ->
+            LibrarianBooksScreen(
+                books = books,
+                isLoading = isLoadingBooks,
+                searchQuery = bookSearchQuery,
+                onSearchChange = {
+                    bookSearchQuery = it
+                },
+                selectedCategory = bookCategoryFilter,
+                onCategoryChange = { bookCategoryFilter = it },
+                categories = distinctCategories,
+                onOpenAddBook = {
+                    editingBook = null
+                    isBookFormOpen = true
+                },
+                onEditBook = { book ->
+                    editingBook = book
+                    isBookFormOpen = true
+                },
+                onDeleteBook = { book ->
+                    bookToDelete = book
+                },
+                onRefresh = ::refreshAll,
+                onNotificationClick = onNotifClick,
+                hasUnreadNotifications = hasUnreadNotif
+            )
+        }
     ) { onNotificationClick, hasUnread ->
+        val tabSwitcher = LocalTabSwitcher.current
         val scrollState = rememberScrollState()
         val headerCollapsed by remember { derivedStateOf { scrollState.value > 100 } }
         val headerAlpha by animateFloatAsState(
@@ -199,7 +285,11 @@ fun LibrarianScreen(
             label = "headerSlide"
         )
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -214,46 +304,120 @@ fun LibrarianScreen(
                     hasUnreadNotifications = hasUnread
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // ── Segmented Section Bar ─────────────────────────────────────
-                Row(
+                // ── Segmented Section Bar with Shifting Pill Background ───────
+                val isDark = isAppDark()
+
+                // Tight padding & compact sizing
+                val tabSpacing = 3.dp
+                val containerPadding = 3.dp
+                val containerShape = RoundedCornerShape(12.dp)
+                val pillShape = RoundedCornerShape(9.dp)
+                val tabHeight = 36.dp
+
+                // Colors: Gray shared container & black shifting button pill
+                val containerBg = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+                val pillBg = Color(0xFF000000)
+
+                BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        .padding(horizontal = 14.dp)
+                        .clip(containerShape)
+                        .background(containerBg)
+                        .padding(containerPadding)
                 ) {
-                    sectionTitles.forEachIndexed { idx, title ->
-                        val isSelected = selectedSection == idx
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(
-                                    if (isSelected) MaterialTheme.colorScheme.primary
-                                    else Color.Transparent
-                                )
-                                .clickable { selectedSection = idx }
-                                .padding(vertical = 10.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = title,
-                                fontSize = 12.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                    val tabCount = sectionTitles.size
+                    val totalAvailableWidth = maxWidth
+                    val tabWidth = (totalAvailableWidth - (tabSpacing * (tabCount - 1))) / tabCount
+
+                    val indicatorOffset by animateDpAsState(
+                        targetValue = (tabWidth + tabSpacing) * selectedSection,
+                        animationSpec = spring(
+                            dampingRatio = 0.8f,
+                            stiffness = Spring.StiffnessMediumLow
+                        ),
+                        label = "tabIndicatorOffset"
+                    )
+
+                    // 1. Black Shifting Pill Background
+                    Box(
+                        modifier = Modifier
+                            .offset(x = indicatorOffset)
+                            .width(tabWidth)
+                            .height(tabHeight)
+                            .shadow(elevation = 2.dp, shape = pillShape)
+                            .background(pillBg, pillShape)
+                    )
+
+                    // 2. Interactive Tab Buttons on Top
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(tabHeight),
+                        horizontalArrangement = Arrangement.spacedBy(tabSpacing),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        sectionTitles.forEachIndexed { idx, title ->
+                            val isSelected = selectedSection == idx
+                            val targetTextColor = if (isSelected) {
+                                Color.White
+                            } else {
+                                if (isDark) Color.White.copy(alpha = 0.6f) else Color(0xFF71717A)
+                            }
+                            val textColor by animateColorAsState(
+                                targetValue = targetTextColor,
+                                animationSpec = tween(180),
+                                label = "tabTextColor_$idx"
                             )
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .clip(pillShape)
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ) {
+                                        selectedSection = idx
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.5.dp)
+                                ) {
+                                    val iconRes = when (idx) {
+                                        0 -> R.drawable.ic_custom_overview
+                                        1 -> R.drawable.ic_custom_circulation
+                                        2 -> R.drawable.ic_custom_isbn
+                                        else -> null
+                                    }
+                                    if (iconRes != null) {
+                                        Icon(
+                                            painter = painterResource(id = iconRes),
+                                            contentDescription = null,
+                                            tint = textColor,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                    }
+                                    Text(
+                                        text = title,
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = textColor,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // ── Section Contents ──────────────────────────────────────────
                 when (selectedSection) {
@@ -270,8 +434,8 @@ fun LibrarianScreen(
                             isBookFormOpen = true
                         },
                         onNavigateToCirculation = { selectedSection = 1 },
-                        onNavigateToCatalog = { selectedSection = 2 },
-                        onNavigateToIsbnTool = { selectedSection = 3 },
+                        onNavigateToCatalog = { tabSwitcher?.invoke("books") },
+                        onNavigateToIsbnTool = { selectedSection = 2 },
                         onBorrowingAction = ::handleBorrowingAction,
                         onRefresh = ::refreshAll
                     )
@@ -288,33 +452,9 @@ fun LibrarianScreen(
                         onRefresh = ::fetchBorrowings
                     )
 
-                    2 -> LibrarianBooksCatalogSection(
-                        books = books,
-                        isLoading = isLoadingBooks,
-                        searchQuery = bookSearchQuery,
-                        onSearchChange = {
-                            bookSearchQuery = it
-                            fetchBooks(it)
-                        },
-                        selectedCategory = bookCategoryFilter,
-                        onCategoryChange = { bookCategoryFilter = it },
-                        categories = distinctCategories,
-                        onOpenAddBook = {
-                            editingBook = null
-                            isBookFormOpen = true
-                        },
-                        onEditBook = { book ->
-                            editingBook = book
-                            isBookFormOpen = true
-                        },
-                        onDeleteBook = { book ->
-                            bookToDelete = book
-                        },
-                        onRefresh = { fetchBooks(bookSearchQuery) }
-                    )
-
-                    3 -> LibrarianIsbnLookupSection(
+                    2 -> LibrarianIsbnLookupSection(
                         authHeader = authHeader,
+                        scrollState = scrollState,
                         onBookAddedOrFound = {
                             refreshAll()
                         },
@@ -338,9 +478,8 @@ fun LibrarianScreen(
 
     // ── Dialogs ───────────────────────────────────────────────────────────────
     if (isIssueDialogOpen) {
-        IssueBookDialog(
-            authHeader = authHeader,
-            books = books.filter { it.actualAvailable > 0 },
+        LibrarianIssueBookDrawer(
+            sessionManager = sessionManager,
             onDismiss = { isIssueDialogOpen = false },
             onSuccess = {
                 isIssueDialogOpen = false
@@ -425,51 +564,22 @@ private fun LibrarianOverviewSection(
     onRefresh: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Quick Action Shortcuts Bar
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Button(
-                onClick = onOpenIssueDialog,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(44.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(Icons.Default.AddCircleOutline, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Issue Book", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            }
-
-            OutlinedButton(
-                onClick = onOpenAddBook,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(44.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.LibraryAdd, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Add Book", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            }
-        }
-
         // Metrics Grid (2x2)
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 MetricKpiCard(
                     modifier = Modifier.weight(1f),
                     title = "Total Catalog",
                     value = "$totalCatalog",
-                    subtitle = "$availableCopies available",
-                    icon = Icons.Default.Book,
+                    iconRes = R.drawable.ic_custom_books,
                     accentColor = Color(0xFF3B82F6),
                     onClick = onNavigateToCatalog
                 )
@@ -477,8 +587,7 @@ private fun LibrarianOverviewSection(
                     modifier = Modifier.weight(1f),
                     title = "Active Loans",
                     value = "$activeIssues",
-                    subtitle = "Currently borrowed",
-                    icon = Icons.Default.AssignmentReturn,
+                    iconRes = R.drawable.ic_custom_active_loans,
                     accentColor = Color(0xFF6366F1),
                     onClick = onNavigateToCirculation
                 )
@@ -488,81 +597,33 @@ private fun LibrarianOverviewSection(
                     modifier = Modifier.weight(1f),
                     title = "Overdue Books",
                     value = "$overdueIssues",
-                    subtitle = if (overdueIssues > 0) "Immediate attention" else "All clear",
-                    icon = Icons.Default.WarningAmber,
-                    accentColor = if (overdueIssues > 0) Color(0xFFEF4444) else Color(0xFF10B981),
+                    iconRes = R.drawable.ic_custom_overdue,
+                    accentColor = Color(0xFFEF4444),
                     onClick = onNavigateToCirculation
                 )
                 MetricKpiCard(
                     modifier = Modifier.weight(1f),
                     title = "Active Borrowers",
                     value = "$totalMembers",
-                    subtitle = "Students & faculty",
-                    icon = Icons.Default.PeopleOutline,
+                    iconRes = R.drawable.ic_custom_active_borrowers,
                     accentColor = Color(0xFF10B981),
                     onClick = onNavigateToCirculation
                 )
             }
         }
 
-        // Quick ISBN Auto-Lookup Banner
+        // Recent Borrowings Section (List table width: screen width with slight margin from x)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onNavigateToIsbnTool() },
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.45f)
-            ),
-            border = CardDefaults.outlinedCardBorder()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    Column {
-                        Text("Smart OpenLibrary Scanner", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        Text("Redis cached ISBN lookup with auto-DB persistence", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))
-                    }
-                }
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                )
-            }
-        }
-
-        // Recent Borrowings Section
-        Card(
-            modifier = Modifier.fillMaxWidth(),
+                .padding(horizontal = 8.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
             ),
-            border = CardDefaults.outlinedCardBorder()
+            border = null
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 14.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -579,25 +640,198 @@ private fun LibrarianOverviewSection(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                if (recentBorrowings.isEmpty()) {
-                    Box(
+                RecentCirculationList(
+                    recentBorrowings = recentBorrowings,
+                    onItemClick = onNavigateToCirculation
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecentCirculationList(
+    recentBorrowings: List<LibrarianBorrowingItem>,
+    onItemClick: () -> Unit
+) {
+    val isDark = isAppDark()
+    val grayColor = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+
+    if (recentBorrowings.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "No recent circulation records",
+                fontSize = 12.sp,
+                color = grayColor
+            )
+        }
+    } else {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            recentBorrowings.forEachIndexed { index, item ->
+                key(item.id) {
+                    val isReturned = item.status.equals("returned", ignoreCase = true)
+                    val isOverdue = item.status.equals("overdue", ignoreCase = true)
+
+                    val (overviewBg, overviewTint, overviewIcon) = when {
+                        isReturned -> Triple(
+                            Color(0xFF10B981).copy(alpha = 0.12f),
+                            Color(0xFF10B981),
+                            R.drawable.ic_custom_check_circle
+                        )
+                        isOverdue -> Triple(
+                            Color(0xFFEF4444).copy(alpha = 0.12f),
+                            Color(0xFFEF4444),
+                            R.drawable.ic_custom_overdue
+                        )
+                        else -> Triple(
+                            if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7),
+                            if (isDark) Color(0xFFE4E4E7) else Color(0xFF52525B),
+                            R.drawable.ic_custom_books
+                        )
+                    }
+
+                    val studentDetail = item.studentName.ifBlank { "Student" }
+                    val classParts = listOfNotNull(
+                        item.studentClass?.takeIf { it.isNotBlank() },
+                        item.studentSection?.takeIf { it.isNotBlank() }
+                    ).joinToString("-")
+
+                    val dueDateText = formatTableDate(item.dueDate)
+
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 24.dp),
-                        contentAlignment = Alignment.Center
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onItemClick() }
+                            .padding(vertical = 8.dp, horizontal = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("No borrowing records found", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                    }
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        recentBorrowings.forEach { item ->
-                            BorrowingItemCard(
-                                item = item,
-                                onReturn = { onBorrowingAction(item.id, "return") },
-                                onRenew = { onBorrowingAction(item.id, "renew") },
-                                compact = true
+                        // Left side squircle status icon
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(9.dp))
+                                .background(overviewBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = overviewIcon),
+                                contentDescription = null,
+                                tint = overviewTint,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
+
+                        // Right side content
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(3.dp)
+                        ) {
+                            // Top row: Book title and status badge
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = item.bookTitle.ifBlank { "Untitled Book" },
+                                    fontSize = 13.5.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .weight(1f, fill = false)
+                                        .padding(end = 6.dp)
+                                )
+
+                                if (isOverdue) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "Overdue",
+                                            fontSize = 10.5.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color(0xFFEF4444)
+                                        )
+                                    }
+                                } else if (isReturned) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(Color(0xFF10B981).copy(alpha = 0.12f))
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "Returned",
+                                            fontSize = 10.5.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color(0xFF10B981)
+                                        )
+                                    }
+                                } else {
+                                    Text(
+                                        text = "Due $dueDateText",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = grayColor
+                                    )
+                                }
+                            }
+
+                            // Bottom row: student name & class
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(
+                                    text = studentDetail,
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = grayColor,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+
+                                if (classParts.isNotBlank()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7))
+                                            .padding(horizontal = 4.dp, vertical = 1.dp)
+                                    ) {
+                                        Text(
+                                            text = classParts,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (index < recentBorrowings.lastIndex) {
+                        HorizontalDivider(
+                            thickness = 0.8.dp,
+                            color = dividerColor.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(start = 50.dp)
+                        )
                     }
                 }
             }
@@ -639,67 +873,116 @@ private fun LibrarianBorrowingsSection(
         }
     }
 
+    val isDark = isAppDark()
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Search & New Issue Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            OutlinedTextField(
+        // Search Input (Full Width with 14.dp margin, Round Full)
+        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp)) {
+            CustomTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
+                placeholder = "Search by student or book...",
                 modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp),
-                placeholder = { Text("Search by student or book...", fontSize = 13.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                    .fillMaxWidth()
+                    .background(if (isDark) Color(0xFF1C1C20) else Color(0xFFF4F4F6), CircleShape),
+                shape = CircleShape,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_custom_search),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { onSearchChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", modifier = Modifier.size(16.dp))
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear",
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable { onSearchChange("") },
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
                     }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                }
             )
-
-            Button(
-                onClick = onOpenIssueDialog,
-                modifier = Modifier.height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Issue", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            }
         }
 
         // Status Filter Chips
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 14.dp)
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            val chipSelectedBg = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+            val chipSelectedBorder = if (isDark) Color(0xFF3F3F46) else Color(0xFFD4D4D8)
+            val chipUnselectedBorder = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+
             listOf(
-                "all" to "All Loans (${borrowings.size})",
-                "active" to "Active (${borrowings.count { it.status.equals("active", ignoreCase = true) }})",
-                "overdue" to "Overdue (${borrowings.count { it.status.equals("overdue", ignoreCase = true) }})",
-                "returned" to "Returned (${borrowings.count { it.status.equals("returned", ignoreCase = true) }})"
-            ).forEach { (key, label) ->
+                Triple("all", "All Loans", borrowings.size),
+                Triple("active", "Active", borrowings.count { it.status.equals("active", ignoreCase = true) }),
+                Triple("overdue", "Overdue", borrowings.count { it.status.equals("overdue", ignoreCase = true) }),
+                Triple("returned", "Returned", borrowings.count { it.status.equals("returned", ignoreCase = true) })
+            ).forEach { (key, title, count) ->
                 val isSelected = statusFilter == key
+                val circleBg = if (isSelected) {
+                    if (isDark) Color(0xFF18181B) else Color.White
+                } else {
+                    if (isDark) Color(0xFF27272A) else Color(0xFFF4F4F5)
+                }
+                val circleTextColor = if (isSelected) {
+                    if (isDark) Color.White else Color(0xFF18181B)
+                } else {
+                    if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+                }
+
                 FilterChip(
                     selected = isSelected,
                     onClick = { onStatusFilterChange(key) },
-                    label = { Text(label, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = Color.Transparent,
+                        labelColor = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
+                        selectedContainerColor = chipSelectedBg,
+                        selectedLabelColor = if (isDark) Color.White else Color(0xFF18181B)
+                    ),
+                    border = BorderStroke(1.dp, if (isSelected) chipSelectedBorder else chipUnselectedBorder),
+                    label = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = title,
+                                fontSize = 12.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .height(20.dp)
+                                    .defaultMinSize(minWidth = 20.dp)
+                                    .clip(CircleShape)
+                                    .background(circleBg)
+                                    .padding(horizontal = 5.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = count.toString(),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = circleTextColor,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = 11.sp
+                                )
+                            }
+                        }
+                    },
                     shape = RoundedCornerShape(10.dp)
                 )
             }
@@ -717,11 +1000,14 @@ private fun LibrarianBorrowingsSection(
             }
         } else if (filteredBorrowings.isEmpty()) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                )
+                ),
+                border = null
             ) {
                 Column(
                     modifier = Modifier
@@ -742,14 +1028,39 @@ private fun LibrarianBorrowingsSection(
                 }
             }
         } else {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                filteredBorrowings.forEach { item ->
-                    BorrowingItemCard(
-                        item = item,
-                        onReturn = { onBorrowingAction(item.id, "return") },
-                        onRenew = { onBorrowingAction(item.id, "renew") },
-                        compact = false
-                    )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ),
+                border = null
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    filteredBorrowings.forEachIndexed { index, item ->
+                        key(item.id) {
+                            BorrowingItemCard(
+                                item = item,
+                                onReturn = { onBorrowingAction(item.id, "return") },
+                                onRenew = { onBorrowingAction(item.id, "renew") }
+                            )
+
+                            if (index < filteredBorrowings.lastIndex) {
+                                HorizontalDivider(
+                                    thickness = 0.8.dp,
+                                    color = dividerColor.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(start = 54.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -757,7 +1068,113 @@ private fun LibrarianBorrowingsSection(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 3. BOOK CATALOG SECTION
+// 3. BOOKS SCREEN (ACCESSED FROM BOTTOM BAR)
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+fun LibrarianBooksScreen(
+    books: List<LibraryBookItem>,
+    isLoading: Boolean,
+    searchQuery: String,
+    onSearchChange: (String) -> Unit,
+    selectedCategory: String,
+    onCategoryChange: (String) -> Unit,
+    categories: List<String>,
+    onOpenAddBook: () -> Unit,
+    onEditBook: (LibraryBookItem) -> Unit,
+    onDeleteBook: (LibraryBookItem) -> Unit,
+    onRefresh: () -> Unit,
+    onNotificationClick: () -> Unit = {},
+    hasUnreadNotifications: Boolean = false
+) {
+    val scrollState = rememberScrollState()
+    val headerCollapsed by remember { derivedStateOf { scrollState.value > 100 } }
+    val headerAlpha by animateFloatAsState(
+        targetValue = if (headerCollapsed) 1f else 0f,
+        animationSpec = tween(220),
+        label = "booksHeaderAlpha"
+    )
+    val headerSlide by animateFloatAsState(
+        targetValue = if (headerCollapsed) 0f else -24f,
+        animationSpec = tween(220),
+        label = "booksHeaderSlide"
+    )
+
+    val isDark = isAppDark()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .statusBarsPadding()
+                .padding(bottom = 80.dp)
+        ) {
+            DashboardHeader(
+                title = "Books",
+                subtitle = "${books.size} books in library catalog",
+                onNotificationClick = onNotificationClick,
+                hasUnreadNotifications = hasUnreadNotifications
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            LibrarianBooksCatalogSection(
+                books = books,
+                isLoading = isLoading,
+                searchQuery = searchQuery,
+                onSearchChange = onSearchChange,
+                selectedCategory = selectedCategory,
+                onCategoryChange = onCategoryChange,
+                categories = categories,
+                onOpenAddBook = onOpenAddBook,
+                onEditBook = onEditBook,
+                onDeleteBook = onDeleteBook,
+                onRefresh = onRefresh
+            )
+        }
+
+        // Fixed Add Book Button at Bottom Right (Just above the bottom bar)
+        FloatingActionButton(
+            onClick = onOpenAddBook,
+            shape = CircleShape,
+            containerColor = if (isDark) Color(0xFFFAFAFA) else Color(0xFF18181B),
+            contentColor = if (isDark) Color(0xFF18181B) else Color.White,
+            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 16.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Book",
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Add Book",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        if (headerAlpha > 0f) {
+            DashboardStickyHeader(
+                title = "Books",
+                headerAlpha = headerAlpha,
+                headerSlide = headerSlide,
+                onNotificationClick = onNotificationClick
+            )
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOK CATALOG COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun LibrarianBooksCatalogSection(
@@ -773,75 +1190,136 @@ private fun LibrarianBooksCatalogSection(
     onDeleteBook: (LibraryBookItem) -> Unit,
     onRefresh: () -> Unit
 ) {
-    val filteredBooks = remember(books, selectedCategory) {
-        if (selectedCategory == "All") books
-        else books.filter { it.category.equals(selectedCategory, ignoreCase = true) }
+    val filteredBooks = remember(books, selectedCategory, searchQuery) {
+        books.filter { book ->
+            val matchesCategory = if (selectedCategory == "All") true
+            else book.category.equals(selectedCategory, ignoreCase = true)
+
+            val matchesQuery = searchQuery.isBlank() ||
+                    book.title.contains(searchQuery, ignoreCase = true) ||
+                    book.author.contains(searchQuery, ignoreCase = true) ||
+                    book.isbn.contains(searchQuery, ignoreCase = true) ||
+                    (book.location?.contains(searchQuery, ignoreCase = true) == true)
+
+            matchesCategory && matchesQuery
+        }
     }
 
+    val isDark = isAppDark()
+    val dividerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Search & Add Book Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            OutlinedTextField(
+        // Search Input (Full Width with 14.dp margin, Round Full)
+        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp)) {
+            CustomTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
+                placeholder = "Search catalog by title, author, ISBN...",
                 modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp),
-                placeholder = { Text("Search catalog by title, ISBN, author...", fontSize = 13.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp)) },
+                    .fillMaxWidth()
+                    .background(if (isDark) Color(0xFF1C1C20) else Color(0xFFF4F4F6), CircleShape),
+                shape = CircleShape,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_custom_search),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { onSearchChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", modifier = Modifier.size(16.dp))
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear",
+                            modifier = Modifier
+                                .size(18.dp)
+                                .clickable { onSearchChange("") },
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
                     }
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                }
             )
-
-            Button(
-                onClick = onOpenAddBook,
-                modifier = Modifier.height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Add", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            }
         }
 
-        // Category Filter Chips
+        // Category Filter Chips (Same styling as circulation tab)
         if (categories.size > 1) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 14.dp)
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                val chipSelectedBg = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+                val chipSelectedBorder = if (isDark) Color(0xFF3F3F46) else Color(0xFFD4D4D8)
+                val chipUnselectedBorder = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+
                 categories.forEach { cat ->
                     val isSelected = selectedCategory == cat
+                    val count = if (cat == "All") books.size else books.count { it.category.equals(cat, ignoreCase = true) }
+
+                    val circleBg = if (isSelected) {
+                        if (isDark) Color(0xFF18181B) else Color.White
+                    } else {
+                        if (isDark) Color(0xFF27272A) else Color(0xFFF4F4F5)
+                    }
+                    val circleTextColor = if (isSelected) {
+                        if (isDark) Color.White else Color(0xFF18181B)
+                    } else {
+                        if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+                    }
+
                     FilterChip(
                         selected = isSelected,
                         onClick = { onCategoryChange(cat) },
-                        label = { Text(cat, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = Color.Transparent,
+                            labelColor = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
+                            selectedContainerColor = chipSelectedBg,
+                            selectedLabelColor = if (isDark) Color.White else Color(0xFF18181B)
+                        ),
+                        border = BorderStroke(1.dp, if (isSelected) chipSelectedBorder else chipUnselectedBorder),
+                        label = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(
+                                    text = cat,
+                                    fontSize = 12.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .height(20.dp)
+                                        .defaultMinSize(minWidth = 20.dp)
+                                        .clip(CircleShape)
+                                        .background(circleBg)
+                                        .padding(horizontal = 5.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = count.toString(),
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = circleTextColor,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 11.sp
+                                    )
+                                }
+                            }
+                        },
                         shape = RoundedCornerShape(10.dp)
                     )
                 }
             }
         }
 
-        // Catalog List
+        // Catalog List / Empty State (Same table card container as circulation table)
         if (isLoading) {
             Box(
                 modifier = Modifier
@@ -853,11 +1331,14 @@ private fun LibrarianBooksCatalogSection(
             }
         } else if (filteredBooks.isEmpty()) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                )
+                ),
+                border = null
             ) {
                 Column(
                     modifier = Modifier
@@ -878,13 +1359,39 @@ private fun LibrarianBooksCatalogSection(
                 }
             }
         } else {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                filteredBooks.forEach { book ->
-                    BookCatalogItemCard(
-                        book = book,
-                        onEdit = { onEditBook(book) },
-                        onDelete = { onDeleteBook(book) }
-                    )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ),
+                border = null
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    filteredBooks.forEachIndexed { index, book ->
+                        key(book.id) {
+                            BookCatalogItemCard(
+                                book = book,
+                                onEdit = { onEditBook(book) },
+                                onDelete = { onDeleteBook(book) }
+                            )
+
+                            if (index < filteredBooks.lastIndex) {
+                                HorizontalDivider(
+                                    thickness = 0.8.dp,
+                                    color = dividerColor.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(start = 42.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -897,6 +1404,7 @@ private fun LibrarianBooksCatalogSection(
 @Composable
 private fun LibrarianIsbnLookupSection(
     authHeader: String,
+    scrollState: ScrollState,
     onBookAddedOrFound: () -> Unit,
     onIssueThisBook: (String) -> Unit
 ) {
@@ -906,6 +1414,8 @@ private fun LibrarianIsbnLookupSection(
     var isSearching by remember { mutableStateOf(false) }
     var lookupResult by remember { mutableStateOf<BookLookupResponse?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isScannerOpen by remember { mutableStateOf(false) }
+    var showManualIsbnField by remember { mutableStateOf(false) }
 
     fun performLookup(isbn: String) {
         val clean = isbn.replace(Regex("[^0-9X]", RegexOption.IGNORE_CASE), "").uppercase()
@@ -948,125 +1458,220 @@ private fun LibrarianIsbnLookupSection(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(18.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-            ),
-            border = CardDefaults.outlinedCardBorder()
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val targetMinHeight = if (showManualIsbnField) 0.dp else (screenHeight - 240.dp).coerceAtLeast(340.dp)
+    val minCenterHeight by animateDpAsState(
+        targetValue = targetMinHeight,
+        animationSpec = tween(280),
+        label = "minCenterHeight"
+    )
+    val topPadding by animateDpAsState(
+        targetValue = if (showManualIsbnField) 16.dp else 0.dp,
+        animationSpec = tween(280),
+        label = "topPadding"
+    )
+    val contentAlignment = if (showManualIsbnField) Alignment.TopCenter else Alignment.Center
+
+    LaunchedEffect(showManualIsbnField) {
+        if (showManualIsbnField) {
+            delay(100)
+            scrollState.animateScrollTo(0)
+        }
+    }
+
+    if (lookupResult == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = minCenterHeight)
+                .padding(horizontal = 24.dp)
+                .padding(top = topPadding),
+            contentAlignment = contentAlignment
         ) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Default.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                    }
-                    Column {
-                        Text("OpenLibrary ISBN Scanner", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        Text("3-Layer Lookup: Redis Cache -> DB -> OpenLibrary API", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f))
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                OutlinedTextField(
-                    value = isbnInput,
-                    onValueChange = {
-                        isbnInput = it
-                        errorMessage = null
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Enter ISBN-10 or ISBN-13") },
-                    placeholder = { Text("e.g. 9780140328721 or 9780439708180") },
-                    leadingIcon = { Icon(Icons.Default.QrCode, contentDescription = null) },
-                    trailingIcon = {
-                        if (isbnInput.isNotEmpty()) {
-                            IconButton(onClick = { isbnInput = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = "Clear")
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { performLookup(isbnInput) }),
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 320.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Primary Scan Barcode Button (same as used in issue book drawer)
                 Button(
-                    onClick = { performLookup(isbnInput) },
+                    onClick = { isScannerOpen = true },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(46.dp),
+                        .height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    enabled = !isSearching && isbnInput.isNotBlank()
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
-                    if (isSearching) {
-                        CircularProgressIndicator(modifier = Modifier.size(18.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Searching Redis & OpenLibrary...")
-                    } else {
-                        Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Lookup & Auto-Save", fontWeight = FontWeight.SemiBold)
-                    }
-                }
-
-                // Quick test suggestions
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text("Sample:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                    listOf("9780140328721", "9780439708180").forEach { sample ->
-                        SuggestionChip(
-                            onClick = {
-                                isbnInput = sample
-                                performLookup(sample)
-                            },
-                            label = { Text(sample, fontSize = 10.sp) },
-                            shape = RoundedCornerShape(8.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = "Scan Barcode",
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = "Scan Book Barcode (ISBN)",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
-            }
-        }
 
-        // Error Banner
-        if (errorMessage != null) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f))
-            ) {
-                Row(
-                    modifier = Modifier.padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                    Text(errorMessage ?: "", fontSize = 12.sp, color = MaterialTheme.colorScheme.onErrorContainer)
+                // Enter ISBN Manually Button
+                TextButton(onClick = { showManualIsbnField = !showManualIsbnField }) {
+                    Text(
+                        text = if (showManualIsbnField) "Hide Manual Entry" else "Or enter ISBN manually",
+                        fontSize = 12.sp
+                    )
+                }
+
+                AnimatedVisibility(visible = showManualIsbnField) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CustomTextField(
+                                value = isbnInput,
+                                onValueChange = {
+                                    isbnInput = it
+                                    errorMessage = null
+                                },
+                                placeholder = "e.g. 9780132350884",
+                                trailingIcon = if (isbnInput.isNotEmpty()) {
+                                    {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = "Clear",
+                                            modifier = Modifier
+                                                .size(18.dp)
+                                                .clickable { isbnInput = "" },
+                                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                        )
+                                    }
+                                } else null,
+                                modifier = Modifier.weight(1f),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Search
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onSearch = { performLookup(isbnInput) }
+                                )
+                            )
+
+                            Button(
+                                onClick = { performLookup(isbnInput) },
+                                enabled = !isSearching && isbnInput.trim().isNotEmpty(),
+                                modifier = Modifier.height(44.dp),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text("Lookup", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    }
+                }
+
+                if (isSearching) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Searching Redis & OpenLibrary...",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+
+                // Error Banner
+                if (errorMessage != null) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.6f))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                            Text(errorMessage ?: "", fontSize = 12.sp, color = MaterialTheme.colorScheme.onErrorContainer)
+                        }
+                    }
                 }
             }
         }
+    } else {
+        // Result Card View
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Book Details",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
 
-        // Result Card
-        if (lookupResult != null && lookupResult?.book != null) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    TextButton(
+                        onClick = {
+                            lookupResult = null
+                            isbnInput = ""
+                            errorMessage = null
+                        }
+                    ) {
+                        Text("Clear", fontSize = 12.sp)
+                    }
+
+                    Button(
+                        onClick = {
+                            lookupResult = null
+                            isbnInput = ""
+                            errorMessage = null
+                            isScannerOpen = true
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
+                        modifier = Modifier.height(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Scan Next", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+
             val book = lookupResult!!.book!!
             val sourceText = when (lookupResult?.source) {
                 "redis_cache" -> "⚡ Redis Cache Hit"
@@ -1168,7 +1773,34 @@ private fun LibrarianIsbnLookupSection(
                     }
                 }
             }
+
+            OutlinedButton(
+                onClick = {
+                    lookupResult = null
+                    isbnInput = ""
+                    errorMessage = null
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Icon(Icons.Default.QrCodeScanner, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Scan / Lookup Another Book", fontSize = 13.sp)
+            }
         }
+    }
+
+    if (isScannerOpen) {
+        BarcodeScannerDialog(
+            onDismiss = { isScannerOpen = false },
+            onBarcodeScanned = { code ->
+                isScannerOpen = false
+                isbnInput = code
+                performLookup(code)
+            }
+        )
     }
 }
 
@@ -1181,60 +1813,71 @@ private fun MetricKpiCard(
     modifier: Modifier = Modifier,
     title: String,
     value: String,
-    subtitle: String,
-    icon: ImageVector,
+    iconRes: Int,
     accentColor: Color,
     onClick: () -> Unit
 ) {
+    val isDark = isAppDark()
+    val cardBg = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+
     Card(
-        modifier = modifier.clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+            containerColor = cardBg
         ),
-        border = CardDefaults.outlinedCardBorder()
+        border = null
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .heightIn(min = 78.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Icon at top left
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(accentColor.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = null,
+                    tint = accentColor,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Bottom row: Title at bottom left, Count at bottom right
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Bottom
             ) {
                 Text(
-                    text = title.uppercase(),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    letterSpacing = 0.8.sp
-                )
-                Box(
+                    text = title,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
                     modifier = Modifier
-                        .size(30.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(accentColor.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(imageVector = icon, contentDescription = null, tint = accentColor, modifier = Modifier.size(16.dp))
-                }
+                        .weight(1f, fill = false)
+                        .padding(end = 4.dp),
+                    lineHeight = 14.sp
+                )
+                Text(
+                    text = value,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = 22.sp
+                )
             }
-
-            Text(
-                text = value,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Text(
-                text = subtitle,
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
         }
     }
 }
@@ -1250,93 +1893,401 @@ private fun BorrowingItemCard(
     val isReturned = item.status.equals("returned", ignoreCase = true)
     val isActive = item.status.equals("active", ignoreCase = true)
 
-    val badgeVariant = when {
-        isReturned -> BadgeVariant.SUCCESS
-        isOverdue -> BadgeVariant.DESTRUCTIVE
-        else -> BadgeVariant.DEFAULT
+    val isDark = isAppDark()
+    val grayColor = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+
+    val (statusBg, statusTint, statusIcon) = when {
+        isReturned -> Triple(
+            Color(0xFF10B981).copy(alpha = 0.12f),
+            Color(0xFF10B981),
+            R.drawable.ic_custom_check_circle
+        )
+        isOverdue -> Triple(
+            Color(0xFFEF4444).copy(alpha = 0.12f),
+            Color(0xFFEF4444),
+            R.drawable.ic_custom_overdue
+        )
+        else -> Triple(
+            if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7),
+            if (isDark) Color(0xFFE4E4E7) else Color(0xFF52525B),
+            R.drawable.ic_custom_books
+        )
     }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isOverdue) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.15f)
-            else MaterialTheme.colorScheme.surface
-        ),
-        border = CardDefaults.outlinedCardBorder()
+    val studentDetail = item.studentName.ifBlank { "Student" }
+    val classParts = listOfNotNull(
+        item.studentClass?.takeIf { it.isNotBlank() },
+        item.studentSection?.takeIf { it.isNotBlank() }
+    ).joinToString("-")
+
+    val dueDateText = formatTableDate(item.dueDate)
+
+    // Expand/collapse state for action buttons (hidden until tapped)
+    var isExpanded by remember { mutableStateOf(false) }
+
+    // Drag / Swipe states
+    val coroutineScope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+    val density = LocalDensity.current
+
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var animJob by remember { mutableStateOf<Job?>(null) }
+    var hasTriggeredHaptic by remember { mutableStateOf(false) }
+
+    val thresholdPx = with(density) { 68.dp.toPx() }
+    val maxDragPx = with(density) { 108.dp.toPx() }
+
+    val canRenew = isActive && item.renewalsCount < 3 && !isReturned
+    val canReturn = !isReturned
+
+    val draggableState = rememberDraggableState { delta ->
+        val current = offsetX
+        val effectiveDelta = if (abs(current) > thresholdPx) delta * 0.45f else delta
+        val newOffset = (current + effectiveDelta).coerceIn(
+            if (canRenew) -maxDragPx else 0f,
+            if (canReturn) maxDragPx else 0f
+        )
+        offsetX = newOffset
+
+        if (!hasTriggeredHaptic) {
+            if ((newOffset >= thresholdPx && canReturn) || (newOffset <= -thresholdPx && canRenew)) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                hasTriggeredHaptic = true
+            }
+        } else {
+            if (abs(newOffset) < thresholdPx * 0.8f) {
+                hasTriggeredHaptic = false
+            }
+        }
+    }
+
+    // Blend seamlessly with the table container
+    val cardBg = if (isDark) Color(0xFF141416) else Color(0xFFF7F7F9)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
     ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+        // Background swipe action indicators
+        if (!isReturned) {
+            val isDraggingRight = offsetX > 0f
+            val pullProgress = (abs(offsetX) / thresholdPx).coerceIn(0.5f, 1f)
+
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .graphicsLayer {
+                        alpha = if (abs(offsetX) > 2f) 1f else 0f
+                    }
+                    .background(
+                        if (isDraggingRight) Color(0xFF059669) else Color(0xFF2563EB),
+                        RoundedCornerShape(10.dp)
+                    )
+                    .padding(horizontal = 14.dp),
+                contentAlignment = if (isDraggingRight) Alignment.CenterStart else Alignment.CenterEnd
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.bookTitle,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "Borrower: ${item.studentName}" +
-                                (item.studentClass?.let { " • Class $it" } ?: "") +
-                                (item.studentSection?.let { "-$it" } ?: ""),
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                    )
+                Row(
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = pullProgress
+                        scaleY = pullProgress
+                        alpha = pullProgress
+                    },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    if (isDraggingRight) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_custom_check_circle),
+                            contentDescription = "Return",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = "Return",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    } else {
+                        Text(
+                            text = "Renew",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_custom_circulation),
+                            contentDescription = "Renew",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
-                Badge(text = item.status.uppercase(), variant = badgeVariant)
+            }
+        }
+
+        // Foreground sliding card
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    translationX = offsetX
+                }
+                .background(cardBg, RoundedCornerShape(10.dp))
+                .draggable(
+                    state = draggableState,
+                    orientation = Orientation.Horizontal,
+                    enabled = !isReturned && (canReturn || canRenew),
+                    onDragStarted = {
+                        animJob?.cancel()
+                        animJob = null
+                        hasTriggeredHaptic = false
+                    },
+                    onDragStopped = { velocity ->
+                        val finalOffset = offsetX
+                        val reachedRight = (finalOffset >= thresholdPx || (velocity > 600f && finalOffset > 20f)) && canReturn
+                        val reachedLeft = (finalOffset <= -thresholdPx || (velocity < -600f && finalOffset < -20f)) && canRenew
+
+                        if (reachedRight) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onReturn()
+                        } else if (reachedLeft) {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onRenew()
+                        }
+
+                        hasTriggeredHaptic = false
+                        animJob = coroutineScope.launch {
+                            Animatable(finalOffset).animateTo(
+                                targetValue = 0f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessMediumLow
+                                )
+                            ) {
+                                offsetX = value
+                            }
+                        }
+                    }
+                )
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    if (!isReturned) {
+                        isExpanded = !isExpanded
+                    }
+                }
+                .padding(vertical = 10.dp, horizontal = 6.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Left side status squircle icon
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(statusBg),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = statusIcon),
+                    contentDescription = null,
+                    tint = statusTint,
+                    modifier = Modifier.size(18.dp)
+                )
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Right side content
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp)
             ) {
-                Column {
+                // Row 1: Book Title & Status Pill / Due Date
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = "Due: ${formatDateString(item.dueDate)}",
-                        fontSize = 11.sp,
-                        fontWeight = if (isOverdue) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isOverdue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        text = item.bookTitle.ifBlank { "Untitled Book" },
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .padding(end = 6.dp)
                     )
-                    if (item.renewalsCount > 0) {
+
+                    if (isOverdue) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFFEF4444).copy(alpha = 0.12f))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "Overdue",
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFFEF4444)
+                            )
+                        }
+                    } else if (isReturned) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF10B981).copy(alpha = 0.12f))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "Returned",
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF10B981)
+                            )
+                        }
+                    } else {
                         Text(
-                            text = "Renewed: ${item.renewalsCount}/3 times",
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            text = "Due $dueDateText",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = grayColor
                         )
                     }
                 }
 
-                if (!isReturned) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        if (isActive && item.renewalsCount < 3) {
-                            OutlinedButton(
-                                onClick = onRenew,
-                                modifier = Modifier.height(32.dp),
-                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-                                shape = RoundedCornerShape(8.dp)
+                // Row 2: Student details & Class badge & Animated Expand Chevron
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.weight(1f, fill = false)
+                    ) {
+                        Text(
+                            text = studentDetail,
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = grayColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        if (classParts.isNotBlank()) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7))
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
                             ) {
-                                Text("Renew", fontSize = 11.sp)
+                                Text(
+                                    text = classParts,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+                                )
                             }
                         }
+                    }
 
-                        Button(
-                            onClick = onReturn,
-                            modifier = Modifier.height(32.dp),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isOverdue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                            )
+                    if (!isReturned) {
+                        val rotation by animateFloatAsState(
+                            targetValue = if (isExpanded) 180f else 0f,
+                            label = "chevronRotation"
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = if (isExpanded) "Collapse" else "Expand",
+                            tint = grayColor.copy(alpha = 0.6f),
+                            modifier = Modifier
+                                .size(16.dp)
+                                .graphicsLayer { rotationZ = rotation }
+                        )
+                    }
+                }
+
+                // Actions row (Renew / Return) revealed only when tapped / expanded
+                AnimatedVisibility(
+                    visible = isExpanded && !isReturned,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 2.dp)
+                    ) {
+                        HorizontalDivider(
+                            thickness = 0.6.dp,
+                            color = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { /* prevent collapsing when clicking buttons row */ },
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Return", fontSize = 11.sp)
+                            if (isActive && item.renewalsCount < 3) {
+                                OutlinedButton(
+                                    onClick = onRenew,
+                                    modifier = Modifier.height(32.dp),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                                    shape = RoundedCornerShape(8.dp),
+                                    border = BorderStroke(1.dp, if (isDark) Color(0xFF3F3F46) else Color(0xFFD4D4D8))
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_custom_circulation),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(13.dp),
+                                        tint = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(
+                                        text = "Renew (${item.renewalsCount}/3)",
+                                        fontSize = 11.5.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+
+                            Button(
+                                onClick = onReturn,
+                                modifier = Modifier.height(32.dp),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isOverdue) Color(0xFFEF4444) else if (isDark) Color(0xFFFAFAFA) else Color(0xFF18181B),
+                                    contentColor = if (isOverdue) Color.White else if (isDark) Color(0xFF18181B) else Color.White
+                                )
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_custom_check_circle),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(13.dp),
+                                    tint = if (isOverdue) Color.White else if (isDark) Color(0xFF18181B) else Color.White
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = "Return Book",
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                         }
                     }
                 }
@@ -1351,59 +2302,183 @@ private fun BookCatalogItemCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = CardDefaults.outlinedCardBorder()
+    val isDark = isAppDark()
+    val grayColor = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 2.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
+        // Left side book cover or icon
+        val cover = book.coverUrl
+        if (!cover.isNullOrEmpty()) {
+            AsyncImage(
+                model = cover,
+                contentDescription = "Cover",
                 modifier = Modifier
-                    .size(46.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
-                contentAlignment = Alignment.Center
+                    .padding(top = 2.dp)
+                    .width(28.dp)
+                    .height(38.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_custom_books),
+                contentDescription = "Book",
+                tint = if (book.actualAvailable > 0) MaterialTheme.colorScheme.primary else grayColor,
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .size(28.dp)
+            )
+        }
+
+        // Center column details
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+            // Top row: Author & Category, and Available copies at right
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.MenuBook,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                val authorCategory = buildString {
+                    if (book.author.isNotBlank()) append(book.author)
+                    if (book.category.isNotBlank()) {
+                        if (isNotEmpty()) append(" • ")
+                        append(book.category)
+                    }
+                }.ifBlank { "General" }
+
+                Text(
+                    text = authorCategory,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = grayColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .padding(end = 8.dp)
+                )
+
+                Text(
+                    text = "${book.actualAvailable}/${book.quantity} Avail",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (book.actualAvailable > 0) Color(0xFF10B981) else Color(0xFFEF4444),
+                    maxLines = 1
                 )
             }
 
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(book.title, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("By ${book.author}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), maxLines = 1)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("ISBN: ${book.isbn}", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-                    Text("•", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
-                    Text(book.location ?: "Shelf A", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+            // Book Title in semi-bold
+            Text(
+                text = book.title.ifBlank { "Untitled Book" },
+                fontSize = 13.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            // Bottom row: ISBN & Shelf location
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (book.isbn.isNotBlank()) {
+                    Text(
+                        text = "ISBN: ${book.isbn}",
+                        fontSize = 11.sp,
+                        color = grayColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Badge(text = book.category, variant = BadgeVariant.SECONDARY)
-                    Badge(
-                        text = "${book.actualAvailable}/${book.quantity} copies",
-                        variant = if (book.actualAvailable > 0) BadgeVariant.SUCCESS else BadgeVariant.DESTRUCTIVE
+                if (!book.location.isNullOrBlank()) {
+                    if (book.isbn.isNotBlank()) {
+                        Text(
+                            text = "•",
+                            fontSize = 11.sp,
+                            color = grayColor.copy(alpha = 0.6f)
+                        )
+                    }
+                    Text(
+                        text = "Shelf: ${book.location}",
+                        fontSize = 11.sp,
+                        color = grayColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
+        }
 
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.size(16.dp))
-                }
-                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
-                }
+        // Three dots action button with Edit and Delete
+        Box {
+            IconButton(
+                onClick = { menuExpanded = true },
+                modifier = Modifier
+                    .size(28.dp)
+                    .padding(top = 0.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Actions",
+                    tint = grayColor,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Edit Book", fontSize = 13.sp) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    onClick = {
+                        menuExpanded = false
+                        onEdit()
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            "Delete",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    onClick = {
+                        menuExpanded = false
+                        onDelete()
+                    }
+                )
             }
         }
     }
@@ -1430,6 +2505,7 @@ private fun IssueBookDialog(
     var selectedBookId by remember { mutableStateOf(books.firstOrNull()?.id ?: "") }
     var customIsbnInput by remember { mutableStateOf("") }
     var isUsingCustomIsbn by remember { mutableStateOf(books.isEmpty()) }
+    var isScannerOpen by remember { mutableStateOf(false) }
     var loanDays by remember { mutableIntStateOf(14) }
     var isSubmitting by remember { mutableStateOf(false) }
 
@@ -1563,6 +2639,11 @@ private fun IssueBookDialog(
                             modifier = Modifier.fillMaxWidth(),
                             placeholder = { Text("Enter Book ISBN or ID", fontSize = 12.sp) },
                             leadingIcon = { Icon(Icons.Default.QrCode, contentDescription = null) },
+                            trailingIcon = {
+                                IconButton(onClick = { isScannerOpen = true }) {
+                                    Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan Barcode", tint = MaterialTheme.colorScheme.primary)
+                                }
+                            },
                             singleLine = true,
                             shape = RoundedCornerShape(10.dp)
                         )
@@ -1698,6 +2779,17 @@ private fun IssueBookDialog(
                 }
             }
         }
+    }
+
+    if (isScannerOpen) {
+        BarcodeScannerDialog(
+            onDismiss = { isScannerOpen = false },
+            onBarcodeScanned = { code ->
+                isScannerOpen = false
+                customIsbnInput = code
+                isUsingCustomIsbn = true
+            }
+        )
     }
 }
 
@@ -1968,5 +3060,27 @@ private fun formatDateString(rawIso: String?): String {
         if (date != null) formatter.format(date) else rawIso.take(10)
     } catch (e: Exception) {
         rawIso.take(10)
+    }
+}
+
+private fun formatTableDate(rawIso: String?): String {
+    if (rawIso.isNullOrBlank()) return "—"
+    return try {
+        val clean = rawIso.replace("Z", "").split(".")[0]
+        val parser = if (clean.contains("T")) {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+        } else {
+            SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        }
+        val date = parser.parse(clean)
+        val formatter = SimpleDateFormat("MMM d", Locale.US)
+        if (date != null) formatter.format(date) else rawIso.take(10)
+    } catch (e: Exception) {
+        try {
+            val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(rawIso.take(10))
+            if (date != null) SimpleDateFormat("MMM d", Locale.US).format(date) else rawIso.take(10)
+        } catch (_: Exception) {
+            rawIso.take(10)
+        }
     }
 }

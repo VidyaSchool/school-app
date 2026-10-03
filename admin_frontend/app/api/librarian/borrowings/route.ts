@@ -6,7 +6,7 @@ import { getAuthenticatedSession } from '@/lib/auth-helpers'
 import crypto from 'crypto'
 
 export async function GET(req: NextRequest) {
-  const session = await getAuthenticatedSession()
+  const session = await getAuthenticatedSession(req)
   if (!session?.user || (session.user.role !== 'librarian' && session.user.role !== 'admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getAuthenticatedSession()
+  const session = await getAuthenticatedSession(req)
   if (!session?.user || (session.user.role !== 'librarian' && session.user.role !== 'admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -52,8 +52,10 @@ export async function POST(req: NextRequest) {
   try {
     const { studentIdentifier, bookId, dueDate } = await req.json()
     if (!studentIdentifier || !bookId || !dueDate) {
-      return NextResponse.json({ error: 'Student username/email, Book, and Due Date are required' }, { status: 400 })
+      return NextResponse.json({ error: 'Student username/email/admission number, Book, and Due Date are required' }, { status: 400 })
     }
+
+    const cleanIdentifier = String(studentIdentifier).trim()
 
     const studentUser = await db.select({
       id: user.id,
@@ -64,34 +66,37 @@ export async function POST(req: NextRequest) {
     .leftJoin(userProfile, eq(user.id, userProfile.userId))
     .where(
       or(
-        eq(user.email, studentIdentifier),
-        eq(userProfile.username, studentIdentifier)
+        eq(user.email, cleanIdentifier),
+        eq(userProfile.username, cleanIdentifier),
+        eq(userProfile.admissionNumber, cleanIdentifier)
       )
     )
     .limit(1)
 
     if (studentUser.length === 0) {
-      return NextResponse.json({ error: 'Student not found in system. Please verify username/email.' }, { status: 400 })
+      return NextResponse.json({ error: 'Student not found in system. Please verify username, email, or admission number.' }, { status: 400 })
     }
 
+    const cleanBookId = String(bookId).trim()
     const book = await db.select()
       .from(libraryBook)
-      .where(eq(libraryBook.id, bookId))
+      .where(or(eq(libraryBook.id, cleanBookId), eq(libraryBook.isbn, cleanBookId)))
       .limit(1)
 
     if (book.length === 0) {
-      return NextResponse.json({ error: 'Book not found' }, { status: 400 })
+      return NextResponse.json({ error: 'Book not found in library catalog.' }, { status: 400 })
     }
 
     if (book[0].availableQuantity <= 0) {
       return NextResponse.json({ error: 'Book is currently out of stock (no copies available)' }, { status: 400 })
     }
 
+    const targetBookId = book[0].id
     const issueId = `iss-${crypto.randomUUID()}`
 
     await db.insert(libraryBookIssue).values({
       id: issueId,
-      bookId,
+      bookId: targetBookId,
       userId: studentUser[0].id,
       issueDate: new Date(),
       dueDate: new Date(dueDate),
@@ -106,7 +111,7 @@ export async function POST(req: NextRequest) {
         availableQuantity: book[0].availableQuantity - 1,
         updatedAt: new Date(),
       })
-      .where(eq(libraryBook.id, bookId))
+      .where(eq(libraryBook.id, targetBookId))
 
     return NextResponse.json({ success: true, id: issueId })
   } catch (error: any) {
@@ -116,7 +121,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const session = await getAuthenticatedSession()
+  const session = await getAuthenticatedSession(req)
   if (!session?.user || (session.user.role !== 'librarian' && session.user.role !== 'admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

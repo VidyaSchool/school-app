@@ -15,7 +15,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Stop
 import kotlinx.coroutines.Job
 import androidx.compose.material3.*
@@ -103,11 +108,405 @@ enum class MessageSender {
     USER, AGENT
 }
 
+// ── Agent Action Card Types & Detection ─────────────────────────────────
+
+enum class AgentActionType { SEND_PUSH, SEND_NOTICE }
+enum class AgentActionStatus { DRAFT, PENDING, SUCCESS, ERROR, CANCELLED }
+
+data class DetectedAction(
+    val type: AgentActionType,
+    val title: String,
+    val body: String,
+    val targetRole: String = "all",
+    val category: String = "General"
+)
+
+/**
+ * Detects JSON action blocks in AI response text.
+ * Matches patterns like: ```action {"action": "send_push", ...} ``` or raw JSON with "action" key.
+ */
+fun detectActionFromText(text: String): DetectedAction? {
+    // Match ```action { ... } ``` or raw JSON with "action" key
+    val regex = Regex("""(?:```(?:action|json)?\s*)?(\{[^{}]*"action"\s*:\s*"[^"]+?"[^{}]*\})(?:\s*```)?""", RegexOption.DOT_MATCHES_ALL)
+    val match = regex.find(text) ?: return null
+    try {
+        val jsonStr = match.groupValues[1].trim()
+        val json = org.json.JSONObject(jsonStr)
+        val action = json.optString("action", "")
+        val title = json.optString("title", "")
+        val body = json.optString("message", json.optString("body", json.optString("content", "")))
+        val targetRole = json.optString("targetRole", "all")
+        val category = json.optString("category", "General")
+
+        val type = when {
+            action.contains("push", ignoreCase = true) || action.contains("notification", ignoreCase = true) || action.contains("notify", ignoreCase = true) -> AgentActionType.SEND_PUSH
+            action.contains("notice", ignoreCase = true) || action.contains("announce", ignoreCase = true) || action.contains("publish", ignoreCase = true) -> AgentActionType.SEND_NOTICE
+            else -> return null
+        }
+
+        return DetectedAction(
+            type = type,
+            title = title,
+            body = body,
+            targetRole = targetRole,
+            category = category
+        )
+    } catch (e: Exception) {
+        return null
+    }
+}
+
+/**
+ * Strips the raw JSON action block from the message text, leaving only the descriptive text.
+ */
+fun stripActionBlock(text: String): String {
+    // Remove ```action ... ``` blocks
+    var cleaned = text.replace(Regex("""```(?:action|json)?\s*\{[^{}]*"action"\s*:\s*"[^"]+?"[^{}]*\}\s*```""", RegexOption.DOT_MATCHES_ALL), "")
+    // Remove standalone raw JSON blocks with "action"
+    cleaned = cleaned.replace(Regex("""\{[^{}]*"action"\s*:\s*"[^"]+?"[^{}]*\}""", RegexOption.DOT_MATCHES_ALL), "")
+    return cleaned.trim()
+}
+
+@Composable
+fun AgentActionCard(
+    action: DetectedAction,
+    sessionToken: String?,
+    modifier: Modifier = Modifier
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val prefs = remember(context) {
+        context.getSharedPreferences("ai_action_widget_status", android.content.Context.MODE_PRIVATE)
+    }
+    val dedupKey = remember(action) {
+        "action_${action.type.name}_${action.title.trim().take(50)}_${action.body.trim().take(50)}"
+    }
+    val initialStatus = remember(dedupKey) {
+        when (prefs.getString(dedupKey, null)) {
+            "success" -> AgentActionStatus.SUCCESS
+            "cancelled" -> AgentActionStatus.CANCELLED
+            else -> AgentActionStatus.DRAFT
+        }
+    }
+
+    var status by remember(dedupKey) { mutableStateOf(initialStatus) }
+    var deliveredCount by remember { mutableStateOf<Int?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    val iconTint = when (action.type) {
+        AgentActionType.SEND_PUSH -> Color(0xFF8B5CF6)  // violet
+        AgentActionType.SEND_NOTICE -> Color(0xFFF59E0B)  // amber
+    }
+
+    val label = when (action.type) {
+        AgentActionType.SEND_PUSH -> "Send Push Notification"
+        AgentActionType.SEND_NOTICE -> "Post School Notice"
+    }
+
+    val handleConfirm = {
+        if (status == AgentActionStatus.DRAFT) {
+            status = AgentActionStatus.PENDING
+            scope.launch(Dispatchers.IO) {
+            try {
+                val authHeader = if (!sessionToken.isNullOrEmpty()) "Bearer $sessionToken" else ""
+                if (action.type == AgentActionType.SEND_PUSH) {
+                    val res = com.vidyaschool.app.api.RetrofitClient.authApi.sendPushNotification(
+                        authHeader = authHeader,
+                        request = com.vidyaschool.app.api.SendPushRequest(
+                            title = action.title,
+                            body = action.body,
+                            targetRole = action.targetRole
+                        )
+                    )
+                    withContext(Dispatchers.Main) {
+                        if (res.isSuccessful) {
+                            status = AgentActionStatus.SUCCESS
+                            deliveredCount = res.body()?.deliveredCount
+                            prefs.edit().putString(dedupKey, "success").apply()
+                        } else {
+                            status = AgentActionStatus.ERROR
+                            errorMessage = "Failed to send notification (${res.code()})"
+                        }
+                    }
+                } else {
+                    val res = com.vidyaschool.app.api.RetrofitClient.authApi.postNotice(
+                        authHeader = authHeader,
+                        request = com.vidyaschool.app.api.PostNoticeRequest(
+                            title = action.title,
+                            content = action.body,
+                            category = action.category
+                        )
+                    )
+                    withContext(Dispatchers.Main) {
+                        if (res.isSuccessful) {
+                            status = AgentActionStatus.SUCCESS
+                            prefs.edit().putString(dedupKey, "success").apply()
+                        } else {
+                            status = AgentActionStatus.ERROR
+                            errorMessage = "Failed to post notice (${res.code()})"
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    status = AgentActionStatus.ERROR
+                    errorMessage = e.message ?: "Network error"
+                }
+            }
+        }
+        }
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column {
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Single Leading Icon (Notification icon or Notice icon, with status states)
+                when (status) {
+                    AgentActionStatus.PENDING -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    AgentActionStatus.SUCCESS -> {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_custom_check_circle),
+                            contentDescription = "Success",
+                            modifier = Modifier.size(16.dp),
+                            tint = Color(0xFF10B981)
+                        )
+                    }
+                    AgentActionStatus.CANCELLED -> {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancelled",
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        )
+                    }
+                    AgentActionStatus.ERROR -> {
+                        Icon(
+                            imageVector = Icons.Default.ErrorOutline,
+                            contentDescription = "Error",
+                            modifier = Modifier.size(16.dp),
+                            tint = Color(0xFFEF4444)
+                        )
+                    }
+                    AgentActionStatus.DRAFT -> {
+                        if (action.type == AgentActionType.SEND_PUSH) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_custom_notification),
+                                contentDescription = "Notification",
+                                modifier = Modifier.size(16.dp),
+                                tint = iconTint
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_custom_notice),
+                                contentDescription = "Notice",
+                                modifier = Modifier.size(16.dp),
+                                tint = iconTint
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = label,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+
+                // Audience badge
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = null,
+                            modifier = Modifier.size(10.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                        Text(
+                            text = action.targetRole.replaceFirstChar { it.uppercase() },
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+
+            // Content details
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.02f))
+                    .padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Title
+                if (action.title.isNotEmpty()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Title", fontSize = 10.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), modifier = Modifier.width(52.dp))
+                        Text(action.title, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+
+                // Message
+                if (action.body.isNotEmpty()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Message", fontSize = 10.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), modifier = Modifier.width(52.dp))
+                        Text(action.body, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f), lineHeight = 16.sp)
+                    }
+                }
+
+                // Interactive Footer
+                when (status) {
+                    AgentActionStatus.DRAFT -> {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Send to ${action.targetRole}?",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                // Cancel button
+                                Surface(
+                                    onClick = {
+                                        if (status == AgentActionStatus.DRAFT) {
+                                            status = AgentActionStatus.CANCELLED
+                                            prefs.edit().putString(dedupKey, "cancelled").apply()
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.surface,
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                                        Text("Cancel", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                                    }
+                                }
+                                // Send button
+                                Surface(
+                                    onClick = {
+                                        if (status == AgentActionStatus.DRAFT) {
+                                            handleConfirm()
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.surface)
+                                        Text("Yes, Send", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.surface)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    AgentActionStatus.PENDING -> {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            CircularProgressIndicator(modifier = Modifier.size(12.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
+                            Text("Sending notification…", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                        }
+                    }
+                    AgentActionStatus.SUCCESS -> {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_custom_check_circle),
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = Color(0xFF10B981)
+                            )
+                            Text(
+                                text = if (action.type == AgentActionType.SEND_PUSH && deliveredCount != null) "Delivered to $deliveredCount user(s)" else "Published successfully",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF10B981)
+                            )
+                        }
+                    }
+                    AgentActionStatus.CANCELLED -> {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(12.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                            Text("Notification cancelled. No messages were sent.", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f))
+                        }
+                    }
+                    AgentActionStatus.ERROR -> {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        Row(
+                            modifier = Modifier.padding(top = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(Icons.Default.ErrorOutline, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFEF4444))
+                            Text(errorMessage ?: "Failed to dispatch notification", fontSize = 11.sp, color = Color(0xFFEF4444))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable
 fun AgentScreen(
     teacherName: String = "Teacher",
     chatId: String? = null,
     sessionToken: String? = null,
+    onNewChat: () -> Unit = {},
     onBack: () -> Unit
 ) {
     val messages = remember {
@@ -213,6 +612,29 @@ fun AgentScreen(
         activeJob?.cancel()
         activeJob = null
         isThinking = false
+    }
+
+    val startNewChat: () -> Unit = {
+        stopGeneration()
+        activeChatId = null
+        messages.clear()
+        messages.add(
+            AgentChatMessage(
+                sender = MessageSender.AGENT,
+                text = "Hello $teacherName! 👋 I am your AI Agent.\n\nI can help you create lesson plans, draft exam questions, analyze student marks, or generate announcements. What would you like to build today?"
+            )
+        )
+        inputText = ""
+        attachedBase64 = null
+        attachedMime = null
+        attachedFileName = null
+        isUploadingFile = false
+        scope.launch {
+            try {
+                listState.scrollToItem(0)
+            } catch (e: Exception) {}
+        }
+        onNewChat()
     }
 
     val sendMessage: (String) -> Unit = { prompt ->
@@ -464,25 +886,6 @@ fun AgentScreen(
                             }
                         }
 
-                        // Model Mode Switcher chip (Thinking vs Fast)
-                        Surface(
-                            onClick = { useThinking = !useThinking },
-                            shape = RoundedCornerShape(16.dp),
-                            color = if (useThinking) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier.padding(start = 2.dp, end = 2.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = if (useThinking) "🧠 Thinking" else "⚡ Fast",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = if (useThinking) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
 
                         Box(
                             modifier = Modifier
@@ -594,6 +997,11 @@ fun AgentScreen(
                         }
                     } else {
                         // Agent Message (Left aligned, instant live streaming Markdown + MathJax fallback)
+                        val detectedAction = remember(msg.text) { detectActionFromText(msg.text) }
+                        val cleanedText = remember(msg.text) {
+                            if (detectedAction != null) stripActionBlock(msg.text) else msg.text
+                        }
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Start
@@ -603,19 +1011,32 @@ fun AgentScreen(
                                     .widthIn(max = 320.dp)
                                     .padding(vertical = 2.dp)
                             ) {
-                                if (msg.text.contains("$$") || msg.text.contains("\\(")) {
-                                    MarkdownMathMessageView(
-                                        markdownContent = msg.text,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                } else {
-                                    Text(
-                                        text = remember(msg.text, primaryColor) { parseMarkdownToAnnotatedString(msg.text, primaryColor) },
-                                        fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
-                                        lineHeight = 20.sp
+                                // Show descriptive text (stripped of JSON block)
+                                if (cleanedText.isNotBlank()) {
+                                    if (cleanedText.contains("$$") || cleanedText.contains("\\(")) {
+                                        MarkdownMathMessageView(
+                                            markdownContent = cleanedText,
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    } else {
+                                        Text(
+                                            text = remember(cleanedText, primaryColor) { parseMarkdownToAnnotatedString(cleanedText, primaryColor) },
+                                            fontSize = 14.sp,
+                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
+                                            lineHeight = 20.sp
+                                        )
+                                    }
+                                }
+
+                                // Show action card if detected
+                                if (detectedAction != null) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    AgentActionCard(
+                                        action = detectedAction,
+                                        sessionToken = sessionToken
                                     )
                                 }
+
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = msg.timestamp,
@@ -658,15 +1079,18 @@ fun AgentScreen(
                 )
         )
 
-        // Floating Back Button (Top-Left corner)
+        // Top Header Bar (Back Button + Model Name Center + New Chat Button Right)
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(start = 16.dp, top = 12.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp)
         ) {
+            // Left: Floating Back Button
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .size(36.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
@@ -682,6 +1106,50 @@ fun AgentScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            // Center: Model Name "Sarvam"
+            Surface(
+                modifier = Modifier.align(Alignment.Center),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f)
+                )
+            ) {
+                Text(
+                    text = "Sarvam",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                )
+            }
+
+            // Right: New Chat Button
+            IconButton(
+                onClick = startNewChat,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(36.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                        shape = CircleShape
+                    )
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f),
+                        shape = CircleShape
+                    )
+                    .clip(CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "New Chat",
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onBackground
                 )

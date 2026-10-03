@@ -2,8 +2,9 @@ package com.vidyaschool.app.ui.shadcn
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.vidyaschool.app.ui.theme.isAppDark
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,16 +26,18 @@ enum class BadgeVariant {
 }
 
 /**
- * shadcn/ui-inspired Badge component for Jetpack Compose
+ * shadcn/ui-inspired Badge component for Jetpack Compose (pill rounded-full)
  */
 @Composable
 fun Badge(
     text: String,
     modifier: Modifier = Modifier,
     variant: BadgeVariant = BadgeVariant.DEFAULT,
+    shape: Shape = CircleShape,
+    showDot: Boolean = false,
     leadingIcon: (@Composable () -> Unit)? = null
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppDark()
 
     val (bgColor, textColor, borderColor) = when (variant) {
         BadgeVariant.DEFAULT -> Triple(
@@ -52,37 +56,45 @@ fun Badge(
             if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
         )
         BadgeVariant.DESTRUCTIVE -> Triple(
-            if (isDark) Color(0xFF7F1D1D).copy(alpha = 0.4f) else Color(0xFFFEE2E2),
-            if (isDark) Color(0xFFFCA5A5) else Color(0xFF991B1B),
-            if (isDark) Color(0xFF991B1B).copy(alpha = 0.5f) else Color(0xFFFECACA)
+            if (isDark) Color(0xFFEF4444).copy(alpha = 0.18f) else Color(0xFFEF4444).copy(alpha = 0.10f),
+            if (isDark) Color(0xFFF87171) else Color(0xFFDC2626),
+            if (isDark) Color(0xFFEF4444).copy(alpha = 0.30f) else Color(0xFFEF4444).copy(alpha = 0.25f)
         )
         BadgeVariant.SUCCESS -> Triple(
-            if (isDark) Color(0xFF064E3B).copy(alpha = 0.4f) else Color(0xFFDCFCE7),
-            if (isDark) Color(0xFF6EE7B7) else Color(0xFF166534),
-            if (isDark) Color(0xFF059669).copy(alpha = 0.5f) else Color(0xFFBBF7D0)
+            if (isDark) Color(0xFF10B981).copy(alpha = 0.18f) else Color(0xFF10B981).copy(alpha = 0.12f),
+            if (isDark) Color(0xFF34D399) else Color(0xFF047857),
+            if (isDark) Color(0xFF10B981).copy(alpha = 0.30f) else Color(0xFF10B981).copy(alpha = 0.25f)
         )
     }
 
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(6.dp))
+            .clip(shape)
             .background(bgColor)
             .then(
                 if (borderColor != Color.Transparent)
-                    Modifier.border(1.dp, borderColor, RoundedCornerShape(6.dp))
+                    Modifier.border(1.dp, borderColor, shape)
                 else Modifier
             )
-            .padding(horizontal = 8.dp, vertical = 2.5.dp),
+            .padding(horizontal = 8.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        if (showDot) {
+            Box(
+                modifier = Modifier
+                    .size(5.dp)
+                    .clip(CircleShape)
+                    .background(textColor)
+            )
+        }
         leadingIcon?.invoke()
         Text(
             text = text,
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
             color = textColor,
-            letterSpacing = 0.2.sp
+            letterSpacing = 0.1.sp
         )
     }
 }

@@ -3,6 +3,8 @@ package com.vidyaschool.app.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -140,8 +142,12 @@ fun CustomTextField(
     label: String? = null,
     isPassword: Boolean = false,
     readOnly: Boolean = false,
+    leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    onClick: (() -> Unit)? = null
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    onClick: (() -> Unit)? = null,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp)
 ) {
     com.vidyaschool.app.ui.shadcn.Input(
         value = value,
@@ -151,7 +157,11 @@ fun CustomTextField(
         modifier = modifier,
         isPassword = isPassword,
         readOnly = readOnly,
+        leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
-        onClick = onClick
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        onClick = onClick,
+        shape = shape
     )
 }

@@ -9,11 +9,13 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -31,7 +33,10 @@ fun Input(
     readOnly: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    onClick: (() -> Unit)? = null
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    onClick: (() -> Unit)? = null,
+    shape: Shape = RoundedCornerShape(8.dp)
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -50,6 +55,8 @@ fun Input(
             onValueChange = onValueChange,
             readOnly = readOnly,
             singleLine = true,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             visualTransformation = if (isPassword && !passwordVisible)
                 PasswordVisualTransformation() else VisualTransformation.None,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -72,9 +79,9 @@ fun Input(
                         .border(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = shape
                         )
-                        .padding(horizontal = 12.dp, vertical = 11.dp),
+                        .padding(horizontal = if (shape == RoundedCornerShape(8.dp)) 12.dp else 16.dp, vertical = 11.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (leadingIcon != null) {

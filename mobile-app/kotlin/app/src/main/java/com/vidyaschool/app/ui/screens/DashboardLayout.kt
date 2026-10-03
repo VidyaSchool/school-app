@@ -141,6 +141,7 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.AccountBalance
 
 val LocalMenuClickHandler = staticCompositionLocalOf<(() -> Unit)?> { null }
+val LocalTabSwitcher = staticCompositionLocalOf<((String) -> Unit)?> { null }
 
 @Composable
 fun DashboardHeader(
@@ -306,6 +307,7 @@ fun DashboardLayout(
     onThemeChange: (String) -> Unit,
     onLogout: () -> Unit,
     onShowLibrary: (() -> Unit)? = null,
+    booksContent: (@Composable (onNotificationClick: () -> Unit, hasUnreadNotifications: Boolean) -> Unit)? = null,
     homeContent: @Composable (onNotificationClick: () -> Unit, hasUnreadNotifications: Boolean) -> Unit
 ) {
     val context = LocalContext.current
@@ -341,6 +343,7 @@ fun DashboardLayout(
     var sidebarSessionsCount by remember { mutableStateOf<Int?>(null) }
     var paymentSuccessInstallment by remember { mutableStateOf<FeeInstallment?>(null) }
     var showQRLogin by remember { mutableStateOf(false) }
+    var showIssueBookDrawer by remember { mutableStateOf(false) }
     var biometricError by remember { mutableStateOf<String?>(null) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     
@@ -384,6 +387,7 @@ fun DashboardLayout(
             showAiDialog ||
             showAgentScreen ||
             showQRLogin ||
+            showIssueBookDrawer ||
             showSearchDialog ||
             selectedTab != "home"
 
@@ -398,6 +402,7 @@ fun DashboardLayout(
             showAiDialog -> showAiDialog = false
             showAgentScreen -> showAgentScreen = false
             showQRLogin -> showQRLogin = false
+            showIssueBookDrawer -> showIssueBookDrawer = false
             selectedTab != "home" -> selectedTab = "home"
             else -> {}
         }
@@ -567,7 +572,10 @@ fun DashboardLayout(
         }
     }
 
-    CompositionLocalProvider(LocalMenuClickHandler provides { scope.launch { drawerState.open() } }) {
+    CompositionLocalProvider(
+        LocalMenuClickHandler provides { scope.launch { drawerState.open() } },
+        LocalTabSwitcher provides { tab -> selectedTab = tab }
+    ) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -1103,7 +1111,7 @@ fun DashboardLayout(
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_custom_search),
                                     contentDescription = "Search",
-                                    modifier = Modifier.size(22.dp),
+                                    modifier = Modifier.size(18.dp),
                                     tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f)
                                 )
                                 Text(
@@ -1278,6 +1286,14 @@ fun DashboardLayout(
                                 icon = { Icon(painter = painterResource(id = R.drawable.ic_custom_pay_fees), contentDescription = "Pay Fees", modifier = Modifier.size(22.dp)) },
                                 colors = navItemColors
                             )
+                        } else if (currentRole.value.equals("librarian", ignoreCase = true)) {
+                            NavigationBarItem(
+                                selected = showIssueBookDrawer || selectedTab == "issue_book",
+                                onClick = { showIssueBookDrawer = true },
+                                label = { Text("Issue Book", fontSize = 10.sp, maxLines = 1, softWrap = false) },
+                                icon = { Icon(painter = painterResource(id = R.drawable.ic_custom_issue_book), contentDescription = "Issue Book", modifier = Modifier.size(22.dp)) },
+                                colors = navItemColors
+                            )
                         } else {
                             NavigationBarItem(
                                 selected = selectedTab == "community",
@@ -1293,6 +1309,14 @@ fun DashboardLayout(
                                 onClick = { selectedTab = "courses" },
                                 label = { Text("Courses", fontSize = 10.sp, maxLines = 1, softWrap = false) },
                                 icon = { Icon(painter = painterResource(id = R.drawable.ic_courses), contentDescription = "Courses", modifier = Modifier.size(22.dp)) },
+                                colors = navItemColors
+                            )
+                        } else if (currentRole.value.equals("librarian", ignoreCase = true)) {
+                            NavigationBarItem(
+                                selected = selectedTab == "books",
+                                onClick = { selectedTab = "books" },
+                                label = { Text("Books", fontSize = 10.sp, maxLines = 1, softWrap = false) },
+                                icon = { Icon(painter = painterResource(id = R.drawable.ic_custom_books), contentDescription = "Books", modifier = Modifier.size(22.dp)) },
                                 colors = navItemColors
                             )
                         } else {
@@ -1356,6 +1380,11 @@ fun DashboardLayout(
                             onBackClick = { selectedTab = "home" }
                         )
                     }
+                    "issue_book" -> {
+                        LaunchedEffect(Unit) {
+                            showIssueBookDrawer = true
+                        }
+                    }
                     "fees" -> {
                         FeesTabContent(
                             sessionManager = sessionManager,
@@ -1369,6 +1398,15 @@ fun DashboardLayout(
                     }
                     "courses" -> {
                         CoursesTabContent()
+                    }
+                    "books" -> {
+                        PullToRefreshBox(
+                            isRefreshing = isRefreshing,
+                            onRefresh = triggerRefresh,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            booksContent?.invoke({ showNotifications = true }, hasUnreadNotifications)
+                        }
                     }
                     "search" -> {
                         SearchTabContent(
@@ -1434,6 +1472,9 @@ fun DashboardLayout(
             teacherName = currentName.value.ifEmpty { "Teacher" },
             chatId = selectedChatId,
             sessionToken = sessionManager.getSessionToken(),
+            onNewChat = {
+                selectedChatId = null
+            },
             onBack = {
                 showAgentScreen = false
                 selectedChatId = null
@@ -1445,6 +1486,19 @@ fun DashboardLayout(
     if (showQRLogin) {
         QRLoginDrawer(
             onDismiss = { showQRLogin = false }
+        )
+    }
+
+    // ── Issue Book drawer bottom sheet ──────────────────────────────────────
+    if (showIssueBookDrawer) {
+        LibrarianIssueBookDrawer(
+            sessionManager = sessionManager,
+            onDismiss = {
+                showIssueBookDrawer = false
+                if (selectedTab == "issue_book") {
+                    selectedTab = "home"
+                }
+            }
         )
     }
 
@@ -7838,15 +7892,18 @@ fun QuickSearchDialog(
                 .clickable { onDismiss() },
             contentAlignment = Alignment.TopCenter
         ) {
+            val dialogShape = RoundedCornerShape(if (query.isEmpty()) 999.dp else 24.dp)
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 32.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .clip(dialogShape)
                     .background(surfaceColor)
-                    .border(1.dp, onSurface.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
+                    .border(1.dp, onSurface.copy(alpha = 0.12f), dialogShape)
                     .clickable(enabled = false) {}
-                    .padding(16.dp)
+                    .padding(horizontal = 18.dp, vertical = 10.dp)
             ) {
                 // Input header - clean input box without ESC badge
                 Row(
@@ -7857,7 +7914,7 @@ fun QuickSearchDialog(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_custom_search),
                         contentDescription = "Search",
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(18.dp),
                         tint = onSurface.copy(alpha = 0.6f)
                     )
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {

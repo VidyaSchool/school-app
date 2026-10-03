@@ -385,6 +385,18 @@ interface AuthApi {
         @Query("days") days: Int = 30
     ): Response<List<NotificationHistoryItem>>
 
+    @POST("api/notifications/send")
+    suspend fun sendPushNotification(
+        @Header("Authorization") authHeader: String,
+        @Body request: SendPushRequest
+    ): Response<SendPushResponse>
+
+    @POST("api/notices")
+    suspend fun postNotice(
+        @Header("Authorization") authHeader: String,
+        @Body request: PostNoticeRequest
+    ): Response<Map<String, Any>>
+
     @GET("api/student/leaderboard")
     suspend fun getTopPerformers(
         @Header("Authorization") authHeader: String
@@ -864,4 +876,28 @@ data class ResolvedBorrowerUser(
 data class ResolveBorrowerResponse(
     val found: Boolean = false,
     val user: ResolvedBorrowerUser? = null
+)
+
+// ── Agent Action Card API models ────────────────────────────────────────
+data class SendPushRequest(
+    val title: String,
+    val body: String,
+    val targetRole: String = "all",
+    val targetClass: String? = null,
+    val targetSection: String? = null
+)
+
+data class SendPushResponse(
+    val deliveredCount: Int? = null,
+    val detail: String? = null,
+    val error: String? = null
+)
+
+data class PostNoticeRequest(
+    val title: String,
+    val content: String,
+    val category: String = "General",
+    val isUrgent: Boolean = false,
+    val targetClass: String? = null,
+    val targetSection: String? = null
 )

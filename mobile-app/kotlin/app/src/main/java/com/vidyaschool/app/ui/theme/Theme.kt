@@ -6,11 +6,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+
+val LocalThemeIsDark = staticCompositionLocalOf { false }
+
+@Composable
+fun isAppDark(): Boolean {
+    val localDark = LocalThemeIsDark.current
+    val surfaceDark = MaterialTheme.colorScheme.surface != Color(0xFFFFFFFF)
+    return localDark || surfaceDark
+}
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFFFFFFFF),
@@ -22,7 +33,9 @@ private val DarkColorScheme = darkColorScheme(
     outline = Color(0xFF27272A),
     surfaceVariant = Color(0xFF121214),
     secondary = Color(0xFF71717A),
-    onSecondary = Color(0xFFFFFFFF)
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFF27272A),
+    onSecondaryContainer = Color(0xFFFFFFFF)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -35,7 +48,9 @@ private val LightColorScheme = lightColorScheme(
     outline = Color(0xFFE4E4E7),
     surfaceVariant = Color(0xFFF4F4F5),
     secondary = Color(0xFFA1A1AA),
-    onSecondary = Color(0xFF18181B)
+    onSecondary = Color(0xFF18181B),
+    secondaryContainer = Color(0xFFE4E4E7),
+    onSecondaryContainer = Color(0xFF18181B)
 )
 
 @Composable
@@ -61,6 +76,13 @@ fun VidyaSchoolTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        content = content
-    )
+        typography = AppTypography
+    ) {
+        CompositionLocalProvider(
+            LocalThemeIsDark provides darkTheme,
+            androidx.compose.material3.LocalTextStyle provides androidx.compose.material3.LocalTextStyle.current.copy(fontFamily = ClarityCityFontFamily)
+        ) {
+            content()
+        }
+    }
 }
