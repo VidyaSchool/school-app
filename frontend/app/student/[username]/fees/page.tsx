@@ -141,7 +141,9 @@ export default function StudentFeesPage() {
   }, [])
 
   const fetchData = async () => {
-    setLoading(true)
+    if (!getStudentCache("fees_data")) {
+      setLoading(true)
+    }
     setError("")
     try {
       // 1. Fetch student info from frontend '/api/account'
@@ -193,7 +195,9 @@ export default function StudentFeesPage() {
         months: mappedFees,
       })
     } catch (err) {
-      setError(getErrorMessage(err))
+      if (!getStudentCache("fees_data")) {
+        setError(getErrorMessage(err))
+      }
     } finally {
       setLoading(false)
     }
