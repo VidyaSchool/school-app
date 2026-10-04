@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+import StudentFeesLoading from "./loading"
 
 interface FeeMonth {
   id: string
@@ -308,6 +309,10 @@ export default function StudentFeesPage() {
     }
   }
 
+  if (loading) {
+    return <StudentFeesLoading />
+  }
+
   return (
     <div className="flex flex-col gap-6 py-6 min-h-screen bg-background">
       
@@ -328,15 +333,8 @@ export default function StudentFeesPage() {
         </div>
       )}
 
-      {loading ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-24 gap-3">
-          <Loader2Icon className="h-10 w-10 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground font-medium">Loading fee records...</span>
-        </div>
-      ) : (
-        <>
-          {/* Metrics Summary Panels */}
-          <div className="grid gap-4 md:grid-cols-3 px-6 lg:px-8">
+      {/* Metrics Summary Panels */}
+      <div className="grid gap-4 md:grid-cols-3 px-6 lg:px-8">
             
             {/* Metric 1 */}
             <div className="rounded-xl border border-border bg-card/50 p-6 flex items-center justify-between shadow-sm">
@@ -527,8 +525,6 @@ export default function StudentFeesPage() {
               </Table>
             </div>
           </div>
-        </>
-      )}
 
       {/* Checkout Dialog Modal */}
       <AnimatePresence>

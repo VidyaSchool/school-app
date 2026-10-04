@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
+import StudentNoticeLoading from "./loading"
 
 interface Notice {
   id: string
@@ -24,11 +25,12 @@ interface Notice {
 export default function StudentNoticePage() {
   const [notices, setNotices] = React.useState<Notice[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [isRefreshing, setIsRefreshing] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All")
 
-  const fetchNotices = React.useCallback(async () => {
-    setLoading(true)
+  const fetchNotices = React.useCallback(async (isInitial = false) => {
+    if (!isInitial) setIsRefreshing(true)
     try {
       const res = await fetch("/api/notices")
       if (!res.ok) throw new Error("Failed to fetch notices")
@@ -38,12 +40,17 @@ export default function StudentNoticePage() {
       toast.error(err.message || "Failed to load notices")
     } finally {
       setLoading(false)
+      setIsRefreshing(false)
     }
   }, [])
 
   React.useEffect(() => {
-    fetchNotices()
+    fetchNotices(true)
   }, [fetchNotices])
+
+  if (loading) {
+    return <StudentNoticeLoading />
+  }
 
   const filteredNotices = notices.filter(notice => {
     const matchesSearch = notice.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -67,13 +74,13 @@ export default function StudentNoticePage() {
           </p>
         </div>
         <Button
-          onClick={fetchNotices}
+          onClick={() => fetchNotices(false)}
           variant="outline"
           size="sm"
           className="sm:w-auto rounded-lg cursor-pointer flex items-center gap-1.5"
-          disabled={loading}
+          disabled={isRefreshing}
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
           Refresh
         </Button>
       </div>
@@ -107,12 +114,7 @@ export default function StudentNoticePage() {
 
       {/* Notices List */}
       <div className="grid gap-6 px-6 lg:px-8">
-        {loading ? (
-          <div className="py-24 flex flex-col items-center justify-center gap-3">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground font-semibold">Loading notices...</p>
-          </div>
-        ) : filteredNotices.length > 0 ? (
+        {filteredNotices.length > 0 ? (
           filteredNotices.map((notice) => (
             <div key={notice.id} className={`rounded-xl border p-6 bg-card/30 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden ${
               notice.isUrgent ? "border-amber-500/30 bg-amber-500/[0.01]" : "border-border"

@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
+import StudentLibraryLoading from "./loading"
 import {
   Table,
   TableBody,
@@ -104,6 +105,10 @@ export default function StudentLibraryPage() {
     return matchesSearch && book.status === statusFilter
   })
 
+
+  if (loading) {
+    return <StudentLibraryLoading />
+  }
 
   return (
     <div className="flex flex-col gap-6 py-6 min-h-screen bg-background">
@@ -206,16 +211,7 @@ export default function StudentLibraryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground text-sm animate-pulse">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Spinner size="lg" />
-                      <span className="font-semibold text-xs text-muted-foreground mt-2">Retrieving library logs...</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : filteredIssues.length > 0 ? (
+              {filteredIssues.length > 0 ? (
                 filteredIssues.map((book) => {
                   const isActive = book.status === "active"
 

@@ -4,6 +4,7 @@ import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import StudentNotesLoading from "./loading"
 import {
   NotebookPenIcon,
   BookOpenIcon,
@@ -205,6 +206,10 @@ export default function StudentNotesPage() {
     })
   }, [notes, selectedTopic, searchQuery])
 
+  if (loading) {
+    return <StudentNotesLoading />
+  }
+
   return (
     <div className="flex flex-col gap-6 py-6 px-4 lg:px-8 min-h-screen">
       {/* Header Bar */}
@@ -261,16 +266,7 @@ export default function StudentNotesPage() {
       )}
 
       {/* Main Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="h-56 bg-zinc-100 dark:bg-[#18181b] rounded-2xl p-5 flex flex-col gap-3 animate-pulse border border-border/40"
-            />
-          ))}
-        </div>
-      ) : filteredNotes.length === 0 ? (
+      {filteredNotes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 border border-dashed border-border/60 rounded-3xl bg-muted/10 text-center">
           <NotebookPenIcon className="size-12 text-muted-foreground/30 mb-3" />
           <h3 className="font-bold text-base text-foreground">No notes available</h3>

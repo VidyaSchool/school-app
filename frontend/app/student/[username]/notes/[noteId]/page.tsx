@@ -36,6 +36,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
+import StudentNoteDetailLoading from "./loading"
 
 interface NoteDetail {
   id: string
@@ -786,6 +787,10 @@ export default function StudentNoteDetailPage() {
   const readingStats = note ? calculateReadingStats(note.content) : null
   const pdfLink = note?.pdf_url || note?.pdfUrl
 
+  if (loading) {
+    return <StudentNoteDetailLoading />
+  }
+
   return (
     <div
       className={`min-h-screen transition-colors duration-300 pb-20 ${
@@ -935,29 +940,7 @@ export default function StudentNoteDetailPage() {
         </div>
 
         {/* Content Section */}
-        {loading ? (
-          <div className="space-y-6 animate-pulse">
-            <Card className="rounded-3xl p-8 border-border/60">
-              <div className="h-6 bg-muted rounded-full w-1/4 mb-4" />
-              <div className="h-10 bg-muted rounded-2xl w-3/4 mb-6" />
-              <div className="flex items-center gap-4">
-                <div className="size-10 bg-muted rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-3 bg-muted rounded w-1/4" />
-                  <div className="h-3 bg-muted rounded w-1/6" />
-                </div>
-              </div>
-            </Card>
-            <Card className="rounded-3xl p-8 border-border/60">
-              <div className="space-y-4">
-                <div className="h-4 bg-muted rounded w-full" />
-                <div className="h-4 bg-muted rounded w-5/6" />
-                <div className="h-4 bg-muted rounded w-4/6" />
-                <div className="h-32 bg-muted/40 rounded-2xl mt-6" />
-              </div>
-            </Card>
-          </div>
-        ) : !note ? (
+        {!note ? (
           <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
             <Card className="rounded-3xl p-16 text-center border-border/60 bg-card/60 backdrop-blur-md">
               <div className="size-16 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-4 text-muted-foreground">

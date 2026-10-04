@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import StudentLeaderboardLoading from "./loading"
 
 interface LeaderboardEntry {
   id: string
@@ -77,11 +78,7 @@ export default function StudentLeaderboardPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] w-full items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
+    return <StudentLeaderboardLoading />
   }
 
   if (error || !data || data.leaderboard.length === 0) {

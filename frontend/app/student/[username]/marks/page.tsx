@@ -37,6 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import StudentMarksLoading from "./loading"
 
 interface SubjectMark {
   code: string
@@ -330,11 +331,7 @@ export default function StudentMarksPage() {
   }))
 
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] w-full items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
+    return <StudentMarksLoading />
   }
 
   if (Object.keys(marksData).length === 0) {
