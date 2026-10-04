@@ -46,6 +46,7 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const { isMobile, setOpenMobile } = useSidebar()
 
   return (
@@ -76,6 +77,12 @@ export function NavMain({
                 >
                   <Link 
                     href={item.url} 
+                    prefetch={true}
+                    onMouseEnter={() => {
+                      try {
+                        router.prefetch(item.url)
+                      } catch {}
+                    }}
                     onClick={() => {
                       item.onClick?.()
                       if (isMobile) {

@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import StudentLeaderboardSkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 
 interface LeaderboardEntry {
   id: string
@@ -37,8 +38,9 @@ interface LeaderboardData {
 }
 
 export default function StudentLeaderboardPage() {
-  const [data, setData] = React.useState<LeaderboardData | null>(null)
-  const [loading, setLoading] = React.useState(true)
+  const cachedLeaderboard = React.useMemo(() => getStudentCache<LeaderboardData>("leaderboard"), [])
+  const [data, setData] = React.useState<LeaderboardData | null>(() => cachedLeaderboard || null)
+  const [loading, setLoading] = React.useState(() => !cachedLeaderboard)
   const [error, setError] = React.useState<string | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
 
@@ -50,10 +52,13 @@ export default function StudentLeaderboardPage() {
       })
       .then((data: LeaderboardData) => {
         setData(data)
+        setStudentCache("leaderboard", data)
         setLoading(false)
       })
       .catch((err) => {
-        setError(err.message)
+        if (!getStudentCache("leaderboard")) {
+          setError(err.message)
+        }
         setLoading(false)
       })
   }, [])

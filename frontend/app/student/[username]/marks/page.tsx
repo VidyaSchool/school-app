@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import StudentMarksSkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 
 interface SubjectMark {
   code: string
@@ -269,13 +270,20 @@ function normalizeMarksResponse(data: any): Record<string, TermMarks> {
 }
 
 export default function StudentMarksPage() {
-  const [activeTerm, setActiveTerm] = React.useState<string>("")
+  const cachedMarks = React.useMemo(() => getStudentCache<Record<string, TermMarks>>("marks_parsed"), [])
+  const [activeTerm, setActiveTerm] = React.useState<string>(() => {
+    if (cachedMarks) {
+      const keys = Object.keys(cachedMarks)
+      return keys.length > 0 ? keys[0] : ""
+    }
+    return ""
+  })
   const [selectedSubject, setSelectedSubject] = React.useState<SubjectMark | null>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [isMounted, setIsMounted] = React.useState(false)
 
-  const [marksData, setMarksData] = React.useState<Record<string, TermMarks>>({})
-  const [loading, setLoading] = React.useState(true)
+  const [marksData, setMarksData] = React.useState<Record<string, TermMarks>>(() => cachedMarks || {})
+  const [loading, setLoading] = React.useState(() => !cachedMarks)
   const [error, setError] = React.useState("")
 
   React.useEffect(() => {
@@ -288,14 +296,17 @@ export default function StudentMarksPage() {
       .then((data) => {
         const parsed = normalizeMarksResponse(data)
         setMarksData(parsed)
+        setStudentCache("marks_parsed", parsed)
         const keys = Object.keys(parsed)
         if (keys.length > 0) {
-          setActiveTerm(keys[0])
+          setActiveTerm((prev) => prev || keys[0])
         }
         setLoading(false)
       })
       .catch((err) => {
-        setError(err.message)
+        if (!getStudentCache("marks_parsed")) {
+          setError(err.message)
+        }
         setLoading(false)
       })
   }, [])

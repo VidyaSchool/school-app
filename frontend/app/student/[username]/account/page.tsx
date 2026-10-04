@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Loader2Icon, UserIcon, UploadCloudIcon, BusIcon, FootprintsIcon, Link2Icon } from "lucide-react"
 import StudentAccountSkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 
 const STUDENT_DOCUMENT_SLOTS: DocumentSlot[] = [
   {
@@ -56,8 +57,9 @@ const STUDENT_DOCUMENT_SLOTS: DocumentSlot[] = [
 ]
 
 export default function StudentAccountPage() {
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
+  const cachedAccount = useMemo(() => getStudentCache<{ user: any; profile: any }>("account_full"), [])
+  const [user, setUser] = useState<any>(() => cachedAccount?.user || null)
+  const [profile, setProfile] = useState<any>(() => cachedAccount?.profile || null)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
@@ -77,10 +79,15 @@ export default function StudentAccountPage() {
   }, [])
 
   const fetchData = async () => {
-    const res = await fetch('/api/account')
-    const data = await res.json()
-    setUser(data.user)
-    setProfile(data.profile)
+    try {
+      const res = await fetch('/api/account')
+      const data = await res.json()
+      if (data.user) {
+        setUser(data.user)
+        setProfile(data.profile)
+        setStudentCache("account_full", { user: data.user, profile: data.profile })
+      }
+    } catch {}
   }
 
   const handleSave = async () => {

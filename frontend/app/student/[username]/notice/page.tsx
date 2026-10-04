@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
 import StudentNoticeSkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 
 interface Notice {
   id: string
@@ -23,8 +24,9 @@ interface Notice {
 }
 
 export default function StudentNoticePage() {
-  const [notices, setNotices] = React.useState<Notice[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const cachedNotices = React.useMemo(() => getStudentCache<Notice[]>("notices"), [])
+  const [notices, setNotices] = React.useState<Notice[]>(() => cachedNotices || [])
+  const [loading, setLoading] = React.useState(() => !cachedNotices)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All")
@@ -36,8 +38,11 @@ export default function StudentNoticePage() {
       if (!res.ok) throw new Error("Failed to fetch notices")
       const data = await res.json()
       setNotices(data)
+      setStudentCache("notices", data)
     } catch (err: any) {
-      toast.error(err.message || "Failed to load notices")
+      if (isInitial && !getStudentCache("notices")) {
+        toast.error(err.message || "Failed to load notices")
+      }
     } finally {
       setLoading(false)
       setIsRefreshing(false)

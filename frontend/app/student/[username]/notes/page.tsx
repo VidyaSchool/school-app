@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import StudentNotesSkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 import {
   NotebookPenIcon,
   BookOpenIcon,
@@ -59,8 +60,9 @@ export default function StudentNotesPage() {
   const params = useParams<{ username: string }>()
   const username = params?.username || ""
 
-  const [notes, setNotes] = React.useState<NoteItem[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const cachedNotes = React.useMemo(() => getStudentCache<NoteItem[]>("notes_parsed"), [])
+  const [notes, setNotes] = React.useState<NoteItem[]>(() => cachedNotes || [])
+  const [loading, setLoading] = React.useState(() => !cachedNotes)
   const [selectedTopic, setSelectedTopic] = React.useState<string>("All")
   const [searchQuery, setSearchQuery] = React.useState<string>("")
 
@@ -160,13 +162,17 @@ export default function StudentNotesPage() {
       })
       .then(data => {
         if (data.notes && Array.isArray(data.notes) && data.notes.length > 0) {
-          setNotes(parseNotes(data.notes))
+          const parsed = parseNotes(data.notes)
+          setNotes(parsed)
+          setStudentCache("notes_parsed", parsed)
         } else {
           return fetch("/api/student/notes")
             .then(res => res.json())
             .then(fallbackData => {
               if (fallbackData.notes && Array.isArray(fallbackData.notes)) {
-                setNotes(parseNotes(fallbackData.notes))
+                const parsed = parseNotes(fallbackData.notes)
+                setNotes(parsed)
+                setStudentCache("notes_parsed", parsed)
               }
             })
         }
@@ -176,7 +182,9 @@ export default function StudentNotesPage() {
           .then(res => res.json())
           .then(data => {
             if (data.notes && Array.isArray(data.notes)) {
-              setNotes(parseNotes(data.notes))
+              const parsed = parseNotes(data.notes)
+              setNotes(parsed)
+              setStudentCache("notes_parsed", parsed)
             }
           })
           .catch(() => {})

@@ -17,8 +17,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { Spinner } from "@/components/ui/spinner"
 import StudentLibrarySkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 import {
   Table,
   TableBody,
@@ -42,8 +42,9 @@ interface BookIssue {
 }
 
 export default function StudentLibraryPage() {
-  const [issues, setIssues] = React.useState<BookIssue[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const cachedIssues = React.useMemo(() => getStudentCache<BookIssue[]>("library"), [])
+  const [issues, setIssues] = React.useState<BookIssue[]>(() => cachedIssues || [])
+  const [loading, setLoading] = React.useState(() => !cachedIssues)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [statusFilter, setStatusFilter] = React.useState<"all" | "active" | "overdue" | "returned">("all")
   
@@ -56,8 +57,11 @@ export default function StudentLibraryPage() {
       if (!res.ok) throw new Error("Failed to fetch library borrowings")
       const data = await res.json()
       setIssues(data)
+      setStudentCache("library", data)
     } catch (err: any) {
-      toast.error(err.message || "Failed to load library logs")
+      if (!getStudentCache("library")) {
+        toast.error(err.message || "Failed to load library logs")
+      }
     } finally {
       setLoading(false)
     }

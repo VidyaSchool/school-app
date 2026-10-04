@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import StudentFeesSkeleton from "./skeleton"
+import { getStudentCache, setStudentCache } from "@/lib/student-cache"
 
 interface FeeMonth {
   id: string
@@ -85,15 +86,16 @@ const formatClassSection = (cls?: string, sec?: string) => {
 }
 
 export default function StudentFeesPage() {
-  const [months, setMonths] = React.useState<FeeMonth[]>([])
+  const cachedFees = React.useMemo(() => getStudentCache<{ profile: any; months: FeeMonth[] }>("fees_data"), [])
+  const [months, setMonths] = React.useState<FeeMonth[]>(() => cachedFees?.months || [])
   const [selectedMonths, setSelectedMonths] = React.useState<string[]>([])
-  const [studentProfile, setStudentProfile] = React.useState<{ name: string; admissionNumber: string; class: string; section: string } | null>(null)
+  const [studentProfile, setStudentProfile] = React.useState<{ name: string; admissionNumber: string; class: string; section: string } | null>(() => cachedFees?.profile || null)
   
   const [checkoutData, setCheckoutData] = React.useState<{ ids: string[]; amount: number; title: string; subtitle: string } | null>(null)
   const [receiptMonth, setReceiptMonth] = React.useState<FeeMonth | null>(null)
   const [isPaying, setIsPaying] = React.useState(false)
   const [paymentMessage, setPaymentMessage] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(true)
+  const [loading, setLoading] = React.useState(() => !cachedFees)
   const [error, setError] = React.useState("")
   const razorpayScriptLoaded = React.useRef(false)
 
@@ -181,6 +183,15 @@ export default function StudentFeesPage() {
         qrDataUrl: inst.qr_data_url ?? undefined,
       }))
       setMonths(mappedFees)
+      setStudentCache("fees_data", {
+        profile: {
+          name: accountData.user?.name || "Student",
+          admissionNumber: accountData.profile?.admissionNumber || "N/A",
+          class: accountData.profile?.class || "",
+          section: accountData.profile?.section || "",
+        },
+        months: mappedFees,
+      })
     } catch (err) {
       setError(getErrorMessage(err))
     } finally {
