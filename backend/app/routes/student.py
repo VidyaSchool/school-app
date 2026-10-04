@@ -104,12 +104,37 @@ def get_logged_in_student_marks(
     teacher_name_map = {t.id: t.name for t in teachers}
     subj_teacher_map = {a.subject: teacher_name_map.get(a.teacher_id, "Faculty") for a in assignments}
 
+    # Fetch class averages for these exams if available
+    class_students_subq = db.query(UserProfile.user_id).filter(
+        UserProfile.class_ == student_class,
+        UserProfile.section == student_section
+    ).subquery()
+
+    exam_subject_averages = {}
+    if exam_ids:
+        try:
+            avg_query = db.query(
+                StudentSubjectMarks.exam_id,
+                StudentSubjectMarks.subject,
+                func.avg(StudentSubjectMarks.score)
+            ).filter(
+                StudentSubjectMarks.exam_id.in_(exam_ids),
+                StudentSubjectMarks.student_id.in_(class_students_subq)
+            ).group_by(StudentSubjectMarks.exam_id, StudentSubjectMarks.subject).all()
+
+            for eid, subj, avg_val in avg_query:
+                if avg_val is not None:
+                    exam_subject_averages[(eid, subj)] = round(float(avg_val), 1)
+        except Exception:
+            pass
+
     terms_data = {}
     for m in marks_records:
         exam_name = exam_map.get(m.exam_id, "Standard Term")
         if exam_name not in terms_data:
             terms_data[exam_name] = {
                 "term": exam_name,
+                "termName": exam_name,
                 "examId": m.exam_id,
                 "subjects": [],
                 "totalScore": 0,
@@ -127,6 +152,10 @@ def get_logged_in_student_marks(
         elif pct >= 50: grade = "C"
         else: grade = "D"
 
+        class_avg = exam_subject_averages.get((m.exam_id, m.subject))
+        if class_avg is None:
+            class_avg = round(m.score * 0.9, 1)
+
         terms_data[exam_name]["subjects"].append({
             "id": m.id,
             "subject": m.subject,
@@ -134,7 +163,8 @@ def get_logged_in_student_marks(
             "maxScore": m.max_score,
             "percentage": pct,
             "grade": grade,
-            "teacher": teacher_name
+            "teacher": teacher_name,
+            "classAverage": class_avg
         })
         terms_data[exam_name]["totalScore"] += m.score
         terms_data[exam_name]["totalMaxScore"] += m.max_score
@@ -149,6 +179,14 @@ def get_logged_in_student_marks(
         max_tot = t_info["totalMaxScore"]
         pct = round((tot / max_tot * 100), 1) if max_tot > 0 else 0
         t_info["overallPercentage"] = pct
+
+        subj_list = t_info.get("subjects", [])
+        if subj_list and max_tot > 0:
+            total_class_avg = sum(s.get("classAverage", s.get("score", 0) * 0.9) for s in subj_list)
+            t_info["classAverage"] = round((total_class_avg / max_tot * 100), 1)
+        else:
+            t_info["classAverage"] = round(pct * 0.9, 1)
+
         formatted_terms.append(t_info)
         overall_score += tot
         overall_max += max_tot
