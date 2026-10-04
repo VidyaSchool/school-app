@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Loader2Icon, UserIcon, UploadCloudIcon, BusIcon, FootprintsIcon, Link2Icon } from "lucide-react"
 import StudentAccountSkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 
 const STUDENT_DOCUMENT_SLOTS: DocumentSlot[] = [
   {
@@ -75,7 +75,9 @@ export default function StudentAccountPage() {
   }, [searchParams])
 
   useEffect(() => {
-    fetchData()
+    if (!isCacheFresh("account_full")) {
+      fetchData()
+    }
   }, [])
 
   const fetchData = async () => {

@@ -15,6 +15,7 @@ import { AlertTriangle, CirclePlusIcon, MailIcon, Send } from "lucide-react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { useSession } from "@/lib/auth-client"
+import { prefetchTabOnIntent } from "@/lib/student-cache"
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,26 @@ export function NavMain({
   const pathname = usePathname()
   const router = useRouter()
   const { isMobile, setOpenMobile } = useSidebar()
+  const hoverTimersRef = React.useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+
+  const handleMouseEnter = React.useCallback((url: string) => {
+    try {
+      router.prefetch(url)
+    } catch {}
+
+    if (url.includes("/student/")) {
+      hoverTimersRef.current[url] = setTimeout(() => {
+        prefetchTabOnIntent(url)
+      }, 150)
+    }
+  }, [router])
+
+  const handleMouseLeave = React.useCallback((url: string) => {
+    if (hoverTimersRef.current[url]) {
+      clearTimeout(hoverTimersRef.current[url])
+      delete hoverTimersRef.current[url]
+    }
+  }, [])
 
   return (
     <SidebarGroup>
@@ -78,11 +99,8 @@ export function NavMain({
                   <Link 
                     href={item.url} 
                     prefetch={true}
-                    onMouseEnter={() => {
-                      try {
-                        router.prefetch(item.url)
-                      } catch {}
-                    }}
+                    onMouseEnter={() => handleMouseEnter(item.url)}
+                    onMouseLeave={() => handleMouseLeave(item.url)}
                     onClick={() => {
                       item.onClick?.()
                       if (isMobile) {

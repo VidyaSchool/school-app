@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import StudentMarksSkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 
 interface SubjectMark {
   code: string
@@ -288,27 +288,29 @@ export default function StudentMarksPage() {
 
   React.useEffect(() => {
     setIsMounted(true)
-    fetch("/api/backend/api/student/marks")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load marks")
-        return res.json()
-      })
-      .then((data) => {
-        const parsed = normalizeMarksResponse(data)
-        setMarksData(parsed)
-        setStudentCache("marks_parsed", parsed)
-        const keys = Object.keys(parsed)
-        if (keys.length > 0) {
-          setActiveTerm((prev) => prev || keys[0])
-        }
-        setLoading(false)
-      })
-      .catch((err) => {
-        if (!getStudentCache("marks_parsed")) {
-          setError(err.message)
-        }
-        setLoading(false)
-      })
+    if (!isCacheFresh("marks_parsed")) {
+      fetch("/api/backend/api/student/marks")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load marks")
+          return res.json()
+        })
+        .then((data) => {
+          const parsed = normalizeMarksResponse(data)
+          setMarksData(parsed)
+          setStudentCache("marks_parsed", parsed)
+          const keys = Object.keys(parsed)
+          if (keys.length > 0) {
+            setActiveTerm((prev) => prev || keys[0])
+          }
+          setLoading(false)
+        })
+        .catch((err) => {
+          if (!getStudentCache("marks_parsed")) {
+            setError(err.message)
+          }
+          setLoading(false)
+        })
+    }
   }, [])
 
   const termOptions = React.useMemo(() => {

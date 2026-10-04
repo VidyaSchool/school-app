@@ -1,6 +1,13 @@
 /**
- * In-memory client cache for student portal routes to enable instant 0ms tab switching
- * with Stale-While-Revalidate (SWR) pattern.
+ * High-performance, server-healthy client cache for the student portal.
+ * 
+ * Design Principles:
+ * 1. Zero mass prefetching on login (prevents request storms on server).
+ * 2. In-memory Stale-While-Revalidate with a 2-minute freshness window:
+ *    switching between tabs uses local RAM (0ms latency, 0 server requests).
+ * 3. In-flight request deduplication: concurrent requests for the same key are merged into 1.
+ * 4. Intent-based hover prefetch: only fetches a single tab when the user intentionally
+ *    hovers for >150ms, and only if that tab is not already cached fresh.
  */
 
 interface CacheEntry<T> {
@@ -8,18 +15,23 @@ interface CacheEntry<T> {
   timestamp: number
 }
 
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const DEFAULT_FRESH_TTL_MS = 2 * 60 * 1000 // 2 minutes fresh window
 const _cache = new Map<string, CacheEntry<any>>()
-let _hasPrefetched = false
+const _inFlight = new Map<string, Promise<any>>()
 
+/**
+ * Retrieve cached data from memory.
+ */
 export function getStudentCache<T>(key: string): T | null {
   if (typeof window === "undefined") return null
   const entry = _cache.get(key)
   if (!entry) return null
-  // Return cached data even if slightly stale (stale-while-revalidate)
   return entry.data as T
 }
 
+/**
+ * Store data in client memory with a fresh timestamp.
+ */
 export function setStudentCache<T>(key: string, data: T): void {
   if (typeof window === "undefined") return
   _cache.set(key, {
@@ -28,47 +40,84 @@ export function setStudentCache<T>(key: string, data: T): void {
   })
 }
 
+/**
+ * Check if the cache entry exists and was updated within maxAgeMs (default 2 mins).
+ */
+export function isCacheFresh(key: string, maxAgeMs = DEFAULT_FRESH_TTL_MS): boolean {
+  if (typeof window === "undefined") return false
+  const entry = _cache.get(key)
+  if (!entry) return false
+  return Date.now() - entry.timestamp < maxAgeMs
+}
+
+/**
+ * Clear cache for a specific key or all entries.
+ */
 export function clearStudentCache(key?: string): void {
   if (key) {
     _cache.delete(key)
+    _inFlight.delete(key)
   } else {
     _cache.clear()
-    _hasPrefetched = false
+    _inFlight.clear()
   }
 }
 
 /**
- * Background prefetcher for student portal data.
- * Runs during browser idle time once per session to warm up all student subpage caches.
+ * Deduplicated fetch helper. If an identical request is already in-flight, returns the existing promise.
  */
-export function prefetchStudentPortalData(): void {
-  if (typeof window === "undefined" || _hasPrefetched) return
-  _hasPrefetched = true
+function deduplicatedFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  const existing = _inFlight.get(key)
+  if (existing) return existing
 
-  const runPrefetch = () => {
-    // 1. Notices
-    if (!_cache.has("notices")) {
+  const promise = fetcher().finally(() => {
+    _inFlight.delete(key)
+  })
+
+  _inFlight.set(key, promise)
+  return promise
+}
+
+/**
+ * Intent-based prefetcher for a single tab.
+ * Only called on intentional hover/interaction, and skips completely if already fresh.
+ */
+export function prefetchTabOnIntent(url: string): void {
+  if (typeof window === "undefined") return
+
+  const cleanUrl = url.toLowerCase().split("?")[0]
+
+  // 1. Notice Board
+  if (cleanUrl.endsWith("/notice")) {
+    if (isCacheFresh("notices")) return
+    deduplicatedFetch("notices", () =>
       fetch("/api/notices")
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (data) setStudentCache("notices", data)
         })
-        .catch(() => {})
-    }
+        .catch(() => null)
+    )
+    return
+  }
 
-    // 2. Fees & Student Profile
-    if (!_cache.has("fees_data")) {
+  // 2. Fees
+  if (cleanUrl.endsWith("/fees")) {
+    if (isCacheFresh("fees_data")) return
+    deduplicatedFetch("fees_data", () =>
       Promise.all([
         fetch("/api/account").then((r) => (r.ok ? r.json() : null)).catch(() => null),
         fetch("/api/fees").then((r) => (r.ok ? r.json() : null)).catch(() => null),
       ]).then(([accountData, feesData]) => {
         if (accountData || feesData) {
-          const profile = accountData ? {
-            name: accountData.user?.name || "Student",
-            admissionNumber: accountData.profile?.admissionNumber || "N/A",
-            class: accountData.profile?.class || "",
-            section: accountData.profile?.section || "",
-          } : null
+          const profile = accountData
+            ? {
+                name: accountData.user?.name || "Student",
+                admissionNumber: accountData.profile?.admissionNumber || "N/A",
+                class: accountData.profile?.class || "",
+                section: accountData.profile?.section || "",
+              }
+            : null
 
           let months: any[] = []
           if (Array.isArray(feesData)) {
@@ -88,54 +137,78 @@ export function prefetchStudentPortalData(): void {
           if (profile && months.length > 0) {
             setStudentCache("fees_data", { profile, months })
           }
-          if (accountData?.user) {
-            setStudentCache("account_full", { user: accountData.user, profile: accountData.profile })
-          }
         }
-      }).catch(() => {})
-    }
+      }).catch(() => null)
+    )
+    return
+  }
 
-    // 3. Library Borrowings
-    if (!_cache.has("library")) {
+  // 3. Library
+  if (cleanUrl.endsWith("/library")) {
+    if (isCacheFresh("library")) return
+    deduplicatedFetch("library", () =>
       fetch("/api/backend/api/student/borrowings")
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (data) setStudentCache("library", data)
         })
-        .catch(() => {})
-    }
+        .catch(() => null)
+    )
+    return
+  }
 
-    // 4. Leaderboard
-    if (!_cache.has("leaderboard")) {
+  // 4. Leaderboard
+  if (cleanUrl.endsWith("/leaderboard")) {
+    if (isCacheFresh("leaderboard")) return
+    deduplicatedFetch("leaderboard", () =>
       fetch("/api/backend/api/student/leaderboard")
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (data) setStudentCache("leaderboard", data)
         })
-        .catch(() => {})
-    }
+        .catch(() => null)
+    )
+    return
+  }
 
-    // 5. Marks
-    if (!_cache.has("marks_parsed")) {
+  // 5. Marks
+  if (cleanUrl.endsWith("/marks")) {
+    if (isCacheFresh("marks_parsed")) return
+    deduplicatedFetch("marks_raw", () =>
       fetch("/api/backend/api/student/marks")
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           if (data) setStudentCache("marks_raw", data)
         })
-        .catch(() => {})
-    }
-
-    // 6. Notes
-    if (!_cache.has("notes_parsed")) {
-      fetch("/api/student/notes")
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => {})
-    }
+        .catch(() => null)
+    )
+    return
   }
 
-  if ("requestIdleCallback" in window) {
-    (window as any).requestIdleCallback(runPrefetch, { timeout: 2000 })
-  } else {
-    setTimeout(runPrefetch, 200)
+  // 6. Notes
+  if (cleanUrl.endsWith("/notes")) {
+    if (isCacheFresh("notes_parsed")) return
+    deduplicatedFetch("notes", () =>
+      fetch("/api/student/notes")
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+    )
+    return
+  }
+
+  // 7. Account
+  if (cleanUrl.endsWith("/account")) {
+    if (isCacheFresh("account_full")) return
+    deduplicatedFetch("account_full", () =>
+      fetch("/api/account")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (data?.user) {
+            setStudentCache("account_full", { user: data.user, profile: data.profile })
+          }
+        })
+        .catch(() => null)
+    )
+    return
   }
 }

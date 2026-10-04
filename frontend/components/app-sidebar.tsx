@@ -48,7 +48,6 @@ import { Button } from "@/components/ui/button"
 import { Smartphone, Download, Plus } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
-import { prefetchStudentPortalData } from "@/lib/student-cache"
 
 // Module-level username cache — fetched once per page load, shared across all hooks
 let _cachedUsername: string | null = null
@@ -88,9 +87,6 @@ function useProfileUsername(): string | null {
         setUsername(u)
       }
     })
-    if (pathname?.startsWith("/student")) {
-      prefetchStudentPortalData()
-    }
   }, [pathname])
 
   return username

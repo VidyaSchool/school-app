@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
 import StudentNoticeSkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 
 interface Notice {
   id: string
@@ -50,7 +50,9 @@ export default function StudentNoticePage() {
   }, [])
 
   React.useEffect(() => {
-    fetchNotices(true)
+    if (!isCacheFresh("notices")) {
+      fetchNotices(true)
+    }
   }, [fetchNotices])
 
   if (loading) {

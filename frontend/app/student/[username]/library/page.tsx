@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import StudentLibrarySkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 import {
   Table,
   TableBody,
@@ -68,7 +68,9 @@ export default function StudentLibraryPage() {
   }, [])
 
   React.useEffect(() => {
-    fetchIssues()
+    if (!isCacheFresh("library")) {
+      fetchIssues()
+    }
   }, [fetchIssues])
 
   // Calculations

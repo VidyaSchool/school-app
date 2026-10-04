@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import StudentLeaderboardSkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 
 interface LeaderboardEntry {
   id: string
@@ -45,22 +45,24 @@ export default function StudentLeaderboardPage() {
   const [searchQuery, setSearchQuery] = React.useState("")
 
   React.useEffect(() => {
-    fetch("/api/backend/api/student/leaderboard")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load leaderboard data")
-        return res.json()
-      })
-      .then((data: LeaderboardData) => {
-        setData(data)
-        setStudentCache("leaderboard", data)
-        setLoading(false)
-      })
-      .catch((err) => {
-        if (!getStudentCache("leaderboard")) {
-          setError(err.message)
-        }
-        setLoading(false)
-      })
+    if (!isCacheFresh("leaderboard")) {
+      fetch("/api/backend/api/student/leaderboard")
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to load leaderboard data")
+          return res.json()
+        })
+        .then((data: LeaderboardData) => {
+          setData(data)
+          setStudentCache("leaderboard", data)
+          setLoading(false)
+        })
+        .catch((err) => {
+          if (!getStudentCache("leaderboard")) {
+            setError(err.message)
+          }
+          setLoading(false)
+        })
+    }
   }, [])
 
   const filteredLeaderboard = React.useMemo(() => {

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import StudentFeesSkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 
 interface FeeMonth {
   id: string
@@ -207,7 +207,9 @@ export default function StudentFeesPage() {
     const initializePage = async () => {
       try {
         await loadRazorpayScript()
-        await fetchData()
+        if (!isCacheFresh("fees_data")) {
+          await fetchData()
+        }
       } catch (err) {
         setError(getErrorMessage(err))
       }

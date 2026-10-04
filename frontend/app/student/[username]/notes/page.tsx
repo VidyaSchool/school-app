@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import StudentNotesSkeleton from "./skeleton"
-import { getStudentCache, setStudentCache } from "@/lib/student-cache"
+import { getStudentCache, setStudentCache, isCacheFresh } from "@/lib/student-cache"
 import {
   NotebookPenIcon,
   BookOpenIcon,
@@ -155,43 +155,45 @@ export default function StudentNotesPage() {
   }
 
   React.useEffect(() => {
-    fetch("/api/backend/api/student/notes")
-      .then(res => {
-        if (!res.ok) throw new Error("Backend notes endpoint failed")
-        return res.json()
-      })
-      .then(data => {
-        if (data.notes && Array.isArray(data.notes) && data.notes.length > 0) {
-          const parsed = parseNotes(data.notes)
-          setNotes(parsed)
-          setStudentCache("notes_parsed", parsed)
-        } else {
-          return fetch("/api/student/notes")
+    if (!isCacheFresh("notes_parsed")) {
+      fetch("/api/backend/api/student/notes")
+        .then(res => {
+          if (!res.ok) throw new Error("Backend notes endpoint failed")
+          return res.json()
+        })
+        .then(data => {
+          if (data.notes && Array.isArray(data.notes) && data.notes.length > 0) {
+            const parsed = parseNotes(data.notes)
+            setNotes(parsed)
+            setStudentCache("notes_parsed", parsed)
+          } else {
+            return fetch("/api/student/notes")
+              .then(res => res.json())
+              .then(fallbackData => {
+                if (fallbackData.notes && Array.isArray(fallbackData.notes)) {
+                  const parsed = parseNotes(fallbackData.notes)
+                  setNotes(parsed)
+                  setStudentCache("notes_parsed", parsed)
+                }
+              })
+          }
+        })
+        .catch(() => {
+          fetch("/api/student/notes")
             .then(res => res.json())
-            .then(fallbackData => {
-              if (fallbackData.notes && Array.isArray(fallbackData.notes)) {
-                const parsed = parseNotes(fallbackData.notes)
+            .then(data => {
+              if (data.notes && Array.isArray(data.notes)) {
+                const parsed = parseNotes(data.notes)
                 setNotes(parsed)
                 setStudentCache("notes_parsed", parsed)
               }
             })
-        }
-      })
-      .catch(() => {
-        fetch("/api/student/notes")
-          .then(res => res.json())
-          .then(data => {
-            if (data.notes && Array.isArray(data.notes)) {
-              const parsed = parseNotes(data.notes)
-              setNotes(parsed)
-              setStudentCache("notes_parsed", parsed)
-            }
-          })
-          .catch(() => {})
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+            .catch(() => {})
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    }
   }, [])
 
   const topics = React.useMemo(() => {
