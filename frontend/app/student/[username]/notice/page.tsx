@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
-import StudentNoticeLoading from "./loading"
+import StudentNoticeSkeleton from "./skeleton"
 
 interface Notice {
   id: string
@@ -49,7 +49,7 @@ export default function StudentNoticePage() {
   }, [fetchNotices])
 
   if (loading) {
-    return <StudentNoticeLoading />
+    return <StudentNoticeSkeleton />
   }
 
   const filteredNotices = notices.filter(notice => {

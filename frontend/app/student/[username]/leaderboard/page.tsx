@@ -17,7 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import StudentLeaderboardLoading from "./loading"
+import StudentLeaderboardSkeleton from "./skeleton"
 
 interface LeaderboardEntry {
   id: string
@@ -78,7 +78,7 @@ export default function StudentLeaderboardPage() {
   }
 
   if (loading) {
-    return <StudentLeaderboardLoading />
+    return <StudentLeaderboardSkeleton />
   }
 
   if (error || !data || data.leaderboard.length === 0) {

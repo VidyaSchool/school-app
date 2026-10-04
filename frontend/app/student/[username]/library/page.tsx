@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
-import StudentLibraryLoading from "./loading"
+import StudentLibrarySkeleton from "./skeleton"
 import {
   Table,
   TableBody,
@@ -107,7 +107,7 @@ export default function StudentLibraryPage() {
 
 
   if (loading) {
-    return <StudentLibraryLoading />
+    return <StudentLibrarySkeleton />
   }
 
   return (

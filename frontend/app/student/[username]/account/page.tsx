@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Loader2Icon, UserIcon, UploadCloudIcon, BusIcon, FootprintsIcon, Link2Icon } from "lucide-react"
-import StudentAccountLoading from "./loading"
+import StudentAccountSkeleton from "./skeleton"
 
 const STUDENT_DOCUMENT_SLOTS: DocumentSlot[] = [
   {
@@ -118,7 +118,7 @@ export default function StudentAccountPage() {
   }
 
   if (!user) {
-    return <StudentAccountLoading />
+    return <StudentAccountSkeleton />
   }
 
   const lastClassSectionUpdate = profile?.classSectionLastUpdated ? new Date(profile.classSectionLastUpdated) : null;

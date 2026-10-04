@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function StudentNoteDetailLoading() {
+export default function StudentNoteDetailSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 px-4 lg:px-8 max-w-5xl mx-auto w-full min-h-screen animate-in fade-in duration-200">
+    <div className="flex flex-col gap-6 py-6 px-4 lg:px-8 max-w-5xl mx-auto w-full min-h-screen">
       {/* Top navigation & action bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Skeleton className="h-8 w-32 rounded-lg" />

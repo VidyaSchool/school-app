@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function StudentLeaderboardLoading() {
+export default function StudentLeaderboardSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans px-4 lg:px-8 animate-in fade-in duration-200">
+    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans px-4 lg:px-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">

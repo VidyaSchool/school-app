@@ -4,7 +4,7 @@ import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import StudentNotesLoading from "./loading"
+import StudentNotesSkeleton from "./skeleton"
 import {
   NotebookPenIcon,
   BookOpenIcon,
@@ -207,7 +207,7 @@ export default function StudentNotesPage() {
   }, [notes, selectedTopic, searchQuery])
 
   if (loading) {
-    return <StudentNotesLoading />
+    return <StudentNotesSkeleton />
   }
 
   return (

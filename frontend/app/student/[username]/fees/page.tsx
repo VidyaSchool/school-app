@@ -26,7 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import StudentFeesLoading from "./loading"
+import StudentFeesSkeleton from "./skeleton"
 
 interface FeeMonth {
   id: string
@@ -310,7 +310,7 @@ export default function StudentFeesPage() {
   }
 
   if (loading) {
-    return <StudentFeesLoading />
+    return <StudentFeesSkeleton />
   }
 
   return (

@@ -36,7 +36,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
-import StudentNoteDetailLoading from "./loading"
+import StudentNoteDetailSkeleton from "./skeleton"
 
 interface NoteDetail {
   id: string
@@ -788,7 +788,7 @@ export default function StudentNoteDetailPage() {
   const pdfLink = note?.pdf_url || note?.pdfUrl
 
   if (loading) {
-    return <StudentNoteDetailLoading />
+    return <StudentNoteDetailSkeleton />
   }
 
   return (

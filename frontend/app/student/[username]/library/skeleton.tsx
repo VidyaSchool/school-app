@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function StudentLibraryLoading() {
+export default function StudentLibrarySkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans animate-in fade-in duration-200">
+    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background">
       {/* Page Title & Desc */}
       <div className="flex flex-col gap-1.5 px-6 lg:px-8">
         <Skeleton className="h-9 w-48 rounded-lg" />

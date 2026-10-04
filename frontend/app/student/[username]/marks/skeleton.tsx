@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function StudentMarksLoading() {
+export default function StudentMarksSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans animate-in fade-in duration-200">
+    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
         <div className="flex flex-col gap-1.5">

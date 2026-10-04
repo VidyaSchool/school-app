@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function StudentFeesLoading() {
+export default function StudentFeesSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans animate-in fade-in duration-200">
+    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background">
       {/* Header section */}
       <div className="flex flex-col gap-1.5 px-6 lg:px-8">
         <Skeleton className="h-9 w-64 rounded-lg" />

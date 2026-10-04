@@ -37,7 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import StudentMarksLoading from "./loading"
+import StudentMarksSkeleton from "./skeleton"
 
 interface SubjectMark {
   code: string
@@ -331,7 +331,7 @@ export default function StudentMarksPage() {
   }))
 
   if (loading) {
-    return <StudentMarksLoading />
+    return <StudentMarksSkeleton />
   }
 
   if (Object.keys(marksData).length === 0) {

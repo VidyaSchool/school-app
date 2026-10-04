@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function StudentNotesLoading() {
+export default function StudentNotesSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 px-4 lg:px-8 min-h-screen animate-in fade-in duration-200">
+    <div className="flex flex-col gap-6 py-6 px-4 lg:px-8 min-h-screen">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1.5">
