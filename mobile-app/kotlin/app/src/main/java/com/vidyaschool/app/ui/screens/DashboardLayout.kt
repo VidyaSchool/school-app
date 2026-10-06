@@ -83,6 +83,18 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.viewinterop.AndroidView
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.view.ViewGroup
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.OpenInBrowser
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
@@ -326,6 +338,8 @@ fun DashboardLayout(
     var selectedTab by remember { mutableStateOf("home") }
     var activeDocPath by remember { mutableStateOf<String?>(null) }
     var activeDocFallback by remember { mutableStateOf<String?>(null) }
+    var activeWebUrl by remember { mutableStateOf<String?>(null) }
+    var activeWebTitle by remember { mutableStateOf<String?>(null) }
     var showSearchDialog by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
     var showNotifications by remember { mutableStateOf(false) }
@@ -381,6 +395,7 @@ fun DashboardLayout(
     // Handle system Back button press: go 1 step back instead of exiting app
     val isBackEnabled = selectedSidebarNote != null ||
             drawerState.isOpen ||
+            activeWebUrl != null ||
             activeDocPath != null ||
             showNotifications ||
             showComplaintDialog ||
@@ -396,6 +411,10 @@ fun DashboardLayout(
             showSearchDialog -> showSearchDialog = false
             selectedSidebarNote != null -> selectedSidebarNote = null
             drawerState.isOpen -> scope.launch { drawerState.close() }
+            activeWebUrl != null -> {
+                activeWebUrl = null
+                activeWebTitle = null
+            }
             activeDocPath != null -> activeDocPath = null
             showNotifications -> showNotifications = false
             showComplaintDialog -> showComplaintDialog = false
@@ -1250,7 +1269,7 @@ fun DashboardLayout(
                         }
                     )
                 }
-                if (selectedTab != "community" && activeDocPath == null) {
+                if (selectedTab != "community" && activeDocPath == null && activeWebUrl == null) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.background,
                         tonalElevation = 0.dp,
@@ -1346,7 +1365,16 @@ fun DashboardLayout(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
-            if (activeDocPath != null) {
+            if (activeWebUrl != null) {
+                InAppWebScreen(
+                    url = activeWebUrl!!,
+                    title = activeWebTitle ?: "Web",
+                    onBack = {
+                        activeWebUrl = null
+                        activeWebTitle = null
+                    }
+                )
+            } else if (activeDocPath != null) {
                 DocViewerScreen(
                     path = activeDocPath!!,
                     fallbackContent = activeDocFallback,
@@ -1411,8 +1439,18 @@ fun DashboardLayout(
                     "search" -> {
                         SearchTabContent(
                             sessionManager = sessionManager,
-                            onTabSelect = { tab -> selectedTab = tab },
+                            onTabSelect = { tab ->
+                                if (tab == "library") {
+                                    if (onShowLibrary != null) onShowLibrary() else selectedTab = "books"
+                                } else {
+                                    selectedTab = tab
+                                }
+                            },
                             onDocSelect = { path, fallback -> activeDocPath = path; activeDocFallback = fallback },
+                            onOpenWeb = { url, title ->
+                                activeWebUrl = url
+                                activeWebTitle = title
+                            },
                             onShowLibrary = onShowLibrary,
                             isRefreshing = isRefreshing,
                             onRefresh = triggerRefresh
@@ -1664,12 +1702,21 @@ fun DashboardLayout(
         QuickSearchDialog(
             sessionManager = sessionManager,
             onTabSelect = { tab ->
-                selectedTab = tab
+                if (tab == "library") {
+                    if (onShowLibrary != null) onShowLibrary() else selectedTab = "books"
+                } else {
+                    selectedTab = tab
+                }
                 showSearchDialog = false
             },
             onDocSelect = { docPath, fallback ->
                 activeDocPath = docPath
                 activeDocFallback = fallback
+                showSearchDialog = false
+            },
+            onOpenWeb = { url, title ->
+                activeWebUrl = url
+                activeWebTitle = title
                 showSearchDialog = false
             },
             onDismiss = { showSearchDialog = false }
@@ -2045,12 +2092,53 @@ fun CoursesTabContent() {
     }
 }
 
+fun resolveAppScreenTab(url: String): String? {
+    val clean = url.trim()
+    val path = if (clean.startsWith("http://", ignoreCase = true) || clean.startsWith("https://", ignoreCase = true)) {
+        try {
+            java.net.URI(clean).path ?: clean
+        } catch (_: Exception) {
+            clean
+        }
+    } else {
+        clean
+    }.trim().lowercase().trimEnd('/')
+
+    return when {
+        path.endsWith("/fees") || path == "/fees" -> "fees"
+        path.endsWith("/notice") || path.endsWith("/notices") || path == "/notice" || path == "/notices" -> "notice"
+        path.endsWith("/community") || path.endsWith("/complaints") || path == "/community" || path == "/complaints" -> "community"
+        path.endsWith("/library") || path.endsWith("/books") || path == "/library" || path == "/books" -> "library"
+        path.endsWith("/courses") || path == "/courses" -> "courses"
+        path.endsWith("/sessions") || path == "/sessions" -> "sessions"
+        path.endsWith("/profile") || path.endsWith("/settings") || path == "/profile" || path == "/settings" -> "profile"
+        path == "" || path == "/" ||
+        path == "/student" || path == "/student/dashboard" ||
+        path == "/teacher" || path == "/teacher/dashboard" ||
+        path == "/admin" || path == "/admin/dashboard" ||
+        path == "/librarian" || path == "/librarian/dashboard" ||
+        path == "/accounts" || path == "/accounts/dashboard" ||
+        path == "/dashboard" -> "home"
+        else -> null
+    }
+}
+
+fun formatInAppWebUrl(rawUrl: String): String {
+    val trimmed = rawUrl.trim()
+    return when {
+        trimmed.startsWith("http://", ignoreCase = true) || trimmed.startsWith("https://", ignoreCase = true) -> trimmed
+        trimmed.startsWith("/") -> "https://vidyaschool.vercel.app$trimmed"
+        else -> "https://vidyaschool.vercel.app/$trimmed"
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchTabContent(
     sessionManager: SessionManager,
     onTabSelect: (String) -> Unit,
     onDocSelect: (String, String) -> Unit,
+    onOpenWeb: ((String, String) -> Unit)? = null,
     onShowLibrary: (() -> Unit)?,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
@@ -2119,31 +2207,36 @@ fun SearchTabContent(
             backendSearchResults
                 .filter { !it.url.contains("/docs/") && !it.url.contains("privacy-policy") && !it.url.contains("terms-of-service") }
                 .map { item ->
-                    val tabKey = when {
-                        item.url.contains("/student/fees", ignoreCase = true) || item.url.endsWith("/fees", ignoreCase = true) -> "fees"
-                        item.url.contains("/student/notice", ignoreCase = true) || item.url.endsWith("/notice", ignoreCase = true) -> "notice"
-                        item.url.contains("/community", ignoreCase = true) -> "community"
-                        item.url.contains("/student/library", ignoreCase = true) || item.url.endsWith("/library", ignoreCase = true) -> "library"
-                        item.url.contains("/student/profile", ignoreCase = true) || item.url.endsWith("/profile", ignoreCase = true) -> "profile"
-                        item.url.contains("/student/", ignoreCase = true) || item.url.endsWith("/student", ignoreCase = true) -> "home"
-                        else -> "home"
-                    }
+                    val appScreenTab = resolveAppScreenTab(item.url)
+                    val isAppScreen = appScreenTab != null
+                    val fullWebUrl = formatInAppWebUrl(item.url)
+
                     val icon = when {
-                        item.url.contains("/fees", ignoreCase = true) -> Icons.Default.Info
-                        item.url.contains("/library", ignoreCase = true) -> Icons.Default.Info
-                        item.url.contains("/community", ignoreCase = true) -> Icons.Default.Share
-                        item.url.contains("/notice", ignoreCase = true) -> Icons.Default.Info
-                        item.url.contains("/profile", ignoreCase = true) -> Icons.Default.Person
+                        !isAppScreen -> Icons.Default.Language
+                        appScreenTab == "fees" -> Icons.Default.CreditCard
+                        appScreenTab == "notice" -> Icons.Default.Notifications
+                        appScreenTab == "community" -> Icons.Default.Forum
+                        appScreenTab == "library" -> Icons.Default.MenuBook
+                        appScreenTab == "courses" -> Icons.Default.School
+                        appScreenTab == "sessions" -> Icons.Default.Devices
+                        appScreenTab == "profile" -> Icons.Default.Person
                         else -> Icons.Default.Home
                     }
-                    val isExternal = tabKey == "library"
+                    val isExternal = !isAppScreen || appScreenTab == "library"
                     SearchPageItem(
                         name = item.title,
-                        tabKey = tabKey,
+                        tabKey = appScreenTab ?: "home",
                         description = item.content,
                         icon = icon,
                         isExternal = isExternal,
-                        externalAction = if (isExternal) onShowLibrary else null
+                        externalAction = when {
+                            !isAppScreen -> ({
+                                onOpenWeb?.invoke(fullWebUrl, item.title)
+                                Unit
+                            })
+                            appScreenTab == "library" -> onShowLibrary
+                            else -> null
+                        }
                     )
                 }
         }
@@ -2330,7 +2423,7 @@ fun SearchTabContent(
                                     title = item.name,
                                     subtitle = item.description,
                                     icon = item.icon,
-                                    category = "Page",
+                                    category = if (item.isExternal && item.tabKey == "home" && item.externalAction != null) "In-App Web" else "Page",
                                     onClick = {
                                         if (item.isExternal) {
                                             item.externalAction?.invoke()
@@ -7315,6 +7408,208 @@ fun parseMarkdownToAnnotatedString(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun InAppWebScreen(
+    url: String,
+    title: String,
+    onBack: () -> Unit
+) {
+    val context = LocalContext.current
+    var currentTitle by remember { mutableStateOf(title) }
+    var currentUrl by remember { mutableStateOf(url) }
+    var progress by remember { mutableFloatStateOf(0f) }
+    var isLoading by remember { mutableStateOf(true) }
+    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    var canGoBack by remember { mutableStateOf(false) }
+
+    // Intercept hardware / gesture back button to go back in web history if possible
+    BackHandler(enabled = true) {
+        if (webViewRef?.canGoBack() == true) {
+            webViewRef?.goBack()
+        } else {
+            onBack()
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text(
+                            text = currentTitle.ifBlank { "Web" },
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        val host = try {
+                            java.net.URI(currentUrl).host ?: currentUrl
+                        } catch (_: Exception) {
+                            currentUrl
+                        }
+                        Text(
+                            text = host,
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (webViewRef?.canGoBack() == true) {
+                            webViewRef?.goBack()
+                        } else {
+                            onBack()
+                        }
+                    }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { webViewRef?.reload() }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Refresh",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(onClick = {
+                        try {
+                            val customTabsIntent = CustomTabsIntent.Builder()
+                                .setShowTitle(true)
+                                .build()
+                            customTabsIntent.launchUrl(context, Uri.parse(currentUrl))
+                        } catch (_: Exception) {
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(currentUrl))
+                                context.startActivity(intent)
+                            } catch (_: Exception) {}
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.OpenInBrowser,
+                            contentDescription = "Open in External Browser",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            AndroidView(
+                factory = { ctx ->
+                    WebView(ctx).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                        )
+                        settings.apply {
+                            javaScriptEnabled = true
+                            domStorageEnabled = true
+                            databaseEnabled = true
+                            useWideViewPort = true
+                            loadWithOverviewMode = true
+                            allowFileAccess = true
+                            allowContentAccess = true
+                            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                            setSupportZoom(true)
+                            builtInZoomControls = true
+                            displayZoomControls = false
+                        }
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                                isLoading = true
+                                url?.let { currentUrl = it }
+                                canGoBack = view?.canGoBack() == true
+                            }
+
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                isLoading = false
+                                url?.let { currentUrl = it }
+                                view?.title?.let {
+                                    if (it.isNotBlank()) currentTitle = it
+                                }
+                                canGoBack = view?.canGoBack() == true
+                            }
+
+                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                                val targetUri = request?.url ?: return false
+                                val scheme = targetUri.scheme?.lowercase() ?: ""
+                                if (scheme == "http" || scheme == "https") {
+                                    return false
+                                }
+                                return try {
+                                    val intent = Intent(Intent.ACTION_VIEW, targetUri)
+                                    ctx.startActivity(intent)
+                                    true
+                                } catch (_: Exception) {
+                                    true
+                                }
+                            }
+                        }
+                        webChromeClient = object : WebChromeClient() {
+                            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                                progress = newProgress / 100f
+                                if (newProgress >= 100) {
+                                    isLoading = false
+                                }
+                                canGoBack = view?.canGoBack() == true
+                            }
+
+                            override fun onReceivedTitle(view: WebView?, newTitle: String?) {
+                                if (!newTitle.isNullOrBlank()) {
+                                    currentTitle = newTitle
+                                }
+                            }
+                        }
+                        loadUrl(url)
+                        webViewRef = this
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+                onRelease = { webView ->
+                    webView.stopLoading()
+                    webView.destroy()
+                }
+            )
+
+            if (isLoading && progress < 1f) {
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .align(Alignment.TopCenter),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = Color.Transparent
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun DocViewerScreen(
     path: String,
     fallbackContent: String? = null,
@@ -7824,6 +8119,7 @@ fun QuickSearchDialog(
     sessionManager: SessionManager,
     onTabSelect: (String) -> Unit,
     onDocSelect: (String, String) -> Unit,
+    onOpenWeb: (String, String) -> Unit = { _, _ -> },
     onDismiss: () -> Unit
 ) {
     var query by remember { mutableStateOf("") }
@@ -7979,21 +8275,38 @@ fun QuickSearchDialog(
                             }
                             items(filteredPages.size) { idx ->
                                 val item = filteredPages[idx]
-                                val tabKey = when {
-                                    item.url.contains("/fees", ignoreCase = true) -> "fees"
-                                    item.url.contains("/notice", ignoreCase = true) -> "notice"
-                                    item.url.contains("/community", ignoreCase = true) -> "community"
-                                    item.url.contains("/library", ignoreCase = true) -> "library"
-                                    item.url.contains("/profile", ignoreCase = true) -> "profile"
-                                    else -> "home"
+                                val appScreenTab = resolveAppScreenTab(item.url)
+                                val isAppScreen = appScreenTab != null
+
+                                val icon = when {
+                                    !isAppScreen -> Icons.Default.Language
+                                    appScreenTab == "fees" -> Icons.Default.CreditCard
+                                    appScreenTab == "notice" -> Icons.Default.Notifications
+                                    appScreenTab == "community" -> Icons.Default.Forum
+                                    appScreenTab == "library" -> Icons.Default.MenuBook
+                                    appScreenTab == "courses" -> Icons.Default.School
+                                    appScreenTab == "sessions" -> Icons.Default.Devices
+                                    appScreenTab == "profile" -> Icons.Default.Person
+                                    else -> Icons.Default.Home
                                 }
+
+                                val category = when {
+                                    !isAppScreen -> if (item.url.contains("/p/")) "Web Page" else "In-App Web"
+                                    else -> "App Screen"
+                                }
+
                                 SearchResultRow(
                                     title = item.title,
                                     subtitle = item.content,
-                                    icon = Icons.Default.Home,
-                                    category = "Page",
+                                    icon = icon,
+                                    category = category,
                                     onClick = {
-                                        onTabSelect(tabKey)
+                                        if (isAppScreen) {
+                                            onTabSelect(appScreenTab!!)
+                                        } else {
+                                            val fullWebUrl = formatInAppWebUrl(item.url)
+                                            onOpenWeb(fullWebUrl, item.title)
+                                        }
                                     }
                                 )
                             }
