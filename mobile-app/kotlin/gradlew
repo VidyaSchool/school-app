@@ -116,6 +116,17 @@ esac
 
 
 
+# If JAVA_HOME is not set, prefer local JDK 17 to avoid Android Gradle Plugin jlink errors on JDK 21+
+if [ -z "$JAVA_HOME" ] ; then
+    if [ -d "/usr/lib/jvm/java-17-openjdk-amd64" ] ; then
+        export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+    elif [ -d "/usr/lib/jvm/java-1.17.0-openjdk-amd64" ] ; then
+        export JAVA_HOME="/usr/lib/jvm/java-1.17.0-openjdk-amd64"
+    elif [ -d "/usr/lib/jvm/java-17-openjdk" ] ; then
+        export JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
+    fi
+fi
+
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
