@@ -5,6 +5,7 @@
 *.pem
 *.key
 firebase-credentials.json
+teachers_credentials.csv
 
 # Python
 __pycache__/

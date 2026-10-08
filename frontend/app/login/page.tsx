@@ -45,13 +45,13 @@ function LoginFormContent() {
       }
     }
     return {
-      badge: "Institutional Access",
+      badge: null,
       title: "Welcome back",
-      description: "Sign in to your VidyaSchool workspace (Students, Faculty & Staff)",
+      description: "Sign in to your VIDYA SCHOOL workspace (Students, Faculty & Staff)",
     }
   }, [fromParam])
 
-  const [email, setEmail] = useState("")
+  const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -229,15 +229,20 @@ function LoginFormContent() {
 
     try {
       const { error } = await authClient.signIn.email({
-        email,
+        email: identifier.trim(),
         password,
         callbackURL: "/dashboard",
       })
 
       if (error) {
-        toast.error(error.message || "Failed to sign in", {
-          description: "Please check your credentials and try again.",
-        })
+        toast.error(
+          error.message?.toLowerCase().includes("email or password")
+            ? "Invalid email, username, or password"
+            : error.message || "Failed to sign in",
+          {
+            description: "Please check your credentials and try again.",
+          }
+        )
         setLoading(false)
       } else {
         toast.success("Login successful! Redirecting...")
@@ -306,12 +311,12 @@ function LoginFormContent() {
           <Link href="/" className="flex items-center gap-2 font-semibold text-lg tracking-tight">
             <Image
               src="/assets/vidyaschool/Logo/no_title.svg"
-              alt="VidyaSchool Logo"
+              alt="VIDYA SCHOOL Logo"
               width={24}
               height={24}
               className="h-6 w-6 object-contain"
             />
-            VidyaSchool
+            VIDYA SCHOOL
           </Link>
         </div>
 
@@ -322,9 +327,11 @@ function LoginFormContent() {
             {mode === "form" ? (
               <div className="space-y-6">
                 <div className="flex flex-col items-center gap-1.5 text-center">
-                  <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5 mb-1">
-                    {portalMeta.badge}
-                  </Badge>
+                  {portalMeta.badge && (
+                    <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5 mb-1">
+                      {portalMeta.badge}
+                    </Badge>
+                  )}
                   <h1 className="text-2xl font-bold tracking-tight">{portalMeta.title}</h1>
                   <p className="text-sm text-muted-foreground">
                     {portalMeta.description}
@@ -334,13 +341,18 @@ function LoginFormContent() {
                 <form onSubmit={handleEmailSignIn} className="flex flex-col gap-5">
                   <FieldGroup>
                     <Field>
-                      <FieldLabel htmlFor="email">Email</FieldLabel>
+                      <FieldLabel htmlFor="identifier">Email or Username</FieldLabel>
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder="m@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        id="identifier"
+                        name="identifier"
+                        type="text"
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        autoComplete="username"
+                        placeholder="Enter your email or username"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
                         required
                       />
                     </Field>
@@ -466,7 +478,7 @@ function LoginFormContent() {
                 <div className="flex flex-col gap-1.5 text-center">
                   <h1 className="text-2xl font-bold tracking-tight">Scan to Login</h1>
                   <p className="text-sm text-muted-foreground">
-                    Open the <strong>VidyaSchool app</strong> on your phone and tap <strong>QR Login</strong>
+                    Open the <strong>VIDYA SCHOOL app</strong> on your phone and tap <strong>QR Login</strong>
                   </p>
                 </div>
 
@@ -583,7 +595,7 @@ function LoginFormContent() {
         <div className="absolute inset-0 flex items-center justify-center">
           <Image
             src="/assets/illustrations/kid.svg"
-            alt="VidyaSchool Logo"
+            alt="VIDYA SCHOOL Logo"
             width={400}
             height={400}
             className="object-contain animate-fade-in"
