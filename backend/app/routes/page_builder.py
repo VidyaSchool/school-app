@@ -8,6 +8,7 @@ from sqlmodel import Session, select, desc
 from sqlalchemy import func
 from app.core.database import get_db
 from app.core.auth import decode_session_token, get_utc_now
+from app.core.cache import delete_pattern
 from models import CustomPage, User, Session as SessionModel
 
 router = APIRouter(tags=["page-builder"])
@@ -262,6 +263,7 @@ async def save_page(
         db.add(existing_page)
         db.commit()
         db.refresh(existing_page)
+        delete_pattern("search:*")
 
         return {
             "success": True,
@@ -287,6 +289,7 @@ async def save_page(
         db.add(new_page)
         db.commit()
         db.refresh(new_page)
+        delete_pattern("search:*")
 
         return {
             "success": True,
@@ -339,6 +342,7 @@ async def update_page_meta(
     db.add(page)
     db.commit()
     db.refresh(page)
+    delete_pattern("search:*")
 
     return {
         "success": True,
@@ -371,6 +375,7 @@ async def delete_page(
 
     db.delete(page)
     db.commit()
+    delete_pattern("search:*")
 
     return {"success": True, "message": "Page deleted successfully", "uid": target_id}
 

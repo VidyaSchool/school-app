@@ -163,6 +163,12 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Invalidate search cache in backend so new/updated page is immediately indexed
+    try {
+      const backendUrl = (process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000").replace(/\/+$/, '')
+      fetch(`${backendUrl}/api/search/clear-cache`, { method: "POST" }).catch(() => {})
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: "Page changes successfully saved to database!",

@@ -6,6 +6,7 @@ import logging
 from sqlmodel import Session, select
 from app.core.database import get_db
 from models import CustomPage
+from app.core.cache import get_cache, set_cache, delete_pattern, is_redis_online
 
 logger = logging.getLogger(__name__)
 
@@ -495,6 +496,13 @@ def search(
     if not cleaned_query:
         return []
 
+    # 0. Redis Cache Check (instant hit, zero DB / index scanning)
+    cache_key = f"search:{role or 'anon'}:{username or 'anon'}:{cleaned_query}"
+    cached_results = get_cache(cache_key)
+    if cached_results is not None:
+        logger.debug(f"[Search Cache HIT] key: {cache_key}")
+        return cached_results
+
     # Tokenize the query to match individual keywords
     query_tokens = [t for t in re.split(r"\s+", cleaned_query) if t]
     
@@ -638,12 +646,24 @@ def search(
     results.sort(key=lambda x: x["score"], reverse=True)
     
     # Return top 15 results (limited and clean)
-    return [{
+    final_results = [{
         "id": r["id"],
         "title": r["title"],
         "content": r["content"],
         "url": r["url"]
     } for r in results[:15]]
+
+    # Store search results in Redis cache with 300s (5m) TTL
+    set_cache(cache_key, final_results, ttl=300)
+    return final_results
+
+
+@router.post("/clear-cache")
+def clear_search_cache():
+    """Invalidate all cached search queries from Redis and in-memory cache."""
+    count = delete_pattern("search:*")
+    logger.info(f"[Search Cache] Invalidated {count} search keys.")
+    return {"status": "success", "cleared_keys": count}
 
 DOC_MARKDOWNS = {
     "/docs/auth/signup": """# Account Registration (Signup)
@@ -933,6 +953,11 @@ def get_doc_markdown(path: str = Query(...)):
     
     # Strip any trailing/leading slashes
     cleaned_path = "/" + cleaned_path.strip("/")
+
+    doc_cache_key = f"docs:markdown:{cleaned_path}"
+    cached_doc = get_cache(doc_cache_key)
+    if cached_doc is not None:
+        return cached_doc
     
     # Try to load from local .md file in backend/docs/
     import os
@@ -964,16 +989,20 @@ def get_doc_markdown(path: str = Query(...)):
         # Generate a generic fallback markdown if path is not mapped
         title = cleaned_path.split("/")[-1].replace("-", " ").title()
         md_content = f"# {title}\nDocumentation details for `{cleaned_path}` are under review. Contact support if you need immediate guidance."
-        return {
+        res = {
             "title": title,
             "markdown": md_content
         }
+        set_cache(doc_cache_key, res, ttl=3600)
+        return res
         
     # Extract title from the first header line
     title_line = md_content.split("\n")[0]
     title = title_line.replace("#", "").strip() if title_line.startswith("#") else "Help Article"
     
-    return {
+    res = {
         "title": title,
         "markdown": md_content
     }
+    set_cache(doc_cache_key, res, ttl=3600)
+    return res
