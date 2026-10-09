@@ -48,7 +48,8 @@ export default function WaitingRoomPage() {
 
     console.log("Setting up socket connection for user:", user.id)
     const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000", {
-      transports: ["websocket", "polling"]
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 3,
     })
 
     newSocket.on("connect", () => {

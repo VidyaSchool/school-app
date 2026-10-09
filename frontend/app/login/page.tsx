@@ -126,7 +126,7 @@ function LoginFormContent() {
       setQrStatus("active")
 
       const socket = io(BACKEND_URL, {
-        transports: ["websocket", "polling"],
+        transports: ["polling", "websocket"],
         reconnectionAttempts: 5,
       })
       socketRef.current = socket

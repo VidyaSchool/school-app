@@ -479,7 +479,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     // 3. Setup Socket.IO — single persistent connection, reads pathname via ref
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000'), {
-      transports: ["websocket", "polling"]
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 3,
     })
 
     socket.on("teacher_request_created", () => {

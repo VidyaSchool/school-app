@@ -596,7 +596,7 @@ export function ComplaintsOutlineTable() {
   React.useEffect(() => {
     const socket: Socket = io(
       process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000",
-      { transports: ["websocket", "polling"] }
+      { transports: ["polling", "websocket"], reconnectionAttempts: 3 }
     )
 
     socket.on("complaint_created", () => fetchComplaints())

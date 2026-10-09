@@ -630,7 +630,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             ? "https://api.vidyaschool.com"
             : "http://localhost:8000"),
         {
-          transports: ["websocket", "polling"],
+          transports: ["polling", "websocket"],
+          reconnectionAttempts: 3,
         }
       )
     }

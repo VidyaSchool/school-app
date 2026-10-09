@@ -37,7 +37,8 @@ export default function TeacherWaitingRoomPage() {
     // Connect to Socket.IO backend on port 8000
     const socketInstance = io(process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000", {
       withCredentials: true,
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 3,
     })
 
     socketInstance.on("connect", () => {

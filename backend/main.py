@@ -60,16 +60,7 @@ engine = create_engine(
 # Set up Socket.IO server
 sio = socketio.AsyncServer(
     async_mode='asgi',
-    cors_allowed_origins=[
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'https://vidyaschool.vercel.app',
-        'https://vidyaschool.com',
-        'https://www.vidyaschool.com',
-        'https://dashboard.vidyaschool.com',
-        'https://admin.vidyaschool.com',
-        'https://api.vidyaschool.com',
-    ]
+    cors_allowed_origins='*'
 )
 
 active_users = {}

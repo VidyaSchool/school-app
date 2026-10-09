@@ -74,7 +74,8 @@ export default function AdminRequestsPage() {
     if (!user) return
 
     const newSocket = io(process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000", {
-      transports: ["websocket", "polling"]
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 3,
     })
 
     newSocket.on("connect", () => {
