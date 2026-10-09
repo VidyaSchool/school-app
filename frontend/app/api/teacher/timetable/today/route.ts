@@ -52,11 +52,15 @@ function getSubjectColor(subject: string) {
   return SUBJECT_COLORS[hash]
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const { searchParams } = new URL(req.url)
+  const teacherIdParam = searchParams.get('teacherId')
+  const teacherId = (session.user.role === 'admin' && teacherIdParam) ? teacherIdParam : session.user.id
 
   // Get current day of week (e.g. 'Monday')
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -66,7 +70,7 @@ export async function GET() {
     const slots = await db
       .select()
       .from(timetable)
-      .where(and(eq(timetable.teacherId, session.user.id), eq(timetable.dayOfWeek, todayDay)))
+      .where(and(eq(timetable.teacherId, teacherId), eq(timetable.dayOfWeek, todayDay)))
       .orderBy(timetable.startTime)
 
     // Map slots to CalendarEvents

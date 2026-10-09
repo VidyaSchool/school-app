@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { ArrowUp, User, Brain, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit } from "lucide-react"
+import { ArrowUp, User, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit } from "lucide-react"
+import { Strobi } from "@/components/strobi-avatar"
 import { Button } from "@/components/ui/button"
 import { logoutUser } from "@/lib/auth-client"
 import Link from "next/link"
@@ -937,15 +938,19 @@ export default function TeacherTaskChatPage() {
                 }`}
               >
                 {/* Avatar */}
-                <span
-                  className={`flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[10px] sm:text-xs font-semibold ${
-                    isUser
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-800"
-                  }`}
-                >
-                  {isUser ? <User className="size-3 sm:size-3.5" /> : <Brain className="size-3 sm:size-3.5 text-primary" />}
-                </span>
+                {isUser ? (
+                  <span className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[10px] sm:text-xs font-semibold bg-primary text-primary-foreground">
+                    <User className="size-3 sm:size-3.5" />
+                  </span>
+                ) : (
+                  <div className="shrink-0 pt-0.5">
+                    <Strobi
+                      size={32}
+                      isGenerating={index === session.messages.length - 1 && genStatus === "generating"}
+                      isThinking={index === session.messages.length - 1 && (genStatus === "thinking" || genStatus === "sending")}
+                    />
+                  </div>
+                )}
 
                 {/* Bubble */}
                 <div className="space-y-1 flex-1 min-w-0">

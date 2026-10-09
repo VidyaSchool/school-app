@@ -1,0 +1,198 @@
+{
+  "schema": "bible-strong/avatar-definition",
+  "schemaVersion": 1,
+  "name": "Grok",
+  "body": {
+    "primary": {
+      "type": "sphere",
+      "width": 240,
+      "height": 240,
+      "depth": 240,
+      "roundness": 1
+    },
+    "nodes": []
+  },
+  "colors": {
+    "body": "#09090b",
+    "eyes": "#22d3ee"
+  },
+  "expressions": {
+    "neutral": {
+      "head": { "x": 0, "y": 0, "z": 0 },
+      "eyes": {
+        "left": { "width": 32, "height": 42, "x": 0, "y": -4, "angle": 3 },
+        "right": { "width": 32, "height": 42, "x": 0, "y": -4, "angle": -3 },
+        "spacing": 68
+      },
+      "perspective": 1,
+      "motion": {
+        "eyes": "microSaccades",
+        "body": "slowDrift"
+      }
+    },
+    "thinking": {
+      "head": { "x": 4, "y": -8, "z": 0 },
+      "eyes": {
+        "left": { "width": 28, "height": 26, "x": 0, "y": -14, "angle": 8 },
+        "right": { "width": 28, "height": 26, "x": 0, "y": -14, "angle": -4 },
+        "spacing": 68
+      },
+      "perspective": 1,
+      "motion": {
+        "eyes": "microSaccades",
+        "body": "slowDrift"
+      }
+    },
+    "talking": {
+      "head": { "x": 0, "y": -3, "z": 0 },
+      "eyes": {
+        "left": { "width": 34, "height": 46, "x": 0, "y": -6, "angle": 2 },
+        "right": { "width": 34, "height": 46, "x": 0, "y": -6, "angle": -2 },
+        "spacing": 68
+      },
+      "perspective": 1,
+      "motion": {
+        "eyes": "microSaccades",
+        "body": "slowDrift"
+      }
+    },
+    "smirk": {
+      "head": { "x": 2, "y": -2, "z": 0 },
+      "eyes": {
+        "left": { "width": 34, "height": 44, "x": 0, "y": -8, "angle": 10 },
+        "right": { "width": 30, "height": 32, "x": 0, "y": -2, "angle": -6 },
+        "spacing": 68
+      },
+      "perspective": 1,
+      "motion": {
+        "eyes": "microSaccades",
+        "body": "slowDrift"
+      }
+    },
+    "happy": {
+      "head": { "x": 0, "y": -5, "z": 0 },
+      "eyes": {
+        "left": { "width": 34, "height": 32, "x": 0, "y": -6, "angle": 12 },
+        "right": { "width": 34, "height": 32, "x": 0, "y": -6, "angle": -12 },
+        "spacing": 68
+      },
+      "perspective": 1,
+      "motion": {
+        "eyes": "microSaccades",
+        "body": "slowDrift"
+      }
+    }
+  },
+  "expressionOrder": ["neutral", "thinking", "talking", "smirk", "happy"],
+  "animations": {
+    "idle": {
+      "playbackMode": "loop",
+      "steps": [
+        {
+          "expression": "neutral",
+          "holdMs": 3200,
+          "transitionMs": 350,
+          "transition": "smooth"
+        },
+        {
+          "expression": "smirk",
+          "holdMs": 1400,
+          "transitionMs": 250,
+          "transition": "snappy"
+        },
+        {
+          "expression": "neutral",
+          "holdMs": 2800,
+          "transitionMs": 300,
+          "transition": "smooth"
+        }
+      ],
+      "blink": {
+        "enabled": true,
+        "initialDelayMs": 600,
+        "minIntervalMs": 1800,
+        "maxIntervalMs": 3800,
+        "durationMs": 120
+      }
+    },
+    "thinking": {
+      "playbackMode": "loop",
+      "steps": [
+        {
+          "expression": "thinking",
+          "holdMs": 800,
+          "transitionMs": 200,
+          "transition": "snappy"
+        },
+        {
+          "expression": "neutral",
+          "holdMs": 500,
+          "transitionMs": 200,
+          "transition": "snappy"
+        }
+      ],
+      "blink": {
+        "enabled": true,
+        "initialDelayMs": 400,
+        "minIntervalMs": 1200,
+        "maxIntervalMs": 2400,
+        "durationMs": 100
+      }
+    },
+    "talking": {
+      "playbackMode": "loop",
+      "steps": [
+        {
+          "expression": "talking",
+          "holdMs": 250,
+          "transitionMs": 120,
+          "transition": "snappy"
+        },
+        {
+          "expression": "neutral",
+          "holdMs": 180,
+          "transitionMs": 120,
+          "transition": "snappy"
+        },
+        {
+          "expression": "talking",
+          "holdMs": 300,
+          "transitionMs": 120,
+          "transition": "snappy"
+        },
+        {
+          "expression": "smirk",
+          "holdMs": 200,
+          "transitionMs": 120,
+          "transition": "snappy"
+        }
+      ],
+      "blink": {
+        "enabled": true,
+        "initialDelayMs": 500,
+        "minIntervalMs": 1800,
+        "maxIntervalMs": 3200,
+        "durationMs": 110
+      }
+    },
+    "smirk": {
+      "playbackMode": "loop",
+      "steps": [
+        {
+          "expression": "smirk",
+          "holdMs": 2000,
+          "transitionMs": 250,
+          "transition": "snappy"
+        }
+      ],
+      "blink": {
+        "enabled": true,
+        "initialDelayMs": 800,
+        "minIntervalMs": 2000,
+        "maxIntervalMs": 4000,
+        "durationMs": 120
+      }
+    }
+  },
+  "animationOrder": ["idle", "thinking", "talking", "smirk"]
+}
