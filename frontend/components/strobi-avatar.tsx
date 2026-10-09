@@ -30,7 +30,7 @@ export function Strobi({
     <div
       className={`inline-flex shrink-0 items-center justify-center select-none rounded-full ${
         isGenerating || isThinking
-          ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+          ? "drop-shadow-[0_0_8px_rgba(211,50,47,0.6)]"
           : ""
       } ${className}`}
       title="AI Assistant"
