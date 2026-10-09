@@ -32,9 +32,9 @@ export function Strobi({
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`inline-flex shrink-0 items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer select-none rounded-full ${
+      className={`grok-avatar inline-flex shrink-0 items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer select-none rounded-full ${
         isGenerating || isThinking
-          ? "drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
+          ? "is-active drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
           : "hover:drop-shadow-[0_0_6px_rgba(34,211,238,0.5)]"
       } ${className}`}
       title="Grok Assistant"

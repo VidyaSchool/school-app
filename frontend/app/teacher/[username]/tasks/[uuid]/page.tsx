@@ -928,29 +928,37 @@ export default function TeacherTaskChatPage() {
           viewportClassName="px-2.5 sm:px-5 pt-3 sm:pt-5 pb-8"
         >
         <div className="space-y-3.5 sm:space-y-4 max-w-3xl mx-auto w-full">
-          {session.messages.map((msg, index) => {
-            const isUser = msg.role === "user"
-            return (
-              <div
-                key={index}
-                className={`flex gap-2 sm:gap-3 w-full min-w-0 ${
-                  isUser ? "flex-row-reverse" : ""
-                }`}
-              >
-                {/* Avatar */}
-                {isUser ? (
-                  <span className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[10px] sm:text-xs font-semibold bg-primary text-primary-foreground">
-                    <User className="size-3 sm:size-3.5" />
-                  </span>
-                ) : (
-                  <div className="shrink-0 pt-0.5">
-                    <Strobi
-                      size={32}
-                      isGenerating={index === session.messages.length - 1 && genStatus === "generating"}
-                      isThinking={index === session.messages.length - 1 && (genStatus === "thinking" || genStatus === "sending")}
-                    />
-                  </div>
-                )}
+          {(() => {
+            const lastAssistantIndex = session.messages.reduce(
+              (last, m, i) => (m.role === "assistant" ? i : last),
+              -1
+            )
+            return session.messages.map((msg, index) => {
+              const isUser = msg.role === "user"
+              const isLatestAssistant = !isUser && index === lastAssistantIndex
+              return (
+                <div
+                  key={index}
+                  className={`flex gap-2 sm:gap-3 w-full min-w-0 ${
+                    isUser ? "flex-row-reverse" : ""
+                  }`}
+                >
+                  {/* Avatar */}
+                  {isUser ? (
+                    <span className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-[10px] sm:text-xs font-semibold bg-primary text-primary-foreground">
+                      <User className="size-3 sm:size-3.5" />
+                    </span>
+                  ) : isLatestAssistant ? (
+                    <div className="shrink-0 pt-0.5">
+                      <Strobi
+                        size={32}
+                        isGenerating={genStatus === "generating"}
+                        isThinking={genStatus === "thinking" || genStatus === "sending"}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-8 shrink-0" aria-hidden="true" />
+                  )}
 
                 {/* Bubble */}
                 <div className="space-y-1 flex-1 min-w-0">
@@ -1053,7 +1061,8 @@ export default function TeacherTaskChatPage() {
                 </div>
               </div>
             )
-          })}
+          })
+        })()}
 
           {/* Shimmer loading / Generation Status */}
           {genStatus !== "idle" && (!liveThinking || genStatus !== "thinking") ? (
