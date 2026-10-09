@@ -22,22 +22,18 @@ export function Strobi({
   isThinking?: boolean
   isGenerating?: boolean
 }) {
-  const [isHovered, setIsHovered] = React.useState(false)
-
-  // Determine current active animation
+  // Determine current active animation (no hover effect)
   const activeAnimation = animation
-    ?? (isGenerating ? "talking" : isThinking ? "thinking" : isHovered ? "smirk" : undefined)
+    ?? (isGenerating ? "talking" : isThinking ? "thinking" : undefined)
 
   return (
     <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`grok-avatar inline-flex shrink-0 items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer select-none rounded-full ${
+      className={`inline-flex shrink-0 items-center justify-center select-none rounded-full ${
         isGenerating || isThinking
-          ? "is-active drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
-          : "hover:drop-shadow-[0_0_6px_rgba(34,211,238,0.5)]"
+          ? "drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+          : ""
       } ${className}`}
-      title="Grok Assistant"
+      title="AI Assistant"
     >
       <GrokAvatar
         size={size}

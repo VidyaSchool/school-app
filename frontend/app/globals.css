@@ -238,14 +238,3 @@
   contain-intrinsic-size: auto 350px;
 }
 
-/* Grok Avatar Cyber Edge */
-.grok-avatar svg > path {
-  stroke: rgba(34, 211, 238, 0.45);
-  stroke-width: 5px;
-  transition: stroke 0.2s ease;
-}
-.grok-avatar.is-active svg > path {
-  stroke: rgba(34, 211, 238, 0.85);
-  stroke-width: 6px;
-}
-
