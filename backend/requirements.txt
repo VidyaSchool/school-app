@@ -16,7 +16,7 @@ pydantic==2.13.4
 pydantic_core==2.46.4
 Pygments==2.20.0
 pytest==9.1.1
-python-dotenv==1.2.2
+python-dotenv==1.2.3
 python-engineio==4.13.3
 python-socketio==5.16.3
 sentry-sdk==2.63.0
