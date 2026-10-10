@@ -33,7 +33,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, BellIcon, GitPullRequest, AlertTriangle, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, CalendarIcon, NotebookPenIcon, Trophy, Mail, Terminal, Bot } from "lucide-react"
+import { ListIcon, ChartBarIcon, FolderIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, Trophy, Terminal } from "lucide-react"
+import {
+  WidgetIcon,
+  UsersIcon,
+  CalendarIcon,
+  EmailIcon,
+  NotesIcon,
+  NotebookIcon,
+  RequestIcon,
+  BellIcon,
+  DangerTriangleIcon,
+  SmartphoneIcon,
+  BotIcon,
+} from "@/components/icons"
 import { useSession, signOut, logoutUser } from "@/lib/auth-client"
 import { io } from "socket.io-client"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -45,7 +58,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Smartphone, Download, Plus } from "lucide-react"
+import { Download, Plus } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
 
@@ -148,7 +161,7 @@ const data = {
       title: "Dashboard",
       url: "/student",
       icon: (
-        <LayoutDashboardIcon
+        <WidgetIcon
         />
       ),
     },
@@ -172,7 +185,7 @@ const data = {
       title: "Notes",
       url: "/student/notes",
       icon: (
-        <NotebookPenIcon
+        <NotesIcon
         />
       ),
     },
@@ -539,7 +552,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: accountUrls.dashboard,
-          icon: <LayoutDashboardIcon />,
+          icon: <WidgetIcon />,
         },
         {
           title: "Student Fees",
@@ -617,7 +630,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: librarianUrls.dashboard,
-          icon: <LayoutDashboardIcon />,
+          icon: <WidgetIcon />,
         },
         {
           title: "Manage Books",
@@ -627,7 +640,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Book Issues",
           url: librarianUrls.borrowings,
-          icon: <GitPullRequest />,
+          icon: <RequestIcon />,
         },
         {
           title: "Notices",
@@ -641,7 +654,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: teacherUrls.dashboard,
-          icon: <LayoutDashboardIcon />,
+          icon: <WidgetIcon />,
         },
         {
           title: "My Class",
@@ -656,12 +669,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Email",
           url: teacherUrls.email,
-          icon: <Mail />,
+          icon: <EmailIcon />,
         },
         {
           title: "Notes",
           url: teacherUrls.notes,
-          icon: <NotebookPenIcon />,
+          icon: <NotesIcon />,
         },
         {
           title: "Subject Class",
@@ -671,7 +684,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Requests",
           url: teacherUrls.requests,
-          icon: <GitPullRequest />,
+          icon: <RequestIcon />,
           hasNotification: unreadRequests,
         },
         {
@@ -683,7 +696,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Complaints",
           url: `${teacherUrls.dashboard}/complaints`,
-          icon: <AlertTriangle />,
+          icon: <DangerTriangleIcon />,
           hasNotification: unreadComplaints,
         },
       ]
@@ -692,7 +705,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: adminUrls.dashboard,
-          icon: <LayoutDashboardIcon />,
+          icon: <WidgetIcon />,
         },
         {
           title: "Students",
@@ -707,7 +720,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Requests",
           url: adminUrls.requests,
-          icon: <GitPullRequest />,
+          icon: <RequestIcon />,
           hasNotification: unreadRequests,
         },
         {
@@ -718,7 +731,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Complaints",
           url: `${adminUrls.dashboard}/complaints`,
-          icon: <AlertTriangle />,
+          icon: <DangerTriangleIcon />,
           hasNotification: unreadComplaints,
         },
         {
@@ -740,7 +753,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Page Builder",
           url: adminUrls.pageBuilder,
-          icon: <LayoutDashboardIcon />,
+          icon: <WidgetIcon />,
         },
         {
           title: "Developer Console",
@@ -752,7 +765,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: urls.dashboard,
-          icon: <LayoutDashboardIcon />,
+          icon: <WidgetIcon />,
         },
         {
           title: "Leaderboard",
@@ -787,14 +800,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     {
       title: "Mobile App",
       url: "/downloads",
-      icon: <Smartphone />,
+      icon: <SmartphoneIcon />,
     },
     ...(isTeacher
       ? [
           {
             title: "Agent",
             url: `/teacher/${profileUsername || "username"}/tasks/${teacherChats[0]?.id || "new"}`,
-            icon: <Bot />,
+            icon: <BotIcon />,
             onClick: () => {
               setOpen(false)
               if (isMobile) setOpenMobile(false)
@@ -1039,7 +1052,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <DialogContent className="sm:max-w-md text-center flex flex-col items-center p-6">
           <DialogHeader className="items-center">
             <DialogTitle className="flex items-center gap-2 text-lg font-bold">
-              <Smartphone className="size-5 text-primary animate-bounce" />
+              <SmartphoneIcon className="size-5 text-primary animate-bounce" />
               Download VidyaSchool App
             </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
