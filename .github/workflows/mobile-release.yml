@@ -174,7 +174,8 @@ jobs:
         run: |
           RAW=$(grep 'versionName\s*=' mobile-app/kotlin/app/build.gradle.kts | head -1 | awk -F'"' '{print $2}')
           sed -i "s/versionName = \"$RAW\"/versionName = \"$VERSION_NAME\"/" mobile-app/kotlin/app/build.gradle.kts
-          sed -i "s/versionCode = [0-9]*/versionCode = ${{ github.run_number }}/" mobile-app/kotlin/app/build.gradle.kts
+          VERSION_CODE=$(( 1000 + ${{ github.run_number }} ))
+          sed -i "s/versionCode = [0-9]*/versionCode = $VERSION_CODE/" mobile-app/kotlin/app/build.gradle.kts
 
       - name: Build debug APK
         working-directory: mobile-app/kotlin
