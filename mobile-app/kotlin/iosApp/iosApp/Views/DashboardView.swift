@@ -182,8 +182,8 @@ final class StudentDashboardViewModel: ObservableObject {
                     if let subs = exam.subjects, !subs.isEmpty {
                         var totalScore: Float = 0.0
                         for sub in subs {
-                            let obtained: Float = sub.score ?? Float(sub.marksObtained)
-                            let maxM: Float = sub.maxScore ?? Float(sub.maxMarks)
+                            let obtained: Float = sub.score?.floatValue ?? Float(sub.marksObtained)
+                            let maxM: Float = sub.maxScore?.floatValue ?? Float(sub.maxMarks)
                             if maxM > 0 {
                                 totalScore += (obtained / maxM) * 100.0
                             }
