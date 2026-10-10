@@ -43,3 +43,5 @@ export function Strobi({
     </div>
   )
 }
+
+export { Strobi as Avatar }

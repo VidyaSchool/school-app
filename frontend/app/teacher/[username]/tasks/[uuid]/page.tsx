@@ -3,14 +3,13 @@
 import * as React from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ArrowUp, User, ArrowLeft, Loader2, Copy, Check, ArrowDown, Pause, Paperclip, Plus, X, FileText, ImageIcon, Video, ChevronDown, ChevronsUpDown, File, Zap, BrainCircuit } from "lucide-react"
-import { Strobi } from "@/components/strobi-avatar"
+import { Strobi, Avatar } from "@/components/strobi-avatar"
 import { Button } from "@/components/ui/button"
 import { logoutUser } from "@/lib/auth-client"
 import Link from "next/link"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useSidebar } from "@/components/ui/sidebar"
 import { Marker, MarkerContent, MarkerIcon, MarkerLabel } from "@/components/ui/marker"
-import { Spinner } from "@/components/ui/spinner"
 import { AiToolCard, AiToolCall, useAutoDetectTools } from "@/components/ui/ai-tool-card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import ReactMarkdown from "react-markdown"
@@ -116,9 +115,9 @@ function ThinkingBlock({ content, isStreaming }: { content: string; isStreaming:
           transition-colors duration-200
         "
       >
-        {/* Spinner for streaming / static dot for finished */}
+        {/* Avatar with thinking animation when streaming / static dot for finished */}
         {isStreaming ? (
-          <Spinner size="sm" className="h-3 w-3 border-t-primary border-primary/20 shrink-0" />
+          <Avatar size={18} isThinking={true} className="shrink-0" />
         ) : (
           <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-zinc-400 dark:bg-zinc-500 shrink-0" />
         )}
@@ -1067,14 +1066,15 @@ export default function TeacherTaskChatPage() {
           {/* Shimmer loading / Generation Status */}
           {genStatus !== "idle" && (!liveThinking || genStatus !== "thinking") ? (
             <div className="w-full max-w-full mr-auto space-y-2.5 py-1">
-              {/* Row 1 — spinner + dynamic status label (shown before stream begins or when not live thinking) */}
+              {/* Row 1 — avatar with thinking animation + Thinking... label with shimmer */}
               {(genStatus === "sending" || (genStatus === "thinking" && !liveThinking)) && (
                 <Marker role="status">
-                  <MarkerIcon>
-                    <Spinner size="sm" className="border-t-primary border-primary/20" />
-                  </MarkerIcon>
+                  <Avatar
+                    size={28}
+                    isThinking={true}
+                  />
                   <MarkerLabel className="shimmer text-muted-foreground">
-                    {genStatus === "sending" ? "Sending\u2026" : "Thinking\u2026"}
+                    Thinking…
                   </MarkerLabel>
                 </Marker>
               )}
