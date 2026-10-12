@@ -24,7 +24,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useSession, authClient, logoutUser } from "@/lib/auth-client"
+import { useSession } from "@/contexts/session-context"
+import { logoutUser } from "@/lib/auth-client"
 import { useTheme } from "@/components/theme-provider"
 import { EllipsisVerticalIcon, CircleUserRoundIcon, BellIcon, LogOutIcon, SunIcon } from "lucide-react"
 import Link from "next/link"
@@ -34,44 +35,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 export function NavUser() {
   const { isMobile } = useSidebar()
   const { setTheme } = useTheme()
-  const { data: session, isPending } = useSession()
-  const [cachedData] = React.useState<any>(() => {
-    if (typeof window === "undefined") return null
-    try {
-      const raw = localStorage.getItem("vs_admin_user_cache")
-      if (raw) return JSON.parse(raw)
-    } catch {}
-    return null
-  })
-  const [fetchedUser, setFetchedUser] = React.useState<any>(() => cachedData?.user || null)
-  const [username, setUsername] = React.useState<string | null>(() => cachedData?.username || null)
-  const [loading, setLoading] = React.useState(!cachedData?.user)
+  const { user: currentUser, isLoading: isPending } = useSession()
+  const username = (currentUser?.username as string) || null
 
-  React.useEffect(() => {
-    if (cachedData?.user && Date.now() - (cachedData.savedAt || 0) < 5 * 60 * 1000) {
-      setLoading(false)
-      return
-    }
-    fetch('/api/account')
-      .then(res => {
-        if (!res.ok) return null
-        return res.json()
-      })
-      .then(data => {
-        if (data?.user) {
-          setFetchedUser(data.user)
-          if (data.profile?.username) {
-            setUsername(data.profile.username)
-          }
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [cachedData])
-
-  const currentUser = session?.user || fetchedUser
-
-  if (isPending && loading && !currentUser) {
+  if (isPending && !currentUser) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>

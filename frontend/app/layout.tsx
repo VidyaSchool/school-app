@@ -52,6 +52,7 @@ import { CustomSearchDialog } from "@/components/custom-search-dialog"
 import { Toaster } from "@/components/ui/sonner"
 import { PaperPlanesWrapper } from "@/components/paper-planes-wrapper"
 import { Analytics } from "@vercel/analytics/next"
+import { SessionProvider } from "@/contexts/session-context"
 
 export default async function RootLayout({
   children,
@@ -84,11 +85,13 @@ export default async function RootLayout({
               theme={{ enabled: false }}
               search={{ SearchDialog: CustomSearchDialog }}
             >
-              <AlertBanner />
-              <PWARegister />
-              {children}
-              <Analytics />
-              <Toaster richColors position="bottom-right" />
+              <SessionProvider>
+                <AlertBanner />
+                <PWARegister />
+                {children}
+                <Analytics />
+                <Toaster richColors position="bottom-right" />
+              </SessionProvider>
             </RootProvider>
           </TooltipProvider>
         </ThemeProvider>

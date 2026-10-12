@@ -22,9 +22,18 @@ export const authClient = createAuthClient({
   ]
 })
 
-export const { signIn, signUp, signOut, useSession } = authClient
+export const { signIn, signUp, signOut } = authClient
+export const useBetterAuthSession = authClient.useSession
+export { useSession } from '@/contexts/session-context'
 
 export function logoutUser() {
+  // Broadcast logout event to clear centralized session state
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new Event('auth:logout'))
+    } catch {}
+  }
+
   // 1. Immediately expire cookies client-side so middleware sees empty session on next page load
   if (typeof document !== 'undefined') {
     document.cookie = "better-auth.session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"

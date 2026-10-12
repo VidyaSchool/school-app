@@ -395,3 +395,21 @@ class Verification(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, alias="created_at")
     updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updated_at")
 
+
+class RolePermission(SQLModel, table=True):
+    __tablename__ = "role_permission"
+    id: str = Field(primary_key=True)
+    role: str = Field(index=True)
+    permission: str = Field(index=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class UserPermission(SQLModel, table=True):
+    __tablename__ = "user_permission"
+    id: str = Field(primary_key=True)
+    user_id: str = Field(foreign_key="user.id", index=True)
+    permission: str = Field(index=True)
+    granted: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+

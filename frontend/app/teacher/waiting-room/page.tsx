@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { io, Socket } from "socket.io-client"
-import { useSession } from "@/lib/auth-client"
+import { useSession } from "@/contexts/session-context"
 import { 
   Clock, 
   Loader2, 
@@ -20,7 +20,7 @@ import { toast } from "sonner"
 
 export default function TeacherWaitingRoomPage() {
   const router = useRouter()
-  const { data: session, isPending } = useSession()
+  const { user, isLoading: isPending, refreshSession } = useSession()
   const [socket, setSocket] = React.useState<Socket | null>(null)
   const [connected, setConnected] = React.useState(false)
   const [requestStatus, setRequestStatus] = React.useState<"pending" | "approved" | "rejected">("pending")
@@ -29,7 +29,7 @@ export default function TeacherWaitingRoomPage() {
   // Verify request status via HTTP as a fallback, and setup socket
   React.useEffect(() => {
     if (isPending) return
-    if (!session?.user) {
+    if (!user) {
       router.push("/login")
       return
     }
@@ -46,10 +46,10 @@ export default function TeacherWaitingRoomPage() {
       setConnected(true)
       
       socketInstance.emit("join", {
-        userId: session.user.id,
-        name: session.user.name,
-        role: session.user.role,
-        image: session.user.image,
+        userId: user.id,
+        name: user.name,
+        role: user.role,
+        image: user.image,
       })
     })
 
@@ -63,11 +63,13 @@ export default function TeacherWaitingRoomPage() {
       setRequestStatus(data.status)
       if (data.status === "approved") {
         toast.success("Congratulations! Your Teacher Registration has been approved by the Admin!")
+        refreshSession()
         setTimeout(() => {
           router.push("/teacher")
         }, 2000)
       } else if (data.status === "rejected") {
         toast.error("Your educator role request has been rejected. You have been assigned the Student role.")
+        refreshSession()
         setTimeout(() => {
           router.push("/student")
         }, 4000)
@@ -97,7 +99,7 @@ export default function TeacherWaitingRoomPage() {
       socketInstance.disconnect()
       clearInterval(interval)
     }
-  }, [session, isPending, router])
+  }, [user, isPending, router])
 
   const handleSignOut = async () => {
     if (socket) socket.disconnect()
@@ -188,7 +190,7 @@ export default function TeacherWaitingRoomPage() {
 
         <CardFooter className="flex items-center justify-between border-t border-border/50 px-8 py-4 bg-muted/20">
           <div className="text-xs text-muted-foreground">
-            Account: <span className="font-mono font-medium text-foreground">{session?.user?.email}</span>
+            Account: <span className="font-mono font-medium text-foreground">{user?.email}</span>
           </div>
           <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-1 rounded-lg text-xs cursor-pointer">
             <LogOut className="size-3.5" /> Sign Out

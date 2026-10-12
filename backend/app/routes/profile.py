@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlmodel import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import get_current_user, get_user_effective_permissions
 from app.core.database import get_db
 from models import User, UserProfile, TeacherRequest
 
@@ -14,6 +14,45 @@ router = APIRouter(tags=["profile"])
 
 def get_utc_now() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+# ── Centralized Session & Account Endpoints ─────────────────────────────────
+
+@router.get("/api/session")
+@router.get("/api/auth/me")
+def get_user_session(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+    permissions = get_user_effective_permissions(current_user.id, current_user.role, db)
+
+    user_data = {
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "image": current_user.image,
+        "role": current_user.role,
+        "preferredRole": getattr(current_user, "preferred_role", None),
+        "teacherApprovalStatus": getattr(current_user, "teacher_approval_status", "pending"),
+        "username": profile.username if profile else None,
+        "admissionNumber": profile.admission_number if profile else None,
+        "onboardingCompleted": profile.onboarding_completed if profile else False,
+        "class": profile.class_ if profile else None,
+        "section": profile.section if profile else None,
+        "createdAt": current_user.created_at.isoformat() if hasattr(current_user, "created_at") and getattr(current_user, "created_at", None) else None
+    }
+
+    return {
+        "user": user_data,
+        "role": current_user.role,
+        "permissions": permissions,
+        "isAuthenticated": True,
+        "profile": {
+            "username": profile.username if profile else None,
+            "onboardingCompleted": profile.onboarding_completed if profile else False,
+        } if profile else None
+    }
 
 
 # ── Account Info ──────────────────────────────────────────────────────────────
@@ -60,6 +99,8 @@ def get_user_account(
         "updatedAt": profile.updated_at.isoformat() if profile.updated_at else None,
     }
 
+    permissions = get_user_effective_permissions(current_user.id, current_user.role, db)
+
     user_data = {
         "id": current_user.id,
         "name": current_user.name,
@@ -67,10 +108,19 @@ def get_user_account(
         "image": current_user.image,
         "role": current_user.role,
         "preferredRole": getattr(current_user, "preferred_role", None),
+        "username": profile.username,
+        "admissionNumber": profile.admission_number,
+        "onboardingCompleted": profile.onboarding_completed,
         "createdAt": current_user.created_at.isoformat() if hasattr(current_user, "created_at") and getattr(current_user, "created_at", None) else None
     }
 
-    return {"user": user_data, "profile": prof_data}
+    return {
+        "user": user_data,
+        "profile": prof_data,
+        "role": current_user.role,
+        "permissions": permissions,
+        "isAuthenticated": True,
+    }
 
 
 # ── Profile Update ────────────────────────────────────────────────────────────

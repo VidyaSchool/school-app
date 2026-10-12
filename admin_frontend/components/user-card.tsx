@@ -1,14 +1,15 @@
 "use client"
 
-import { useSession, logoutUser } from "@/lib/auth-client"
+import { useSession } from "@/contexts/session-context"
+import { logoutUser } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function UserCard() {
-  const { data: session } = useSession()
+  const { user } = useSession()
 
-  if (!session?.user) {
+  if (!user) {
     return null
   }
 
@@ -28,12 +29,12 @@ export function UserCard() {
   return (
     <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
       <Avatar className="h-10 w-10">
-        <AvatarImage src={session.user.image || undefined} alt={session.user.name} />
-        <AvatarFallback>{getInitials(session.user.name)}</AvatarFallback>
+        <AvatarImage src={user.image || undefined} alt={user.name} />
+        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{session.user.name}</p>
-        <p className="text-xs text-muted-foreground truncate">{session.user.email}</p>
+        <p className="text-sm font-medium truncate">{user.name}</p>
+        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
       </div>
       <Button
         variant="ghost"

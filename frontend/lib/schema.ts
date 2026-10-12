@@ -383,4 +383,20 @@ export const deviceAuthRequest = pgTable('device_auth_request', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+export const rolePermission = pgTable('role_permission', {
+  id: text('id').primaryKey(),
+  role: text('role').notNull(),
+  permission: text('permission').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const userPermission = pgTable('user_permission', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  permission: text('permission').notNull(),
+  granted: boolean('granted').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 

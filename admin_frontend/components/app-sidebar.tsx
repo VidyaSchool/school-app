@@ -439,16 +439,16 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const router = useRouter()
-  const { data: session, isPending } = useSession()
+  const { user: sessionUser, isPending } = useSession()
   const { isMobile, setOpenMobile } = useSidebar()
 
-  // 1. Synchronously initialize user from memory / localStorage cache
+  // 1. Synchronously initialize user from session or memory / localStorage cache
   const [cachedUser, setCachedUser] = React.useState<any>(() => {
     const stored = getStoredUser()
     return stored?.user || null
   })
 
-  const userToDisplay = session?.user || cachedUser
+  const userToDisplay = sessionUser || cachedUser
   // In admin_frontend, default to cached role or "admin" to prevent flash of student navigation
   const userRole = userToDisplay?.role || cachedUser?.role || (pathname?.startsWith("/teacher") ? "teacher" : "admin")
 
@@ -509,13 +509,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     router.push(targetUrl)
   }
 
-  // Stale-While-Revalidate: fetch /api/account ONLY when cache is missing, stale (>5m), or session user changed
+  // Stale-While-Revalidate fallback: skip if sessionUser already available from centralized session
   React.useEffect(() => {
+    if (sessionUser) return
+
     const stored = getStoredUser()
     const isStale = !stored || (Date.now() - stored.savedAt > USER_CACHE_TTL)
-    const idMismatch = session?.user && stored && session.user.id !== stored.user.id
 
-    if (!isStale && !idMismatch && stored?.user) {
+    if (!isStale && stored?.user) {
       if (!cachedUser) setCachedUser(stored.user)
       return
     }
@@ -541,7 +542,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       .finally(() => {
         _accountFetchPromise = null
       })
-  }, [session?.user?.id, profileUsername])
+  }, [sessionUser, profileUsername])
 
   // Notification states — initialized synchronously from sessionStorage cache
   const [unreadRequests, setUnreadRequests] = React.useState(() => getStoredNotifs()?.unreadRequests ?? false)
@@ -597,7 +598,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Fetch initial pending status (suppressed if fetched within last 60s) & persistent Socket.IO listeners
   React.useEffect(() => {
-    if (!session?.user && !cachedUser) return
+    if (!sessionUser && !cachedUser) return
 
     const storedNotifs = getStoredNotifs()
     const isNotifsFresh = storedNotifs && (Date.now() - storedNotifs.savedAt < NOTIFS_CACHE_TTL)
@@ -673,7 +674,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       socket.off("complaint_created", handleComplaint)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.id, isTeacher, isAdmin, isLibrarian])
+  }, [sessionUser?.id, isTeacher, isAdmin, isLibrarian])
 
   // Trigger simulated new notice dot
   React.useEffect(() => {

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, CirclePlusIcon, Send } from "lucide-react"
-import { useSession } from "@/lib/auth-client"
+import { useSession } from "@/contexts/session-context"
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ import {
 import { toast } from "sonner"
 
 export function HeaderComplaintButton() {
-  const { data: session } = useSession()
+  const { user, role } = useSession()
   const [complaintOpen, setComplaintOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [, startTransition] = React.useTransition()
@@ -93,7 +93,7 @@ export function HeaderComplaintButton() {
     setUsers([])
   }
 
-  const userRole = session?.user?.role || "student"
+  const userRole = role || user?.role || "student"
   const isStudent = userRole === "student"
 
   const handleComplaintSubmit = async (e: React.FormEvent) => {

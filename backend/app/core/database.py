@@ -38,3 +38,22 @@ def init_db() -> None:
                 session.commit()
         except Exception:
             session.rollback()
+
+        # Seed default role permissions if not exists
+        try:
+            import uuid
+            from models import RolePermission
+            from app.core.auth import DEFAULT_ROLE_PERMISSIONS
+            existing_count = session.query(RolePermission).count()
+            if existing_count == 0:
+                for role_name, perms in DEFAULT_ROLE_PERMISSIONS.items():
+                    for perm in perms:
+                        rp = RolePermission(
+                            id=str(uuid.uuid4()),
+                            role=role_name,
+                            permission=perm
+                        )
+                        session.add(rp)
+                session.commit()
+        except Exception:
+            session.rollback()

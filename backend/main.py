@@ -83,6 +83,8 @@ async def join(sid, data):
         "image": image,
         "sid": sid
     }
+    if user_id:
+        await sio.enter_room(sid, f"user_{user_id}")
 
 @sio.event
 async def disconnect(sid):
@@ -180,10 +182,17 @@ async def approve_teacher(sid, data):
             db.add(user)
             db.commit()
             
+            try:
+                from app.core.cache import invalidate_user_permissions
+                invalidate_user_permissions(request.user_id)
+            except Exception:
+                pass
+            
             # Emit to all clients
             print(f"Emitting approval_status for user {request.user_id}")
             await sio.emit('approval_status', {"status": "approved", "userId": request.user_id}, broadcast=True)
             await sio.emit('request_updated', {"requestId": request_id, "status": "approved"}, broadcast=True)
+            await sio.emit('session:invalidated', {"userId": request.user_id, "role": user.role, "reason": "teacher_approved"}, broadcast=True)
             print(f"✅ Approved teacher request {request_id} for user {request.user_id}")
 
 @sio.event
@@ -210,9 +219,16 @@ async def reject_teacher(sid, data):
             db.add(user)
             db.commit()
             
+            try:
+                from app.core.cache import invalidate_user_permissions
+                invalidate_user_permissions(request.user_id)
+            except Exception:
+                pass
+            
             # Emit to all clients
             await sio.emit('approval_status', {"status": "rejected", "userId": request.user_id}, broadcast=True)
             await sio.emit('request_updated', {"requestId": request_id, "status": "rejected"}, broadcast=True)
+            await sio.emit('session:invalidated', {"userId": request.user_id, "role": "student", "reason": "teacher_rejected"}, broadcast=True)
             print(f"Rejected teacher request {request_id} for user {request.user_id}")
 
 app = FastAPI(title="VidyaSchool Fees Backend API")

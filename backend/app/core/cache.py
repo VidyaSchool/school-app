@@ -143,3 +143,31 @@ def invalidate_books_cache():
     delete_cache("books:all")
     delete_cache("books:available")
     delete_pattern("books:search:*")
+
+
+# ── RBAC & User Permission Cache Helpers ────────────────────────────────────
+
+def get_permission_cache_key(user_id: str) -> str:
+    return f"user:{user_id}:permissions"
+
+def get_cached_user_permissions(user_id: str) -> Optional[list]:
+    """Retrieve cached permissions for a user from Redis or fallback memory cache."""
+    return get_cache(get_permission_cache_key(user_id))
+
+def set_cached_user_permissions(user_id: str, permissions: list, ttl: Optional[int] = None) -> bool:
+    """Cache derived permissions for a user in Redis with configurable TTL."""
+    if ttl is None:
+        try:
+            from app.core.config import PERMISSION_CACHE_TTL
+            ttl = PERMISSION_CACHE_TTL
+        except Exception:
+            ttl = 3600
+    return set_cache(get_permission_cache_key(user_id), permissions, ttl=ttl)
+
+def invalidate_user_permissions(user_id: str) -> bool:
+    """Invalidate permission cache for a user immediately."""
+    return delete_cache(get_permission_cache_key(user_id))
+
+def invalidate_all_permissions() -> int:
+    """Invalidate all cached user permissions across the system."""
+    return delete_pattern("user:*:permissions")

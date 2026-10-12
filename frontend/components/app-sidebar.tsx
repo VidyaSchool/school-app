@@ -304,7 +304,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const router = useRouter()
-  const { data: session, isPending } = useSession()
+  const { user: sessionUser, isPending } = useSession()
   const { isMobile, setOpenMobile, setOpen } = useSidebar()
   const [profileLoading, setProfileLoading] = React.useState(true)
   const [isQrOpen, setIsQrOpen] = React.useState(false)
@@ -312,17 +312,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [downloadUrl, setDownloadUrl] = React.useState<string>(
     "https://github.com/VidyaSchool/school-app/releases"
   )
-
-  const [fetchedUser, setFetchedUser] = React.useState<any>(null)
-
-  React.useEffect(() => {
-    fetch('/api/account')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.user) setFetchedUser(data.user)
-      })
-      .catch(() => {})
-  }, [])
 
   React.useEffect(() => {
     fetch('/api/profile/username')
@@ -349,9 +338,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       .catch(() => {})
   }, [])
 
-  const userToDisplay = session?.user || fetchedUser
-  const isLoading = (isPending && !fetchedUser) || profileLoading
-  const userRole = userToDisplay?.role || session?.user?.role
+  const userToDisplay = sessionUser
+  const isLoading = isPending || profileLoading
+  const userRole = userToDisplay?.role
   
   const isLibrarian = userRole === "librarian" || (userRole === undefined && pathname?.startsWith("/librarian"))
   const isTeacher = userRole === "teacher" || (userRole === undefined && pathname?.startsWith("/teacher"))
@@ -461,7 +450,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Fetch initial pending status on mount and connect to Socket.IO
   // Deps: session + role flags only — NOT pathname, so socket stays alive across navigations
   React.useEffect(() => {
-    if (!session?.user) return
+    if (!sessionUser) return
 
     // 1. Fetch complaints status
     const roleParam = isTeacher || isLibrarian ? "teacher" : isAdmin ? "admin" : ""
@@ -512,7 +501,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       socket.disconnect()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user?.id, isTeacher, isAdmin, isLibrarian])
+  }, [sessionUser?.id, isTeacher, isAdmin, isLibrarian])
 
   // Trigger simulated new notice dot
   React.useEffect(() => {

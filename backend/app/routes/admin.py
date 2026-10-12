@@ -6,9 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlmodel import Session, func, or_, desc
 
-from app.core.auth import require_role, get_current_user
+from app.core.auth import require_role, get_current_user, require_permission, invalidate_user_permissions_cache, get_user_effective_permissions
 from app.core.database import get_db
-from models import User, UserProfile, FeeInstallment, TeacherRequest, StudentSubjectMarks
+from models import User, UserProfile, FeeInstallment, TeacherRequest, StudentSubjectMarks, RolePermission, UserPermission
 
 router = APIRouter(tags=["admin"])
 
@@ -172,7 +172,7 @@ class ChangeRoleRequest(BaseModel):
     role: str
 
 @router.post("/api/admin/change-role")
-def change_role(
+async def change_role(
     data: ChangeRoleRequest,
     admin: User = Depends(require_role(["admin"])),
     db: Session = Depends(get_db)
@@ -189,6 +189,18 @@ def change_role(
     target_user.updated_at = datetime.utcnow()
     db.add(target_user)
     db.commit()
+    invalidate_user_permissions_cache(target_user.id)
+
+    try:
+        from main import sio
+        await sio.emit("session:invalidated", {
+            "userId": target_user.id,
+            "role": data.role,
+            "reason": "role_changed"
+        })
+    except Exception:
+        pass
+
     return {"success": True}
 
 
@@ -239,6 +251,7 @@ async def approve_teacher_request(
         db.add(target_user)
         
     db.commit()
+    invalidate_user_permissions_cache(req.user_id)
     
     try:
         from main import sio, active_users
@@ -250,6 +263,11 @@ async def approve_teacher_request(
                 
         if target_sid:
             await sio.emit("teacher_request_status", {"status": "approved"}, to=target_sid)
+        await sio.emit("session:invalidated", {
+            "userId": req.user_id,
+            "role": target_user.role if target_user else "teacher",
+            "reason": "teacher_approved"
+        })
     except Exception:
         pass
         
@@ -277,6 +295,7 @@ async def reject_teacher_request(
         db.add(target_user)
         
     db.commit()
+    invalidate_user_permissions_cache(req.user_id)
     
     try:
         from main import sio, active_users
@@ -288,6 +307,11 @@ async def reject_teacher_request(
                 
         if target_sid:
             await sio.emit("teacher_request_status", {"status": "rejected"}, to=target_sid)
+        await sio.emit("session:invalidated", {
+            "userId": req.user_id,
+            "role": "student",
+            "reason": "teacher_rejected"
+        })
     except Exception:
         pass
         
@@ -312,3 +336,131 @@ def search_users(
         )
     results = query.limit(20).all()
     return [{"name": u.name, "username": p.username, "role": u.role} for u, p in results]
+
+
+# ── Granular Permissions Management ──────────────────────────────────────────
+
+class UserPermissionUpdateRequest(BaseModel):
+    permission: str
+    granted: bool = True  # True = grant, False = revoke
+
+
+class RolePermissionUpdateRequest(BaseModel):
+    permission: str
+    action: str = "add"  # "add" or "remove"
+
+
+@router.get("/api/admin/users/{user_id}/permissions")
+def get_admin_user_permissions(
+    user_id: str,
+    admin: User = Depends(require_role(["admin"])),
+    db: Session = Depends(get_db)
+):
+    target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    overrides = db.query(UserPermission).filter(UserPermission.user_id == user_id).all()
+    effective = get_user_effective_permissions(target_user.id, target_user.role, db)
+
+    return {
+        "userId": user_id,
+        "name": target_user.name,
+        "role": target_user.role,
+        "effectivePermissions": effective,
+        "overrides": [{"permission": o.permission, "granted": o.granted} for o in overrides]
+    }
+
+
+@router.post("/api/admin/users/{user_id}/permissions")
+async def update_admin_user_permission(
+    user_id: str,
+    data: UserPermissionUpdateRequest,
+    admin: User = Depends(require_role(["admin"])),
+    db: Session = Depends(get_db)
+):
+    target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    existing = db.query(UserPermission).filter(
+        UserPermission.user_id == user_id,
+        UserPermission.permission == data.permission
+    ).first()
+
+    if existing:
+        existing.granted = data.granted
+        existing.updated_at = datetime.utcnow()
+        db.add(existing)
+    else:
+        new_override = UserPermission(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            permission=data.permission,
+            granted=data.granted,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        db.add(new_override)
+
+    db.commit()
+    invalidate_user_permissions_cache(user_id)
+
+    try:
+        from main import sio
+        await sio.emit("session:invalidated", {
+            "userId": user_id,
+            "permission": data.permission,
+            "granted": data.granted,
+            "reason": "permission_updated"
+        })
+    except Exception:
+        pass
+
+    action_label = "granted" if data.granted else "revoked"
+    return {"success": True, "message": f"Permission '{data.permission}' {action_label} for user {user_id}"}
+
+
+@router.post("/api/admin/roles/{role}/permissions")
+async def update_admin_role_permission(
+    role: str,
+    data: RolePermissionUpdateRequest,
+    admin: User = Depends(require_role(["admin"])),
+    db: Session = Depends(get_db)
+):
+    from app.core.cache import invalidate_all_permissions
+
+    role_norm = role.lower()
+    existing = db.query(RolePermission).filter(
+        RolePermission.role == role_norm,
+        RolePermission.permission == data.permission
+    ).first()
+
+    if data.action == "add" and not existing:
+        rp = RolePermission(
+            id=str(uuid.uuid4()),
+            role=role_norm,
+            permission=data.permission,
+            created_at=datetime.utcnow()
+        )
+        db.add(rp)
+        db.commit()
+    elif data.action == "remove" and existing:
+        db.delete(existing)
+        db.commit()
+
+    # Invalidate all cached user permissions so changes take effect immediately
+    invalidate_all_permissions()
+
+    try:
+        from main import sio
+        await sio.emit("session:invalidated", {
+            "role": role_norm,
+            "permission": data.permission,
+            "action": data.action,
+            "reason": "role_permissions_updated"
+        })
+    except Exception:
+        pass
+
+    return {"success": True, "message": f"Role '{role_norm}' permission '{data.permission}' updated"}

@@ -1,50 +1,59 @@
 "use client"
 
-import { useSession } from "@/lib/auth-client"
+import { useSession } from "@/contexts/session-context"
 import { Role } from "@/lib/auth-helpers"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export function useRequireAuth() {
-  const { data: session, isPending } = useSession()
+  const { user, isLoading, isAuthenticated } = useSession()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isPending && !session) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login')
     }
-  }, [session, isPending, router])
+  }, [isAuthenticated, isLoading, router])
 
-  return { user: session?.user, isPending }
+  return { user, isPending: isLoading }
 }
 
 export function useRequireRole(allowedRoles: Role | Role[]) {
-  const { user, isPending } = useRequireAuth()
+  const { user, isLoading, hasRole } = useSession()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isPending && user) {
-      const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
-      const rolesWithLibrarian = roles.includes('teacher') && !roles.includes('librarian')
-        ? [...roles, 'librarian' as Role]
-        : roles
-      if (!rolesWithLibrarian.includes(user.role as Role)) {
+    if (!isLoading && user) {
+      if (!hasRole(allowedRoles)) {
         router.push('/unauthorized')
       }
     }
-  }, [user, isPending, allowedRoles, router])
+  }, [user, isLoading, allowedRoles, hasRole, router])
 
-  return { user, isPending }
+  return { user, isPending: isLoading }
 }
 
 export function useCheckRole(allowedRoles: Role | Role[]): boolean {
-  const { data: session } = useSession()
-  
-  if (!session?.user) return false
-  
-  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
-  const rolesWithLibrarian = roles.includes('teacher') && !roles.includes('librarian')
-    ? [...roles, 'librarian' as Role]
-    : roles
-  return rolesWithLibrarian.includes(session.user.role as Role)
+  const { hasRole } = useSession()
+  return hasRole(allowedRoles)
+}
+
+export function useRequirePermission(requiredPermission: string) {
+  const { user, isLoading, hasPermission } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (!hasPermission(requiredPermission)) {
+        router.push('/unauthorized')
+      }
+    }
+  }, [user, isLoading, requiredPermission, hasPermission, router])
+
+  return { user, isPending: isLoading }
+}
+
+export function useCheckPermission(permission: string): boolean {
+  const { hasPermission } = useSession()
+  return hasPermission(permission)
 }
