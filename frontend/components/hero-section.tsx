@@ -11,6 +11,20 @@ import { cn } from "@/lib/utils"
 
 const LiquidMetalHero = dynamic(() => import("@/components/liquid-metal-hero"), {
   ssr: false,
+  loading: () => (
+    <div className="relative h-full w-full flex items-center justify-center translate-x-0 lg:translate-x-6">
+      <div className="absolute inset-0 pointer-events-none select-none z-0 flex items-center justify-center">
+        <BlurImage
+          src="/assets/illustrations/hero_section.png"
+          alt="Hero Illustration"
+          fill
+          className="object-contain p-2 sm:p-4"
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, 50vw"
+        />
+      </div>
+    </div>
+  ),
 })
 
 const sections = [
@@ -537,7 +551,8 @@ export function HeroSection() {
                           alt="Hero Illustration"
                           fill
                           className="object-contain p-2 sm:p-4"
-                          priority
+                          loading="lazy"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 60vw, 50vw"
                         />
                       </div>
                     </div>
