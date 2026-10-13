@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Megaphone, Search, Calendar, AlertTriangle, Plus, Trash2, RefreshCw, Bell } from "lucide-react"
+import { Megaphone, Search, Calendar, AlertTriangle, Plus, Trash2, RefreshCw, Bell, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
 import { useSession } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
@@ -47,6 +46,7 @@ export default function TeacherNoticePage() {
   const { data: session } = useSession()
   const [notices, setNotices] = React.useState<Notice[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [isRefreshing, setIsRefreshing] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedCategory, setSelectedCategory] = React.useState<string>("All")
 
@@ -67,8 +67,9 @@ export default function TeacherNoticePage() {
   const [pushTargetSection, setPushTargetSection] = React.useState("")
   const [pushSending, setPushSending] = React.useState(false)
 
-  const fetchNotices = React.useCallback(async () => {
-    setLoading(true)
+  const fetchNotices = React.useCallback(async (isInitial = false) => {
+    if (isInitial) setLoading(true)
+    else setIsRefreshing(true)
     try {
       const res = await fetch("/api/notices")
       if (!res.ok) throw new Error("Failed to fetch notices")
@@ -78,11 +79,12 @@ export default function TeacherNoticePage() {
       toast.error(err.message || "Failed to load notices")
     } finally {
       setLoading(false)
+      setIsRefreshing(false)
     }
   }, [])
 
   React.useEffect(() => {
-    fetchNotices()
+    fetchNotices(true)
   }, [fetchNotices])
 
   const handlePostNotice = async (e: React.FormEvent) => {
@@ -173,12 +175,20 @@ export default function TeacherNoticePage() {
     return matchesSearch && matchesCategory
   })
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
   return (
-    <div className="flex-1 space-y-6 p-4 md:p-8 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 min-h-screen bg-background font-sans w-full">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Notices & Announcements
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -189,10 +199,10 @@ export default function TeacherNoticePage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={fetchNotices}
-            disabled={loading}
+            onClick={() => fetchNotices(false)}
+            disabled={isRefreshing}
           >
-            <RefreshCw className={cn("size-3.5 mr-1.5", loading && "animate-spin")} />
+            <RefreshCw className={cn("size-3.5 mr-1.5", isRefreshing && "animate-spin")} />
             Refresh
           </Button>
           <Button 
@@ -206,7 +216,7 @@ export default function TeacherNoticePage() {
       </div>
 
       <Tabs defaultValue="notices" className="w-full space-y-6">
-        <TabsList className="grid w-full max-w-xs grid-cols-2">
+        <TabsList className="grid w-full sm:w-[320px] grid-cols-2">
           <TabsTrigger value="notices" className="flex items-center gap-1.5 cursor-pointer">
             <Megaphone className="size-3.5" />
             Notices
@@ -220,7 +230,7 @@ export default function TeacherNoticePage() {
         {/* ── NOTICES TAB ── */}
         <TabsContent value="notices" className="space-y-6">
           {isCreating ? (
-            <Card className="max-w-2xl">
+            <Card className="w-full">
               <form onSubmit={handlePostNotice}>
                 <CardHeader>
                   <CardTitle>Create Announcement</CardTitle>
@@ -326,42 +336,35 @@ export default function TeacherNoticePage() {
           ) : (
             <>
               {/* Search & Category Filter */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                <div className="relative w-full sm:w-72">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                <div className="relative flex-1 sm:max-w-xs">
                   <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
                   <Input 
-                    type="text"
+                    type="search"
                     placeholder="Search notices..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9 text-sm"
+                    className="pl-8"
                   />
                 </div>
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                  {["All", "Academic", "Exams", "Events", "General"].map((cat) => (
-                    <Button
-                      key={cat}
-                      variant={selectedCategory === cat ? "secondary" : "ghost"}
-                      size="sm"
-                      onClick={() => setSelectedCategory(cat)}
-                      className="text-xs h-8 shrink-0"
-                    >
-                      {cat}
-                    </Button>
-                  ))}
-                </div>
+                <Tabs
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                  className="w-full sm:w-auto"
+                >
+                  <TabsList>
+                    <TabsTrigger value="All">All</TabsTrigger>
+                    <TabsTrigger value="Academic">Academic</TabsTrigger>
+                    <TabsTrigger value="Exams">Exams</TabsTrigger>
+                    <TabsTrigger value="Events">Events</TabsTrigger>
+                    <TabsTrigger value="General">General</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
 
               {/* Notices List */}
               <div className="space-y-4">
-                {loading ? (
-                  <Card className="flex flex-col items-center justify-center py-16">
-                    <CardContent className="flex flex-col items-center gap-2">
-                      <Spinner size="lg" />
-                      <p className="text-sm text-muted-foreground">Loading announcements...</p>
-                    </CardContent>
-                  </Card>
-                ) : filteredNotices.length > 0 ? (
+                {filteredNotices.length > 0 ? (
                   filteredNotices.map((notice) => (
                     <Card key={notice.id} className="transition-colors hover:border-foreground/20">
                       <CardHeader className="gap-2 pb-3">
@@ -432,7 +435,7 @@ export default function TeacherNoticePage() {
 
         {/* ── PUSH NOTIFICATION TAB ── */}
         <TabsContent value="push">
-          <Card className="max-w-2xl">
+          <Card className="w-full">
             <form onSubmit={handleSendPush}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -517,7 +520,7 @@ export default function TeacherNoticePage() {
 
               <CardFooter className="flex justify-end border-t pt-4">
                 <Button type="submit" size="sm" disabled={pushSending}>
-                  {pushSending && <Spinner size="sm" className="mr-1.5" />}
+                  {pushSending && <Loader2 className="size-3.5 animate-spin mr-1.5" />}
                   {pushSending ? "Sending..." : "Send Notification"}
                 </Button>
               </CardFooter>

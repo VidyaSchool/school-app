@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Calendar, FileText, CheckCircle2, RefreshCw, Download } from "lucide-react"
+import { Search, Calendar, FileText, CheckCircle2, RefreshCw, Download, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Spinner } from "@/components/ui/spinner"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -36,11 +36,13 @@ interface Complaint {
 export default function TeacherComplaintsPage() {
   const [complaints, setComplaints] = React.useState<Complaint[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [isRefreshing, setIsRefreshing] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All")
 
-  const fetchComplaints = React.useCallback(async () => {
-    setLoading(true)
+  const fetchComplaints = React.useCallback(async (isInitial = false) => {
+    if (isInitial) setLoading(true)
+    else setIsRefreshing(true)
     try {
       const res = await fetch("/api/complaints?role=teacher")
       if (!res.ok) throw new Error("Failed to fetch complaints")
@@ -50,11 +52,12 @@ export default function TeacherComplaintsPage() {
       toast.error(err.message || "Failed to load complaints")
     } finally {
       setLoading(false)
+      setIsRefreshing(false)
     }
   }, [])
 
   React.useEffect(() => {
-    fetchComplaints()
+    fetchComplaints(true)
   }, [fetchComplaints])
 
   const handleResolve = async (id: string) => {
@@ -82,12 +85,20 @@ export default function TeacherComplaintsPage() {
     return matchesSearch && matchesStatus
   })
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
   return (
-    <div className="flex-1 space-y-6 p-4 md:p-8 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 min-h-screen bg-background font-sans w-full">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Classroom Complaints
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -95,53 +106,44 @@ export default function TeacherComplaintsPage() {
           </p>
         </div>
         <Button
-          onClick={fetchComplaints}
+          onClick={() => fetchComplaints(false)}
           variant="outline"
           size="sm"
-          disabled={loading}
+          disabled={isRefreshing}
         >
-          <RefreshCw className={cn("size-3.5 mr-1.5", loading && "animate-spin")} />
+          <RefreshCw className={cn("size-3.5 mr-1.5", isRefreshing && "animate-spin")} />
           Refresh
         </Button>
       </div>
 
       {/* Filter and Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative w-full sm:w-72">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
           <Input
-            type="text"
+            type="search"
             placeholder="Search complaints or names..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9 text-sm"
+            className="pl-8"
           />
         </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-          {["All", "Pending", "Resolved"].map((stat) => (
-            <Button
-              key={stat}
-              variant={selectedStatus === stat ? "secondary" : "ghost"}
-              onClick={() => setSelectedStatus(stat)}
-              size="sm"
-              className="text-xs h-8 shrink-0"
-            >
-              {stat}
-            </Button>
-          ))}
-        </div>
+        <Tabs
+          value={selectedStatus}
+          onValueChange={setSelectedStatus}
+          className="w-full sm:w-auto"
+        >
+          <TabsList>
+            <TabsTrigger value="All">All</TabsTrigger>
+            <TabsTrigger value="Pending">Pending</TabsTrigger>
+            <TabsTrigger value="Resolved">Resolved</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Complaints List */}
       <div className="space-y-4">
-        {loading ? (
-          <Card className="flex flex-col items-center justify-center py-16">
-            <CardContent className="flex flex-col items-center gap-2">
-              <Spinner size="lg" />
-              <p className="text-sm text-muted-foreground">Loading complaints...</p>
-            </CardContent>
-          </Card>
-        ) : filteredComplaints.length > 0 ? (
+        {filteredComplaints.length > 0 ? (
           filteredComplaints.map((comp) => (
             <Card key={comp.id} className="transition-colors hover:border-foreground/20">
               <CardHeader className="gap-2 pb-3">
