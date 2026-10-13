@@ -4,6 +4,18 @@ import * as React from "react"
 import { Megaphone, Search, Calendar, AlertTriangle, Plus, Trash2, RefreshCw, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
@@ -15,6 +27,7 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
 import { useSession } from "@/lib/auth-client"
+import { cn } from "@/lib/utils"
 
 interface Notice {
   id: string
@@ -136,12 +149,11 @@ export default function TeacherNoticePage() {
           title: pushTitle,
           body: pushBody,
           targetRole: pushTargetRole,
-          targetClass: pushTargetClass || undefined,
-          targetSection: pushTargetSection || undefined,
+          targetClass: pushTargetClass && pushTargetClass !== "all" ? pushTargetClass : undefined,
+          targetSection: pushTargetSection && pushTargetSection !== "all" ? pushTargetSection : undefined,
         }),
       })
       const data = await res.json()
-      console.log('[push] status:', res.status, 'data:', data)
       if (!res.ok) throw new Error(data.detail || data.error || "Failed to send notification")
       toast.success(`Notification sent to ${data.deliveredCount} user(s)`)
       setPushTitle("")
@@ -162,171 +174,177 @@ export default function TeacherNoticePage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="flex-1 space-y-6 p-4 md:p-8 max-w-6xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
-        <div className="flex flex-col gap-1.5">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
-            <Megaphone className="h-8 w-8 text-primary" />
-            Notice Administration
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Notices & Announcements
           </h1>
-          <p className="text-muted-foreground text-sm max-w-2xl leading-relaxed">
-            Announce notices, schedule events, publish bulletins, and coordinate school announcements for students.
+          <p className="text-sm text-muted-foreground">
+            Publish school bulletins, schedule notices, and send push notifications.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            onClick={fetchNotices}
             variant="outline"
             size="sm"
-            className="rounded-lg cursor-pointer flex items-center gap-1.5"
+            onClick={fetchNotices}
             disabled={loading}
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={cn("size-3.5 mr-1.5", loading && "animate-spin")} />
             Refresh
           </Button>
           <Button 
+            size="sm"
             onClick={() => setIsCreating(!isCreating)} 
-            className="rounded-lg cursor-pointer flex items-center gap-1.5"
           >
-            <Plus className="h-4 w-4" />
-            {isCreating ? "View Notices" : "Post Announcement"}
+            <Plus className="size-3.5 mr-1.5" />
+            {isCreating ? "View Notices" : "New Notice"}
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="notices" className="px-6 lg:px-8">
-        <TabsList className="mb-4">
+      <Tabs defaultValue="notices" className="w-full space-y-6">
+        <TabsList className="grid w-full max-w-xs grid-cols-2">
           <TabsTrigger value="notices" className="flex items-center gap-1.5 cursor-pointer">
-            <Megaphone className="h-4 w-4" /> Notices
+            <Megaphone className="size-3.5" />
+            Notices
           </TabsTrigger>
           <TabsTrigger value="push" className="flex items-center gap-1.5 cursor-pointer">
-            <Bell className="h-4 w-4" /> Push Notification
+            <Bell className="size-3.5" />
+            Push Alert
           </TabsTrigger>
         </TabsList>
 
         {/* ── NOTICES TAB ── */}
-        <TabsContent value="notices">
+        <TabsContent value="notices" className="space-y-6">
           {isCreating ? (
-            <div className="max-w-3xl">
-              <form onSubmit={handlePostNotice} className="rounded-xl border border-border bg-card/40 p-6 flex flex-col gap-5 shadow-sm">
-                <h2 className="text-lg font-bold text-foreground">Post New Announcement</h2>
-                
-                <div className="space-y-1.5">
-                  <label htmlFor="notice-title" className="text-xs font-semibold text-foreground">Announcement Title</label>
-                  <Input
-                    id="notice-title"
-                    type="text"
-                    placeholder="e.g. Extra Class for Mathematics scheduled"
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    className="h-10 rounded-lg border-border focus:ring-1 focus:ring-primary w-full bg-card/60 text-xs"
-                    required
-                  />
-                </div>
+            <Card className="max-w-2xl">
+              <form onSubmit={handlePostNotice}>
+                <CardHeader>
+                  <CardTitle>Create Announcement</CardTitle>
+                  <CardDescription>
+                    Post an announcement or bulletin visible to students and classes.
+                  </CardDescription>
+                </CardHeader>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1.5 flex flex-col">
-                    <label className="text-xs font-semibold text-foreground">Category</label>
-                    <Select value={newCategory} onValueChange={setNewCategory}>
-                      <SelectTrigger className="h-10 rounded-lg border-border bg-card/60 text-xs shadow-xs outline-hidden cursor-pointer">
-                        <SelectValue placeholder="Select Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Academic">Academic</SelectItem>
-                        <SelectItem value="Exams">Exams</SelectItem>
-                        <SelectItem value="Events">Events</SelectItem>
-                        <SelectItem value="General">General</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="notice-title">Title</Label>
+                    <Input
+                      id="notice-title"
+                      type="text"
+                      placeholder="e.g. Extra Class for Mathematics"
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      required
+                    />
                   </div>
 
-                  <div className="space-y-1.5 flex flex-col">
-                    <label className="text-xs font-semibold text-foreground">Target Class</label>
-                    <Select value={targetClass} onValueChange={setTargetClass}>
-                      <SelectTrigger className="h-10 rounded-lg border-border bg-card/60 text-xs shadow-xs outline-hidden cursor-pointer">
-                        <SelectValue placeholder="Select Class" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"].map((c) => (
-                          <SelectItem key={c} value={c}>Class {c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select value={newCategory} onValueChange={setNewCategory}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Academic">Academic</SelectItem>
+                          <SelectItem value="Exams">Exams</SelectItem>
+                          <SelectItem value="Events">Events</SelectItem>
+                          <SelectItem value="General">General</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Target Class</Label>
+                      <Select value={targetClass} onValueChange={setTargetClass}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"].map((c) => (
+                            <SelectItem key={c} value={c}>Class {c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Section</Label>
+                      <Select value={targetSection} onValueChange={setTargetSection}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Section" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All Sections</SelectItem>
+                          <SelectItem value="A">Section A</SelectItem>
+                          <SelectItem value="B">Section B</SelectItem>
+                          <SelectItem value="C">Section C</SelectItem>
+                          <SelectItem value="D">Section D</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="space-y-1.5 flex flex-col">
-                    <label className="text-xs font-semibold text-foreground">Target Section</label>
-                    <Select value={targetSection} onValueChange={setTargetSection}>
-                      <SelectTrigger className="h-10 rounded-lg border-border bg-card/60 text-xs shadow-xs outline-hidden cursor-pointer">
-                        <SelectValue placeholder="Select Section" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All">All Sections</SelectItem>
-                        <SelectItem value="A">Section A</SelectItem>
-                        <SelectItem value="B">Section B</SelectItem>
-                        <SelectItem value="C">Section C</SelectItem>
-                        <SelectItem value="D">Section D</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="flex items-center space-x-2 pt-1">
+                    <Checkbox
+                      id="notice-urgent"
+                      checked={newIsUrgent}
+                      onCheckedChange={(checked) => setNewIsUrgent(Boolean(checked))}
+                    />
+                    <Label htmlFor="notice-urgent" className="text-sm font-normal cursor-pointer">
+                      Mark as urgent alert
+                    </Label>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    id="notice-urgent"
-                    type="checkbox"
-                    checked={newIsUrgent}
-                    onChange={(e) => setNewIsUrgent(e.target.checked)}
-                    className="rounded border-border text-primary focus:ring-primary h-4 w-4 cursor-pointer"
-                  />
-                  <label htmlFor="notice-urgent" className="text-xs font-semibold text-foreground select-none cursor-pointer">Mark as Urgent Alert</label>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="notice-content">Description</Label>
+                    <Textarea
+                      id="notice-content"
+                      rows={5}
+                      placeholder="Write your announcement details here..."
+                      value={newContent}
+                      onChange={(e) => setNewContent(e.target.value)}
+                      required
+                    />
+                  </div>
+                </CardContent>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="notice-content" className="text-xs font-semibold text-foreground">Notice Description / Content</label>
-                  <textarea
-                    id="notice-content"
-                    rows={5}
-                    placeholder="Enter detailed notice information here..."
-                    value={newContent}
-                    onChange={(e) => setNewContent(e.target.value)}
-                    className="flex w-full rounded-lg border border-border bg-card/60 px-3 py-2 text-xs text-foreground shadow-xs outline-none focus:ring-1 focus:ring-primary"
-                    required
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setIsCreating(false)} className="rounded-lg cursor-pointer">
+                <CardFooter className="flex justify-end gap-2 border-t pt-4">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setIsCreating(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" className="rounded-lg cursor-pointer">
+                  <Button type="submit" size="sm">
                     Publish Announcement
                   </Button>
-                </div>
+                </CardFooter>
               </form>
-            </div>
+            </Card>
           ) : (
             <>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
-                <div className="relative w-full sm:w-80">
-                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
+              {/* Search & Category Filter */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
                   <Input 
                     type="text"
-                    placeholder="Search announcements..."
+                    placeholder="Search notices..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9.5 rounded-lg border-border focus:ring-1 focus:ring-primary w-full bg-card/40 text-xs"
+                    className="pl-9 h-9 text-sm"
                   />
                 </div>
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                   {["All", "Academic", "Exams", "Events", "General"].map((cat) => (
                     <Button
                       key={cat}
-                      variant={selectedCategory === cat ? "default" : "outline"}
-                      onClick={() => setSelectedCategory(cat)}
+                      variant={selectedCategory === cat ? "secondary" : "ghost"}
                       size="sm"
-                      className="text-xs rounded-lg cursor-pointer shrink-0"
+                      onClick={() => setSelectedCategory(cat)}
+                      className="text-xs h-8 shrink-0"
                     >
                       {cat}
                     </Button>
@@ -334,76 +352,78 @@ export default function TeacherNoticePage() {
                 </div>
               </div>
 
-              <div className="grid gap-6">
+              {/* Notices List */}
+              <div className="space-y-4">
                 {loading ? (
-                  <div className="py-24 flex flex-col items-center justify-center gap-3">
-                    <Spinner size="lg" />
-                    <p className="text-sm text-muted-foreground font-semibold">Loading announcements...</p>
-                  </div>
+                  <Card className="flex flex-col items-center justify-center py-16">
+                    <CardContent className="flex flex-col items-center gap-2">
+                      <Spinner size="lg" />
+                      <p className="text-sm text-muted-foreground">Loading announcements...</p>
+                    </CardContent>
+                  </Card>
                 ) : filteredNotices.length > 0 ? (
                   filteredNotices.map((notice) => (
-                    <div key={notice.id} className={`rounded-xl border p-6 bg-card/30 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden ${
-                      notice.isUrgent ? "border-amber-500/30 bg-amber-500/[0.01]" : "border-border"
-                    }`}>
-                      {notice.isUrgent && (
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500" />
-                      )}
-
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                            notice.category === "Exams" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
-                            notice.category === "Academic" ? "bg-blue-500/10 text-blue-600 dark:text-blue-400" :
-                            notice.category === "Events" ? "bg-purple-500/10 text-purple-600 dark:text-purple-400" :
-                            "bg-muted text-muted-foreground"
-                          }`}>
-                            {notice.category}
-                          </span>
-                          {notice.isUrgent && (
-                            <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                              <AlertTriangle className="h-3 w-3 mr-0.5" /> Urgent Alert
+                    <Card key={notice.id} className="transition-colors hover:border-foreground/20">
+                      <CardHeader className="gap-2 pb-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <Badge variant="secondary">{notice.category}</Badge>
+                            {notice.isUrgent && (
+                              <Badge variant="destructive" className="gap-1">
+                                <AlertTriangle className="size-3" /> Urgent
+                              </Badge>
+                            )}
+                            {notice.targetClass && (
+                              <Badge variant="outline">
+                                Class {notice.targetClass}-{notice.targetSection || "All"}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="size-3.5" />
+                              {new Date(notice.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
                             </span>
-                          )}
-                          {notice.targetClass && (
-                            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-md font-bold">
-                              Class: {notice.targetClass}-{notice.targetSection || "All"}
-                            </span>
-                          )}
+                            {session?.user && (session.user.id === notice.senderId || session.user.role === "admin") && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDelete(notice.id)}
+                                className="size-7 text-muted-foreground hover:text-destructive"
+                                title="Delete notice"
+                              >
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground font-semibold">
-                          <span className="flex items-center gap-1.5">
-                            <Calendar className="h-3.5 w-3.5" />
-                            {new Date(notice.createdAt).toLocaleDateString("en-US", {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </span>
-                          {session?.user && (session.user.id === notice.senderId || session.user.role === "admin") && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(notice.id)}
-                              className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 cursor-pointer"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-bold text-foreground leading-tight tracking-tight">{notice.title}</h3>
-                        <p className="text-xs text-muted-foreground font-semibold">Posted by: {notice.senderName}</p>
-                      </div>
-
-                      <p className="text-sm text-foreground/80 leading-relaxed font-normal whitespace-pre-wrap">{notice.content}</p>
-                    </div>
+                        <CardTitle className="text-base font-semibold leading-snug">
+                          {notice.title}
+                        </CardTitle>
+                        <CardDescription className="text-xs">
+                          Posted by {notice.senderName}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                          {notice.content}
+                        </p>
+                      </CardContent>
+                    </Card>
                   ))
                 ) : (
-                  <div className="py-16 text-center text-muted-foreground text-sm border border-dashed border-border rounded-xl bg-card/10">
-                    No notices found matching your criteria.
-                  </div>
+                  <Card className="flex flex-col items-center justify-center py-16 text-center">
+                    <CardContent className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">No notices found</p>
+                      <p className="text-xs text-muted-foreground">
+                        {searchQuery ? "Try adjusting your search query or category filter." : "There are no notices published yet."}
+                      </p>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
             </>
@@ -412,94 +432,97 @@ export default function TeacherNoticePage() {
 
         {/* ── PUSH NOTIFICATION TAB ── */}
         <TabsContent value="push">
-          <div className="max-w-xl">
-            <form onSubmit={handleSendPush} className="rounded-xl border border-border bg-card/40 p-6 flex flex-col gap-5 shadow-sm">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Bell className="h-5 w-5 text-primary" /> Send Push Notification
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  Online users receive it instantly via WebSocket. Offline users receive it via Firebase Cloud Messaging.
-                </p>
-              </div>
+          <Card className="max-w-2xl">
+            <form onSubmit={handleSendPush}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="size-4 text-primary" />
+                  Send Push Notification
+                </CardTitle>
+                <CardDescription>
+                  Broadcast instant alerts to student and teacher devices via WebSocket and push notifications.
+                </CardDescription>
+              </CardHeader>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Title</label>
-                <Input
-                  placeholder="e.g. Exam schedule updated"
-                  value={pushTitle}
-                  onChange={(e) => setPushTitle(e.target.value)}
-                  className="h-10 rounded-lg text-xs bg-card/60"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Message</label>
-                <textarea
-                  rows={3}
-                  placeholder="Enter notification message..."
-                  value={pushBody}
-                  onChange={(e) => setPushBody(e.target.value)}
-                  className="flex w-full rounded-lg border border-border bg-card/60 px-3 py-2 text-xs text-foreground shadow-xs outline-none focus:ring-1 focus:ring-primary"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5 flex flex-col">
-                  <label className="text-xs font-semibold text-foreground">Target Role</label>
-                  <Select value={pushTargetRole} onValueChange={setPushTargetRole}>
-                    <SelectTrigger className="h-10 rounded-lg border-border bg-card/60 text-xs cursor-pointer">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="student">Students</SelectItem>
-                      <SelectItem value="teacher">Teachers</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="push-title">Title</Label>
+                  <Input
+                    id="push-title"
+                    placeholder="e.g. Exam schedule updated"
+                    value={pushTitle}
+                    onChange={(e) => setPushTitle(e.target.value)}
+                    required
+                  />
                 </div>
 
-                <div className="space-y-1.5 flex flex-col">
-                  <label className="text-xs font-semibold text-foreground">Class (optional)</label>
-                  <Select value={pushTargetClass} onValueChange={setPushTargetClass}>
-                    <SelectTrigger className="h-10 rounded-lg border-border bg-card/60 text-xs cursor-pointer">
-                      <SelectValue placeholder="All classes" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All classes</SelectItem>
-                      {["1","2","3","4","5","6","7","8","9","10","11","12"].map(c => (
-                        <SelectItem key={c} value={c}>Class {c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2">
+                  <Label htmlFor="push-body">Message</Label>
+                  <Textarea
+                    id="push-body"
+                    rows={3}
+                    placeholder="Enter notification message..."
+                    value={pushBody}
+                    onChange={(e) => setPushBody(e.target.value)}
+                    required
+                  />
                 </div>
 
-                <div className="space-y-1.5 flex flex-col">
-                  <label className="text-xs font-semibold text-foreground">Section (optional)</label>
-                  <Select value={pushTargetSection} onValueChange={setPushTargetSection}>
-                    <SelectTrigger className="h-10 rounded-lg border-border bg-card/60 text-xs cursor-pointer">
-                      <SelectValue placeholder="All sections" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">All sections</SelectItem>
-                      {["A","B","C","D"].map(s => (
-                        <SelectItem key={s} value={s}>Section {s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Target Role</Label>
+                    <Select value={pushTargetRole} onValueChange={setPushTargetRole}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="student">Students</SelectItem>
+                        <SelectItem value="teacher">Teachers</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="flex justify-end pt-2">
-                <Button type="submit" disabled={pushSending} className="rounded-lg cursor-pointer flex items-center gap-1.5">
-                  {pushSending ? <Spinner size="sm" /> : <Bell className="h-4 w-4" />}
+                  <div className="space-y-2">
+                    <Label>Class (optional)</Label>
+                    <Select value={pushTargetClass} onValueChange={setPushTargetClass}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All classes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All classes</SelectItem>
+                        {["1","2","3","4","5","6","7","8","9","10","11","12"].map(c => (
+                          <SelectItem key={c} value={c}>Class {c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Section (optional)</Label>
+                    <Select value={pushTargetSection} onValueChange={setPushTargetSection}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All sections" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All sections</SelectItem>
+                        {["A","B","C","D"].map(s => (
+                          <SelectItem key={s} value={s}>Section {s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardContent>
+
+              <CardFooter className="flex justify-end border-t pt-4">
+                <Button type="submit" size="sm" disabled={pushSending}>
+                  {pushSending && <Spinner size="sm" className="mr-1.5" />}
                   {pushSending ? "Sending..." : "Send Notification"}
                 </Button>
-              </div>
+              </CardFooter>
             </form>
-          </div>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

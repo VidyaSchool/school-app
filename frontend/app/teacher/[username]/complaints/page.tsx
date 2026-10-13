@@ -1,11 +1,21 @@
 "use client"
 
 import * as React from "react"
-import { AlertTriangle, Search, Calendar, FileText, CheckCircle2, RefreshCw, Download } from "lucide-react"
+import { Search, Calendar, FileText, CheckCircle2, RefreshCw, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface Complaint {
   id: string
@@ -73,50 +83,48 @@ export default function TeacherComplaintsPage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="flex-1 space-y-6 p-4 md:p-8 max-w-6xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
-        <div className="flex flex-col gap-1.5">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
-            <AlertTriangle className="h-8 w-8 text-rose-500" />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Classroom Complaints
           </h1>
-          <p className="text-muted-foreground text-sm max-w-2xl leading-relaxed">
-            Review infrastructural complaints, student escalations, and technical concerns reported in your classes.
+          <p className="text-sm text-muted-foreground">
+            Review and resolve student escalations, infrastructural issues, and classroom concerns.
           </p>
         </div>
         <Button
           onClick={fetchComplaints}
           variant="outline"
           size="sm"
-          className="sm:w-auto rounded-lg cursor-pointer flex items-center gap-1.5"
           disabled={loading}
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={cn("size-3.5 mr-1.5", loading && "animate-spin")} />
           Refresh
         </Button>
       </div>
 
       {/* Filter and Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-6 lg:px-8">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search complaints or student name..."
+            placeholder="Search complaints or names..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9.5 rounded-lg border-border focus:ring-1 focus:ring-primary w-full bg-card/40 text-xs"
+            className="pl-9 h-9 text-sm"
           />
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {["All", "Pending", "Resolved"].map((stat) => (
             <Button
               key={stat}
-              variant={selectedStatus === stat ? "default" : "outline"}
+              variant={selectedStatus === stat ? "secondary" : "ghost"}
               onClick={() => setSelectedStatus(stat)}
               size="sm"
-              className="text-xs rounded-lg cursor-pointer shrink-0"
+              className="text-xs h-8 shrink-0"
             >
               {stat}
             </Button>
@@ -125,104 +133,105 @@ export default function TeacherComplaintsPage() {
       </div>
 
       {/* Complaints List */}
-      <div className="grid gap-6 px-6 lg:px-8">
+      <div className="space-y-4">
         {loading ? (
-          <div className="py-24 flex flex-col items-center justify-center gap-3">
-            <Spinner size="lg" />
-            <p className="text-sm text-muted-foreground font-semibold">Loading complaints...</p>
-          </div>
+          <Card className="flex flex-col items-center justify-center py-16">
+            <CardContent className="flex flex-col items-center gap-2">
+              <Spinner size="lg" />
+              <p className="text-sm text-muted-foreground">Loading complaints...</p>
+            </CardContent>
+          </Card>
         ) : filteredComplaints.length > 0 ? (
           filteredComplaints.map((comp) => (
-            <div
-              key={comp.id}
-              className={`rounded-xl border p-6 bg-card/30 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden ${
-                comp.status === "pending"
-                  ? "border-rose-500/20 bg-rose-500/[0.005]"
-                  : "border-emerald-500/20 bg-emerald-500/[0.005]"
-              }`}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                      comp.status === "pending"
-                        ? "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    }`}
-                  >
-                    {comp.status.toUpperCase()}
-                  </span>
-                  {comp.taggedPeople && (
-                    <span className="text-[10px] bg-muted px-2 py-0.5 rounded-md text-muted-foreground font-medium">
-                      Tagged: {comp.taggedPeople}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {new Date(comp.createdAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-foreground leading-tight tracking-tight">
-                  {comp.title}
-                </h3>
-                <p className="text-xs text-muted-foreground font-semibold">
-                  Reported by: {comp.senderName} ({comp.senderRole}) • {comp.senderEmail}
-                </p>
-              </div>
-
-              <p className="text-sm text-foreground/80 leading-relaxed font-normal whitespace-pre-wrap">
-                {comp.message}
-              </p>
-
-              {/* Attachments Section */}
-              {comp.fileUrl && (
-                <div className="flex items-center gap-2.5 p-3 rounded-lg border border-border/80 bg-card/65 w-fit max-w-full">
-                  <FileText className="h-5 w-5 text-rose-500 shrink-0" />
-                  <div className="flex flex-col min-w-0 pr-2">
-                    <span className="text-xs font-semibold text-foreground truncate max-w-[200px] sm:max-w-[400px]">
-                      {comp.fileName || "Attachment"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Reference File</span>
+            <Card key={comp.id} className="transition-colors hover:border-foreground/20">
+              <CardHeader className="gap-2 pb-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    {comp.status === "pending" ? (
+                      <Badge variant="destructive">Pending</Badge>
+                    ) : (
+                      <Badge variant="secondary">Resolved</Badge>
+                    )}
+                    {comp.taggedPeople && (
+                      <Badge variant="outline">
+                        Tagged: {comp.taggedPeople}
+                      </Badge>
+                    )}
                   </div>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
-                  >
-                    <a href={comp.fileUrl} download={comp.fileName || "attachment"}>
-                      <Download className="h-4 w-4" />
-                    </a>
-                  </Button>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="size-3.5" />
+                    {new Date(comp.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </div>
                 </div>
-              )}
+
+                <CardTitle className="text-base font-semibold leading-snug">
+                  {comp.title}
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Reported by {comp.senderName} ({comp.senderRole}) • {comp.senderEmail}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-3 pt-0">
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                  {comp.message}
+                </p>
+
+                {/* Attachments Section */}
+                {comp.fileUrl && (
+                  <div className="flex items-center justify-between rounded-lg border bg-muted/40 p-2.5 text-xs max-w-md">
+                    <div className="flex items-center gap-2 min-w-0 pr-2">
+                      <FileText className="size-4 text-muted-foreground shrink-0" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-medium text-foreground truncate">
+                          {comp.fileName || "Attachment"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">Reference File</span>
+                      </div>
+                    </div>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="icon"
+                      className="size-7 text-muted-foreground hover:text-foreground shrink-0"
+                    >
+                      <a href={comp.fileUrl} download={comp.fileName || "attachment"}>
+                        <Download className="size-3.5" />
+                      </a>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
 
               {/* Action Button */}
               {comp.status === "pending" && (
-                <div className="flex justify-end pt-2">
+                <CardFooter className="flex justify-end border-t pt-3 pb-3">
                   <Button
                     onClick={() => handleResolve(comp.id)}
-                    className="rounded-lg cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white gap-1.5"
+                    variant="outline"
                     size="sm"
+                    className="gap-1.5"
                   >
-                    <CheckCircle2 className="h-4 w-4" />
+                    <CheckCircle2 className="size-3.5" />
                     Mark as Resolved
                   </Button>
-                </div>
+                </CardFooter>
               )}
-            </div>
+            </Card>
           ))
         ) : (
-          <div className="py-16 text-center text-muted-foreground text-sm border border-dashed border-border rounded-xl bg-card/10">
-            No complaints found matching your criteria.
-          </div>
+          <Card className="flex flex-col items-center justify-center py-16 text-center">
+            <CardContent className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">No complaints found</p>
+              <p className="text-xs text-muted-foreground">
+                {searchQuery ? "Try adjusting your search query or status filter." : "There are no complaints recorded yet."}
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

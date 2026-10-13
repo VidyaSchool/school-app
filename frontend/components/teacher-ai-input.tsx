@@ -17,9 +17,11 @@ export function TeacherAIInput() {
   
   const containerRef = React.useRef<HTMLDivElement>(null)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+  const expandedRef = React.useRef<HTMLDivElement>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [attachedFile, setAttachedFile] = React.useState<{ name: string; type: string; content: string; kind: "image" | "pdf" | "video" | "text" } | null>(null)
   const [isUploading, setIsUploading] = React.useState(false)
+  const [expandedHeight, setExpandedHeight] = React.useState(114)
 
   const isExpanded = isFocused || Boolean(message.trim()) || Boolean(attachedFile)
 
@@ -45,6 +47,30 @@ export function TeacherAIInput() {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
+
+  // Keep track of expanded content height so expanding and collapsing animations are completely symmetric
+  React.useLayoutEffect(() => {
+    if (expandedRef.current) {
+      const h = expandedRef.current.scrollHeight
+      if (h > 0) {
+        setExpandedHeight(h)
+      }
+    }
+  }, [message, isExpanded, attachedFile])
+
+  React.useEffect(() => {
+    if (!expandedRef.current) return
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height
+        if (h > 0) {
+          setExpandedHeight(Math.round(h))
+        }
+      }
+    })
+    ro.observe(expandedRef.current)
+    return () => ro.disconnect()
+  }, [isExpanded])
 
   React.useEffect(() => {
     fetch("/api/profile/username")
@@ -193,7 +219,7 @@ export function TeacherAIInput() {
       <motion.form
         initial={false}
         animate={{
-          height: isExpanded ? "auto" : 54,
+          height: isExpanded ? expandedHeight : 54,
         }}
         transition={{
           duration: 0.3,
@@ -212,6 +238,7 @@ export function TeacherAIInput() {
             /* ── Expanded UI: matches the AI chat page input box ── */
             <motion.div
               key="expanded"
+              ref={expandedRef}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 6 }}
@@ -269,7 +296,7 @@ export function TeacherAIInput() {
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5 h-[54px] cursor-text"
             >
               <button
