@@ -114,8 +114,9 @@ interface TimetableEntry {
   section: string
   subject: string
   dayOfWeek: string
-  startTime: string
-  endTime: string
+  periodNumber?: number
+  startTime?: string
+  endTime?: string
   room?: string | null
 }
 
@@ -152,8 +153,7 @@ export default function TeacherTimetablePage() {
   const [formSection, setFormSection] = React.useState("")
   const [formSubject, setFormSubject] = React.useState("")
   const [formDay, setFormDay] = React.useState("Monday")
-  const [formStartTime, setFormStartTime] = React.useState("09:00")
-  const [formEndTime, setFormEndTime] = React.useState("09:45")
+  const [formPeriodNumber, setFormPeriodNumber] = React.useState<number>(1)
   const [formRoom, setFormRoom] = React.useState("")
 
   const loadTimetable = React.useCallback(() => {
@@ -179,7 +179,7 @@ export default function TeacherTimetablePage() {
 
   const handleAddSlot = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formClass || !formSection || !formSubject || !formDay || !formStartTime || !formEndTime) {
+    if (!formClass || !formSection || !formDay || !formPeriodNumber) {
       toast.error("Please fill in all required fields")
       return
     }
@@ -192,11 +192,9 @@ export default function TeacherTimetablePage() {
         body: JSON.stringify({
           class: formClass,
           section: formSection,
-          subject: formSubject,
+          subject: formSubject || "",
           dayOfWeek: formDay,
-          startTime: formStartTime,
-          endTime: formEndTime,
-          room: formRoom || undefined,
+          periodNumber: Number(formPeriodNumber),
         }),
       })
 
@@ -211,6 +209,7 @@ export default function TeacherTimetablePage() {
       setFormClass("")
       setFormSection("")
       setFormSubject("")
+      setFormPeriodNumber(1)
       setFormRoom("")
       loadTimetable()
     } catch (err: any) {
@@ -360,7 +359,7 @@ export default function TeacherTimetablePage() {
 
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                       <ClockIcon className="h-3.5 w-3.5 shrink-0" />
-                      {entry.startTime} - {entry.endTime}
+                      {entry.periodNumber ? `Period ${entry.periodNumber}` : `${entry.startTime} - ${entry.endTime}`}
                     </div>
 
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium mt-1">
@@ -448,24 +447,14 @@ export default function TeacherTimetablePage() {
             </div>
 
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="startTime" className="text-right">Start Time *</Label>
+              <Label htmlFor="periodNumber" className="text-right">Period No. *</Label>
               <Input
-                id="startTime"
-                type="time"
-                value={formStartTime}
-                onChange={(e) => setFormStartTime(e.target.value)}
-                className="col-span-3 text-xs"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="endTime" className="text-right">End Time *</Label>
-              <Input
-                id="endTime"
-                type="time"
-                value={formEndTime}
-                onChange={(e) => setFormEndTime(e.target.value)}
+                id="periodNumber"
+                type="number"
+                min={1}
+                max={12}
+                value={formPeriodNumber}
+                onChange={(e) => setFormPeriodNumber(parseInt(e.target.value, 10) || 1)}
                 className="col-span-3 text-xs"
                 required
               />
