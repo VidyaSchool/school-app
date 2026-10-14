@@ -885,11 +885,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: <RequestIcon />,
           hasNotification: unreadRequests,
         },
-        {
+        /* {
           title: "Fee Management",
           url: adminUrls.feeManagement,
           icon: <DatabaseIcon />,
-        },
+        }, */
         {
           title: "Complaints",
           url: `${adminUrls.dashboard}/complaints`,
