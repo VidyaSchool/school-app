@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum, integer, date } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, pgEnum, integer, date, smallint, varchar, doublePrecision } from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('role', ['student', 'teacher', 'admin', 'account', 'librarian'])
 
@@ -43,6 +43,14 @@ export const userProfile = pgTable('user_profile', {
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const teacherProfiles = pgTable('teacher_profiles', {
+  id: varchar('id').primaryKey(),
+  userId: varchar('user_id').notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
+  wingId: varchar('wing_id').default('General'),
+  weeklyProxyCount: integer('weekly_proxy_count').default(0),
+  dailyFreeCount: integer('daily_free_count').default(0),
 })
 
 export const session = pgTable('session', {
@@ -238,11 +246,9 @@ export const timetable = pgTable('timetable', {
   teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   class: text('class').notNull(),
   section: text('section').notNull(),
-  subject: text('subject').notNull(),
+  subject: text('subject').notNull().default(''),
   dayOfWeek: text('day_of_week').notNull(), // 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
-  startTime: text('start_time').notNull(),  // '09:00' (HH:MM 24h)
-  endTime: text('end_time').notNull(),      // '09:45'
-  room: text('room'),                       // optional room/location
+  periodNumber: smallint('period_number').notNull().default(0),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
@@ -310,27 +316,26 @@ export const teacherAbsence = pgTable('teacher_absence', {
 })
 
 export const substitutionRecord = pgTable('substitution_record', {
-  id: text('id').primaryKey(),
-  date: text('date').notNull(), // YYYY-MM-DD
-  absenceId: text('absence_id').references(() => teacherAbsence.id, { onDelete: 'cascade' }),
-  timetableId: text('timetable_id').references(() => timetable.id, { onDelete: 'set null' }),
-  periodName: text('period_name').notNull().default('Period 1'),
-  startTime: text('start_time').notNull(),
-  endTime: text('end_time').notNull(),
-  class: text('class').notNull(),
-  section: text('section').notNull(),
-  subject: text('subject').notNull(),
-  room: text('room'),
-  originalTeacherId: text('original_teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  substituteTeacherId: text('substitute_teacher_id').references(() => user.id, { onDelete: 'set null' }),
-  status: text('status').notNull().default('assigned'), // 'assigned', 'activity_fallback', 'unassigned', 'manual_override'
+  id: varchar('id').primaryKey(),
+  date: date('date').notNull(),
+  absenceId: varchar('absence_id'),
+  timetableId: varchar('timetable_id').references(() => timetable.id),
+  class: varchar('class').notNull(),
+  section: varchar('section').notNull(),
+  subject: varchar('subject').notNull().default(''),
+  room: varchar('room'),
+  originalTeacherId: varchar('original_teacher_id').notNull().references(() => user.id),
+  substituteTeacherId: varchar('substitute_teacher_id').references(() => user.id),
+  status: varchar('status').notNull(), // 'AUTO_ASSIGNED', 'MANUAL_OVERRIDE', 'MERGED', 'UNASSIGNED'
   isActivityFallback: boolean('is_activity_fallback').notNull().default(false),
-  activityName: text('activity_name'),
-  suitabilityScore: integer('suitability_score'),
-  scoreBreakdown: text('score_breakdown'), // JSON string
-  notes: text('notes'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  activityName: varchar('activity_name'),
+  suitabilityScore: doublePrecision('suitability_score'),
+  scoreBreakdown: varchar('score_breakdown'),
+  notes: varchar('notes'),
+  periodNumber: smallint('period_number').notNull().default(0),
+  mergedWithTimetableId: varchar('merged_with_timetable_id').references(() => timetable.id),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 })
 
 export const substitutionSettings = pgTable('substitution_settings', {

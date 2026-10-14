@@ -273,6 +273,18 @@ export const substitutionRecord = pgTable('substitution_record', {
   updatedAt: timestamp('updated_at'),
 })
 
+export const teacherAbsence = pgTable('teacher_absence', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(), // YYYY-MM-DD
+  status: text('status').notNull().default('absent'), // 'absent', 'half_day', 'on_leave'
+  reason: text('reason').notNull().default('Sick Leave'),
+  duration: text('duration').notNull().default('Full Day'),
+  remarks: text('remarks'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 export const userDocument = pgTable('user_document', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),

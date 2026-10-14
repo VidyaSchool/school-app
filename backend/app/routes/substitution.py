@@ -238,10 +238,15 @@ def get_substitutions_for_date(
     admin: User = Depends(require_role(["admin", "teacher"])),
     db: Session = Depends(get_db),
 ):
+    try:
+        target_date = datetime.strptime(date, "%Y-%m-%d").date() if isinstance(date, str) else date
+    except Exception:
+        target_date = date
+
     # Fetch all substitution records for this date
     subs = db.query(SubstitutionRecord).filter(
-        SubstitutionRecord.date == date
-    ).order_by(SubstitutionRecord.start_time).all()
+        SubstitutionRecord.date == target_date
+    ).order_by(SubstitutionRecord.period_number).all()
 
     if not subs:
         # Check if absences exist and auto-run allocation if not yet run
@@ -253,8 +258,8 @@ def get_substitutions_for_date(
             engine = SubstitutionEngine(db=db)
             engine.run_global_allocation(date)
             subs = db.query(SubstitutionRecord).filter(
-                SubstitutionRecord.date == date
-            ).order_by(SubstitutionRecord.start_time).all()
+                SubstitutionRecord.date == target_date
+            ).order_by(SubstitutionRecord.period_number).all()
 
     # Gather user details
     user_ids = set()
@@ -297,8 +302,10 @@ def get_substitutions_for_date(
 
         # Generate live candidate alternatives for dropdown
         req_mock = type("ReqMock", (), {
-            "start_time": s.start_time,
-            "end_time": s.end_time,
+            "period_number": s.period_number,
+            "period_name": f"Period {s.period_number}",
+            "start_time": "",
+            "end_time": "",
             "class_": s.class_,
             "section": s.section,
             "subject": s.subject,
@@ -330,14 +337,16 @@ def get_substitutions_for_date(
 
         results.append({
             "id": s.id,
-            "date": s.date,
-            "periodName": s.period_name,
-            "startTime": s.start_time,
-            "endTime": s.end_time,
+            "date": s.date.strftime("%Y-%m-%d") if hasattr(s.date, "strftime") else str(s.date),
+            "periodNumber": s.period_number,
+            "periodName": f"Period {s.period_number}",
+            "startTime": "",
+            "endTime": "",
             "class": s.class_,
             "section": s.section,
             "subject": s.subject,
             "room": s.room,
+            "mergedWithTimetableId": s.merged_with_timetable_id,
             "originalTeacher": {
                 "id": orig_u.id if orig_u else s.original_teacher_id,
                 "name": orig_u.name if orig_u else "Absent Teacher",

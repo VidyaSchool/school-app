@@ -301,7 +301,7 @@ def get_student_calendar(
         )
         if profile.section:
             today_query = today_query.filter(Timetable.section == profile.section)
-        today_slots = today_query.order_by(Timetable.start_time).all()
+        today_slots = today_query.order_by(Timetable.period_number).all()
 
         tomorrow_query = db.query(Timetable, User).outerjoin(
             User, Timetable.teacher_id == User.id
@@ -311,7 +311,7 @@ def get_student_calendar(
         )
         if profile.section:
             tomorrow_query = tomorrow_query.filter(Timetable.section == profile.section)
-        tomorrow_slots = tomorrow_query.order_by(Timetable.start_time).all()
+        tomorrow_slots = tomorrow_query.order_by(Timetable.period_number).all()
 
     today_iso = now.strftime("%Y-%m-%d")
     tomorrow_iso = (now + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -353,8 +353,8 @@ def get_student_calendar(
             return {
                 "id": slot.id,
                 "title": title,
-                "time": format_time(slot.start_time),
-                "room": slot.room or "",
+                "time": f"Period {slot.period_number}",
+                "room": "",
                 "isSubstituted": True,
                 "substituteTeacher": sub_name,
                 "originalTeacher": teacher_user.name if teacher_user else None,
@@ -365,8 +365,8 @@ def get_student_calendar(
             return {
                 "id": slot.id,
                 "title": f"{slot.subject} (by {teacher_user.name})" if teacher_user and teacher_user.name else slot.subject,
-                "time": format_time(slot.start_time),
-                "room": slot.room or "",
+                "time": f"Period {slot.period_number}",
+                "room": "",
                 "isSubstituted": False,
             }
 

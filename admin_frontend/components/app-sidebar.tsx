@@ -880,6 +880,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: <UsersIcon />,
         },
         {
+          title: "Timetable Rescheduling",
+          url: "/timetable/absences",
+          icon: <CalendarIcon />,
+        },
+        {
           title: "Requests",
           url: adminUrls.requests,
           icon: <RequestIcon />,

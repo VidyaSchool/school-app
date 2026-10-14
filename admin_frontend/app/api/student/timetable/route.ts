@@ -28,9 +28,7 @@ export async function GET() {
         section: timetable.section,
         subject: timetable.subject,
         dayOfWeek: timetable.dayOfWeek,
-        startTime: timetable.startTime,
-        endTime: timetable.endTime,
-        room: timetable.room,
+        periodNumber: timetable.periodNumber,
         teacherName: user.name,
       })
       .from(timetable)
@@ -41,7 +39,7 @@ export async function GET() {
           eq(timetable.section, profile.section)
         )
       )
-      .orderBy(timetable.dayOfWeek, timetable.startTime)
+      .orderBy(timetable.dayOfWeek, timetable.periodNumber)
 
     return NextResponse.json({ timetable: slots })
   } catch (error: any) {

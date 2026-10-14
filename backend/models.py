@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date as py_date
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
@@ -57,6 +57,7 @@ class UserProfile(SQLModel, table=True):
     class_section_last_updated: Optional[datetime] = Field(default=None, alias="class_section_last_updated")
     class_section_changes: Optional[str] = Field(default=None, alias="class_section_changes")
     secondary_role: Optional[str] = Field(default=None, alias="secondary_role")
+    designation: Optional[str] = Field(default=None, alias="designation")
     transport_mode: Optional[str] = Field(default=None, alias="transport_mode")
     teacher_category: Optional[str] = Field(default=None, alias="teacher_category")  # 'PRT', 'TGT', 'PGT'
     activity_skills: Optional[str] = Field(default=None, alias="activity_skills")  # JSON list string e.g. ["Games / Sports", "Computer"]
@@ -74,9 +75,9 @@ class FeeInstallment(SQLModel, table=True):
     month: str = Field(index=True)
     year: str = Field(index=True)
     amount: int
-    due_date: date = Field(alias="due_date")
+    due_date: py_date = Field(alias="due_date")
     status: str = Field(index=True)  # 'paid', 'pending', 'overdue', 'upcoming'
-    paid_date: Optional[date] = Field(default=None, alias="paid_date")
+    paid_date: Optional[py_date] = Field(default=None, alias="paid_date")
     receipt_no: Optional[str] = Field(default=None, alias="receipt_no", index=True)
     payment_method: Optional[str] = Field(default=None, alias="payment_method")
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -245,17 +246,23 @@ class ChatMessage(SQLModel, table=True):
     content: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+class TeacherProfiles(SQLModel, table=True):
+    __tablename__ = "teacher_profiles"
+    id: str = Field(primary_key=True)
+    user_id: str = Field(alias="user_id", foreign_key="user.id", unique=True)
+    wing_id: Optional[str] = Field(default="General", alias="wing_id")
+    weekly_proxy_count: Optional[int] = Field(default=0, alias="weekly_proxy_count")
+    daily_free_count: Optional[int] = Field(default=0, alias="daily_free_count")
+
 class Timetable(SQLModel, table=True):
     __tablename__ = "timetable"
     id: str = Field(primary_key=True)
     teacher_id: str = Field(alias="teacher_id", foreign_key="user.id")
     class_: str = Field(alias="class", sa_column_kwargs={"name": "class"})
     section: str
-    subject: str
+    subject: str = Field(default="")
     day_of_week: str = Field(alias="day_of_week")
-    start_time: str = Field(alias="start_time")
-    end_time: str = Field(alias="end_time")
-    room: Optional[str] = Field(default=None)
+    period_number: int = Field(default=0, alias="period_number")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -333,24 +340,23 @@ class TeacherAbsence(SQLModel, table=True):
 class SubstitutionRecord(SQLModel, table=True):
     __tablename__ = "substitution_record"
     id: str = Field(primary_key=True)
-    date: str = Field(index=True)  # YYYY-MM-DD
+    date: py_date = Field(index=True)
     absence_id: Optional[str] = Field(default=None, alias="absence_id", foreign_key="teacher_absence.id", index=True)
     timetable_id: Optional[str] = Field(default=None, alias="timetable_id", foreign_key="timetable.id", index=True)
-    period_name: str = Field(default="Period 1")
-    start_time: str = Field(alias="start_time")
-    end_time: str = Field(alias="end_time")
+    period_number: int = Field(default=0, alias="period_number")
     class_: str = Field(alias="class", sa_column_kwargs={"name": "class"})
     section: str
-    subject: str
+    subject: str = Field(default="")
     room: Optional[str] = Field(default=None)
     original_teacher_id: str = Field(alias="original_teacher_id", foreign_key="user.id", index=True)
     substitute_teacher_id: Optional[str] = Field(default=None, alias="substitute_teacher_id", foreign_key="user.id", index=True)
-    status: str = Field(default="assigned")  # 'assigned', 'activity_fallback', 'unassigned', 'manual_override'
+    status: str = Field(default="AUTO_ASSIGNED")  # 'AUTO_ASSIGNED', 'MANUAL_OVERRIDE', 'MERGED', 'UNASSIGNED', etc.
     is_activity_fallback: bool = Field(default=False)
     activity_name: Optional[str] = Field(default=None)
     suitability_score: Optional[float] = Field(default=None)
     score_breakdown: Optional[str] = Field(default=None)  # JSON string
     notes: Optional[str] = Field(default=None)
+    merged_with_timetable_id: Optional[str] = Field(default=None, alias="merged_with_timetable_id", foreign_key="timetable.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

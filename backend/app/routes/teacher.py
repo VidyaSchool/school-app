@@ -734,12 +734,12 @@ def get_teacher_calendar(
     today_slots = db.query(Timetable).filter(
         Timetable.teacher_id == current_user.id,
         Timetable.day_of_week == today_day
-    ).order_by(Timetable.start_time).all()
+    ).order_by(Timetable.period_number).all()
 
     tomorrow_slots = db.query(Timetable).filter(
         Timetable.teacher_id == current_user.id,
         Timetable.day_of_week == tomorrow_day
-    ).order_by(Timetable.start_time).all()
+    ).order_by(Timetable.period_number).all()
 
     today_iso = now.strftime("%Y-%m-%d")
     tomorrow_iso = (now + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -822,8 +822,8 @@ def get_teacher_calendar(
         today_events.append({
             "id": s.id,
             "title": title,
-            "time": format_time(s.start_time),
-            "room": s.room or "",
+            "time": f"Period {s.period_number}",
+            "room": "",
             "isAbsent": is_absent_today,
             "isSubstitution": False,
         })
@@ -834,7 +834,7 @@ def get_teacher_calendar(
         today_events.append({
             "id": sub.id,
             "title": f"Substitution: {label} (Class {sub.class_}-{sub.section}) [Covering for {orig_u.name}]",
-            "time": format_time(sub.start_time),
+            "time": f"Period {sub.period_number}",
             "room": sub.room or "",
             "isAbsent": False,
             "isSubstitution": True,
@@ -855,8 +855,8 @@ def get_teacher_calendar(
         tomorrow_events.append({
             "id": s.id,
             "title": title,
-            "time": format_time(s.start_time),
-            "room": s.room or "",
+            "time": f"Period {s.period_number}",
+            "room": "",
             "isAbsent": is_absent_tomorrow,
             "isSubstitution": False,
         })
@@ -866,7 +866,7 @@ def get_teacher_calendar(
         tomorrow_events.append({
             "id": sub.id,
             "title": f"Substitution: {label} (Class {sub.class_}-{sub.section}) [Covering for {orig_u.name}]",
-            "time": format_time(sub.start_time),
+            "time": f"Period {sub.period_number}",
             "room": sub.room or "",
             "isAbsent": False,
             "isSubstitution": True,

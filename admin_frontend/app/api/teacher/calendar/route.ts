@@ -42,37 +42,27 @@ export async function GET() {
       .select()
       .from(timetable)
       .where(and(eq(timetable.teacherId, session.user.id), eq(timetable.dayOfWeek, todayDay)))
-      .orderBy(timetable.startTime)
+      .orderBy(timetable.periodNumber)
 
     const tomorrowSlots = await db
       .select()
       .from(timetable)
       .where(and(eq(timetable.teacherId, session.user.id), eq(timetable.dayOfWeek, tomorrowDay)))
-      .orderBy(timetable.startTime)
-
-    const formatTime = (timeStr: string) => {
-      const parts = timeStr.split(':')
-      if (parts.length < 2) return timeStr
-      let h = parseInt(parts[0], 10)
-      const m = parts[1]
-      const ampm = h >= 12 ? 'PM' : 'AM'
-      h = h % 12 || 12
-      return `${h}:${m} ${ampm}`
-    }
+      .orderBy(timetable.periodNumber)
 
     return NextResponse.json({
       todayDateStr: todayFormatted,
       todayEvents: todaySlots.map((s) => ({
         id: s.id,
-        title: `${s.subject} (${s.class}-${s.section})`,
-        time: formatTime(s.startTime),
-        room: s.room || '',
+        title: `${s.subject || 'Class'} (${s.class}-${s.section})`,
+        time: `Period ${s.periodNumber}`,
+        room: '',
       })),
       tomorrowEvents: tomorrowSlots.map((s) => ({
         id: s.id,
-        title: `${s.subject} (${s.class}-${s.section})`,
-        time: formatTime(s.startTime),
-        room: s.room || '',
+        title: `${s.subject || 'Class'} (${s.class}-${s.section})`,
+        time: `Period ${s.periodNumber}`,
+        room: '',
       })),
     })
   } catch (error: any) {

@@ -40,16 +40,17 @@ class SubstitutionRequirement:
     day_of_week: str
     timetable_id: Optional[str]
     absence_id: Optional[str]
-    period_name: str
-    start_time: str
-    end_time: str
-    class_: str
-    section: str
-    subject: str
-    room: Optional[str]
-    original_teacher_id: str
-    original_teacher_name: str
-    required_category: str
+    period_number: int = 0
+    period_name: str = ""
+    start_time: str = ""
+    end_time: str = ""
+    class_: str = ""
+    section: str = ""
+    subject: str = ""
+    room: Optional[str] = None
+    original_teacher_id: str = ""
+    original_teacher_name: str = ""
+    required_category: str = ""
 
 
 def normalize_subject(subj: str) -> str:
@@ -164,9 +165,10 @@ class SubstitutionEngine:
                 "class": row.class_,
                 "section": row.section,
                 "subject": row.subject,
-                "start_time": row.start_time,
-                "end_time": row.end_time,
-                "room": row.room,
+                "period_number": row.period_number,
+                "start_time": "",
+                "end_time": "",
+                "room": None,
             })
 
         # Subject class assignments
@@ -178,9 +180,14 @@ class SubstitutionEngine:
             asgn_map.setdefault(a.teacher_id, []).append(a)
 
         # Existing substitutions assigned to teachers for this date
+        try:
+            target_date = datetime.strptime(date_str, "%Y-%m-%d").date() if isinstance(date_str, str) else date_str
+        except Exception:
+            target_date = date_str
+
         existing_subs = self.db.query(SubstitutionRecord).filter(
-            SubstitutionRecord.date == date_str,
-            SubstitutionRecord.status.in_(["assigned", "activity_fallback", "manual_override"]),
+            SubstitutionRecord.date == target_date,
+            SubstitutionRecord.status.in_(["assigned", "activity_fallback", "manual_override", "AUTO_ASSIGNED", "MANUAL_OVERRIDE", "MERGED"]),
             SubstitutionRecord.substitute_teacher_id.isnot(None)
         ).all()
         daily_sub_counts: Dict[str, int] = {}
@@ -290,7 +297,9 @@ class SubstitutionEngine:
 
         # 5. Teacher must not already have a class during that period in their own timetable
         for slot in candidate.timetable_slots:
-            if is_time_overlap(req.start_time, req.end_time, slot["start_time"], slot["end_time"]):
+            if slot.get("period_number") and req.period_number and slot.get("period_number") == req.period_number:
+                return False, -math.inf, {}, f"Teacher has regular class {slot.get('subject', '')} (Class {slot.get('class', '')}-{slot.get('section', '')}) in Period {req.period_number}"
+            if req.start_time and slot.get("start_time") and is_time_overlap(req.start_time, req.end_time, slot["start_time"], slot["end_time"]):
                 return False, -math.inf, {}, f"Teacher has regular class {slot['subject']} (Class {slot['class']}-{slot['section']}) at {slot['start_time']}-{slot['end_time']}"
 
         # 6. Category Eligibility Hard Constraint
@@ -368,7 +377,9 @@ class SubstitutionEngine:
             return False, -math.inf, {}, "Teacher already assigned this period"
 
         for slot in candidate.timetable_slots:
-            if is_time_overlap(req.start_time, req.end_time, slot["start_time"], slot["end_time"]):
+            if slot.get("period_number") and req.period_number and slot.get("period_number") == req.period_number:
+                return False, -math.inf, {}, "Teacher has regular class"
+            if req.start_time and slot.get("start_time") and is_time_overlap(req.start_time, req.end_time, slot["start_time"], slot["end_time"]):
                 return False, -math.inf, {}, "Teacher has regular class"
 
         score = 0.0
@@ -531,7 +542,7 @@ class SubstitutionEngine:
         ).filter(
             Timetable.teacher_id.in_(absent_teacher_ids),
             func.lower(Timetable.day_of_week) == day_of_week.lower()
-        ).order_by(Timetable.start_time).all()
+        ).order_by(Timetable.period_number).all()
 
         # Build requirements list
         requirements: List[SubstitutionRequirement] = []
@@ -539,7 +550,6 @@ class SubstitutionEngine:
 
         for idx, (slot, teacher_user) in enumerate(absent_timetable_slots, 1):
             req_cat = class_to_required_category(slot.class_)
-            period_num = f"Period {idx}"
             req_id = f"sub_{date_str}_{slot.id}"
             abs_obj = absence_by_teacher.get(slot.teacher_id)
 
@@ -549,13 +559,14 @@ class SubstitutionEngine:
                 day_of_week=day_of_week,
                 timetable_id=slot.id,
                 absence_id=abs_obj.id if abs_obj else None,
-                period_name=period_num,
-                start_time=slot.start_time,
-                end_time=slot.end_time,
+                period_number=slot.period_number,
+                period_name=f"Period {slot.period_number}",
+                start_time="",
+                end_time="",
                 class_=slot.class_,
                 section=slot.section,
                 subject=slot.subject,
-                room=slot.room,
+                room=None,
                 original_teacher_id=slot.teacher_id,
                 original_teacher_name=teacher_user.name,
                 required_category=req_cat,
@@ -564,11 +575,10 @@ class SubstitutionEngine:
         if not requirements:
             return []
 
-        # 4. Group requirements by period time (start_time, end_time)
-        period_groups: Dict[Tuple[str, str], List[SubstitutionRequirement]] = {}
+        # 4. Group requirements by period_number
+        period_groups: Dict[int, List[SubstitutionRequirement]] = {}
         for r in requirements:
-            key = (r.start_time, r.end_time)
-            period_groups.setdefault(key, []).append(r)
+            period_groups.setdefault(r.period_number, []).append(r)
 
         # Parse approved activities list
         try:
@@ -579,7 +589,7 @@ class SubstitutionEngine:
         final_allocations: List[Dict[str, Any]] = []
 
         # 5. Process period-by-period with global matching and workload propagation
-        sorted_periods = sorted(period_groups.keys(), key=lambda p: parse_time_to_minutes(p[0]))
+        sorted_periods = sorted(period_groups.keys())
 
         for p_key in sorted_periods:
             p_reqs = period_groups[p_key]
@@ -683,17 +693,16 @@ class SubstitutionEngine:
                 alternatives.sort(key=lambda x: (x["eligible"], x["score"] or -999), reverse=True)
 
                 # Save or update in database
+                target_date = target_dt.date()
                 existing_rec = self.db.query(SubstitutionRecord).filter(
-                    SubstitutionRecord.date == date_str,
+                    SubstitutionRecord.date == target_date,
                     SubstitutionRecord.timetable_id == r.timetable_id
                 ).first()
 
                 if existing_rec:
                     # Do not overwrite if admin manually overridden unless forced
-                    if existing_rec.status != "manual_override":
-                        existing_rec.period_name = r.period_name
-                        existing_rec.start_time = r.start_time
-                        existing_rec.end_time = r.end_time
+                    if existing_rec.status not in ["manual_override", "MANUAL_OVERRIDE"]:
+                        existing_rec.period_number = r.period_number
                         existing_rec.class_ = r.class_
                         existing_rec.section = r.section
                         existing_rec.subject = r.subject
@@ -711,12 +720,10 @@ class SubstitutionEngine:
                 else:
                     new_rec = SubstitutionRecord(
                         id=r.id,
-                        date=date_str,
+                        date=target_date,
                         absence_id=r.absence_id,
                         timetable_id=r.timetable_id,
-                        period_name=r.period_name,
-                        start_time=r.start_time,
-                        end_time=r.end_time,
+                        period_number=r.period_number,
                         class_=r.class_,
                         section=r.section,
                         subject=r.subject,
@@ -737,9 +744,10 @@ class SubstitutionEngine:
                 final_allocations.append({
                     "id": db_rec_id,
                     "date": date_str,
-                    "period_name": r.period_name,
-                    "start_time": r.start_time,
-                    "end_time": r.end_time,
+                    "period_number": r.period_number,
+                    "period_name": f"Period {r.period_number}",
+                    "start_time": "",
+                    "end_time": "",
                     "class": r.class_,
                     "section": r.section,
                     "subject": r.subject,
