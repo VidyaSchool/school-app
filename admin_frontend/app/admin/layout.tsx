@@ -4,13 +4,23 @@ import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 import { requireRole } from "@/lib/auth-helpers"
+import { db } from "@/lib/db"
+import { userProfile } from "@/lib/schema"
+import { eq } from "drizzle-orm"
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  await requireRole(['admin'])
+  const user = await requireRole(['admin'])
+
+  const profile = await db
+    .select({ username: userProfile.username })
+    .from(userProfile)
+    .where(eq(userProfile.userId, user.id))
+    .then(res => res[0])
+    .catch(() => null)
 
   return (
     <SidebarProvider
@@ -21,7 +31,15 @@ export default async function AdminLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar
+        user={{
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          username: profile?.username ?? null,
+        }}
+        variant="inset"
+      />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

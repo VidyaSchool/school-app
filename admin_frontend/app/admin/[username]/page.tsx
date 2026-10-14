@@ -80,36 +80,6 @@ export default async function AdminDashboardPage({ params }: PageProps) {
         <h2 className="text-lg font-semibold mb-2">Welcome, {currentUser.name}!</h2>
         <p className="text-sm text-muted-foreground">Role: {currentUser.role}</p>
       </div>
-      <SectionCards 
-        card1={{
-          title: "Total Fee Received",
-          value: `₹${totalFeesPaid.toLocaleString()}`,
-          trend: undefined,
-          footer1: undefined,
-          footer2: "Successfully processed payments"
-        }}
-        card2={{
-          title: "Expected Fee to Collect",
-          value: `₹${expectedFeesToCollect.toLocaleString()}`,
-          trend: undefined,
-          footer1: undefined,
-          footer2: "Outstanding and upcoming payments"
-        }}
-        card3={{
-          title: "Active Accounts",
-          value: activeAccounts.toLocaleString(),
-          trend: undefined,
-          footer1: undefined,
-          footer2: "Total registered users in system"
-        }}
-        card4={{
-          title: "Pending Complaints",
-          value: pendingComplaints.toLocaleString(),
-          trend: undefined,
-          footer1: undefined,
-          footer2: "Complaints awaiting resolution"
-        }}
-      />
       <div className="px-4 lg:px-6">
         <ChartAreaInteractive 
           title="School Academic Performance"
