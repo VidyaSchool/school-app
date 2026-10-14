@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import kotlin.math.abs
 import com.vidyaschool.app.ui.components.CustomTextField
+import com.vidyaschool.app.ui.components.PrimaryButton
+import com.vidyaschool.app.ui.components.SecondaryButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -489,7 +491,7 @@ fun LibrarianScreen(
     }
 
     if (isBookFormOpen) {
-        BookFormDialog(
+        LibrarianBookFormDrawer(
             authHeader = authHeader,
             editingBook = editingBook,
             categories = distinctCategories.filter { it != "All" },
@@ -1356,6 +1358,19 @@ private fun LibrarianBooksCatalogSection(
                     Spacer(modifier = Modifier.height(10.dp))
                     Text("No books found", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     Text("Try a different search term or add a new book.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Button(
+                        onClick = onOpenAddBook,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isDark) Color(0xFFFAFAFA) else Color(0xFF18181B),
+                            contentColor = if (isDark) Color(0xFF18181B) else Color.White
+                        )
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Add Book", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         } else {
@@ -2794,36 +2809,46 @@ private fun IssueBookDialog(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DIALOG: ADD / EDIT BOOK (with OpenLibrary ISBN Auto-Population)
+// DRAWER: ADD / EDIT BOOK (BOTTOM SHEET with OpenLibrary ISBN & Barcode Scanner)
 // ─────────────────────────────────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BookFormDialog(
+fun LibrarianBookFormDrawer(
     authHeader: String,
-    editingBook: LibraryBookItem?,
-    categories: List<String>,
+    editingBook: LibraryBookItem? = null,
+    categories: List<String> = emptyList(),
     onDismiss: () -> Unit,
     onSuccess: () -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val isDark = isAppDark()
     val isEdit = editingBook != null
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var title by remember { mutableStateOf(editingBook?.title ?: "") }
-    var author by remember { mutableStateOf(editingBook?.author ?: "") }
-    var isbn by remember { mutableStateOf(editingBook?.isbn ?: "") }
-    var category by remember { mutableStateOf(editingBook?.category ?: "General") }
-    var quantity by remember { mutableStateOf(editingBook?.quantity?.toString() ?: "1") }
-    var location by remember { mutableStateOf(editingBook?.location ?: "Main Library") }
+    var title by remember(editingBook) { mutableStateOf(editingBook?.title ?: "") }
+    var author by remember(editingBook) { mutableStateOf(editingBook?.author ?: "") }
+    var isbn by remember(editingBook) { mutableStateOf(editingBook?.isbn ?: "") }
+    var category by remember(editingBook) { mutableStateOf(editingBook?.category ?: "General") }
+    var quantity by remember(editingBook) { mutableStateOf(editingBook?.quantity?.toString() ?: "1") }
+    var location by remember(editingBook) { mutableStateOf(editingBook?.location ?: "Main Library") }
+    var coverUrl by remember(editingBook) { mutableStateOf(editingBook?.coverUrl) }
 
-    var isLookingUpIsbn by remember { mutableStateOf(false) }
     var isSaving by remember { mutableStateOf(false) }
+    var isBarcodeScannerOpen by remember { mutableStateOf(false) }
+    var isLookingUpIsbn by remember { mutableStateOf(false) }
+    var lastLookedUpIsbn by remember {
+        mutableStateOf(
+            if (isEdit) editingBook?.isbn?.replace(Regex("[^0-9X]", RegexOption.IGNORE_CASE), "")?.uppercase() ?: ""
+            else ""
+        )
+    }
 
-    fun lookupAndAutofill(targetIsbn: String) {
+    fun lookupAndAutofill(targetIsbn: String, silent: Boolean = false) {
         val clean = targetIsbn.replace(Regex("[^0-9X]", RegexOption.IGNORE_CASE), "").uppercase()
-        if (clean.length < 8) {
-            Toast.makeText(context, "Enter a valid 10/13-digit ISBN first", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (clean.length < 10) return
+        if (clean == lastLookedUpIsbn) return
+
         isLookingUpIsbn = true
         scope.launch {
             try {
@@ -2831,157 +2856,309 @@ private fun BookFormDialog(
                     RetrofitClient.authApi.lookupBookByIsbn(authHeader, clean)
                 }
                 if (res.isSuccessful && res.body()?.found == true) {
+                    lastLookedUpIsbn = clean
                     val b = res.body()?.book
-                    if (b != null) {
-                        title = b.title
-                        author = b.author
-                        category = b.category
-                        Toast.makeText(context, "Autofilled from OpenLibrary / Cache!", Toast.LENGTH_SHORT).show()
+                    val fetchedCover = res.body()?.coverUrl ?: b?.coverUrl
+                    if (!fetchedCover.isNullOrEmpty()) {
+                        coverUrl = fetchedCover
                     }
-                } else {
-                    Toast.makeText(context, "No match found for this ISBN", Toast.LENGTH_SHORT).show()
+                    if (b != null) {
+                        if (b.title.isNotBlank()) title = b.title
+                        if (b.author.isNotBlank()) author = b.author
+                        if (b.category.isNotBlank()) category = b.category
+                        if (!b.location.isNullOrBlank() && (location.isBlank() || location == "Main Library")) {
+                            location = b.location
+                        }
+                        Toast.makeText(context, "Book details autofilled!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Autofill error: ${e.message}", Toast.LENGTH_SHORT).show()
+                android.util.Log.e("LibrarianScreen", "Autofill error: ${e.message}")
             } finally {
                 isLookingUpIsbn = false
             }
         }
     }
 
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
+    // Automatically autofill on typing or pasting 10 or 13-digit ISBN
+    LaunchedEffect(isbn, authHeader) {
+        val clean = isbn.replace(Regex("[^0-9X]", RegexOption.IGNORE_CASE), "").uppercase()
+        if (clean.length in 10..13 && clean != lastLookedUpIsbn) {
+            delay(500)
+            lookupAndAutofill(clean, silent = true)
+        }
+    }
+
+    val popularCategories = remember(categories) {
+        val defaults = listOf("General", "Computer Science", "Mathematics", "Science", "Literature", "History", "Fiction", "Non-Fiction")
+        (categories + defaults).filter { it.isNotBlank() && it != "All" }.distinct().take(12)
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        scrimColor = Color.Black.copy(alpha = 0.55f),
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(top = 12.dp, bottom = 6.dp)
+                    .width(42.dp)
+                    .height(5.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+            )
+        },
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                .fillMaxHeight(0.92f)
+                .imePadding()
+                .navigationBarsPadding()
         ) {
+            // ── Top Header ────────────────────────────────────────────────────────
             Column(
                 modifier = Modifier
-                    .padding(22.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, top = 4.dp, end = 20.dp, bottom = 8.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(if (isEdit) "Edit Book Details" else "Add New Book", fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(28.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", modifier = Modifier.size(18.dp))
-                    }
-                }
+                Text(
+                    text = if (isEdit) "Edit Book Details" else "Add New Book",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = if (isEdit) "Update catalog inventory and details" else "Enter book information to add to catalog",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
 
-                // ISBN field with instant OpenLibrary Autofill button
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("ISBN Code", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = isbn,
-                            onValueChange = { isbn = it },
-                            modifier = Modifier.weight(1f),
-                            placeholder = { Text("e.g. 9780140328721", fontSize = 12.sp) },
-                            singleLine = true,
-                            shape = RoundedCornerShape(10.dp)
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
+
+            // ── Scrollable Form Body ──────────────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+            ) {
+                // 1. ISBN field with Barcode Scanner
+                CustomTextField(
+                    value = isbn,
+                    onValueChange = { isbn = it },
+                    label = "ISBN Code",
+                    placeholder = "e.g. 9780140328721",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    trailingIcon = {
+                        if (isLookingUpIsbn) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            IconButton(
+                                onClick = { isBarcodeScannerOpen = true },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_solar_camera),
+                                    contentDescription = "Scan Barcode",
+                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
+                )
+
+                // Cover preview if found
+                if (!coverUrl.isNullOrEmpty()) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                         )
-                        Button(
-                            onClick = { lookupAndAutofill(isbn) },
-                            modifier = Modifier.height(52.dp),
-                            shape = RoundedCornerShape(10.dp),
-                            enabled = !isLookingUpIsbn && isbn.isNotBlank()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            if (isLookingUpIsbn) {
-                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
-                            } else {
-                                Text("Autofill", fontSize = 11.sp)
+                            AsyncImage(
+                                model = coverUrl,
+                                contentDescription = "Book cover",
+                                modifier = Modifier
+                                    .width(44.dp)
+                                    .height(64.dp)
+                                    .clip(RoundedCornerShape(6.dp)),
+                                contentScale = ContentScale.Crop
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = title.ifBlank { "Cover Preview" },
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 13.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                if (author.isNotBlank()) {
+                                    Text(
+                                        text = "by $author",
+                                        fontSize = 11.sp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                        maxLines = 1
+                                    )
+                                }
+                                Text(
+                                    text = "Cover retrieved from OpenLibrary",
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
                             }
                         }
                     }
                 }
 
-                // Title
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Book Title", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Book title", fontSize = 12.sp) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                }
+                // 2. Book Title
+                CustomTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = "Book Title",
+                    placeholder = "e.g. Clean Code",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                )
 
-                // Author
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Author(s)", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    OutlinedTextField(
-                        value = author,
-                        onValueChange = { author = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Author name", fontSize = 12.sp) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                }
+                // 3. Author(s)
+                CustomTextField(
+                    value = author,
+                    onValueChange = { author = it },
+                    label = "Author(s)",
+                    placeholder = "e.g. Robert C. Martin",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                )
 
-                // Category & Quantity Row
+                // 4. Category with Suggestions
+                CustomTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = "Category",
+                    placeholder = "e.g. Computer Science, Science",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                )
+
+                // Suggestion chips
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Category", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                        OutlinedTextField(
-                            value = category,
-                            onValueChange = { category = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                    }
-
-                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Quantity", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                        OutlinedTextField(
-                            value = quantity,
-                            onValueChange = { quantity = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true,
-                            shape = RoundedCornerShape(10.dp)
+                    popularCategories.forEach { cat ->
+                        val isSelected = category.equals(cat, ignoreCase = true)
+                        AssistChip(
+                            onClick = { category = cat },
+                            label = { Text(cat, fontSize = 11.sp) },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = if (isSelected) {
+                                    if (isDark) Color(0xFF3F3F46) else Color(0xFFE4E4E7)
+                                } else {
+                                    Color.Transparent
+                                }
+                            ),
+                            border = BorderStroke(
+                                1.dp,
+                                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                            )
                         )
                     }
                 }
 
-                // Shelf Location
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Shelf / Storage Location", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    OutlinedTextField(
+                // 5. Quantity & Shelf Location Row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    CustomTextField(
+                        value = quantity,
+                        onValueChange = { input ->
+                            if (input.isEmpty() || input.all { it.isDigit() }) {
+                                quantity = input
+                            }
+                        },
+                        label = "Quantity (Copies)",
+                        placeholder = "1",
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+
+                    CustomTextField(
                         value = location,
                         onValueChange = { location = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("e.g. Shelf B-4, Floor 2", fontSize = 12.sp) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp)
+                        label = "Shelf Location",
+                        placeholder = "e.g. Shelf B-4",
+                        modifier = Modifier.weight(1f)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
-                // Submit Button
-                Button(
+            // ── Bottom Action Bar (Fixed at Drawer Bottom) ─────────────────────────
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                thickness = 1.dp
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SecondaryButton(
+                    text = "Cancel",
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f),
+                    enabled = !isSaving
+                )
+
+                PrimaryButton(
+                    text = if (isEdit) "Update Record" else "Save to Catalog",
                     onClick = {
                         val qtyInt = quantity.toIntOrNull() ?: 1
                         if (title.isBlank() || author.isBlank() || isbn.isBlank()) {
                             Toast.makeText(context, "Please fill in title, author, and ISBN", Toast.LENGTH_SHORT).show()
-                            return@Button
+                            return@PrimaryButton
                         }
 
                         isSaving = true
@@ -2996,8 +3173,8 @@ private fun BookFormDialog(
                                                 title = title.trim(),
                                                 author = author.trim(),
                                                 isbn = isbn.trim(),
-                                                category = category.trim(),
-                                                quantity = qtyInt,
+                                                category = category.trim().ifBlank { "General" },
+                                                quantity = qtyInt.coerceAtLeast(1),
                                                 location = location.trim().takeIf { it.isNotBlank() }
                                             )
                                         )
@@ -3008,8 +3185,8 @@ private fun BookFormDialog(
                                                 title = title.trim(),
                                                 author = author.trim(),
                                                 isbn = isbn.trim(),
-                                                category = category.trim(),
-                                                quantity = qtyInt,
+                                                category = category.trim().ifBlank { "General" },
+                                                quantity = qtyInt.coerceAtLeast(1),
                                                 location = location.trim().takeIf { it.isNotBlank() }
                                             )
                                         )
@@ -3017,7 +3194,11 @@ private fun BookFormDialog(
                                 }
 
                                 if (res.isSuccessful) {
-                                    Toast.makeText(context, if (isEdit) "Book updated!" else "Book added to catalog!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        if (isEdit) "Book updated in catalog!" else "Book added to catalog!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     onSuccess()
                                 } else {
                                     val err = res.errorBody()?.string() ?: "Failed to save book"
@@ -3030,21 +3211,41 @@ private fun BookFormDialog(
                             }
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(46.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = !isSaving
-                ) {
-                    if (isSaving) {
-                        CircularProgressIndicator(modifier = Modifier.size(18.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
-                    } else {
-                        Text(if (isEdit) "Update Book Record" else "Save to Catalog", fontWeight = FontWeight.Bold)
-                    }
-                }
+                    modifier = Modifier.weight(1.5f),
+                    loading = isSaving
+                )
             }
         }
     }
+
+    if (isBarcodeScannerOpen) {
+        BarcodeScannerDialog(
+            onDismiss = { isBarcodeScannerOpen = false },
+            onBarcodeScanned = { scannedCode ->
+                isbn = scannedCode
+                isBarcodeScannerOpen = false
+                lookupAndAutofill(scannedCode)
+            }
+        )
+    }
+}
+
+// Backward compatibility alias
+@Composable
+private fun BookFormDialog(
+    authHeader: String,
+    editingBook: LibraryBookItem?,
+    categories: List<String>,
+    onDismiss: () -> Unit,
+    onSuccess: () -> Unit
+) {
+    LibrarianBookFormDrawer(
+        authHeader = authHeader,
+        editingBook = editingBook,
+        categories = categories,
+        onDismiss = onDismiss,
+        onSuccess = onSuccess
+    )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -165,14 +165,14 @@ const data = {
         />
       ),
     },
-    {
+    /* {
       title: "Fees",
       url: "/student/fees",
       icon: (
         <DatabaseIcon
         />
       ),
-    },
+    }, */
     {
       title: "Library",
       url: "/student/library",
@@ -712,11 +712,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           icon: <RequestIcon />,
           hasNotification: unreadRequests,
         },
-        {
+        /* {
           title: "Fee Management",
           url: adminUrls.feeManagement,
           icon: <DatabaseIcon />,
-        },
+        }, */
         {
           title: "Complaints",
           url: `${adminUrls.dashboard}/complaints`,
@@ -761,11 +761,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           url: urls.leaderboard,
           icon: <Trophy />,
         },
-        {
+        /* {
           title: "Fees",
           url: urls.fees,
           icon: <DatabaseIcon />,
-        },
+        }, */
         {
           title: "Library",
           url: urls.library,
