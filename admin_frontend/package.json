@@ -32,7 +32,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@paper-design/shaders-react": "^0.0.80",
     "@radix-ui/react-radio-group": "^1.4.7",
-    "@sentry/browser": "^10.65.0",
+    "@sentry/browser": "^11.7.0",
     "@sentry/nextjs": "^10.62.0",
     "@solar-icons/react": "^2.3.2",
     "@tanstack/react-table": "^8.21.3",
