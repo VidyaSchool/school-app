@@ -74,7 +74,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
-    "monaco-editor": "^0.56.0",
+    "monaco-editor": "^0.57.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
