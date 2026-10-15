@@ -45,5 +45,5 @@ Pillow==11.3.0
 base58==2.1.1
 qrcode[pil]
 boto3>=1.43.101
-sarvamai==0.1.31a4
+sarvamai==0.1.37
 redis>=5.0.0
