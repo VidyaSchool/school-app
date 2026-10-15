@@ -7,7 +7,7 @@ click==8.4.2
 fastapi==0.138.0
 greenlet==3.5.2
 h11==0.16.0
-idna==3.18
+idna==3.20
 iniconfig==2.3.0
 packaging==26.3
 pluggy==1.6.0
