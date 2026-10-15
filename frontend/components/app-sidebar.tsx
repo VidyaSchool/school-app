@@ -33,20 +33,38 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { ListIcon, ChartBarIcon, FolderIcon, CameraIcon, ImageIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon, BookOpenIcon, GraduationCapIcon, MoonIcon, CircleUserRoundIcon, ChevronsUpDown, SunIcon, Laptop, ChevronRight, LogOut, Trophy, Terminal } from "lucide-react"
-import {
-  WidgetIcon,
-  UsersIcon,
-  CalendarIcon,
-  EmailIcon,
-  NotesIcon,
-  NotebookIcon,
-  RequestIcon,
-  BellIcon,
-  DangerTriangleIcon,
-  SmartphoneIcon,
-  BotIcon,
-} from "@/components/icons"
+import { Widget2Icon } from "@solar-icons/react/outline/widget-2"
+import { UsersGroupTwoRoundedIcon } from "@solar-icons/react/outline/users-group-two-rounded"
+import { CalendarIcon } from "@solar-icons/react/outline/calendar"
+import { InboxIcon } from "@solar-icons/react/outline/inbox"
+import { NotesIcon } from "@solar-icons/react/outline/notes"
+import { Book2Icon } from "@solar-icons/react/outline/book-2"
+import { GitPullRequestIcon } from "@solar-icons/react/outline/git-pull-request"
+import { BellIcon } from "@solar-icons/react/outline/bell"
+import { DangerTriangleIcon } from "@solar-icons/react/outline/danger-triangle"
+import { SmartphoneIcon } from "@solar-icons/react/outline/smartphone"
+import { BotIcon } from "@solar-icons/react/outline/bot"
+import { SquareAcademicCap2Icon } from "@solar-icons/react/outline/square-academic-cap-2"
+import { CupStarIcon } from "@solar-icons/react/outline/cup-star"
+import { CameraIcon } from "@solar-icons/react/outline/camera"
+import { GalleryIcon } from "@solar-icons/react/outline/gallery"
+import { CodeSquareIcon } from "@solar-icons/react/outline/code-square"
+import { SettingsMinimalisticIcon } from "@solar-icons/react/outline/settings-minimalistic"
+import { QuestionCircleIcon } from "@solar-icons/react/outline/question-circle"
+import { MagnifierIcon } from "@solar-icons/react/outline/magnifier"
+import { UserCircleIcon } from "@solar-icons/react/outline/user-circle"
+import { Sun2Icon } from "@solar-icons/react/outline/sun-2"
+import { MoonIcon } from "@solar-icons/react/outline/moon"
+import { LaptopIcon } from "@solar-icons/react/outline/laptop"
+import { Logout2Icon } from "@solar-icons/react/outline/logout-2"
+import { AddCircleIcon } from "@solar-icons/react/outline/add-circle"
+import { DownloadMinimalisticIcon } from "@solar-icons/react/outline/download-minimalistic"
+import { ChevronsUpDownIcon } from "@solar-icons/react/outline/chevrons-up-down"
+import { DatabaseIcon } from "@solar-icons/react/outline/database"
+import { FileTextIcon } from "@solar-icons/react/outline/file-text"
+import { FileChartIcon } from "@solar-icons/react/outline/file-chart"
+import { ChartIcon } from "@solar-icons/react/outline/chart"
+import { BillListIcon } from "@solar-icons/react/outline/bill-list"
 import { useSession, signOut, logoutUser } from "@/lib/auth-client"
 import { io } from "socket.io-client"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -58,7 +76,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Download, Plus } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
 
@@ -160,51 +177,28 @@ const data = {
     {
       title: "Dashboard",
       url: "/student",
-      icon: (
-        <WidgetIcon
-        />
-      ),
+      icon: <Widget2Icon className="size-5 shrink-0" />,
     },
-    /* {
-      title: "Fees",
-      url: "/student/fees",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
-    }, */
     {
       title: "Library",
       url: "/student/library",
-      icon: (
-        <BookOpenIcon
-        />
-      ),
+      icon: <Book2Icon className="size-5 shrink-0" />,
     },
     {
       title: "Notes",
       url: "/student/notes",
-      icon: (
-        <NotesIcon
-        />
-      ),
+      icon: <NotesIcon className="size-5 shrink-0" />,
     },
     {
       title: "Marks",
       url: "/student/marks",
-      icon: (
-        <GraduationCapIcon
-        />
-      ),
+      icon: <SquareAcademicCap2Icon className="size-5 shrink-0" />,
     },
   ],
   navClouds: [
     {
       title: "Capture",
-      icon: (
-        <CameraIcon
-        />
-      ),
+      icon: <CameraIcon className="size-5 shrink-0" />,
       isActive: true,
       url: "#",
       items: [
@@ -220,10 +214,7 @@ const data = {
     },
     {
       title: "Proposal",
-      icon: (
-        <FileTextIcon
-        />
-      ),
+      icon: <FileTextIcon className="size-5 shrink-0" />,
       url: "#",
       items: [
         {
@@ -238,10 +229,7 @@ const data = {
     },
     {
       title: "Prompts",
-      icon: (
-        <FileTextIcon
-        />
-      ),
+      icon: <FileTextIcon className="size-5 shrink-0" />,
       url: "#",
       items: [
         {
@@ -259,44 +247,29 @@ const data = {
     {
       title: "Sessions",
       url: "/login-accounts",
-      icon: (
-        <Settings2Icon
-        />
-      ),
+      icon: <SettingsMinimalisticIcon className="size-5 shrink-0" />,
     },
     {
       title: "Get Help",
       url: "/docs",
-      icon: (
-        <CircleHelpIcon
-        />
-      ),
+      icon: <QuestionCircleIcon className="size-5 shrink-0" />,
     },
   ],
   documents: [
     {
       name: "Data Library",
       url: "#",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
+      icon: <DatabaseIcon className="size-5 shrink-0" />,
     },
     {
       name: "Reports",
       url: "#",
-      icon: (
-        <FileChartColumnIcon
-        />
-      ),
+      icon: <FileChartIcon className="size-5 shrink-0" />,
     },
     {
       name: "Word Assistant",
       url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
+      icon: <FileTextIcon className="size-5 shrink-0" />,
     },
   ],
 }
@@ -541,77 +514,77 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: accountUrls.dashboard,
-          icon: <WidgetIcon />,
+          icon: <Widget2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Student Fees",
           url: accountUrls.fees,
-          icon: <UsersIcon />,
+          icon: <UsersGroupTwoRoundedIcon className="size-5 shrink-0" />,
         },
         {
           title: "Fee Structures",
           url: accountUrls.structures,
-          icon: <FileTextIcon />,
+          icon: <FileTextIcon className="size-5 shrink-0" />,
         },
         {
           title: "Payments",
           url: accountUrls.payments,
-          icon: <DatabaseIcon />,
+          icon: <DatabaseIcon className="size-5 shrink-0" />,
         },
         {
           title: "Expenses",
           url: accountUrls.expenses,
-          icon: <FileChartColumnIcon />,
+          icon: <FileChartIcon className="size-5 shrink-0" />,
         },
         {
           title: "Income",
           url: accountUrls.income,
-          icon: <ChartBarIcon />,
+          icon: <ChartIcon className="size-5 shrink-0" />,
         },
         {
           title: "Payroll",
           url: accountUrls.payroll,
-          icon: <UsersIcon />,
+          icon: <UsersGroupTwoRoundedIcon className="size-5 shrink-0" />,
         },
         {
           title: "Ledgers",
           url: accountUrls.ledgers,
-          icon: <BookOpenIcon />,
+          icon: <Book2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Bank Accounts",
           url: accountUrls.banks,
-          icon: <DatabaseIcon />,
+          icon: <DatabaseIcon className="size-5 shrink-0" />,
         },
         {
           title: "Invoices",
           url: accountUrls.invoices,
-          icon: <FileTextIcon />,
+          icon: <FileTextIcon className="size-5 shrink-0" />,
         },
         {
           title: "Receipts",
           url: accountUrls.receipts,
-          icon: <FileIcon />,
+          icon: <BillListIcon className="size-5 shrink-0" />,
         },
         {
           title: "Refunds",
           url: accountUrls.refunds,
-          icon: <CircleHelpIcon />,
+          icon: <QuestionCircleIcon className="size-5 shrink-0" />,
         },
         {
           title: "Scholarships",
           url: accountUrls.scholarships,
-          icon: <GraduationCapIcon />,
+          icon: <SquareAcademicCap2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Reports",
           url: accountUrls.reports,
-          icon: <FileChartColumnIcon />,
+          icon: <FileChartIcon className="size-5 shrink-0" />,
         },
         {
           title: "Settings",
           url: accountUrls.settings,
-          icon: <Settings2Icon />,
+          icon: <SettingsMinimalisticIcon className="size-5 shrink-0" />,
         },
       ]
     : isLibrarian
@@ -619,22 +592,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: librarianUrls.dashboard,
-          icon: <WidgetIcon />,
+          icon: <Widget2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Manage Books",
           url: librarianUrls.books,
-          icon: <BookOpenIcon />,
+          icon: <Book2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Book Issues",
           url: librarianUrls.borrowings,
-          icon: <RequestIcon />,
+          icon: <GitPullRequestIcon className="size-5 shrink-0" />,
         },
         {
           title: "Notices",
           url: librarianUrls.notice,
-          icon: <BellIcon />,
+          icon: <BellIcon className="size-5 shrink-0" />,
           hasNotification: unreadNotices,
         },
       ]
@@ -643,49 +616,49 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: teacherUrls.dashboard,
-          icon: <WidgetIcon />,
+          icon: <Widget2Icon className="size-5 shrink-0" />,
         },
         {
           title: "My Class",
           url: teacherUrls.class,
-          icon: <UsersIcon />,
+          icon: <UsersGroupTwoRoundedIcon className="size-5 shrink-0" />,
         },
         {
           title: "Timetable",
           url: teacherUrls.timetable,
-          icon: <CalendarIcon />,
+          icon: <CalendarIcon className="size-5 shrink-0" />,
         },
         {
           title: "Email",
           url: teacherUrls.email,
-          icon: <EmailIcon />,
+          icon: <InboxIcon className="size-5 shrink-0" />,
         },
         {
           title: "Notes",
           url: teacherUrls.notes,
-          icon: <NotesIcon />,
+          icon: <NotesIcon className="size-5 shrink-0" />,
         },
         {
           title: "Subject Class",
           url: teacherUrls.subjects,
-          icon: <BookOpenIcon />,
+          icon: <Book2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Requests",
           url: teacherUrls.requests,
-          icon: <RequestIcon />,
+          icon: <GitPullRequestIcon className="size-5 shrink-0" />,
           hasNotification: unreadRequests,
         },
         {
           title: "Notices",
           url: teacherUrls.notice,
-          icon: <BellIcon />,
+          icon: <BellIcon className="size-5 shrink-0" />,
           hasNotification: unreadNotices,
         },
         {
           title: "Complaints",
           url: `${teacherUrls.dashboard}/complaints`,
-          icon: <DangerTriangleIcon />,
+          icon: <DangerTriangleIcon className="size-5 shrink-0" />,
           hasNotification: unreadComplaints,
         },
       ]
@@ -694,92 +667,92 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Dashboard",
           url: adminUrls.dashboard,
-          icon: <WidgetIcon />,
+          icon: <Widget2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Students",
           url: adminUrls.students,
-          icon: <GraduationCapIcon />,
+          icon: <SquareAcademicCap2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Teachers",
           url: adminUrls.teachers,
-          icon: <UsersIcon />,
+          icon: <UsersGroupTwoRoundedIcon className="size-5 shrink-0" />,
         },
         {
           title: "Requests",
           url: adminUrls.requests,
-          icon: <RequestIcon />,
+          icon: <GitPullRequestIcon className="size-5 shrink-0" />,
           hasNotification: unreadRequests,
         },
         /* {
           title: "Fee Management",
           url: adminUrls.feeManagement,
-          icon: <DatabaseIcon />,
+          icon: <DatabaseIcon className="size-5 shrink-0" />,
         }, */
         {
           title: "Complaints",
           url: `${adminUrls.dashboard}/complaints`,
-          icon: <DangerTriangleIcon />,
+          icon: <DangerTriangleIcon className="size-5 shrink-0" />,
           hasNotification: unreadComplaints,
         },
         {
           title: "Notices",
           url: adminUrls.notices,
-          icon: <BellIcon />,
+          icon: <BellIcon className="size-5 shrink-0" />,
           hasNotification: unreadNotices,
         },
         {
           title: "Slider Banners",
           url: adminUrls.slider,
-          icon: <CameraIcon />,
+          icon: <CameraIcon className="size-5 shrink-0" />,
         },
         {
           title: "Gallery",
           url: adminUrls.gallery,
-          icon: <ImageIcon />,
+          icon: <GalleryIcon className="size-5 shrink-0" />,
         },
         {
           title: "Page Builder",
           url: adminUrls.pageBuilder,
-          icon: <WidgetIcon />,
+          icon: <Widget2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Developer Console",
           url: adminUrls.developer,
-          icon: <Terminal />,
+          icon: <CodeSquareIcon className="size-5 shrink-0" />,
         },
       ]
     : [
         {
           title: "Dashboard",
           url: urls.dashboard,
-          icon: <WidgetIcon />,
+          icon: <Widget2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Leaderboard",
           url: urls.leaderboard,
-          icon: <Trophy />,
+          icon: <CupStarIcon className="size-5 shrink-0" />,
         },
         /* {
           title: "Fees",
           url: urls.fees,
-          icon: <DatabaseIcon />,
+          icon: <DatabaseIcon className="size-5 shrink-0" />,
         }, */
         {
           title: "Library",
           url: urls.library,
-          icon: <BookOpenIcon />,
+          icon: <Book2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Marks",
           url: urls.marks,
-          icon: <GraduationCapIcon />,
+          icon: <SquareAcademicCap2Icon className="size-5 shrink-0" />,
         },
         {
           title: "Notices",
           url: urls.notice,
-          icon: <BellIcon />,
+          icon: <BellIcon className="size-5 shrink-0" />,
           hasNotification: unreadNotices,
         },
       ]
@@ -789,14 +762,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     {
       title: "Mobile App",
       url: "/downloads",
-      icon: <SmartphoneIcon />,
+      icon: <SmartphoneIcon className="size-5 shrink-0" />,
     },
     ...(isTeacher
       ? [
           {
             title: "Agent",
             url: `/teacher/${profileUsername || "username"}/tasks/${teacherChats[0]?.id || "new"}`,
-            icon: <BotIcon />,
+            icon: <BotIcon className="size-5 shrink-0" />,
             onClick: () => {
               setOpen(false)
               if (isMobile) setOpenMobile(false)
@@ -846,7 +819,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {userToDisplay?.name || "VidyaSchool User"}
                     </span>
                   </div>
-                  <ChevronsUpDown className="size-3.5 text-muted-foreground/60 shrink-0 group-hover:text-muted-foreground transition-colors group-data-[collapsible=icon]:hidden" />
+                  <ChevronsUpDownIcon className="size-3.5 text-muted-foreground/60 shrink-0 group-hover:text-muted-foreground transition-colors group-data-[collapsible=icon]:hidden" />
                 </button>
               </PopoverTrigger>
 
@@ -879,7 +852,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     onClick={() => { setIsCommandOpen(false); router.push(accountUrl) }}
                     className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-sm text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
                   >
-                    <CircleUserRoundIcon className="size-4 text-muted-foreground shrink-0" />
+                    <UserCircleIcon className="size-4 text-muted-foreground shrink-0" />
                     Account Settings
                   </button>
                   <button
@@ -908,9 +881,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                   <div className="grid grid-cols-3 gap-1">
                     {[
-                      { label: "Light", value: "light" as const, icon: <SunIcon className="size-3.5" /> },
+                      { label: "Light", value: "light" as const, icon: <Sun2Icon className="size-3.5" /> },
                       { label: "Dark",  value: "dark" as const,  icon: <MoonIcon className="size-3.5" /> },
-                      { label: "System",value: "system" as const,icon: <Laptop   className="size-3.5" /> },
+                      { label: "System",value: "system" as const,icon: <LaptopIcon className="size-3.5" /> },
                     ].map(({ label, value, icon }) => (
                       <button
                         key={value}
@@ -930,7 +903,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     onClick={() => { setIsCommandOpen(false); window.location.href = "/login" }}
                     className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-sm text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:text-foreground transition-colors cursor-pointer"
                   >
-                    <Plus className="size-4 shrink-0" />
+                    <AddCircleIcon className="size-4 shrink-0" />
                     Add Account
                   </button>
                   <Button
@@ -941,7 +914,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       await logoutUser()
                     }}
                   >
-                    <LogOut className="size-4 shrink-0" />
+                    <Logout2Icon className="size-4 shrink-0" />
                     Log Out
                   </Button>
                 </div>
@@ -961,7 +934,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="w-full h-9 flex items-center justify-between group-data-[collapsible=icon]:justify-center px-3 group-data-[collapsible=icon]:px-0 rounded-xl border border-border/80 bg-sidebar-foreground/5 hover:bg-sidebar-foreground/10 text-muted-foreground transition-all duration-150 text-xs cursor-pointer focus:outline-none"
             >
               <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
-                <SearchIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
+                <MagnifierIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
                 <span className="text-muted-foreground/80 font-normal group-data-[collapsible=icon]:hidden">Quick Search</span>
               </div>
               <kbd className="pointer-events-none inline-flex group-data-[collapsible=icon]:hidden h-5 select-none items-center gap-0.5 rounded-md border border-border bg-transparent dark:bg-transparent px-1.5 font-mono text-[9px] font-medium text-muted-foreground/60 shadow-none">
@@ -1062,7 +1035,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="flex flex-col gap-2 w-full">
             <Button asChild variant="default" className="w-full gap-2">
               <a href={downloadUrl} download>
-                <Download className="size-4" />
+                <DownloadMinimalisticIcon className="size-4" />
                 Direct Download (APK)
               </a>
             </Button>

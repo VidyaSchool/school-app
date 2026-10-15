@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 
 import { NavMain } from "@/components/nav-main"
@@ -23,27 +22,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import {
-  CameraIcon,
-  ImageIcon,
-  Settings2Icon,
-  CircleHelpIcon,
-  SearchIcon,
-  GraduationCapIcon,
-  MoonIcon,
-  CircleUserRoundIcon,
-  ChevronsUpDown,
-  SunIcon,
-  Laptop,
-  LogOut,
-} from "lucide-react"
-import {
-  WidgetIcon,
-  UsersIcon,
-  RequestIcon,
-  BellIcon,
-  DangerTriangleIcon,
-} from "@/components/icons"
+import { Widget2Icon } from "@solar-icons/react/outline/widget-2"
+import { SquareAcademicCap2Icon } from "@solar-icons/react/outline/square-academic-cap-2"
+import { UsersGroupTwoRoundedIcon } from "@solar-icons/react/outline/users-group-two-rounded"
+import { GitPullRequestIcon } from "@solar-icons/react/outline/git-pull-request"
+import { DangerTriangleIcon } from "@solar-icons/react/outline/danger-triangle"
+import { BellIcon } from "@solar-icons/react/outline/bell"
+import { CameraIcon } from "@solar-icons/react/outline/camera"
+import { GalleryIcon } from "@solar-icons/react/outline/gallery"
+import { SettingsMinimalisticIcon } from "@solar-icons/react/outline/settings-minimalistic"
+import { QuestionCircleIcon } from "@solar-icons/react/outline/question-circle"
+import { MagnifierIcon } from "@solar-icons/react/outline/magnifier"
+import { UserCircleIcon } from "@solar-icons/react/outline/user-circle"
+import { Sun2Icon } from "@solar-icons/react/outline/sun-2"
+import { MoonIcon } from "@solar-icons/react/outline/moon"
+import { LaptopIcon } from "@solar-icons/react/outline/laptop"
+import { Logout2Icon } from "@solar-icons/react/outline/logout-2"
+import { ChevronsUpDownIcon } from "@solar-icons/react/outline/chevrons-up-down"
 import { logoutUser } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
@@ -99,52 +94,52 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       {
         title: "Dashboard",
         url: base,
-        icon: <WidgetIcon />,
+        icon: <Widget2Icon className="size-5 shrink-0" />,
       },
       {
         title: "Students",
         url: `${base}/students`,
-        icon: <GraduationCapIcon />,
+        icon: <SquareAcademicCap2Icon className="size-5 shrink-0" />,
       },
       {
         title: "Teachers",
         url: `${base}/teacher`,
-        icon: <UsersIcon />,
+        icon: <UsersGroupTwoRoundedIcon className="size-5 shrink-0" />,
       },
       {
         title: "Requests",
         url: `${base}/requests`,
-        icon: <RequestIcon />,
+        icon: <GitPullRequestIcon className="size-5 shrink-0" />,
       },
       /* {
         title: "Fee Management",
         url: `${base}/fee-management`,
-        icon: <DatabaseIcon />,
+        icon: <DatabaseIcon className="size-5 shrink-0" />,
       }, */
       {
         title: "Complaints",
         url: `${base}/complaints`,
-        icon: <DangerTriangleIcon />,
+        icon: <DangerTriangleIcon className="size-5 shrink-0" />,
       },
       {
         title: "Notices",
         url: `${base}/notice`,
-        icon: <BellIcon />,
+        icon: <BellIcon className="size-5 shrink-0" />,
       },
       {
         title: "Slider Banners",
         url: `${base}/slider`,
-        icon: <CameraIcon />,
+        icon: <CameraIcon className="size-5 shrink-0" />,
       },
       {
         title: "Gallery",
         url: `${base}/gallery`,
-        icon: <ImageIcon />,
+        icon: <GalleryIcon className="size-5 shrink-0" />,
       },
       {
         title: "Page Builder",
         url: `${base}/page-builder`,
-        icon: <WidgetIcon />,
+        icon: <Widget2Icon className="size-5 shrink-0" />,
       },
     ],
     [base]
@@ -155,12 +150,12 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       {
         title: "Sessions",
         url: "/login-accounts",
-        icon: <Settings2Icon />,
+        icon: <SettingsMinimalisticIcon className="size-5 shrink-0" />,
       },
       {
         title: "Get Help",
         url: "https://beta.blazeneuro.com/docs",
-        icon: <CircleHelpIcon />,
+        icon: <QuestionCircleIcon className="size-5 shrink-0" />,
       },
     ],
     []
@@ -228,7 +223,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                     {displayName}
                   </span>
                 </div>
-                <ChevronsUpDown className="size-3.5 text-muted-foreground/60 shrink-0 group-hover:text-muted-foreground transition-colors" />
+                <ChevronsUpDownIcon className="size-3.5 text-muted-foreground/60 shrink-0 group-hover:text-muted-foreground transition-colors" />
               </button>
             </PopoverTrigger>
 
@@ -266,7 +261,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                   }}
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-sm text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
                 >
-                  <CircleUserRoundIcon className="size-4 text-muted-foreground shrink-0" />
+                  <UserCircleIcon className="size-4 text-muted-foreground shrink-0" />
                   Account Settings
                 </button>
                 <button
@@ -288,9 +283,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                 </div>
                 <div className="grid grid-cols-3 gap-1">
                   {[
-                    { label: "Light", value: "light" as const, icon: <SunIcon className="size-3.5" /> },
+                    { label: "Light", value: "light" as const, icon: <Sun2Icon className="size-3.5" /> },
                     { label: "Dark", value: "dark" as const, icon: <MoonIcon className="size-3.5" /> },
-                    { label: "System", value: "system" as const, icon: <Laptop className="size-3.5" /> },
+                    { label: "System", value: "system" as const, icon: <LaptopIcon className="size-3.5" /> },
                   ].map(({ label, value, icon }) => (
                     <button
                       key={value}
@@ -318,7 +313,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                     await logoutUser()
                   }}
                 >
-                  <LogOut className="size-4 shrink-0" />
+                  <Logout2Icon className="size-4 shrink-0" />
                   Log Out
                 </Button>
               </div>
@@ -338,7 +333,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             className="w-full h-9 flex items-center justify-between px-3 py-1.5 rounded-xl border border-border/80 bg-sidebar-foreground/5 hover:bg-sidebar-foreground/10 text-muted-foreground transition-all duration-150 text-xs cursor-pointer focus:outline-none"
           >
             <div className="flex items-center gap-2.5">
-              <SearchIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
+              <MagnifierIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
               <span className="text-muted-foreground/80 font-normal">Quick Search</span>
             </div>
             <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded-md border border-border bg-transparent dark:bg-transparent px-1.5 font-mono text-[9px] font-medium text-muted-foreground/60 shadow-none">

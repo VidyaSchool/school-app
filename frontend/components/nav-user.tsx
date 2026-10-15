@@ -27,7 +27,11 @@ import {
 import { useSession } from "@/contexts/session-context"
 import { logoutUser } from "@/lib/auth-client"
 import { useTheme } from "@/components/theme-provider"
-import { EllipsisVerticalIcon, CircleUserRoundIcon, BellIcon, LogOutIcon, SunIcon } from "lucide-react"
+import { MenuDotsVerticalIcon } from "@solar-icons/react/outline/menu-dots-vertical"
+import { UserCircleIcon } from "@solar-icons/react/outline/user-circle"
+import { BellIcon } from "@solar-icons/react/outline/bell"
+import { Logout2Icon } from "@solar-icons/react/outline/logout-2"
+import { Sun2Icon } from "@solar-icons/react/outline/sun-2"
 import Link from "next/link"
 import * as React from "react"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -109,7 +113,7 @@ export function NavUser() {
                   {user.role}
                 </span>
               </div>
-              <EllipsisVerticalIcon className="ml-auto size-4" />
+              <MenuDotsVerticalIcon className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -136,13 +140,13 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link href={accountUrl} className="flex items-center cursor-pointer">
-                  <CircleUserRoundIcon />
+                  <UserCircleIcon className="size-4" />
                   Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  <SunIcon />
+                  <Sun2Icon className="size-4" />
                   Theme
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
@@ -161,15 +165,13 @@ export function NavUser() {
               </DropdownMenuSub>
 
               <DropdownMenuItem>
-                <BellIcon
-                />
+                <BellIcon className="size-4" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleSignOut}>
-              <LogOutIcon
-              />
+              <Logout2Icon className="size-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

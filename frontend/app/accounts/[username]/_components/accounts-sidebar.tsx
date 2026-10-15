@@ -1,9 +1,20 @@
 "use client"
 
-import {
-  LayoutDashboard, Users, CreditCard, Wallet, Receipt, FileText,
-  TrendingUp, Settings, DollarSign, Archive, Award, AlertCircle, Lock
-} from "lucide-react"
+import { Widget2Icon } from "@solar-icons/react/outline/widget-2"
+import { UsersGroupTwoRoundedIcon } from "@solar-icons/react/outline/users-group-two-rounded"
+import { Card2Icon } from "@solar-icons/react/outline/card-2"
+import { BillListIcon } from "@solar-icons/react/outline/bill-list"
+import { FileChartIcon } from "@solar-icons/react/outline/file-chart"
+import { ChartIcon } from "@solar-icons/react/outline/chart"
+import { Book2Icon } from "@solar-icons/react/outline/book-2"
+import { DatabaseIcon } from "@solar-icons/react/outline/database"
+import { FileTextIcon } from "@solar-icons/react/outline/file-text"
+import { BillIcon } from "@solar-icons/react/outline/bill"
+import { QuestionCircleIcon } from "@solar-icons/react/outline/question-circle"
+import { SquareAcademicCap2Icon } from "@solar-icons/react/outline/square-academic-cap-2"
+import { SettingsMinimalisticIcon } from "@solar-icons/react/outline/settings-minimalistic"
+import { WalletMoneyIcon } from "@solar-icons/react/outline/wallet-money"
+import { LockIcon } from "@solar-icons/react/outline/lock"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -22,28 +33,28 @@ import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 interface MenuItem {
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   label: string
   href: string
   unlocked: boolean
 }
 
 const menuItems: MenuItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "", unlocked: true },
-  { icon: Users, label: "Student Fees", href: "/fees", unlocked: true },
-  { icon: CreditCard, label: "Fee Structures", href: "/structures", unlocked: true },
-  { icon: DollarSign, label: "Payments", href: "/payments", unlocked: false },
-  { icon: Wallet, label: "Expenses", href: "/expenses", unlocked: false },
-  { icon: TrendingUp, label: "Income", href: "/income", unlocked: false },
-  { icon: Users, label: "Payroll", href: "/payroll", unlocked: false },
-  { icon: FileText, label: "Ledgers", href: "/ledgers", unlocked: false },
-  { icon: Archive, label: "Bank Accounts", href: "/banks", unlocked: false },
-  { icon: Receipt, label: "Invoices", href: "/invoices", unlocked: false },
-  { icon: Receipt, label: "Receipts", href: "/receipts", unlocked: false },
-  { icon: AlertCircle, label: "Refunds", href: "/refunds", unlocked: false },
-  { icon: Award, label: "Scholarships", href: "/scholarships", unlocked: false },
-  { icon: FileText, label: "Reports", href: "/reports", unlocked: false },
-  { icon: Settings, label: "Settings", href: "/settings", unlocked: false },
+  { icon: Widget2Icon, label: "Dashboard", href: "", unlocked: true },
+  { icon: UsersGroupTwoRoundedIcon, label: "Student Fees", href: "/fees", unlocked: true },
+  { icon: Card2Icon, label: "Fee Structures", href: "/structures", unlocked: true },
+  { icon: BillListIcon, label: "Payments", href: "/payments", unlocked: false },
+  { icon: FileChartIcon, label: "Expenses", href: "/expenses", unlocked: false },
+  { icon: ChartIcon, label: "Income", href: "/income", unlocked: false },
+  { icon: UsersGroupTwoRoundedIcon, label: "Payroll", href: "/payroll", unlocked: false },
+  { icon: Book2Icon, label: "Ledgers", href: "/ledgers", unlocked: false },
+  { icon: DatabaseIcon, label: "Bank Accounts", href: "/banks", unlocked: false },
+  { icon: FileTextIcon, label: "Invoices", href: "/invoices", unlocked: false },
+  { icon: BillIcon, label: "Receipts", href: "/receipts", unlocked: false },
+  { icon: QuestionCircleIcon, label: "Refunds", href: "/refunds", unlocked: false },
+  { icon: SquareAcademicCap2Icon, label: "Scholarships", href: "/scholarships", unlocked: false },
+  { icon: FileChartIcon, label: "Reports", href: "/reports", unlocked: false },
+  { icon: SettingsMinimalisticIcon, label: "Settings", href: "/settings", unlocked: false },
 ]
 
 export function AccountsSidebar({ username }: { username: string }) {
@@ -60,7 +71,7 @@ export function AccountsSidebar({ username }: { username: string }) {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-4">
-          <Wallet className="h-6 w-6 text-primary" />
+          <WalletMoneyIcon className="h-6 w-6 text-primary" />
           <div>
             <p className="text-sm font-semibold">Accounts</p>
             <p className="text-xs text-muted-foreground">{username}</p>
@@ -105,7 +116,7 @@ export function AccountsSidebar({ username }: { username: string }) {
                       <span className="text-xs">{item.label}</span>
                     </div>
                     <span className="flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded font-medium shrink-0">
-                      <Lock className="h-2.5 w-2.5" /> Coming Soon
+                      <LockIcon className="h-2.5 w-2.5" /> Coming Soon
                     </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

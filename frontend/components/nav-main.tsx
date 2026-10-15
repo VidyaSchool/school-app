@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { AlertTriangle, CirclePlusIcon, MailIcon, Send } from "lucide-react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { useSession } from "@/lib/auth-client"
