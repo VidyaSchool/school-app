@@ -5,7 +5,7 @@ bidict==0.23.1
 certifi==2026.6.17
 click==8.4.2
 fastapi==0.138.0
-greenlet==3.5.2
+greenlet==3.5.6
 h11==0.16.0
 idna==3.18
 iniconfig==2.3.0
