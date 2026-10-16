@@ -9,6 +9,10 @@ on:
       - "backend/**"          # only runs when backend files change
       - ".github/workflows/deploy-backend.yml"
 
+concurrency:
+  group: deploy-backend-lightsail
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: SSH Deploy to Lightsail
