@@ -439,16 +439,17 @@ def schedule_timetable_slot(
             return f"Error: Teacher with email '{teacher_email}' not found."
         
         # Check for collision
+        period_number = 1
         existing = session.exec(
             select(Timetable).where(
                 Timetable.class_ == class_name,
                 Timetable.section == section,
                 Timetable.day_of_week == day_of_week,
-                Timetable.start_time == start_time
+                Timetable.period_number == period_number
             )
         ).first()
         if existing:
-            return f"Collision: Slot already scheduled for {class_name}-{section} on {day_of_week} at {start_time}."
+            return f"Collision: Slot already scheduled for {class_name}-{section} on {day_of_week} for Period {period_number}."
 
         slot = Timetable(
             id=f"slot_{uuid.uuid4().hex[:10]}",
@@ -457,15 +458,13 @@ def schedule_timetable_slot(
             section=section,
             subject=subject,
             day_of_week=day_of_week,
-            start_time=start_time,
-            end_time=end_time,
-            room=room,
+            period_number=period_number,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow()
         )
         session.add(slot)
         session.commit()
-        return f"Successfully scheduled {subject} class for {class_name}-{section} on {day_of_week} ({start_time} - {end_time}) in Room {room or 'N/A'}."
+        return f"Successfully scheduled {subject} class for {class_name}-{section} on {day_of_week} (Period {period_number})."
 
 # ── Tool 8: Get Teacher Timetable ──
 @mcp.tool()
@@ -482,13 +481,13 @@ def get_teacher_timetable(teacher_email: str) -> str:
         slots = session.exec(
             select(Timetable)
             .where(Timetable.teacher_id == teacher.id)
-            .order_by(Timetable.day_of_week, Timetable.start_time)
+            .order_by(Timetable.day_of_week, Timetable.period_number)
         ).all()
         if not slots:
             return "No scheduled classes found in your timetable."
         res = [f"Timetable for {teacher.name}:"]
         for s in slots:
-            res.append(f"- {s.day_of_week}: {s.subject} ({s.class_}-{s.section}) at {s.start_time}-{s.end_time} in Room {s.room or 'N/A'}")
+            res.append(f"- {s.day_of_week}: {s.subject} ({s.class_}-{s.section}) during Period {s.period_number}")
         return "\n".join(res)
 
 if __name__ == "__main__":

@@ -71,34 +71,20 @@ export async function GET(req: Request) {
       .select()
       .from(timetable)
       .where(and(eq(timetable.teacherId, teacherId), eq(timetable.dayOfWeek, todayDay)))
-      .orderBy(timetable.startTime)
+      .orderBy(timetable.periodNumber)
 
     // Map slots to CalendarEvents
     const events = slots.map((slot) => {
-      const startParts = slot.startTime.split(':')
-      const startHourNum = parseInt(startParts[0], 10)
-      const startMinNum = parseInt(startParts[1], 10)
-      
-      // Calculate float hour offset from 8 AM
-      const offsetHour = (startHourNum + startMinNum / 60) - 8
-      
-      // Calculate end float hour offset from start hour to see if it spans multiple columns
-      const endParts = slot.endTime.split(':')
-      const endHourNum = parseInt(endParts[0], 10)
-      const endMinNum = parseInt(endParts[1], 10)
-      const durationHours = (endHourNum + endMinNum / 60) - (startHourNum + startMinNum / 60)
-
-      // Time formatting (e.g., 9:00 AM)
-      const displayHour = startHourNum % 12 || 12
-      const displayMin = String(startMinNum).padStart(2, '0')
-      const ampm = startHourNum >= 12 ? 'PM' : 'AM'
-      const timeStr = `${displayHour}:${displayMin} ${ampm}`
+      const periodHour = 7 + slot.periodNumber
+      const displayHour = periodHour % 12 || 12
+      const ampm = periodHour >= 12 ? 'PM' : 'AM'
+      const timeStr = `Period ${slot.periodNumber} (${displayHour}:00 ${ampm})`
 
       return {
-        hour: Math.floor(offsetHour), // match the grid column (0-indexed from 8 AM)
-        title: `${slot.subject} (Class ${slot.class}-${slot.section})`,
+        hour: Math.max(0, slot.periodNumber - 1),
+        title: `${slot.subject || 'Class'} (Class ${slot.class}-${slot.section})`,
         time: timeStr,
-        color: getSubjectColor(slot.subject),
+        color: getSubjectColor(slot.subject || ''),
       }
     })
 

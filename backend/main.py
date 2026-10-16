@@ -638,16 +638,18 @@ async def send_custom_notification(data: dict, current_user: User = Depends(requ
     return {"success": True, "deliveredCount": len(user_ids)}
 
 
+_scheduler = None
+
 @app.on_event("startup")
 def on_startup():
+    global _scheduler
     init_db()
     # Init and start the automated notification scheduler
     try:
         from scheduler import init_scheduler, create_scheduler
         init_scheduler(engine, send_notification_to_user)
-        scheduler = create_scheduler()
-        scheduler.start()
-        app.state.scheduler = scheduler
+        _scheduler = create_scheduler()
+        _scheduler.start()
         print("[Scheduler] Automated notification scheduler started.")
     except Exception as e:
         print(f"[Scheduler] Could not start scheduler: {e}")
@@ -655,9 +657,9 @@ def on_startup():
 
 @app.on_event("shutdown")
 def on_shutdown():
-    scheduler = getattr(app.state, "scheduler", None)
-    if scheduler and scheduler.running:
-        scheduler.shutdown(wait=False)
+    global _scheduler
+    if _scheduler and _scheduler.running:
+        _scheduler.shutdown(wait=False)
         print("[Scheduler] Scheduler stopped.")
 
 

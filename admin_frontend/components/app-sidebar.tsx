@@ -30,6 +30,7 @@ import { DangerTriangleIcon } from "@solar-icons/react/outline/danger-triangle"
 import { BellIcon } from "@solar-icons/react/outline/bell"
 import { CameraIcon } from "@solar-icons/react/outline/camera"
 import { GalleryIcon } from "@solar-icons/react/outline/gallery"
+import { CalendarIcon } from "@solar-icons/react/outline/calendar"
 import { SettingsMinimalisticIcon } from "@solar-icons/react/outline/settings-minimalistic"
 import { QuestionCircleIcon } from "@solar-icons/react/outline/question-circle"
 import { MagnifierIcon } from "@solar-icons/react/outline/magnifier"
@@ -105,6 +106,11 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         title: "Teachers",
         url: `${base}/teacher`,
         icon: <UsersGroupTwoRoundedIcon className="size-5 shrink-0" />,
+      },
+      {
+        title: "Timetable Rescheduling",
+        url: "/timetable/absences",
+        icon: <CalendarIcon className="size-5 shrink-0" />,
       },
       {
         title: "Requests",

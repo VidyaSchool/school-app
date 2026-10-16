@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { db } from '@/lib/db'
-import { timetable, teacherAbsence, substitutionRecord, user } from '@/lib/schema'
+import { timetable } from '@/lib/schema'
 import { eq, and } from 'drizzle-orm'
 
 const SUBJECT_COLORS = [
@@ -52,110 +52,43 @@ function getSubjectColor(subject: string) {
   return SUBJECT_COLORS[hash]
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const { searchParams } = new URL(req.url)
+  const teacherIdParam = searchParams.get('teacherId')
+  const teacherId = (session.user.role === 'admin' && teacherIdParam) ? teacherIdParam : session.user.id
 
   // Get current day of week (e.g. 'Monday')
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const todayDay = days[new Date().getDay()]
 
   try {
-    const todayIso = new Date().toISOString().split('T')[0]
-
-    // Check if teacher is absent today
-    const absence = await db.query.teacherAbsence.findFirst({
-      where: and(eq(teacherAbsence.teacherId, session.user.id), eq(teacherAbsence.date, todayIso))
-    })
-
-    const isAbsent = !!absence
-
-    // Fetch substitutions assigned to this teacher today
-    const assignedSubs = await db
-      .select({
-        id: substitutionRecord.id,
-        class: substitutionRecord.class,
-        section: substitutionRecord.section,
-        subject: substitutionRecord.subject,
-        startTime: substitutionRecord.startTime,
-        endTime: substitutionRecord.endTime,
-        isActivityFallback: substitutionRecord.isActivityFallback,
-        activityName: substitutionRecord.activityName,
-        originalTeacherName: user.name,
-      })
-      .from(substitutionRecord)
-      .innerJoin(user, eq(substitutionRecord.originalTeacherId, user.id))
-      .where(
-        and(
-          eq(substitutionRecord.substituteTeacherId, session.user.id),
-          eq(substitutionRecord.date, todayIso)
-        )
-      )
-
     const slots = await db
       .select()
       .from(timetable)
-      .where(and(eq(timetable.teacherId, session.user.id), eq(timetable.dayOfWeek, todayDay)))
-      .orderBy(timetable.startTime)
+      .where(and(eq(timetable.teacherId, teacherId), eq(timetable.dayOfWeek, todayDay)))
+      .orderBy(timetable.periodNumber)
 
-    // Map regular slots to CalendarEvents
-    const regularEvents = slots.map((slot) => {
-      const startParts = slot.startTime.split(':')
-      const startHourNum = parseInt(startParts[0], 10)
-      const startMinNum = parseInt(startParts[1], 10)
-      
-      const offsetHour = (startHourNum + startMinNum / 60) - 8
-
-      const displayHour = startHourNum % 12 || 12
-      const displayMin = String(startMinNum).padStart(2, '0')
-      const ampm = startHourNum >= 12 ? 'PM' : 'AM'
-      const timeStr = `${displayHour}:${displayMin} ${ampm}`
-
-      const title = isAbsent
-        ? `${slot.subject} (Class ${slot.class}-${slot.section}) [Absent]`
-        : `${slot.subject} (Class ${slot.class}-${slot.section})`
+    // Map slots to CalendarEvents
+    const events = slots.map((slot) => {
+      const periodHour = 7 + slot.periodNumber
+      const displayHour = periodHour % 12 || 12
+      const ampm = periodHour >= 12 ? 'PM' : 'AM'
+      const timeStr = `Period ${slot.periodNumber} (${displayHour}:00 ${ampm})`
 
       return {
-        hour: Math.floor(offsetHour),
-        title,
+        hour: Math.max(0, slot.periodNumber - 1),
+        title: `${slot.subject || 'Class'} (Class ${slot.class}-${slot.section})`,
         time: timeStr,
-        color: getSubjectColor(slot.subject),
-        isAbsent,
-        isSubstitution: false,
+        color: getSubjectColor(slot.subject || ''),
       }
     })
 
-    // Map assigned substitution slots to CalendarEvents
-    const subEvents = assignedSubs.map((sub) => {
-      const startParts = sub.startTime.split(':')
-      const startHourNum = parseInt(startParts[0], 10)
-      const startMinNum = parseInt(startParts[1], 10)
-      
-      const offsetHour = (startHourNum + startMinNum / 60) - 8
-
-      const displayHour = startHourNum % 12 || 12
-      const displayMin = String(startMinNum).padStart(2, '0')
-      const ampm = startHourNum >= 12 ? 'PM' : 'AM'
-      const timeStr = `${displayHour}:${displayMin} ${ampm}`
-
-      const label = sub.isActivityFallback ? (sub.activityName || 'Activity') : sub.subject
-      const title = `Substitution: ${label} (Class ${sub.class}-${sub.section}) [Covering ${sub.originalTeacherName}]`
-
-      return {
-        hour: Math.floor(offsetHour),
-        title,
-        time: timeStr,
-        color: getSubjectColor(label),
-        isAbsent: false,
-        isSubstitution: true,
-      }
-    })
-
-    const events = [...regularEvents, ...subEvents].sort((a, b) => a.hour - b.hour)
-
-    return NextResponse.json({ events, isAbsent })
+    return NextResponse.json({ events })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }

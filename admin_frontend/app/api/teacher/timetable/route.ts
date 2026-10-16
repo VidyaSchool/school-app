@@ -20,7 +20,7 @@ export async function GET() {
       .select()
       .from(timetable)
       .where(eq(timetable.teacherId, session.user.id))
-      .orderBy(timetable.dayOfWeek, timetable.startTime)
+      .orderBy(timetable.dayOfWeek, timetable.periodNumber)
 
     return NextResponse.json({ timetable: data })
   } catch (error: any) {
@@ -40,9 +40,9 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { class: className, section, subject, dayOfWeek, startTime, endTime, room } = await req.json()
+    const { class: className, section, subject, dayOfWeek, periodNumber } = await req.json()
 
-    if (!className || !section || !subject || !dayOfWeek || !startTime || !endTime) {
+    if (!className || !section || !dayOfWeek || periodNumber === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
           eq(timetable.class, className),
           eq(timetable.section, section),
           eq(timetable.dayOfWeek, dayOfWeek),
-          eq(timetable.startTime, startTime)
+          eq(timetable.periodNumber, Number(periodNumber))
         )
       )
 
@@ -70,11 +70,9 @@ export async function POST(req: Request) {
       teacherId: session.user.id,
       class: className,
       section,
-      subject,
+      subject: subject || '',
       dayOfWeek,
-      startTime,
-      endTime,
-      room: room || null,
+      periodNumber: Number(periodNumber),
     })
 
     return NextResponse.json({ success: true, id })

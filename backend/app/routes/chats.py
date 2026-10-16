@@ -895,19 +895,17 @@ def execute_tool_call(name: str, args: dict, current_user: User, db: Session) ->
             section = args.get("section")
             subject = args.get("subject")
             day_of_week = args.get("day_of_week")
-            start_time = args.get("start_time")
-            end_time = args.get("end_time")
-            room = args.get("room")
+            period_number = int(args.get("period_number") or 1)
             existing = db.exec(
                 select(Timetable).where(
                     Timetable.class_ == class_name,
                     Timetable.section == section,
                     Timetable.day_of_week == day_of_week,
-                    Timetable.start_time == start_time,
+                    Timetable.period_number == period_number,
                 )
             ).first()
             if existing:
-                return f"Collision: A class for {class_name}-{section} is already scheduled on {day_of_week} at {start_time}."
+                return f"Collision: A class for {class_name}-{section} is already scheduled on {day_of_week} for Period {period_number}."
             slot = Timetable(
                 id=f"slot_{uuid.uuid4().hex[:10]}",
                 teacher_id=current_user.id,
@@ -915,28 +913,26 @@ def execute_tool_call(name: str, args: dict, current_user: User, db: Session) ->
                 section=section,
                 subject=subject,
                 day_of_week=day_of_week,
-                start_time=start_time,
-                end_time=end_time,
-                room=room,
+                period_number=period_number,
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
             )
             db.add(slot)
             db.commit()
-            return f"Success: Scheduled {subject} for {class_name}-{section} on {day_of_week} ({start_time} - {end_time}) in Room {room or 'N/A'}."
+            return f"Success: Scheduled {subject} for {class_name}-{section} on {day_of_week} (Period {period_number})."
 
         elif name == "get_teacher_timetable":
             slots = db.exec(
                 select(Timetable)
                 .where(Timetable.teacher_id == current_user.id)
-                .order_by(Timetable.day_of_week, Timetable.start_time)
+                .order_by(Timetable.day_of_week, Timetable.period_number)
             ).all()
             if not slots:
                 return "Your timetable is currently empty."
             res = [f"Weekly Schedule for {current_user.name}:"]
             for s in slots:
                 res.append(
-                    f"- {s.day_of_week}: {s.subject} ({s.class_}-{s.section}) at {s.start_time}-{s.end_time} in Room {s.room or 'N/A'}"
+                    f"- {s.day_of_week}: {s.subject} ({s.class_}-{s.section}) during Period {s.period_number}"
                 )
             return "\n".join(res)
 

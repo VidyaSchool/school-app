@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date as py_date
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
@@ -333,24 +333,23 @@ class TeacherAbsence(SQLModel, table=True):
 class SubstitutionRecord(SQLModel, table=True):
     __tablename__ = "substitution_record"
     id: str = Field(primary_key=True)
-    date: str = Field(index=True)  # YYYY-MM-DD
+    date: py_date = Field(index=True)
     absence_id: Optional[str] = Field(default=None, alias="absence_id", foreign_key="teacher_absence.id", index=True)
     timetable_id: Optional[str] = Field(default=None, alias="timetable_id", foreign_key="timetable.id", index=True)
-    period_name: str = Field(default="Period 1")
-    start_time: str = Field(alias="start_time")
-    end_time: str = Field(alias="end_time")
+    period_number: int = Field(default=0, alias="period_number")
     class_: str = Field(alias="class", sa_column_kwargs={"name": "class"})
     section: str
-    subject: str
+    subject: str = Field(default="")
     room: Optional[str] = Field(default=None)
     original_teacher_id: str = Field(alias="original_teacher_id", foreign_key="user.id", index=True)
     substitute_teacher_id: Optional[str] = Field(default=None, alias="substitute_teacher_id", foreign_key="user.id", index=True)
-    status: str = Field(default="assigned")  # 'assigned', 'activity_fallback', 'unassigned', 'manual_override'
+    status: str = Field(default="AUTO_ASSIGNED")  # 'AUTO_ASSIGNED', 'MANUAL_OVERRIDE', 'MERGED', 'UNASSIGNED', etc.
     is_activity_fallback: bool = Field(default=False)
     activity_name: Optional[str] = Field(default=None)
     suitability_score: Optional[float] = Field(default=None)
     score_breakdown: Optional[str] = Field(default=None)  # JSON string
     notes: Optional[str] = Field(default=None)
+    merged_with_timetable_id: Optional[str] = Field(default=None, alias="merged_with_timetable_id", foreign_key="timetable.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

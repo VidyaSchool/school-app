@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from "react"
+import Link from "next/link"
 import { 
   Users, 
   Search, 
@@ -594,7 +595,17 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
           </TabsList>
 
           {activeTab === "absent-teachers" && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link href={`/timetable/substitutions?date=${selectedDate || todayStr}`}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 h-9 text-xs font-semibold rounded-lg cursor-pointer"
+                >
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  Substitution Matrix
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 size="sm"
@@ -604,16 +615,14 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
                 <Sliders className="h-3.5 w-3.5 text-muted-foreground" />
                 Scoring Rules
               </Button>
-              <Button 
-                onClick={() => {
-                  setAbsenceDate(selectedDate || todayStr)
-                  setIsMarkModalOpen(true)
-                }} 
-                className="gap-2 h-9 text-xs font-semibold rounded-lg cursor-pointer shrink-0"
-              >
-                <Plus className="h-4 w-4" />
-                Mark Teacher Absent
-              </Button>
+              <Link href="/timetable/absences">
+                <Button 
+                  className="gap-2 h-9 text-xs font-semibold rounded-lg cursor-pointer shrink-0 bg-primary text-primary-foreground shadow-2xs"
+                >
+                  <Plus className="h-4 w-4" />
+                  Mark Teacher Absences
+                </Button>
+              </Link>
             </div>
           )}
         </div>
