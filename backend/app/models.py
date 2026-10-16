@@ -1,4 +1,4 @@
-from datetime import datetime, date as py_date
+from datetime import datetime, date, date as py_date
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
