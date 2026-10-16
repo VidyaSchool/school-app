@@ -19,6 +19,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
 
 interface SubjectMark {
   score?: number
@@ -93,7 +94,7 @@ function getTermOrderWeight(term: TermMarks, fallbackIdx: number): number {
   return 100 + fallbackIdx
 }
 
-export function AcademicPerformanceChart() {
+export function AcademicPerformanceChart({ className }: { className?: string } = {}) {
   const { data: rawData, error: fetchError, isLoading: loading } = useSWRFetch<any>("/api/backend/api/student/marks")
 
   const chartData = React.useMemo<ChartDataPoint[]>(() => {
@@ -159,7 +160,7 @@ export function AcademicPerformanceChart() {
 
   if (loading) {
     return (
-      <div className="px-4 lg:px-6 py-1.5">
+      <div className={cn("w-full py-1.5", className)}>
         <Card className="@container/card">
           <CardHeader>
             <CardTitle>Academic Performance</CardTitle>
@@ -178,7 +179,7 @@ export function AcademicPerformanceChart() {
 
   if (error || chartData.length === 0) {
     return (
-      <div className="px-4 lg:px-6 py-1.5">
+      <div className={cn("w-full py-1.5", className)}>
         <Card className="@container/card">
           <CardHeader>
             <CardTitle>Academic Performance</CardTitle>
@@ -200,7 +201,7 @@ export function AcademicPerformanceChart() {
   }
 
   return (
-    <div className="px-4 lg:px-6 py-1.5">
+    <div className={cn("w-full py-1.5", className)}>
       <Card className="@container/card">
         <CardHeader>
           <CardTitle>Academic Performance</CardTitle>

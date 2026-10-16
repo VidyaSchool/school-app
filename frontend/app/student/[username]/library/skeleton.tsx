@@ -2,15 +2,16 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function StudentLibrarySkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background">
+    <div className="page-container py-6 min-h-screen bg-background">
+      <div className="page-content">
       {/* Page Title & Desc */}
-      <div className="flex flex-col gap-1.5 px-6 lg:px-8">
+      <div className="flex flex-col gap-1.5">
         <Skeleton className="h-9 w-48 rounded-lg" />
         <Skeleton className="h-4 w-full max-w-xl rounded-md" />
       </div>
 
       {/* Metrics Summary Panels */}
-      <div className="grid gap-4 md:grid-cols-3 px-6 lg:px-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
@@ -27,7 +28,7 @@ export default function StudentLibrarySkeleton() {
       </div>
 
       {/* Book List Operations */}
-      <div className="px-6 lg:px-8 space-y-4">
+      <div className="space-y-4">
         {/* Controls Layout */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <Skeleton className="h-9.5 w-full sm:w-80 rounded-lg" />
@@ -68,6 +69,7 @@ export default function StudentLibrarySkeleton() {
             ))}
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

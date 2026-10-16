@@ -161,7 +161,8 @@ export default function SubjectsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -397,6 +398,7 @@ export default function SubjectsPage() {
           </Card>
         </div>
         
+      </div>
       </div>
     </div>
   )

@@ -23,7 +23,7 @@ interface Complaint {
   senderRole: string
 }
 
-export function TeacherComplaintsWidget() {
+export function TeacherComplaintsWidget({ className }: { className?: string } = {}) {
   const { data: fetchedComplaints, isLoading: swrLoading, mutate } = useSWRFetch<Complaint[]>("/api/complaints?role=teacher")
   const [localComplaints, setLocalComplaints] = React.useState<Complaint[]>([])
   const [resolving, setResolving] = React.useState<string | null>(null)
@@ -103,7 +103,7 @@ export function TeacherComplaintsWidget() {
   const pendingCount = complaints.filter(c => c.status === "pending").length
 
   return (
-    <section className="mx-4 lg:mx-6 rounded-2xl bg-zinc-100 dark:bg-[#121212] overflow-hidden">
+    <section className={cn("rounded-2xl bg-zinc-100 dark:bg-[#121212] overflow-hidden w-full", className)}>
       <div className="p-5 pb-4">
 
         {/* ── Header ── */}

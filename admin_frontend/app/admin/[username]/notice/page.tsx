@@ -168,9 +168,10 @@ export default function AdminNoticePage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
             <Megaphone className="h-8 w-8 text-primary" />
@@ -182,7 +183,7 @@ export default function AdminNoticePage() {
         </div>
       </div>
 
-      <div className="px-6 lg:px-8">
+      <div>
         <Tabs defaultValue="bulletins" className="w-full">
           <TabsList className="grid w-full max-w-[400px] grid-cols-2 mb-6">
             <TabsTrigger value="bulletins">Bulletins</TabsTrigger>
@@ -503,6 +504,7 @@ export default function AdminNoticePage() {
             </div>
           </TabsContent>
         </Tabs>
+      </div>
       </div>
     </div>
   )

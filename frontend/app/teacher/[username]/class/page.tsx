@@ -106,9 +106,10 @@ export default function MyClassPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans relative">
+    <div className="page-container py-6 min-h-screen bg-background font-sans relative">
+      <div className="page-content">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
             <Users className="h-8 w-8 text-primary" />
@@ -121,7 +122,7 @@ export default function MyClassPage() {
       </div>
 
       {/* Roster Controls */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
           <Input 
@@ -169,8 +170,8 @@ export default function MyClassPage() {
       </div>
 
       {/* Roster Table */}
-      <div className="px-6 lg:px-8">
-        <div className="rounded-xl border border-border bg-card/30 overflow-hidden shadow-sm">
+      <div>
+        <div className="rounded-xl border border-border bg-card/30 overflow-x-auto shadow-sm">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -261,6 +262,7 @@ export default function MyClassPage() {
             </TableBody>
           </Table>
         </div>
+      </div>
       </div>
     </div>
   )

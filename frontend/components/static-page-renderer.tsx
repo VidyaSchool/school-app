@@ -1113,7 +1113,7 @@ export function StaticPageRenderer({
   }
 
   const hasTable = Boolean(editorBlocks?.some((b) => b.type === "table"))
-  const defaultContainerWidth = hasTable ? "max-w-6xl" : "max-w-4xl"
+  const defaultContainerWidth = "max-w-[1380px]"
 
   const mainArticleContent = (
     <>
@@ -1172,7 +1172,7 @@ export function StaticPageRenderer({
       <Header />
 
       {shouldShowSideGallery ? (
-        <main className="flex-1 mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <main className="flex-1 mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="flex justify-center items-start gap-6 2xl:gap-10">
             {/* Left Side Gallery Column */}
             <SideGalleryColumn

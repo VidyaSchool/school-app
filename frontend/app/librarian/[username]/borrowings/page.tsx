@@ -341,9 +341,10 @@ export default function LibrarianBorrowingsPage() {
   const returnedCount = borrowings.filter((b) => b.status === "returned").length
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
             <GitPullRequest className="h-8 w-8 text-primary" />
@@ -375,7 +376,7 @@ export default function LibrarianBorrowingsPage() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid gap-4 md:grid-cols-3 px-6 lg:px-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-card/50 p-6 flex items-center justify-between shadow-sm">
           <div className="space-y-1">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active Loans</p>
@@ -411,7 +412,7 @@ export default function LibrarianBorrowingsPage() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="relative max-w-sm w-full">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
           <Input 
@@ -437,8 +438,8 @@ export default function LibrarianBorrowingsPage() {
       </div>
 
       {/* Table Section */}
-      <div className="px-6 lg:px-8">
-        <div className="rounded-xl border border-border bg-card/30 overflow-hidden shadow-sm">
+      <div>
+        <div className="rounded-xl border border-border bg-card/30 overflow-x-auto shadow-sm">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -577,7 +578,7 @@ export default function LibrarianBorrowingsPage() {
               exit={{ scale: 0.96, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-md w-full rounded-xl border border-border bg-card p-6 shadow-2xl space-y-5"
+              className="relative max-w-md w-full rounded-xl border border-border bg-card p-6 shadow-2xl space-y-5 max-h-[min(90vh,calc(100%-2rem))] overflow-y-auto"
             >
               {/* Modal Header */}
               <div className="flex items-start justify-between">
@@ -886,6 +887,7 @@ export default function LibrarianBorrowingsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   )
 }

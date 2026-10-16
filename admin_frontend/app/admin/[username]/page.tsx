@@ -75,25 +75,27 @@ export default async function AdminDashboardPage({ params }: PageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 bg-background min-h-screen font-sans">
-      <div className="px-4 lg:px-6">
-        <h2 className="text-lg font-semibold mb-2">Welcome, {currentUser.name}!</h2>
-        <p className="text-sm text-muted-foreground">Role: {currentUser.role}</p>
+    <div className="page-container py-4 md:py-6 bg-background min-h-screen font-sans">
+      <div className="page-content">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1">Welcome, {currentUser.name}!</h2>
+          <p className="text-sm text-muted-foreground">Role: {currentUser.role}</p>
+        </div>
+        <div className="w-full">
+          <ChartAreaInteractive 
+            title="School Academic Performance"
+            descriptionLine1="Class averages compared to overall school average"
+            descriptionLine2={schoolAverage > 0 ? `Overall School Average: ${schoolAverage}%` : "No exam data available yet"}
+            data={performanceData}
+            config={performanceChartConfig}
+            xAxisKey="class"
+            dataKey1="classAverage"
+            dataKey2="schoolAverage"
+            hideTimeRangeToggle={true}
+          />
+        </div>
+        <ComplaintsOutlineTable />
       </div>
-      <div className="px-4 lg:px-6">
-        <ChartAreaInteractive 
-          title="School Academic Performance"
-          descriptionLine1="Class averages compared to overall school average"
-          descriptionLine2={schoolAverage > 0 ? `Overall School Average: ${schoolAverage}%` : "No exam data available yet"}
-          data={performanceData}
-          config={performanceChartConfig}
-          xAxisKey="class"
-          dataKey1="classAverage"
-          dataKey2="schoolAverage"
-          hideTimeRangeToggle={true}
-        />
-      </div>
-      <ComplaintsOutlineTable />
     </div>
   )
 }

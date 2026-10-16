@@ -27,7 +27,7 @@ const DEFAULT_TASKS = [
   { id: "4", label: "Prepare for Spanish vocabulary quiz", completed: false },
 ]
 
-export function StudentWidgets() {
+export function StudentWidgets({ className }: { className?: string } = {}) {
   const [tasks, setTasks] = React.useState<Array<{ id: string; label: string; completed: boolean }>>(DEFAULT_TASKS)
   const [scratchText, setScratchText] = React.useState("")
   const [isLoaded, setIsLoaded] = React.useState(false)
@@ -105,7 +105,7 @@ export function StudentWidgets() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 lg:px-6">
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4 w-full", className)}>
       {/* Tasks Card */}
       <div className="rounded-2xl bg-zinc-100 dark:bg-[#121212] p-5 flex flex-col min-h-[300px]">
         <div className="flex items-center justify-between mb-4">

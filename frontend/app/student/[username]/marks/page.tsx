@@ -364,10 +364,11 @@ export default function StudentMarksPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-3xl font-medium tracking-tight text-foreground">
             Academic Grades
@@ -404,7 +405,7 @@ export default function StudentMarksPage() {
       </div>
 
       {/* KPI Indicators */}
-      <div className="grid gap-4 md:grid-cols-4 px-6 lg:px-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         
         {/* GPA */}
         <div className="rounded-xl border border-border bg-card/50 p-6 flex items-center justify-between shadow-sm">
@@ -459,7 +460,7 @@ export default function StudentMarksPage() {
       </div>
 
       {/* Main layout container (Grid split: Chart + Detail) */}
-      <div className="grid gap-6 lg:grid-cols-3 px-6 lg:px-8">
+      <div className="grid gap-6 lg:grid-cols-3">
         
         {/* Chart Column */}
         <div className="lg:col-span-2 rounded-xl border border-border bg-card/30 p-6 flex flex-col gap-4 shadow-xs">
@@ -678,13 +679,13 @@ export default function StudentMarksPage() {
       </div>
 
       {/* Subject Wise Table */}
-      <div className="px-6 lg:px-8 space-y-4">
+      <div className="space-y-4">
         <div className="flex flex-col gap-1">
           <h3 className="text-base font-medium text-foreground">Subject Wise Marksheet</h3>
           <p className="text-xs text-muted-foreground font-normal">Select a row to highlight breakdown graphs in the panel above</p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card/30 overflow-hidden shadow-sm">
+        <div className="rounded-xl border border-border bg-card/30 overflow-x-auto shadow-sm">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -766,6 +767,7 @@ export default function StudentMarksPage() {
         </div>
       </div>
 
+      </div>
     </div>
   )
 }

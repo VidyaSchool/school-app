@@ -94,7 +94,8 @@ export default function StudentSubjectDetailPage() {
   const { details, exams, examScores } = studentDetails
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header with back navigation */}
       <div className="flex items-center gap-3">
@@ -145,7 +146,7 @@ export default function StudentSubjectDetailPage() {
       </Card>
 
       {/* Subject details card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {exams && exams.length > 0 ? (
           exams.map((exam: any) => {
             const scoreObj = examScores?.[exam.id]
@@ -184,6 +185,7 @@ export default function StudentSubjectDetailPage() {
             No exams have been created for this class and section.
           </div>
         )}
+      </div>
       </div>
     </div>
   )

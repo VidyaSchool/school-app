@@ -267,7 +267,8 @@ export default function SubjectClassStudentsPage() {
   }, [exams])
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -336,7 +337,7 @@ export default function SubjectClassStudentsPage() {
                 <Loader2Icon className="h-6 w-6 animate-spin text-primary" />
               </div>
             ) : (
-              <div className="rounded-lg border">
+              <div className="rounded-lg border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -482,7 +483,7 @@ export default function SubjectClassStudentsPage() {
                   <Loader2Icon className="h-6 w-6 animate-spin text-primary" />
                 </div>
               ) : (
-                <div className="rounded-lg border">
+                <div className="rounded-lg border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -536,6 +537,7 @@ export default function SubjectClassStudentsPage() {
           </TabsContent>
         </div>
       </Tabs>
+      </div>
     </div>
   )
 }

@@ -63,7 +63,8 @@ export default function AdminsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen">
+    <div className="page-container py-6 min-h-screen bg-background">
+      <div className="page-content">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button 
@@ -100,7 +101,7 @@ export default function AdminsPage() {
         </CardHeader>
         <CardContent>
           {admins.length > 0 ? (
-            <div className="rounded-lg border">
+            <div className="rounded-lg border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -150,6 +151,7 @@ export default function AdminsPage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

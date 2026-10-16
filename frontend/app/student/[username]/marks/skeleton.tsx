@@ -2,9 +2,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function StudentMarksSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <Skeleton className="h-9 w-56 rounded-lg" />
           <Skeleton className="h-4 w-full max-w-xl rounded-md" />
@@ -18,7 +19,7 @@ export default function StudentMarksSkeleton() {
       </div>
 
       {/* KPI Indicators */}
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 px-6 lg:px-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
@@ -35,7 +36,7 @@ export default function StudentMarksSkeleton() {
       </div>
 
       {/* Main layout container (Grid split: Chart + Detail) */}
-      <div className="grid gap-6 lg:grid-cols-3 px-6 lg:px-8">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Chart Column */}
         <div className="lg:col-span-2 rounded-xl border border-border bg-card/30 p-6 flex flex-col gap-4 shadow-xs">
           <div className="flex justify-between items-start">
@@ -94,7 +95,7 @@ export default function StudentMarksSkeleton() {
       </div>
 
       {/* Subject cards preview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-6 lg:px-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
@@ -114,6 +115,7 @@ export default function StudentMarksSkeleton() {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   )

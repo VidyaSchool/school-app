@@ -2,15 +2,16 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function LibrarianDashboardLoading() {
   return (
-    <div className="flex flex-col gap-6 py-6">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
-      <div className="px-6 lg:px-8 space-y-2">
+      <div className="space-y-2">
         <Skeleton className="h-9 w-64 rounded-lg" />
         <Skeleton className="h-4 w-80 rounded-md" />
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 px-6 lg:px-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="rounded-xl border border-border bg-card/45 p-6 flex flex-col gap-4">
             <div className="flex items-start justify-between">
@@ -29,7 +30,7 @@ export default function LibrarianDashboardLoading() {
       </div>
 
       {/* Content Grid */}
-      <div className="grid gap-6 md:grid-cols-2 px-6 lg:px-8">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <div className="rounded-xl border border-border bg-card/25 p-6 space-y-4">
           <Skeleton className="h-5 w-48 rounded" />
           <div className="space-y-3">
@@ -52,6 +53,7 @@ export default function LibrarianDashboardLoading() {
             ))}
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

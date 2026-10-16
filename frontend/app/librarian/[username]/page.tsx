@@ -53,18 +53,19 @@ export default async function LibrarianDashboardPage() {
 
 
   return (
-    <div className="flex flex-col gap-6 py-6 font-sans">
-      <div className="px-6 lg:px-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-          Librarian Dashboard
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Welcome back, {user.name}! Here is a summary of your library operations.
-        </p>
-      </div>
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+            Librarian Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Welcome back, {user.name}! Here is a summary of your library operations.
+          </p>
+        </div>
 
-      {/* Metrics Row */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 px-6 lg:px-8">
+        {/* Metrics Row */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <div key={i} className="rounded-xl border border-border bg-card/45 p-6 flex flex-col justify-between shadow-xs relative overflow-hidden">
             <div className="flex items-start justify-between">
@@ -87,7 +88,7 @@ export default async function LibrarianDashboardPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="grid gap-6 md:grid-cols-2 px-6 lg:px-8">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* Recent Transactions Card */}
         <div className="rounded-xl border border-border bg-card/25 p-6 flex flex-col gap-4">
           <div>
@@ -162,6 +163,7 @@ export default async function LibrarianDashboardPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

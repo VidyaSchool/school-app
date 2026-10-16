@@ -84,7 +84,7 @@ export function SiteHeader({ title, children, actions }: SiteHeaderProps) {
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="relative flex w-full items-center gap-2 px-4 lg:gap-2 lg:px-6">
+      <div className="relative flex w-full items-center gap-2 px-4 sm:px-6 lg:px-8 lg:gap-2">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"

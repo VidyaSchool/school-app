@@ -111,7 +111,8 @@ export default function AdminAccountPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Profile Settings</h1>
@@ -295,6 +296,7 @@ export default function AdminAccountPage() {
             </Card>
           </>
         )}
+      </div>
       </div>
     </div>
   )

@@ -564,7 +564,8 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Tab Navigation Header */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
@@ -620,7 +621,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
         {/* ── Tab 1: All Teachers ── */}
         <TabsContent value="all-teachers" className="space-y-6 mt-0">
           {/* Summary Cards */}
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             <Card className="shadow-xs border-muted/50">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-semibold text-muted-foreground uppercase">
@@ -696,7 +697,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
           </div>
 
           {/* All Teachers Table */}
-          <div className="rounded-xl border border-border bg-card/20 overflow-hidden shadow-xs">
+          <div className="rounded-xl border border-border bg-card/20 overflow-x-auto shadow-xs">
             <Table>
               <TableHeader className="bg-muted/40">
                 <TableRow>
@@ -959,7 +960,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
           </div>
 
           {/* Key Metrics Grid */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="shadow-xs border-muted/50">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">
@@ -1032,7 +1033,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
           {/* ── Sub-view 1: Substitutions Allocation Board ── */}
           {absentSubTab === "board" && (
             <div className="space-y-4">
-              <div className="rounded-xl border border-border bg-card/20 overflow-hidden shadow-xs">
+              <div className="rounded-xl border border-border bg-card/20 overflow-x-auto shadow-xs">
                 <Table>
                   <TableHeader className="bg-muted/40">
                     <TableRow>
@@ -1340,7 +1341,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-card/20 overflow-hidden shadow-xs">
+              <div className="rounded-xl border border-border bg-card/20 overflow-x-auto shadow-xs">
                 <Table>
                   <TableHeader className="bg-muted/40">
                     <TableRow>
@@ -1425,7 +1426,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
           {/* ── Sub-view 3: Faculty Skills & Category Roster ── */}
           {absentSubTab === "roster" && (
             <div className="space-y-4">
-              <div className="rounded-xl border border-border bg-card/20 overflow-hidden shadow-xs">
+              <div className="rounded-xl border border-border bg-card/20 overflow-x-auto shadow-xs">
                 <Table>
                   <TableHeader className="bg-muted/40">
                     <TableRow>
@@ -1896,7 +1897,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
           </DialogContent>
         </Dialog>
       )}
-
+      </div>
     </div>
   )
 }

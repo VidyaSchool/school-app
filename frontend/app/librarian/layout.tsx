@@ -12,7 +12,7 @@ export default function LibrarianLayout({
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--sidebar-width": "calc(var(--spacing) * 64)",
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
@@ -20,8 +20,8 @@ export default function LibrarianLayout({
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
+        <div className="flex flex-1 flex-col min-w-0">
+          <div className="@container/main flex flex-1 flex-col min-w-0 gap-2">
             {children}
           </div>
         </div>

@@ -238,3 +238,20 @@
   contain-intrinsic-size: auto 350px;
 }
 
+/* Shared layout primitives for consistent desktop scaling */
+.page-container {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 2vw, 2rem);
+  min-width: 0;
+}
+
+.page-content {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+

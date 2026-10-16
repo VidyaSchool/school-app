@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { cn } from "@/lib/utils"
 
 interface ClassInfo {
   class: string | null
@@ -15,11 +16,11 @@ interface ClassInfo {
   classTeacher: string | null
 }
 
-export function ClassInfoWidget() {
+export function ClassInfoWidget({ className }: { className?: string } = {}) {
   const { data: info } = useSWRFetch<ClassInfo>("/api/student/class-info")
 
   return (
-    <div className="mx-4 lg:mx-6">
+    <div className={cn("w-full", className)}>
       <Card className="@container/card">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="font-medium text-base text-foreground flex items-center gap-2">

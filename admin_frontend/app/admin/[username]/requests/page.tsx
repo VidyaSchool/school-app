@@ -177,7 +177,8 @@ export default function AdminRequestsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -223,7 +224,7 @@ export default function AdminRequestsPage() {
             </CardHeader>
             <CardContent>
               {teacherRequests.filter(r => r.status === "pending").length > 0 ? (
-                <div className="rounded-lg border">
+                <div className="rounded-lg border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -312,7 +313,7 @@ export default function AdminRequestsPage() {
             </CardHeader>
             <CardContent>
               {subjectRequests.length > 0 ? (
-                <div className="rounded-lg border">
+                <div className="rounded-lg border overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -394,7 +395,7 @@ export default function AdminRequestsPage() {
           </Card>
         </TabsContent>
       </Tabs>
-      
+      </div>
     </div>
   )
 }

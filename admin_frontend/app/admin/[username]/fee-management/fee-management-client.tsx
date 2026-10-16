@@ -247,7 +247,8 @@ export function FeeManagementClient({ initialInstallments, adminUsername }: Clie
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -273,7 +274,7 @@ export function FeeManagementClient({ initialInstallments, adminUsername }: Clie
       </div>
 
       {/* Metrics Summary Row */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-xs border-muted/50 bg-card/40 backdrop-blur-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -618,7 +619,7 @@ export function FeeManagementClient({ initialInstallments, adminUsername }: Clie
           </div>
         </CardContent>
       </Card>
-
+      </div>
     </div>
   )
 }

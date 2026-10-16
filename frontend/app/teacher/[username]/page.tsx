@@ -138,31 +138,33 @@ export default async function TeacherDashboardPage({ params }: TeacherDashboardP
     : "/api/teacher/timetable/today"
 
   return (
-    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-      <div className="px-4 lg:px-6">
-        <h2 className="text-lg font-medium mb-2">Teacher Dashboard - Welcome, {displayName}!</h2>
-        <p className="text-sm text-muted-foreground font-normal">Role: {displayRole}</p>
-      </div>
-      <SectionCards card1={card1} card2={card2} card3={card3} card4={card4} />
-      <StudentCalendar apiUrl={timetableUrl} title="Today's Classes" />
-      <TeacherComplaintsWidget />
-      <div className="px-4 lg:px-6">
-        <ChartAreaInteractive
-          title="Class Average Performance"
-          descriptionLine1={
-            hasClassData && hasStudents
-              ? `Class ${perf.class} – Section ${perf.section ?? "—"} · ${perf.totalStudents} students`
-              : "Average score (%) across all exams"
-          }
-          descriptionLine2={chartData.length > 0 ? "Avg score by exam" : "Not available"}
-          data={chartData}
-          config={chartConfig}
-          xAxisKey="date"
-          dataKey1="average"
-          dataKey2={chartData.length > 0 && chartData[0]?.highest !== undefined ? "highest" : undefined}
-          hideTimeRangeToggle={true}
-          emptyMessage={perf?.message || "Class performance data is not available."}
-        />
+    <div className="page-container py-4 md:py-6">
+      <div className="page-content">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1">Teacher Dashboard - Welcome, {displayName}!</h2>
+          <p className="text-sm text-muted-foreground font-normal">Role: {displayRole}</p>
+        </div>
+        <SectionCards card1={card1} card2={card2} card3={card3} card4={card4} />
+        <StudentCalendar apiUrl={timetableUrl} title="Today's Classes" />
+        <TeacherComplaintsWidget />
+        <div className="w-full">
+          <ChartAreaInteractive
+            title="Class Average Performance"
+            descriptionLine1={
+              hasClassData && hasStudents
+                ? `Class ${perf.class} – Section ${perf.section ?? "—"} · ${perf.totalStudents} students`
+                : "Average score (%) across all exams"
+            }
+            descriptionLine2={chartData.length > 0 ? "Avg score by exam" : "Not available"}
+            data={chartData}
+            config={chartConfig}
+            xAxisKey="date"
+            dataKey1="average"
+            dataKey2={chartData.length > 0 && chartData[0]?.highest !== undefined ? "highest" : undefined}
+            hideTimeRangeToggle={true}
+            emptyMessage={perf?.message || "Class performance data is not available."}
+          />
+        </div>
       </div>
     </div>
   )

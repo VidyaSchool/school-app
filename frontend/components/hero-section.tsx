@@ -4,7 +4,7 @@ import Link from "next/link"
 import dynamic from "next/dynamic"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ChevronLeft, ChevronRight, Play, Pause } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { BlurImage } from "@/components/blur-image"
 import { cn } from "@/lib/utils"
@@ -243,35 +243,8 @@ export function HeroSection() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
   const [displayIndex, setDisplayIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(true)
-  const [isPlaying, setIsPlaying] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
   const [, setIsAllLoaded] = useState(false)
-
-  // Restore user autoplay preference from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("antigravity_hero_slider_playing")
-      if (saved !== null) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsPlaying(saved === "true")
-      }
-    } catch {
-      // localStorage may be unavailable or restricted
-    }
-  }, [])
-
-  // Toggle play/pause and persist user preference to localStorage
-  const togglePlayPause = useCallback(() => {
-    setIsPlaying((prev) => {
-      const next = !prev
-      try {
-        localStorage.setItem("antigravity_hero_slider_playing", String(next))
-      } catch {
-        // ignore errors if storage quota exceeded or disabled
-      }
-      return next
-    })
-  }, [])
 
   // Touch swipe tracking
   const touchStartRef = useRef<number | null>(null)
@@ -381,13 +354,6 @@ export function HeroSection() {
     })
   }, [slides.length])
 
-  // Jump to specific slide
-  const goToSlide = useCallback((idx: number) => {
-    setIsTransitioning(true)
-    setDisplayIndex(idx)
-    setCurrentSlideIndex(idx)
-  }, [])
-
   // Handle seamless infinite right-to-left loop on track transition end
   const handleTransitionEnd = () => {
     if (displayIndex >= slides.length) {
@@ -408,16 +374,16 @@ export function HeroSection() {
     }
   }, [isTransitioning])
 
-  // Right-to-left continuous autoplay loop
+  // Right-to-left continuous autoplay loop (pauses when user hovers over hero section)
   useEffect(() => {
-    if (slides.length <= 1 || !isPlaying || isHovered) return
+    if (slides.length <= 1 || isHovered) return
 
     const interval = setInterval(() => {
       goToNext()
     }, 6000)
 
     return () => clearInterval(interval)
-  }, [slides.length, isPlaying, isHovered, goToNext])
+  }, [slides.length, isHovered, goToNext])
 
   // Keyboard arrow navigation
   useEffect(() => {
@@ -465,13 +431,14 @@ export function HeroSection() {
 
       {/* Full Width Hero Carousel Track Container */}
       <div className="relative z-10 mx-auto max-w-[1480px] w-full px-2 sm:px-4 md:px-6 lg:px-8 h-full flex flex-col justify-center select-none">
-        {/* Carousel Viewport: strictly overflow-hidden with zero horizontal padding so adjacent slides are 100% clipped */}
-        <div
-          className="relative w-full overflow-hidden flex items-center"
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
+        <div className="relative w-full flex items-center">
+          {/* Carousel Viewport: strictly overflow-hidden with zero horizontal padding so adjacent slides are 100% clipped */}
+          <div
+            className="relative w-full overflow-hidden flex items-center"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
           {/* Sliding Track: moves right-to-left across all slides */}
           <div
             className="flex w-full h-full items-center"
@@ -494,7 +461,7 @@ export function HeroSection() {
                 {/* ── Slide 0: The original hero section exactly as it was ── */}
                 {isSlide0 ? (
                   <div className="grid w-full h-full grid-cols-1 items-center gap-8 py-6 sm:gap-10 sm:py-12 lg:grid-cols-12 lg:gap-12 lg:py-16 max-w-[1380px] mx-auto pb-4 lg:pb-16">
-                    <div className="order-2 flex flex-col justify-center lg:order-1 lg:col-span-6">
+                    <div className="order-2 flex flex-col justify-center lg:order-1 lg:col-span-6 px-4 sm:px-6 lg:px-0 lg:pl-10 xl:pl-12">
                       <div className="space-y-3 text-center sm:space-y-5 lg:space-y-6 lg:text-left">
                         <h1 className="text-[clamp(1.75rem,5vw+0.75rem,4.5rem)] tracking-tight text-foreground leading-[1.08] text-balance">
                           Empowering Minds, Shaping Futures
@@ -523,7 +490,7 @@ export function HeroSection() {
                 ) : isClone0 ? (
                   /* Clone of slide 0 at end of track for seamless right-to-left loop */
                   <div className="grid w-full h-full grid-cols-1 items-center gap-8 py-6 sm:gap-10 sm:py-12 lg:grid-cols-12 lg:gap-12 lg:py-16 max-w-[1380px] mx-auto pb-4 lg:pb-16">
-                    <div className="order-2 flex flex-col justify-center lg:order-1 lg:col-span-6">
+                    <div className="order-2 flex flex-col justify-center lg:order-1 lg:col-span-6 px-4 sm:px-6 lg:px-0 lg:pl-10 xl:pl-12">
                       <div className="space-y-3 text-center sm:space-y-5 lg:space-y-6 lg:text-left">
                         <h1 className="text-[clamp(1.75rem,5vw+0.75rem,4.5rem)] tracking-tight text-foreground leading-[1.08] text-balance">
                           Empowering Minds, Shaping Futures
@@ -562,7 +529,7 @@ export function HeroSection() {
                   <div className="w-full h-full flex items-center justify-center">
                     {/* Mobile layout (< lg): Matches hero main slider layout exactly */}
                     <div className="grid lg:hidden w-full h-full grid-cols-1 items-center gap-8 py-6 sm:gap-10 sm:py-12 max-w-[1380px] mx-auto pb-4">
-                      <div className="order-2 flex flex-col justify-center">
+                      <div className="order-2 flex flex-col justify-center px-4 sm:px-6 lg:px-0">
                         <div className="space-y-3 text-center sm:space-y-5">
                           <h2 className="text-[clamp(1.75rem,5vw+0.75rem,4.5rem)] tracking-tight text-foreground leading-[1.08] text-balance">
                             {slide.title}
@@ -650,188 +617,54 @@ export function HeroSection() {
         </div>
       </div>
 
-        {/* Mobile Navigation Controls: Positioned in normal flow BELOW the track - 100% CANNOT overlap text or buttons */}
-        {slides.length > 1 && (
-          <div className="w-full flex justify-center items-center pt-3 pb-2 z-20 lg:hidden shrink-0">
-            <div
-              className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-card/95 dark:bg-card/90 border border-border select-none text-foreground shadow-md"
-              aria-label="Slider navigation"
-            >
-              {/* Prev Slide */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={goToPrev}
-                className="h-8 w-8 rounded-full text-foreground hover:bg-muted cursor-pointer"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              {/* Dot Indicators */}
-              <div className="flex items-center gap-1.5 px-1">
-                {slides.map((s, dotIdx) => {
-                  const isActive = currentSlideIndex === dotIdx
-                  return (
-                    <button
-                      key={s.id || dotIdx}
-                      onClick={() => goToSlide(dotIdx)}
-                      className={cn(
-                        "h-2 rounded-full transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer",
-                        isActive
-                          ? "w-5 bg-primary"
-                          : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/60"
-                      )}
-                      aria-label={`Go to slide ${dotIdx + 1}: ${s.title}`}
-                      aria-current={isActive ? "true" : undefined}
-                    />
-                  )
-                })}
-              </div>
-
-              {/* Next Slide */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={goToNext}
-                className="h-8 w-8 rounded-full text-foreground hover:bg-muted cursor-pointer"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-
-              {/* Play/Pause Toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={togglePlayPause}
-                className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted ml-0.5 cursor-pointer"
-                aria-label={isPlaying ? "Pause slider" : "Play slider"}
-              >
-                {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              </Button>
-
-              {/* Slide Index Counter */}
-              <span className="text-[11px] text-muted-foreground font-mono pl-1.5 border-l border-border">
-                {String(currentSlideIndex + 1).padStart(2, "0")}/{String(slides.length).padStart(2, "0")}
-              </span>
-            </div>
-          </div>
-        )}
-
-      {/* Desktop Navigation Controls: Stationed bottom-left inside image on lg screens */}
-      {slides.length > 1 && (
-        <div className="hidden lg:flex absolute inset-0 pointer-events-none items-center justify-center z-20 px-2 sm:px-4 md:px-6 lg:px-8">
-          <div className="relative w-full h-[540px] sm:h-[610px] lg:h-[78dvh] max-h-[730px]">
-            <div
+          {/* Previous Slide Button (Left of slide) */}
+          {slides.length > 1 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goToPrev}
               className={cn(
-                "absolute bottom-8 sm:bottom-10 left-8 sm:left-10 pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full backdrop-blur-xl select-none shadow-xl transition-all duration-300",
+                "absolute left-2 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-30",
+                "size-10 sm:size-12 rounded-full cursor-pointer",
+                "backdrop-blur-md shadow-lg transition-all duration-200",
+                "hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 currentSlideIndex === 0
-                  ? "bg-background/90 dark:bg-black/60 border border-border/80 dark:border-white/20 text-foreground dark:text-white"
-                  : "bg-black/60 border border-white/20 text-white"
+                  ? "bg-background/85 hover:bg-background text-foreground border border-border/80 shadow-black/5 dark:shadow-black/20"
+                  : "bg-background/85 hover:bg-background text-foreground border border-border/80 lg:bg-black/50 lg:hover:bg-black/70 lg:text-white lg:border-white/25 shadow-black/20"
               )}
-              aria-label="Slider navigation"
+              aria-label="Previous slide"
             >
-              {/* Prev Slide */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={goToPrev}
-                className={cn(
-                  "h-7 w-7 rounded-full cursor-pointer",
-                  currentSlideIndex === 0
-                    ? "text-foreground dark:text-white hover:bg-muted dark:hover:bg-white/20"
-                    : "text-white hover:bg-white/20"
-                )}
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+              <ChevronLeft className="size-5 sm:size-6" />
+            </Button>
+          )}
 
-              {/* Dot Indicators */}
-              <div className="flex items-center gap-1.5 px-1">
-                {slides.map((s, dotIdx) => {
-                  const isActive = currentSlideIndex === dotIdx
-                  return (
-                    <button
-                      key={s.id || dotIdx}
-                      onClick={() => goToSlide(dotIdx)}
-                      className={cn(
-                        "h-2 rounded-full transition-all duration-300 outline-none cursor-pointer",
-                        currentSlideIndex === 0
-                          ? cn(
-                              "focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-white",
-                              isActive
-                                ? "w-6 bg-primary dark:bg-white"
-                                : "w-2 bg-muted-foreground/30 dark:bg-white/40 hover:bg-muted-foreground/60 dark:hover:bg-white/70"
-                            )
-                          : cn(
-                              "focus-visible:ring-2 focus-visible:ring-white",
-                              isActive
-                                ? "w-6 bg-white"
-                                : "w-2 bg-white/40 hover:bg-white/70"
-                            )
-                      )}
-                      aria-label={`Go to slide ${dotIdx + 1}: ${s.title}`}
-                      aria-current={isActive ? "true" : undefined}
-                    />
-                  )
-                })}
-              </div>
-
-              {/* Next Slide */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={goToNext}
-                className={cn(
-                  "h-7 w-7 rounded-full cursor-pointer",
-                  currentSlideIndex === 0
-                    ? "text-foreground dark:text-white hover:bg-muted dark:hover:bg-white/20"
-                    : "text-white hover:bg-white/20"
-                )}
-                aria-label="Next slide"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-
-              {/* Play/Pause Toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={togglePlayPause}
-                className={cn(
-                  "h-7 w-7 rounded-full ml-0.5 cursor-pointer",
-                  currentSlideIndex === 0
-                    ? "text-muted-foreground dark:text-white/80 hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-white/20"
-                    : "text-white/80 hover:text-white hover:bg-white/20"
-                )}
-                aria-label={isPlaying ? "Pause slider" : "Play slider"}
-              >
-                {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              </Button>
-
-              {/* Slide Index Counter */}
-              <span
-                className={cn(
-                  "text-[11px] font-mono pl-1 border-l",
-                  currentSlideIndex === 0
-                    ? "text-muted-foreground dark:text-white/80 border-border dark:border-white/20"
-                    : "text-white/80 border-white/20"
-                )}
-              >
-                {String(currentSlideIndex + 1).padStart(2, "0")}/{String(slides.length).padStart(2, "0")}
-              </span>
-            </div>
-          </div>
+          {/* Next Slide Button (Right of slide) */}
+          {slides.length > 1 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goToNext}
+              className={cn(
+                "absolute right-2 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-30",
+                "size-10 sm:size-12 rounded-full cursor-pointer",
+                "backdrop-blur-md shadow-lg transition-all duration-200",
+                "hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                currentSlideIndex === 0
+                  ? "bg-background/85 hover:bg-background text-foreground border border-border/80 shadow-black/5 dark:shadow-black/20"
+                  : "bg-background/85 hover:bg-background text-foreground border border-border/80 lg:bg-black/50 lg:hover:bg-black/70 lg:text-white lg:border-white/25 shadow-black/20"
+              )}
+              aria-label="Next slide"
+            >
+              <ChevronRight className="size-5 sm:size-6" />
+            </Button>
+          )}
         </div>
-      )}
       </div>
 
       {/* Right Side Floating Page Content Scroller (Horizontal Lines) */}
       <nav
         aria-label="Page content navigation"
-        className="fixed right-3 md:right-6 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-end gap-3 px-2.5 py-3 rounded-2xl border border-border/40 bg-background/65 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:border-border/70"
+        className="fixed right-2.5 md:right-4 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-end gap-3 px-2.5 py-3 rounded-2xl border border-border/40 bg-background/65 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:border-border/70"
       >
         {sections.map((sec) => {
           const isActive = activeSection === sec.id

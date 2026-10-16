@@ -2,9 +2,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function StudentNoticeSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <Skeleton className="h-9 w-52 rounded-lg" />
           <Skeleton className="h-4 w-full max-w-xl rounded-md" />
@@ -13,7 +14,7 @@ export default function StudentNoticeSkeleton() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <Skeleton className="h-9.5 w-full sm:w-80 rounded-lg" />
         <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           {[...Array(5)].map((_, i) => (
@@ -23,7 +24,7 @@ export default function StudentNoticeSkeleton() {
       </div>
 
       {/* Notices List */}
-      <div className="grid gap-6 px-6 lg:px-8">
+      <div className="grid gap-6">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
@@ -55,6 +56,7 @@ export default function StudentNoticeSkeleton() {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   )

@@ -124,7 +124,8 @@ export function StudentList({ initialStudents }: { initialStudents: StudentRow[]
   })
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -150,7 +151,7 @@ export function StudentList({ initialStudents }: { initialStudents: StudentRow[]
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card className="shadow-xs border-muted/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-semibold text-muted-foreground uppercase">
@@ -242,7 +243,7 @@ export function StudentList({ initialStudents }: { initialStudents: StudentRow[]
       </div>
 
       {/* Roster Table */}
-      <div className="rounded-xl border border-border bg-card/20 overflow-hidden shadow-xs">
+      <div className="rounded-xl border border-border bg-card/20 overflow-x-auto shadow-xs">
         <Table>
           <TableHeader className="bg-muted/40">
             <TableRow>
@@ -418,7 +419,7 @@ export function StudentList({ initialStudents }: { initialStudents: StudentRow[]
           </Pagination>
         </div>
       )}
-
+      </div>
     </div>
   )
 }

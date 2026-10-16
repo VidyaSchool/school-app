@@ -90,7 +90,8 @@ export default function RequestsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 bg-background min-h-screen font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Header & Back button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -125,7 +126,7 @@ export default function RequestsPage() {
         </CardHeader>
         <CardContent>
           {requests.length > 0 ? (
-            <div className="rounded-lg border">
+            <div className="rounded-lg border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -205,7 +206,7 @@ export default function RequestsPage() {
           )}
         </CardContent>
       </Card>
-      
+      </div>
     </div>
   )
 }

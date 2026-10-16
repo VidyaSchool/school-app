@@ -94,7 +94,8 @@ export default function TeacherComplaintsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-6 lg:px-8 min-h-screen bg-background font-sans w-full">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
@@ -235,6 +236,7 @@ export default function TeacherComplaintsPage() {
             </CardContent>
           </Card>
         )}
+      </div>
       </div>
     </div>
   )

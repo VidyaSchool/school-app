@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface CardData {
   title?: string;
@@ -25,6 +26,7 @@ interface SectionCardsProps {
   card2?: CardData;
   card3?: CardData;
   card4?: CardData;
+  className?: string;
 }
 
 function StatCard({
@@ -77,7 +79,7 @@ function StatCard({
   )
 }
 
-export function SectionCards({ card1, card2, card3, card4 }: SectionCardsProps = {}) {
+export function SectionCards({ card1, card2, card3, card4, className }: SectionCardsProps = {}) {
   // Card 1 values
   const c1Title = card1?.title ?? "Total Revenue"
   const c1Value = card1?.value ?? "$1,250.00"
@@ -111,7 +113,7 @@ export function SectionCards({ card1, card2, card3, card4 }: SectionCardsProps =
   const c4Footer2 = card4 ? card4.footer2 : "Meets growth projections"
 
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 gap-4 w-full *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs dark:*:data-[slot=card]:bg-card", className)}>
       <StatCard
         title={c1Title}
         value={c1Value}

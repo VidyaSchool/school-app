@@ -89,7 +89,7 @@ export function SiteHeader({ title, children, actions, onToggleChatSidebar, isCh
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className={cn(
         "relative flex w-full items-center gap-2",
-        onToggleChatSidebar ? "pl-2 pr-4 lg:pr-6" : "px-4 lg:gap-2 lg:px-6"
+        onToggleChatSidebar ? "pl-2 pr-4 sm:pr-6 lg:pr-8" : "px-4 sm:px-6 lg:px-8 lg:gap-2"
       )}>
         {onToggleChatSidebar ? (
           <Button

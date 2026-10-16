@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useSWRFetch } from "@/hooks/use-swr-fetch"
+import { cn } from "@/lib/utils"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
 import {
   Card,
@@ -57,7 +58,7 @@ function formatTimeAgo(dateStr: string): string {
   return `${d}d ago`
 }
 
-export function StudentNotes() {
+export function StudentNotes({ className }: { className?: string } = {}) {
   const router = useRouter()
   const params = useParams<{ username: string }>()
   const username = params?.username || ""
@@ -156,7 +157,7 @@ export function StudentNotes() {
   }
 
   return (
-    <section className="w-full px-4 lg:px-6 py-1.5">
+    <section className={cn("w-full py-1.5", className)}>
       {/* Section Outer Container */}
       <div className="rounded-2xl border border-border/60 bg-background/50 pt-3.5 px-3.5 sm:pt-4 sm:px-4 pb-0 shadow-xs backdrop-blur-xs transition-all duration-300 overflow-hidden">
         

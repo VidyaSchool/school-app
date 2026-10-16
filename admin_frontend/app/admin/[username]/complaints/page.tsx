@@ -74,9 +74,10 @@ export default function AdminComplaintsPage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
             <AlertTriangle className="h-8 w-8 text-rose-500" />
@@ -99,7 +100,7 @@ export default function AdminComplaintsPage() {
       </div>
 
       {/* Filter and Search */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
           <Input
@@ -126,7 +127,7 @@ export default function AdminComplaintsPage() {
       </div>
 
       {/* Complaints List */}
-      <div className="grid gap-6 px-6 lg:px-8">
+      <div className="grid gap-6">
         {loading ? (
           <div className="py-24 flex flex-col items-center justify-center gap-3">
             <Spinner size="lg" />
@@ -228,6 +229,7 @@ export default function AdminComplaintsPage() {
             No complaints found matching your criteria.
           </div>
         )}
+      </div>
       </div>
     </div>
   )

@@ -111,9 +111,10 @@ export default function SubjectClassRegisterPage({
   const totalPages = Math.ceil(filteredRoster.length / itemsPerPage)
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Back link & Header */}
-      <div className="flex flex-col gap-4 px-6 lg:px-8">
+      <div className="flex flex-col gap-4">
         <Link 
           href="/teacher/subjects" 
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium select-none transition-colors w-fit"
@@ -135,7 +136,7 @@ export default function SubjectClassRegisterPage({
       </div>
 
       {/* Roster Controls */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
           <Input 
@@ -149,8 +150,8 @@ export default function SubjectClassRegisterPage({
       </div>
 
       {/* Student List Table */}
-      <div className="px-6 lg:px-8">
-        <div className="rounded-xl border border-border bg-card/30 overflow-hidden shadow-sm">
+      <div>
+        <div className="rounded-xl border border-border bg-card/30 overflow-x-auto shadow-sm">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -216,7 +217,7 @@ export default function SubjectClassRegisterPage({
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="px-6 lg:px-8 mt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground select-none">
+        <div className="mt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground select-none">
           <div>
             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRoster.length)} of {filteredRoster.length} students
           </div>
@@ -248,7 +249,7 @@ export default function SubjectClassRegisterPage({
           </Pagination>
         </div>
       )}
-
+      </div>
     </div>
   )
 }

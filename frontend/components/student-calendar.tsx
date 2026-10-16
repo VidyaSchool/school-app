@@ -39,11 +39,13 @@ const HOURS = Array.from({ length: TOTAL_HOURS }, (_, i) => {
 interface StudentCalendarProps {
   apiUrl?: string
   title?: string
+  className?: string
 }
 
 export function StudentCalendar({ 
   apiUrl = '/api/student/timetable/today', 
-  title = 'Calendar' 
+  title = 'Calendar',
+  className,
 }: StudentCalendarProps = {}) {
   const [activeTab, setActiveTab] = React.useState<Tab>("Today")
   const [playheadLeft, setPlayheadLeft] = React.useState<number | null>(null)
@@ -81,7 +83,7 @@ export function StudentCalendar({
   const displayEvents = events
 
   return (
-    <section className="mx-4 lg:mx-6 rounded-2xl bg-zinc-100 dark:bg-[#121212] overflow-hidden">
+    <section className={cn("rounded-2xl bg-zinc-100 dark:bg-[#121212] overflow-hidden w-full", className)}>
       <div className="p-5 pb-4">
 
         {/* ── Header ── */}

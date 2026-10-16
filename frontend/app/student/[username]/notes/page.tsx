@@ -221,7 +221,8 @@ export default function StudentNotesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-4 lg:px-8 min-h-screen">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -335,6 +336,7 @@ export default function StudentNotesPage() {
           })}
         </div>
       )}
+      </div>
     </div>
   )
 }

@@ -77,7 +77,8 @@ export default function LibrarianAccountPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 px-4 lg:px-6 font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">My Account</h1>
         {isEditing ? (
@@ -223,6 +224,7 @@ export default function LibrarianAccountPage() {
           </Card>
         </>
       )}
+      </div>
     </div>
   )
 }

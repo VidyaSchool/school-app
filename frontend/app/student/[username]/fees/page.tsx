@@ -331,10 +331,11 @@ export default function StudentFeesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       
       {/* Page Title & Desc */}
-      <div className="flex flex-col gap-1.5 px-6 lg:px-8">
+      <div className="flex flex-col gap-1.5">
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
           Fee Management
         </h1>
@@ -344,14 +345,14 @@ export default function StudentFeesPage() {
       </div>
 
       {error && (
-        <div className="mx-6 lg:mx-8 p-3 text-sm rounded-lg bg-destructive/15 text-destructive font-medium border border-destructive/25 flex items-center gap-2">
+        <div className="p-3 text-sm rounded-lg bg-destructive/15 text-destructive font-medium border border-destructive/25 flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Metrics Summary Panels */}
-      <div className="grid gap-4 md:grid-cols-3 px-6 lg:px-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
             
             {/* Metric 1 */}
             <div className="rounded-xl border border-border bg-card/50 p-6 flex items-center justify-between shadow-sm">
@@ -400,7 +401,7 @@ export default function StudentFeesPage() {
           </div>
 
           {/* Fee Instalments Table */}
-          <div className="px-6 lg:px-8 space-y-4">
+          <div className="space-y-4">
             
             {/* Table Title and Actions bar */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -424,7 +425,7 @@ export default function StudentFeesPage() {
               )}
             </div>
             
-            <div className="rounded-xl border border-border bg-card/30 overflow-hidden shadow-sm">
+            <div className="rounded-xl border border-border bg-card/30 overflow-x-auto shadow-sm">
               <Table>
                 <TableHeader className="bg-muted/50">
                   <TableRow>
@@ -782,6 +783,7 @@ export default function StudentFeesPage() {
         )}
       </AnimatePresence>
 
+      </div>
     </div>
   )
 }

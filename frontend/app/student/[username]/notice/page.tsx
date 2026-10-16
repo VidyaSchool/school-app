@@ -68,9 +68,10 @@ export default function StudentNoticePage() {
   })
 
   return (
-    <div className="flex flex-col gap-6 py-6 min-h-screen bg-background font-sans">
+    <div className="page-container py-6 min-h-screen bg-background font-sans">
+      <div className="page-content">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
             <Megaphone className="h-8 w-8 text-primary" />
@@ -93,7 +94,7 @@ export default function StudentNoticePage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground/75" />
           <Input 
@@ -120,7 +121,7 @@ export default function StudentNoticePage() {
       </div>
 
       {/* Notices List */}
-      <div className="grid gap-6 px-6 lg:px-8">
+      <div className="grid gap-6">
         {filteredNotices.length > 0 ? (
           filteredNotices.map((notice) => (
             <div key={notice.id} className={`rounded-xl border p-6 bg-card/30 flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden ${
@@ -175,6 +176,7 @@ export default function StudentNoticePage() {
             No notices found matching your criteria.
           </div>
         )}
+      </div>
       </div>
     </div>
   )
