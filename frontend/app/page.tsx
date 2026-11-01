@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: 'VidyaSchool | Empowering Minds, Shaping Futures',
+  title: 'VIDYA School | Empowering Minds, Shaping Futures',
   description: 'Welcome to VIDYA School - academic excellence meets holistic development with modern labs, arts programs, and vibrant student community.',
 }
 
@@ -245,8 +245,8 @@ export default function Home() {
                 {/* Left — text content */}
                 <div className="lg:col-span-5 flex flex-col justify-center space-y-5 order-2 lg:order-1">
                   <div>
-                    <p className="text-lg sm:text-xl font-semibold text-foreground leading-snug">Ila Sarin</p>
-                    <p className="text-sm text-muted-foreground mt-0.5">Principal, VidyaSchool · MSc Chemistry · B.Ed</p>
+                    <p className="text-lg sm:text-xl font-semibold text-foreground leading-snug">Ms. Ila Sarin</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">Principal, VIDYA School · MSc Chemistry · B.Ed</p>
                   </div>
                   <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                     A highly recognized educator deeply committed to empowering underprivileged youth through modern, practical education.
@@ -286,7 +286,7 @@ export default function Home() {
                     {/* Principal image — overflows above card responsively */}
                     <BlurImg
                       src="/assets/illustrations/principle.png"
-                      alt="VidyaSchool Principal"
+                      alt="VIDYA School Principal"
                       className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[300px] sm:h-[400px] md:h-[480px] lg:h-[530px] w-auto max-w-none object-contain"
                     />
                   </div>
@@ -382,7 +382,7 @@ export default function Home() {
                       Now on Mobile
                     </h2>
                     <p className="mt-4 text-sm sm:text-base text-muted-foreground leading-relaxed max-w-md">
-                      Access assignments, timetables, fee updates, library resources, and live announcements — all from your pocket. The VidyaSchool app keeps students, parents, and teachers seamlessly connected.
+                      Access assignments, timetables, fee updates, library resources, and live announcements — all from your pocket. The VIDYA School app keeps students, parents, and teachers seamlessly connected.
                     </p>
                   </div>
 

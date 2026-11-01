@@ -174,7 +174,7 @@ export function Header() {
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground dark:text-white px-3.5 py-1.5 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs hover:opacity-90 transition-all"
           >
-            <span className="font-semibold text-sm">VIDYA SCHOOL</span>
+            <span className="font-semibold text-sm">VIDYA School Gurugram</span>
           </Link>
         </div>
 
@@ -203,7 +203,7 @@ export function Header() {
                       Distinguished educational trustees, directorate, and school leadership.
                     </ListItem>
                     <ListItem href="/torch-bearers" title="Torch Bearers">
-                      Meet the visionary mentors and founders guiding VidyaSchool.
+                      Meet the visionary mentors and founders guiding VIDYA School.
                     </ListItem>
                     <ListItem href="/sponsors" title="Sponsors & Partners">
                       Corporate and philanthropic partners empowering our digital classrooms.
@@ -269,7 +269,7 @@ export function Header() {
                     <ListItem href="/p/arts-and-music" title="Arts, Dance & Music">
                       Visual arts studio, classical Indian music, and theater drama academy.
                     </ListItem>
-                    <ListItem href="/p/student-life" title="Student Life at Vidya">
+                    <ListItem href="/p/student-life" title="Student Life at VIDYA">
                       Four house system, hot meals, health care, and student council.
                     </ListItem>
                     <ListItem href="/p/clubs" title="Clubs & Activities">
@@ -412,7 +412,7 @@ export function Header() {
             <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">About</div>
             <div className="grid gap-1">
               <Link href="/p/about-vidyaschool" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                About VidyaSchool
+                About VIDYA School
               </Link>
               <Link href="/p/principals-message" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Principal&apos;s Message
@@ -480,7 +480,7 @@ export function Header() {
                 Arts, Dance &amp; Music
               </Link>
               <Link href="/p/student-life" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
-                Student Life at Vidya
+                Student Life at VIDYA
               </Link>
               <Link href="/p/clubs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Clubs &amp; Activities

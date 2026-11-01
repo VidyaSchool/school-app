@@ -12,7 +12,7 @@ export function Footer() {
           {/* Column 1: Brand Info & Connect */}
           <div className="space-y-4 sm:col-span-2 md:col-span-3 lg:col-span-1">
             <Link id="footer-brand-logo" href="/" className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground hover:opacity-90">
-              <span className="font-semibold text-sm">VidyaSchool</span>
+              <span className="font-semibold text-sm">VIDYA School</span>
             </Link>
             <p className="text-sm font-semibold text-foreground">Be the Guiding Star</p>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
@@ -63,7 +63,7 @@ export function Footer() {
             <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">About &amp; Campus</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/p/about-vidyaschool" className="hover:text-foreground transition-colors">About VidyaSchool</Link>
+                <Link href="/p/about-vidyaschool" className="hover:text-foreground transition-colors">About VIDYA School</Link>
               </li>
               <li>
                 <Link href="/p/principals-message" className="hover:text-foreground transition-colors">Principal&apos;s Message</Link>
@@ -140,7 +140,7 @@ export function Footer() {
             <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Students &amp; Community</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/p/student-life" className="hover:text-foreground transition-colors">Student Life at Vidya</Link>
+                <Link href="/p/student-life" className="hover:text-foreground transition-colors">Student Life at VIDYA</Link>
               </li>
               <li>
                 <Link href="/p/achievements" className="hover:text-foreground transition-colors">Achievements &amp; Honors</Link>
@@ -155,7 +155,7 @@ export function Footer() {
                 <Link href="/p/get-involved" className="hover:text-foreground transition-colors">Get Involved &amp; Mentorship</Link>
               </li>
               <li>
-                <Link href="/p/tech-fest" className="hover:text-foreground transition-colors">Vidya Tech Fest</Link>
+                <Link href="/p/tech-fest" className="hover:text-foreground transition-colors">VIDYA Tech Fest</Link>
               </li>
               <li>
                 <Link href="/p/events" className="hover:text-foreground transition-colors">Events &amp; Celebrations</Link>
@@ -217,14 +217,14 @@ export function Footer() {
         {/* Giant Footer Watermark */}
         <div className="mt-16 md:mt-24 select-none">
           <h2 className="text-center font-bold tracking-tighter text-foreground/20 dark:text-foreground/10 text-4xl sm:text-6xl md:text-[8rem] lg:text-[10rem] xl:text-[12rem] leading-none">
-            Vidya School
+            VIDYA School
           </h2>
         </div>
 
         {/* Bottom copyright section */}
         <div className="border-t border-border mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-[11px] text-muted-foreground">
-            &copy; {new Date().getFullYear()} VidyaSchool. All rights reserved.
+            &copy; {new Date().getFullYear()} VIDYA School. All rights reserved.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted-foreground">
             <Link href="/docs/privacy-policy" className="hover:text-foreground transition-colors">Privacy</Link>
