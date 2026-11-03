@@ -3,6 +3,7 @@ import { getAllStaticSlugs, getStaticPage } from "@/lib/static-pages"
 import { StaticPageRenderer } from "@/components/static-page-renderer"
 import { DynamicPublicPageFallback } from "./dynamic-fallback"
 import { StemChipHero } from "@/components/stem-chip-hero"
+import { PrincipalSection } from "@/components/principal-section"
 
 // Pre-render all static public pages at build time
 export function generateStaticParams() {
@@ -38,6 +39,18 @@ export default async function PublicPageSlugRoute({
   if (staticPage) {
     if (slug === "stem" || slug === "robotics") {
       return <StaticPageRenderer page={staticPage} customHeader={<StemChipHero />} />
+    }
+    if (slug === "principals-message") {
+      return (
+        <StaticPageRenderer
+          page={staticPage}
+          customHeader={
+            <div className="space-y-4 pb-8 mb-8 border-b border-border/40 overflow-visible">
+              <PrincipalSection />
+            </div>
+          }
+        />
+      )
     }
     if (slug === "about-vidyaschool") {
       return (
