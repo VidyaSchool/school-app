@@ -5,7 +5,6 @@ import dynamic from "next/dynamic"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { BlurImage } from "@/components/blur-image"
 import { cn } from "@/lib/utils"
 
@@ -26,13 +25,6 @@ const LiquidMetalHero = dynamic(() => import("@/components/liquid-metal-hero"), 
     </div>
   ),
 })
-
-const sections = [
-  { id: "hero", name: "Home", num: "01" },
-  { id: "about", name: "About Us", num: "02" },
-  { id: "students", name: "Our School", num: "03" },
-  { id: "mobile-app", name: "Mobile App", num: "04" },
-]
 
 export interface HeroSlide {
   id: string | number
@@ -236,8 +228,6 @@ const INITIAL_SLIDES: HeroSlide[] = [
 ]
 
 export function HeroSection() {
-  const [activeSection, setActiveSection] = useState("hero")
-
   // Slider state
   const [slides, setSlides] = useState<HeroSlide[]>(INITIAL_SLIDES)
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
@@ -249,32 +239,6 @@ export function HeroSection() {
   // Touch swipe tracking
   const touchStartRef = useRef<number | null>(null)
   const touchEndRef = useRef<number | null>(null)
-
-  // Section observer for floating side navigation
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 640) return
-
-    const observerOptions = {
-      root: null,
-      rootMargin: "-20% 0px -60% 0px", // triggers when section is in the middle of the viewport
-      threshold: 0.1,
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id)
-        }
-      })
-    }, observerOptions)
-
-    sections.forEach((sec) => {
-      const el = document.getElementById(sec.id)
-      if (el) observer.observe(el)
-    })
-
-    return () => observer.disconnect()
-  }, [])
 
   // Multi-step loading lifecycle:
   // Step 1: Initial mount displays main hero component with stationary navigation controls active right away.
@@ -660,38 +624,6 @@ export function HeroSection() {
           )}
         </div>
       </div>
-
-      {/* Right Side Floating Page Content Scroller (Horizontal Lines) */}
-      <nav
-        aria-label="Page content navigation"
-        className="fixed right-2.5 md:right-4 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-end gap-3 px-2.5 py-3 rounded-2xl border border-border/40 bg-background/65 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:border-border/70"
-      >
-        {sections.map((sec) => {
-          const isActive = activeSection === sec.id
-          return (
-            <Tooltip key={sec.id}>
-              <TooltipTrigger asChild>
-                <a
-                  href={`#${sec.id}`}
-                  className="group py-1.5 outline-none flex items-center justify-end"
-                >
-                  <div
-                    className={cn(
-                      "rounded-full transition-all duration-300",
-                      isActive
-                        ? "h-[6px] w-6 bg-foreground shadow-2xs"
-                        : "h-[3px] w-3.5 bg-muted-foreground/30 group-hover:h-[4px] group-hover:w-5 group-hover:bg-foreground/70"
-                    )}
-                  />
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="left" className="font-semibold text-xs shadow-xl px-3 py-1.5 rounded-lg">
-                <p>{sec.name}</p>
-              </TooltipContent>
-            </Tooltip>
-          )
-        })}
-      </nav>
     </section>
   )
 }

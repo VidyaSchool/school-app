@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useTheme } from "@/components/theme-provider"
 import { Sun, Moon, Menu, X, Search } from "lucide-react"
 import { useSearchContext } from "fumadocs-ui/contexts/search"
@@ -117,7 +118,7 @@ export function Header() {
           : "sticky top-0"
       )}
     >
-      {/* Linear Gradient Progressive Blur Background — pure blur linear gradient (max at top, minimum at bottom), no color gradient, no bottom border */}
+      {/* Progressive Solid-to-Gradient Color + Progressive Blur Background */}
       <div
         className={cn(
           "pointer-events-none absolute inset-x-0 top-0 h-full -z-10 overflow-hidden select-none",
@@ -127,35 +128,39 @@ export function Header() {
       >
         {/* Layer 1: Base subtle blur tapering to bottom */}
         <div
-          className="absolute inset-0 backdrop-blur-[3px]"
+          className="absolute inset-0 backdrop-blur-[6px]"
           style={{
-            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 40%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 40%, transparent 100%)",
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 50%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 50%, transparent 100%)",
           }}
         />
         {/* Layer 2: Medium blur */}
         <div
-          className="absolute inset-0 backdrop-blur-[8px]"
+          className="absolute inset-0 backdrop-blur-[12px]"
           style={{
-            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 25%, transparent 75%)",
-            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 25%, transparent 75%)",
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 35%, transparent 85%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 35%, transparent 85%)",
           }}
         />
         {/* Layer 3: Strong blur */}
         <div
-          className="absolute inset-0 backdrop-blur-[16px]"
+          className="absolute inset-0 backdrop-blur-[20px]"
           style={{
-            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 15%, transparent 55%)",
-            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.85) 15%, transparent 55%)",
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 20%, transparent 70%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 20%, transparent 70%)",
           }}
         />
         {/* Layer 4: Maximum blur concentrated at the top */}
         <div
-          className="absolute inset-0 backdrop-blur-[28px]"
+          className="absolute inset-0 backdrop-blur-[32px]"
           style={{
-            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 8%, transparent 35%)",
-            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 8%, transparent 35%)",
+            maskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 10%, transparent 55%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, rgba(0,0,0,1) 10%, transparent 55%)",
           }}
+        />
+        {/* Layer 5: Color gradient — solid at top edge, smoothly transitioning down as a translucent gradient so blur shines through */}
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-background from-15% via-background/60 via-55% to-transparent"
         />
       </div>
 
@@ -172,20 +177,28 @@ export function Header() {
             id="header-brand-logo"
             href="/"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 font-semibold text-sm tracking-tight text-foreground dark:text-white px-3.5 py-1.5 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs hover:opacity-90 transition-all"
+            className="flex items-center gap-2.5 font-semibold text-sm tracking-tight text-foreground dark:text-white hover:opacity-90 transition-opacity"
           >
-            <span className="font-semibold text-sm">VIDYA School Gurugram</span>
+            <Image
+              src="/assets/vidyaschool/Logo/vidyaSG_no_bg.png"
+              alt="VIDYA School Logo"
+              width={28}
+              height={28}
+              className="h-7 w-7 object-contain"
+              priority
+            />
+            <span className="font-semibold text-sm">VIDYA School</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center justify-center flex-1 px-8">
           <NavigationMenu>
-            <NavigationMenuList className="gap-1 p-1 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs">
+            <NavigationMenuList className="gap-1">
               
               {/* About Us Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
+                <NavigationMenuTrigger className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   About
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -214,7 +227,7 @@ export function Header() {
 
               {/* Academics Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
+                <NavigationMenuTrigger className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Academics
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -246,7 +259,7 @@ export function Header() {
 
               {/* Campus & Life Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
+                <NavigationMenuTrigger className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Campus & Life
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -281,7 +294,7 @@ export function Header() {
 
               {/* Admissions Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
+                <NavigationMenuTrigger className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Admissions
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -304,7 +317,7 @@ export function Header() {
 
               {/* Disclosures Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
+                <NavigationMenuTrigger className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Disclosures
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -339,7 +352,7 @@ export function Header() {
 
               {/* Community & Get Involved Dropdown */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="rounded-full px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
+                <NavigationMenuTrigger className="rounded-md px-3 py-1.5 text-sm font-medium text-foreground dark:text-white hover:text-foreground dark:hover:text-white hover:bg-muted/70 dark:hover:bg-white/10 transition-colors">
                   Community
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -371,7 +384,7 @@ export function Header() {
         </div>
 
         {/* Right Controls */}
-        <div className="hidden md:flex items-center gap-2 p-1 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs">
+        <div className="hidden md:flex items-center gap-2">
           <SearchButton />
           <ThemeToggle />
           <Button variant="ghost" size="sm" asChild className="rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/10">
@@ -387,7 +400,7 @@ export function Header() {
         </div>
 
         {/* Mobile Hamburg Trigger & Controls */}
-        <div className="flex md:hidden items-center gap-1.5 p-1 rounded-full bg-background/70 dark:bg-card/80 backdrop-blur-md border border-border/50 shadow-2xs">
+        <div className="flex md:hidden items-center gap-1.5">
           <SearchButton onSearchClick={() => setMobileMenuOpen(false)} />
           <ThemeToggle />
           <Button
