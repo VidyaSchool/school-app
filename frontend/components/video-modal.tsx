@@ -1,18 +1,17 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from "react"
+import { useState, useRef, useEffect, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
 import { Play, X } from "lucide-react"
-import { BlurImage } from "@/components/blur-image"
+import Image from "next/image"
 
 const emptySubscribe = () => () => {}
 
 export default function VideoModal() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const badgeRef = useRef<HTMLDivElement>(null)
-  const containerRectRef = useRef<{ left: number; top: number } | null>(null)
+  const rafId = useRef<number | null>(null)
 
   const mounted = useSyncExternalStore(
     emptySubscribe,
@@ -30,42 +29,34 @@ export default function VideoModal() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [isModalOpen])
 
-  const handleMouseEnter = () => {
-    if (imageContainerRef.current) {
-      const rect = imageContainerRef.current.getBoundingClientRect()
-      containerRectRef.current = { left: rect.left, top: rect.top }
+  useEffect(() => {
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current)
     }
-    setIsHovered(true)
-  }
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!badgeRef.current) return
-    if (!containerRectRef.current && imageContainerRef.current) {
-      const rect = imageContainerRef.current.getBoundingClientRect()
-      containerRectRef.current = { left: rect.left, top: rect.top }
-    }
-    if (!containerRectRef.current) return
-    const x = e.clientX - containerRectRef.current.left
-    const y = e.clientY - containerRectRef.current.top
-    badgeRef.current.style.transform = `translate3d(${x - 60}px, ${y - 20}px, 0)`
   }, [])
 
-  const handleMouseLeave = () => {
-    setIsHovered(false)
-    containerRectRef.current = null
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const clientX = e.clientX
+    const clientY = e.clientY
+    if (rafId.current) cancelAnimationFrame(rafId.current)
+    rafId.current = requestAnimationFrame(() => {
+      if (!badgeRef.current || !imageContainerRef.current) return
+      const rect = imageContainerRef.current.getBoundingClientRect()
+      const x = clientX - rect.left
+      const y = clientY - rect.top
+      badgeRef.current.style.transform = `translate3d(${x - 60}px, ${y - 20}px, 0)`
+    })
   }
 
   return (
     <>
       <div 
         ref={imageContainerRef}
-        onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
         onClick={() => setIsModalOpen(true)}
-        className="relative rounded-2xl overflow-hidden border border-border/80 bg-card/45 shadow-lg group aspect-video cursor-pointer select-none transform-gpu"
+        className="relative rounded-2xl overflow-hidden border border-border/80 bg-card/45 shadow-lg group aspect-video cursor-pointer select-none"
       >
-        <BlurImage
+        <Image
           className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105 will-change-transform"
           src="/assets/illustrations/thumbnail.webp"
           alt="VIDYA School Video Thumbnail"
@@ -76,27 +67,27 @@ export default function VideoModal() {
         />
         <button
           type="button"
-          className="absolute left-1/2 top-1/2 z-20 flex h-18 w-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-white/20 text-white shadow-2xl backdrop-blur-xl transition-transform hover:scale-110 transform-gpu"
+          className="absolute left-1/2 top-1/2 z-20 flex h-18 w-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-white/20 text-white shadow-2xl backdrop-blur-md transition-transform hover:scale-110"
           aria-label="Play video"
         >
           <Play className="ml-1 h-7 w-7 fill-current" />
         </button>
-        {isHovered && (
-          <div 
-            ref={badgeRef}
-            className="hidden sm:flex absolute pointer-events-none z-20 items-center gap-2 bg-background/60 backdrop-blur-md border border-border/80 text-foreground font-semibold rounded-xl shadow-2xl text-xs px-4 py-2.5 will-change-transform transition-opacity duration-150"
-            style={{ 
-              top: 0,
-              left: 0,
-              transform: "translate3d(-9999px, -9999px, 0)"
-            }}
-          >
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-white animate-pulse">
-              <Play className="h-2 w-2 fill-current ml-0.5" />
-            </div>
-            <span>Watch Video</span>
+
+        {/* Floating cursor badge — purely GPU accelerated, zero React re-renders */}
+        <div 
+          ref={badgeRef}
+          className="hidden sm:flex absolute pointer-events-none z-20 items-center gap-2 bg-background/90 dark:bg-background/90 border border-border/80 text-foreground font-semibold rounded-xl shadow-2xl text-xs px-4 py-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 will-change-transform"
+          style={{ 
+            top: 0,
+            left: 0,
+            transform: "translate3d(-9999px, -9999px, 0)"
+          }}
+        >
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-white animate-pulse">
+            <Play className="h-2 w-2 fill-current ml-0.5" />
           </div>
-        )}
+          <span>Watch Video</span>
+        </div>
       </div>
 
       {isModalOpen && mounted && createPortal(

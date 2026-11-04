@@ -35,13 +35,13 @@ export default function Home() {
           <InViewRender minHeight="380px" rootMargin="200px 0px">
             <section id="about" className="relative isolate w-full mt-16 md:mt-24 py-10 md:py-16 rounded-3xl border border-border/70 overflow-hidden bg-card/20 shadow-sm">
               {/* Section Background: founder_bg.webp */}
-              <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none transform-gpu will-change-transform">
+              <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
                 <img
                   src="/assets/illustrations/founder_bg.webp"
                   alt="Founder Background"
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover filter blur-[1px] scale-[1.02] transform-gpu"
+                  className="w-full h-full object-cover select-none pointer-events-none"
                 />
                 <div className="absolute inset-0 bg-background/55 dark:bg-background/70" />
               </div>
@@ -50,7 +50,7 @@ export default function Home() {
               <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                   <div className="lg:col-span-7"><VideoModal /></div>
-                  <div className="lg:col-span-5 flex flex-col justify-center space-y-5 bg-background/80 dark:bg-background/85 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-border/50 shadow-md transform-gpu">
+                  <div className="lg:col-span-5 flex flex-col justify-center space-y-5 bg-background/85 dark:bg-background/90 max-sm:backdrop-blur-none sm:backdrop-blur-md sm:bg-background/80 sm:dark:bg-background/85 p-6 sm:p-8 rounded-2xl border border-border/50 shadow-md">
 
                     <p className="text-lg sm:text-xl font-semibold text-foreground leading-relaxed">
                       "It's like a home to me. It's the place where I grow as a person, get exposed to new ideas, learn and reach for my dreams."
