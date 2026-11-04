@@ -1,20 +1,19 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
 import { Play, X } from "lucide-react"
 import { BlurImage } from "@/components/blur-image"
 
+const emptySubscribe = () => () => {}
+
 export default function VideoModal() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [isHovered, setIsHovered] = useState(false)
-  const imageContainerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -26,58 +25,54 @@ export default function VideoModal() {
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [isModalOpen])
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageContainerRef.current) return
-    const rect = imageContainerRef.current.getBoundingClientRect()
-    setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-  }
-
   return (
     <>
       <div 
-        ref={imageContainerRef}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        role="button"
+        tabIndex={0}
+        aria-label="Play VIDYA School Video"
         onClick={() => setIsModalOpen(true)}
-        className="relative rounded-2xl overflow-hidden border border-border/80 bg-card/45 shadow-lg group aspect-video cursor-pointer"
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            setIsModalOpen(true)
+          }
+        }}
+        className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-border/80 bg-card/50 shadow-xl group aspect-video cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transform-gpu"
       >
         <BlurImage
-          className="w-full h-full object-cover rounded-2xl transition-transform duration-500 group-hover:scale-105"
-          src="/assets/illustrations/thumbnail.png"
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] will-change-transform"
+          src="/assets/illustrations/thumbnail.webp"
           alt="VIDYA School Video Thumbnail"
           width={1366}
           height={768}
-          quality={85}
-          priority
+          quality={80}
+          sizes="(max-width: 1024px) 100vw, 58vw"
         />
-        <button
-          type="button"
-          className="absolute left-1/2 top-1/2 z-20 flex h-18 w-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-white/20 text-white shadow-2xl backdrop-blur-xl transition-transform hover:scale-110"
-          aria-label="Play video"
-        >
-          <Play className="ml-1 h-7 w-7 fill-current" />
-        </button>
-        {isHovered && (
-          <div 
-            className="absolute pointer-events-none z-20 flex items-center gap-2 bg-background/60 backdrop-blur-md border border-border/80 text-foreground font-semibold rounded-xl shadow-2xl text-xs px-4 py-2.5 transition-all duration-200"
-            style={{ 
-              left: mousePosition.x - 60, 
-              top: mousePosition.y - 20,
-            }}
+
+        {/* Ambient Dark Gradient for Contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/70 pointer-events-none" />
+
+        {/* Center Play Button & Interactive Badge */}
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none">
+          <div
+            className="relative flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full border border-white/40 bg-black/45 text-white shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:border-primary group-hover:shadow-primary/40 transform-gpu"
           >
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-white animate-pulse">
-              <Play className="h-2 w-2 fill-current ml-0.5" />
-            </div>
+            <Play className="ml-1 h-7 w-7 sm:h-8 sm:w-8 fill-current transition-transform duration-300 group-hover:scale-105" />
+            <span className="absolute inset-0 rounded-full bg-white/20 animate-ping opacity-0 group-hover:opacity-75 transition-opacity duration-300 pointer-events-none" />
+          </div>
+
+          <div className="inline-flex items-center gap-2 rounded-full bg-black/70 border border-white/20 px-3.5 py-1.5 text-xs font-medium text-white shadow-lg transition-all duration-300 group-hover:bg-primary/95 group-hover:border-primary/50 group-hover:scale-105">
+            <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
             <span>Watch Video</span>
           </div>
-        )}
+        </div>
       </div>
 
       {isModalOpen && mounted && createPortal(
         <div 
           onClick={() => setIsModalOpen(false)} 
-          className="fixed inset-0 z-[9999] w-screen h-screen bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 cursor-zoom-out animate-fade-in"
+          className="fixed inset-0 z-[9999] w-screen h-screen bg-black/85 flex items-center justify-center p-4 sm:p-8 cursor-zoom-out animate-fade-in"
         >
           <div 
             onClick={(e) => e.stopPropagation()} 
