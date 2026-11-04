@@ -4,10 +4,7 @@ import { HeroSection } from "@/components/hero-section"
 import { SectionSeparator } from "@/components/section-separator"
 import { InViewRender } from "@/components/in-view-render"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { BlurImg } from "@/components/blur-image"
-import Image from "next/image"
-import { Check, Quote, Sparkles } from "lucide-react"
 import dynamic from "next/dynamic"
 import type { Metadata } from 'next'
 
@@ -36,76 +33,37 @@ export default function Home() {
         {/* About Section with screen-width background and slight x-axis margin */}
         <div className="w-full px-2 sm:px-4 md:px-6">
           <InViewRender minHeight="380px" rootMargin="200px 0px">
-            <section id="about" className="relative isolate w-full mt-16 md:mt-24 py-10 sm:py-14 md:py-18 rounded-3xl border border-border/70 overflow-hidden bg-card/40 shadow-sm">
-              {/* High-Performance Section Background: founder_bg.webp */}
+            <section id="about" className="relative isolate w-full mt-16 md:mt-24 py-10 md:py-16 rounded-3xl border border-border/70 overflow-hidden bg-card/20 shadow-sm">
+              {/* Section Background: founder_bg.webp */}
               <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none transform-gpu will-change-transform">
-                <Image
+                <img
                   src="/assets/illustrations/founder_bg.webp"
-                  alt="VIDYA School Environment"
-                  fill
-                  sizes="100vw"
-                  quality={75}
-                  priority={false}
-                  className="object-cover object-center opacity-40 dark:opacity-20"
+                  alt="Founder Background"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover filter blur-[1px] scale-[1.02] transform-gpu"
                 />
-                {/* Smooth zero-lag gradient tint eliminating expensive backdrop-filter compositing */}
-                <div className="absolute inset-0 bg-gradient-to-b lg:bg-gradient-to-r from-background/95 via-background/80 to-background/95 dark:from-background/95 dark:via-background/85 dark:to-background/95" />
+                <div className="absolute inset-0 bg-background/55 dark:bg-background/70" />
               </div>
 
               {/* Inner Content constrained to max-w-[1380px] */}
               <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  <div className="lg:col-span-7">
-                    <VideoModal />
-                  </div>
-                  <div className="lg:col-span-5 flex flex-col justify-center space-y-6 bg-card/90 dark:bg-card/85 p-6 sm:p-8 lg:p-9 rounded-2xl sm:rounded-3xl border border-border/70 shadow-lg dark:shadow-2xl">
-                    
-                    {/* Badge */}
-                    <Badge
-                      variant="outline"
-                      className="bg-primary/5 text-primary border-primary/20 gap-1.5 px-3 py-1 text-xs font-semibold w-fit"
-                    >
-                      <Sparkles className="h-3.5 w-3.5 text-primary" />
-                      Life at VIDYA
-                    </Badge>
+                  <div className="lg:col-span-7"><VideoModal /></div>
+                  <div className="lg:col-span-5 flex flex-col justify-center space-y-5 bg-background/80 dark:bg-background/85 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-border/50 shadow-md transform-gpu">
 
-                    {/* Quotation */}
-                    <div className="space-y-3">
-                      <Quote className="h-7 w-7 text-primary/30 rotate-180" />
-                      <p className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground leading-snug sm:leading-relaxed">
-                        &ldquo;It&apos;s like a home to me. It&apos;s the place where I grow as a person, get exposed to new ideas, learn and reach for my dreams.&rdquo;
-                      </p>
-                    </div>
-
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      Here&apos;s a short film with the students, teachers, and staff talking about what makes VIDYA School different and what it means to them.
+                    <p className="text-lg sm:text-xl font-semibold text-foreground leading-relaxed">
+                      "It's like a home to me. It's the place where I grow as a person, get exposed to new ideas, learn and reach for my dreams."
                     </p>
 
-                    <div className="space-y-3 pt-1 text-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Check className="h-3 w-3 stroke-[2.5]" />
-                        </div>
-                        <p className="text-muted-foreground leading-snug">
-                          <span className="font-semibold text-foreground">Holistic Growth</span> &mdash; Fostering personal development alongside academic excellence.
-                        </p>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Check className="h-3 w-3 stroke-[2.5]" />
-                        </div>
-                        <p className="text-muted-foreground leading-snug">
-                          <span className="font-semibold text-foreground">New Ideas &amp; Exposure</span> &mdash; Broadening horizons through visual and physical digital learning.
-                        </p>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <Check className="h-3 w-3 stroke-[2.5]" />
-                        </div>
-                        <p className="text-muted-foreground leading-snug">
-                          <span className="font-semibold text-foreground">A Nurturing Community</span> &mdash; A second home where students, teachers, and staff grow together.
-                        </p>
-                      </div>
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                      Here's a short film with the students, teachers, and staff talking about what makes the VIDYA School different and what it means to them.
+                    </p>
+
+                    <div className="space-y-2.5 pt-1 text-sm text-muted-foreground">
+                      <p>✓ <span className="font-medium text-foreground">Holistic Growth</span> — Fostering personal development alongside academic excellence.</p>
+                      <p>✓ <span className="font-medium text-foreground">New Ideas & Exposure</span> — Broadening horizons through visual and physical digital learning.</p>
+                      <p>✓ <span className="font-medium text-foreground">A Nurturing Community</span> — A second home where students, teachers, and staff grow together.</p>
                     </div>
 
                   </div>
