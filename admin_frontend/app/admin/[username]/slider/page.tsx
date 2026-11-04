@@ -152,7 +152,7 @@ function SortableBannerItem({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getSafeImageSrc(img.url)}
-              alt={img.title}
+              alt={String(img.title || "").replace(/[^a-zA-Z0-9 ._-]/g, "")}
               className="h-full w-full object-cover select-none pointer-events-none"
             />
           </div>
@@ -683,7 +683,7 @@ export default function SliderManagementPage() {
                         </div>
                         <div className="flex items-center justify-between px-1">
                           <span className="text-xs truncate max-w-[180px] font-medium text-foreground">
-                            {selectedFile?.name}
+                            {String(selectedFile?.name || "").replace(/[^a-zA-Z0-9._ -]/g, "")}
                           </span>
                           <Button
                             type="button"

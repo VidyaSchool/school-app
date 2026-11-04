@@ -137,32 +137,42 @@ export function getSafeVideoEmbedUrl(url?: string): string | null {
 export function sanitizeHtml(rawHtml?: string): string {
   if (!rawHtml || typeof rawHtml !== "string") return ""
 
-  let clean = rawHtml
-  let prev = ""
+  const allowedTags = new Set([
+    "b", "strong", "i", "em", "u", "s", "strike", "a", "p", "br", "hr",
+    "span", "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "h6",
+    "blockquote", "code", "pre", "table", "thead", "tbody", "tr", "th", "td",
+    "mark", "small", "sub", "sup"
+  ])
 
-  // Iteratively strip dangerous tags to prevent bypass via nesting
-  const dangerousTagRegex = /<\/?(?:script|style|iframe|object|embed|applet|form)\b[^>]*>/gi
-  const dangerousBlockRegex = /<(script|style|iframe|object|applet|form)\b[^>]*>[\s\S]*?<\/\1[^>]*>/gi
+  return rawHtml.replace(/<\/?([a-zA-Z0-9]+)\b([^>]*)>/g, (fullMatch, tag, attrs) => {
+    const lowerTag = tag.toLowerCase()
+    if (!allowedTags.has(lowerTag)) {
+      return ""
+    }
+    if (fullMatch.startsWith("</")) {
+      return `</${lowerTag}>`
+    }
 
-  while (clean !== prev) {
-    prev = clean
-    clean = clean
-      .replace(dangerousBlockRegex, "")
-      .replace(dangerousTagRegex, "")
-  }
+    const sanitizedAttrs: string[] = []
+    const attrRegex = /([a-zA-Z0-9_-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g
+    let m: RegExpExecArray | null
+    while ((m = attrRegex.exec(attrs)) !== null) {
+      const name = m[1].toLowerCase()
+      const val = m[2] ?? m[3] ?? m[4] ?? ""
+      if (name.startsWith("on")) continue
+      if (name === "href" || name === "src") {
+        const trimmed = val.trim().toLowerCase()
+        if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/") || trimmed.startsWith("#") || trimmed.startsWith("mailto:")) {
+          sanitizedAttrs.push(`${name}="${val.replace(/"/g, '&quot;')}"`)
+        }
+      } else if (["class", "classname", "style", "title", "target", "rel", "id", "aria-label"].includes(name)) {
+        sanitizedAttrs.push(`${name}="${val.replace(/"/g, '&quot;')}"`)
+      }
+    }
 
-  // Iteratively remove on* event handlers and dangerous protocol schemes
-  prev = ""
-  while (clean !== prev) {
-    prev = clean
-    clean = clean
-      .replace(/\s+on[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "")
-      .replace(/(href|src)\s*=\s*(?:'javascript:[^']*'|"javascript:[^"]*"|javascript:[^\s>]+)/gi, '$1="#"')
-      .replace(/(href|src)\s*=\s*(?:'data:[^']*'|"data:[^"]*"|data:[^\s>]+)/gi, '$1="#"')
-      .replace(/(href|src)\s*=\s*(?:'vbscript:[^']*'|"vbscript:[^"]*"|vbscript:[^\s>]+)/gi, '$1="#"')
-  }
-
-  return clean
+    const attrsStr = sanitizedAttrs.length > 0 ? " " + sanitizedAttrs.join(" ") : ""
+    return `<${lowerTag}${attrsStr}>`
+  })
 }
 
 export function isInternalLink(url?: string): boolean {

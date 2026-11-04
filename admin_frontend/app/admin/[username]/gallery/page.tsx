@@ -668,7 +668,7 @@ export default function AdminGalleryPage() {
                       <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden border bg-muted">
                         {safeSrc ? <img src={safeSrc} alt="Preview" className="w-full h-full object-cover" /> : null}
                         <span className="absolute bottom-1 left-1 right-1 text-[9px] font-medium text-white bg-black/70 px-1 py-0.5 rounded truncate">
-                          {selectedFiles[i]?.name}
+                          {String(selectedFiles[i]?.name || "").replace(/[^a-zA-Z0-9._ -]/g, "")}
                         </span>
                       </div>
                     )
