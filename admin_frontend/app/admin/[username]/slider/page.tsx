@@ -65,10 +65,10 @@ function isS3Url(url: string) {
 
 function getSafeImageSrc(url?: string): string {
   if (!url || typeof url !== "string") return ""
-  const trimmed = url.trim()
-  if (/^(javascript|data|vbscript):/i.test(trimmed)) return ""
-  if (trimmed.startsWith("/") || trimmed.startsWith("blob:") || trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return trimmed
+  const sanitized = url.replace(/["'<>\s]/g, "")
+  if (/^(javascript|data|vbscript):/i.test(sanitized)) return ""
+  if (sanitized.startsWith("/") || sanitized.startsWith("blob:") || sanitized.startsWith("http://") || sanitized.startsWith("https://")) {
+    return encodeURI(sanitized)
   }
   return ""
 }

@@ -663,7 +663,9 @@ export default function AdminGalleryPage() {
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-40 overflow-y-auto p-1 border rounded-xl">
                   {filePreviews.map((src, i) => {
-                    const safeSrc = typeof src === "string" && (src.startsWith("blob:") || src.startsWith("https://") || src.startsWith("/")) ? src : ""
+                    const safeSrc = typeof src === "string" && (src.startsWith("blob:") || src.startsWith("https://") || src.startsWith("/"))
+                      ? encodeURI(src.replace(/["'<>\s]/g, ""))
+                      : ""
                     return (
                       <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden border bg-muted">
                         {safeSrc ? <img src={safeSrc} alt="Preview" className="w-full h-full object-cover" /> : null}

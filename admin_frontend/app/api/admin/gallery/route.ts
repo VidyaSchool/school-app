@@ -45,7 +45,7 @@ const ALLOWED_ASPECT_RATIOS = [
 function sanitizeString(val: any, maxLength = 150): string {
   if (typeof val !== "string") return ""
   return val
-    .replace(/<[^<>]*>/g, "")
+    .replace(/<|>/g, "")
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
     .trim()
     .slice(0, maxLength)
