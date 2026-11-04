@@ -93,12 +93,12 @@ export async function GET(req: NextRequest) {
     let s3Key = doc.fileKey
 
     // Extract S3 key if file_key was not stored on legacy records
-    if (!s3Key && doc.fileUrl && doc.fileUrl.includes("amazonaws.com/")) {
-      s3Key = doc.fileUrl.split("amazonaws.com/")[1]
-    } else if (!s3Key && doc.fileUrl && /^https?:\/\//i.test(doc.fileUrl)) {
+    if (!s3Key && doc.fileUrl && /^https?:\/\//i.test(doc.fileUrl)) {
       try {
         const parsedUrl = new URL(doc.fileUrl)
-        s3Key = parsedUrl.pathname.replace(/^\/+/, "")
+        if (parsedUrl.hostname === "amazonaws.com" || parsedUrl.hostname.endsWith(".amazonaws.com")) {
+          s3Key = parsedUrl.pathname.replace(/^\/+/, "")
+        }
       } catch {
         s3Key = null
       }

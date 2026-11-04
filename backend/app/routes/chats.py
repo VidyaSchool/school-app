@@ -206,8 +206,8 @@ def extract_pdf_content(pdf_bytes: bytes) -> str:
                 if text and text.strip():
                     text_parts.append(f"--- Page {i + 1} ---\n{text.strip()}")
         return "\n\n".join(text_parts) if text_parts else "[No extractable text found in PDF]"
-    except Exception as e:
-        return f"[PDF extraction error: {str(e)}]"
+    except Exception:
+        return "[PDF extraction error: unable to parse PDF content]"
 
 
 def extract_video_description(filename: str, file_size_bytes: int) -> str:
@@ -1406,14 +1406,21 @@ async def run_agent_loop(
                 last_draft = msg["content"]
                 break
         if last_draft:
-            match = re.search(
-                r"Draft Message[:\*\s]+(.+?)(?:Shall I|$)", last_draft, re.DOTALL | re.IGNORECASE
-            )
-            if match:
-                drafted_content = match.group(1).strip().strip("*").strip()
-                full_history = [system_msg] + clean_history[:-1] + [
-                    {"role": "user", "content": f"Yes, confirmed. Please send this exact message:\n\n{drafted_content}"}
-                ]
+            lower_draft = last_draft.lower()
+            idx = lower_draft.find("draft message")
+            if idx != -1:
+                content_part = last_draft[idx + len("draft message"):]
+                content_part = content_part.lstrip(":* \t\r\n")
+                end_idx = content_part.lower().find("shall i")
+                if end_idx != -1:
+                    drafted_content = content_part[:end_idx].strip().strip("*").strip()
+                else:
+                    drafted_content = content_part.strip().strip("*").strip()
+
+                if drafted_content:
+                    full_history = [system_msg] + clean_history[:-1] + [
+                        {"role": "user", "content": f"Yes, confirmed. Please send this exact message:\n\n{drafted_content}"}
+                    ]
 
     if is_sarvam:
         # ── Sarvam AI Branch ──

@@ -596,7 +596,7 @@ export function TeacherList({ initialTeachers }: { initialTeachers: TeacherRow[]
 
           {activeTab === "absent-teachers" && (
             <div className="flex items-center gap-2 flex-wrap">
-              <Link href={`/timetable/substitutions?date=${selectedDate || todayStr}`}>
+              <Link href={`/timetable/substitutions?date=${encodeURIComponent(/^\d{4}-\d{2}-\d{2}$/.test(selectedDate) ? selectedDate : todayStr)}`}>
                 <Button
                   variant="outline"
                   size="sm"

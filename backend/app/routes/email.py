@@ -180,7 +180,7 @@ def send_teacher_email(
     to_str = ", ".join(to_addr) if isinstance(to_addr, list) else to_addr
     cc_str = (", ".join(cc_addr) if isinstance(cc_addr, list) else cc_addr) if cc_addr else None
 
-    body_text = re.sub(r'<[^>]+>', '', body)
+    body_text = re.sub(r'<[^<>]*>', '', body)
 
     new_email = TeacherEmail(
         id=email_id,
@@ -503,7 +503,7 @@ async def resend_inbound_webhook(request: Request, db: Session = Depends(get_db)
             print(f"[Inbound Fetch Error] {err}")
 
     if not text and html:
-        text = re.sub(r'<[^>]+>', '', html)
+        text = re.sub(r'<[^<>]*>', '', html)
     elif not html and text:
         html = f"<p>{text}</p>"
 

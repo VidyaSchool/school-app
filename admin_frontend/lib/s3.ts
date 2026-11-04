@@ -280,11 +280,13 @@ export async function deleteFromS3(fileUrlOrKey: string): Promise<boolean> {
 
   try {
     let fileKey = fileUrlOrKey
-    if (fileUrlOrKey.includes(".amazonaws.com/")) {
-      fileKey = fileUrlOrKey.split(".amazonaws.com/")[1]
-    } else if (/^https?:\/\//i.test(fileUrlOrKey)) {
-      const parsed = new URL(fileUrlOrKey)
-      fileKey = parsed.pathname.replace(/^\/+/, "")
+    if (/^https?:\/\//i.test(fileUrlOrKey)) {
+      try {
+        const parsed = new URL(fileUrlOrKey)
+        fileKey = parsed.pathname.replace(/^\/+/, "")
+      } catch {
+        fileKey = fileUrlOrKey
+      }
     }
 
     // Security checks: prevent path traversal or root bucket deletions

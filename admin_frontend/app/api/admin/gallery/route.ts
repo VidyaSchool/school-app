@@ -44,8 +44,13 @@ const ALLOWED_ASPECT_RATIOS = [
 
 function sanitizeString(val: any, maxLength = 150): string {
   if (typeof val !== "string") return ""
-  return val
-    .replace(/<[^>]*>?/gm, "")
+  let clean = val
+  let prev = ""
+  while (clean !== prev) {
+    prev = clean
+    clean = clean.replace(/<[^>]*>/g, "")
+  }
+  return clean
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
     .trim()
     .slice(0, maxLength)
@@ -334,9 +339,12 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Delete from S3 if it's an S3 URL
-    if (existing.src && existing.src.includes(".amazonaws.com")) {
+    if (existing.src && /^https?:\/\//i.test(existing.src)) {
       try {
-        await deleteFromS3(existing.src)
+        const u = new URL(existing.src)
+        if (u.hostname === "amazonaws.com" || u.hostname.endsWith(".amazonaws.com")) {
+          await deleteFromS3(existing.src)
+        }
       } catch (s3Err) {
         console.warn("Failed to delete object from S3 during gallery cleanup:", s3Err)
       }

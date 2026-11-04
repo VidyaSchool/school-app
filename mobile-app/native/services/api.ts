@@ -13,11 +13,16 @@ async function request<T>(
     "user-agent": "Android App",
   };
 
-  if (url.startsWith(FRONTEND_URL)) {
-    headersObj["origin"] = FRONTEND_URL;
-    headersObj["referer"] = `${FRONTEND_URL}/`;
-    headersObj["x-forwarded-host"] = "vidyaschool.vercel.app";
-    headersObj["x-forwarded-proto"] = "https";
+  try {
+    const parsed = new URL(url);
+    if (parsed.origin === FRONTEND_URL) {
+      headersObj["origin"] = FRONTEND_URL;
+      headersObj["referer"] = `${FRONTEND_URL}/`;
+      headersObj["x-forwarded-host"] = "vidyaschool.vercel.app";
+      headersObj["x-forwarded-proto"] = "https";
+    }
+  } catch {
+    // Not a full URL or relative path
   }
 
   if (options.headers) {

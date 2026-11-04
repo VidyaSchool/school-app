@@ -971,12 +971,16 @@ def get_doc_markdown(path: str = Query(...)):
         rel_path_part = rel_path_part[5:]
     rel_path_part = rel_path_part.lstrip("/")
     
-    file_path = os.path.join(base_docs_dir, rel_path_part + ".md")
-    
+    # Sanitize relative path to prevent directory traversal
+    rel_path_part = rel_path_part.replace("\\", "/").replace("..", "").lstrip("/")
+
+    real_base = os.path.realpath(base_docs_dir)
+    target_path = os.path.realpath(os.path.join(real_base, rel_path_part + ".md"))
+
     md_content = None
-    if os.path.exists(file_path):
+    if target_path.startswith(real_base + os.sep) and os.path.exists(target_path):
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(target_path, "r", encoding="utf-8") as f:
                 md_content = f.read()
         except Exception:
             pass

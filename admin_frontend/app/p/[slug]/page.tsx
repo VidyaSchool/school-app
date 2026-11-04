@@ -143,23 +143,30 @@ function getSafeVideoEmbedUrl(url?: string): string | null {
 function sanitizeHtml(rawHtml?: string): string {
   if (!rawHtml || typeof rawHtml !== "string") return ""
 
-  // Strip harmful tags (script, style, iframe, object, embed, form, input, button)
   let clean = rawHtml
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "")
-    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, "")
-    .replace(/<embed\b[^>]*>/gi, "")
-    .replace(/<applet\b[^<]*(?:(?!<\/applet>)<[^<]*)*<\/applet>/gi, "")
-    .replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, "")
+  let prev = ""
 
-  // Strip all inline DOM event handlers (onload, onerror, onclick, onmouseover, etc.)
-  clean = clean.replace(/\s+on[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "")
+  // Iteratively strip dangerous tags to prevent bypass via nesting
+  const dangerousTagRegex = /<\/?(?:script|style|iframe|object|embed|applet|form)\b[^>]*>/gi
+  const dangerousBlockRegex = /<(script|style|iframe|object|applet|form)\b[^>]*>[\s\S]*?<\/\1[^>]*>/gi
 
-  // Defang javascript: and data: pseudo-protocols inside attributes
-  clean = clean.replace(/(href|src)\s*=\s*(?:'javascript:[^']*'|"javascript:[^"]*"|javascript:[^\s>]+)/gi, '$1="#"')
-  clean = clean.replace(/(href|src)\s*=\s*(?:'data:[^']*'|"data:[^"]*"|data:[^\s>]+)/gi, '$1="#"')
-  clean = clean.replace(/(href|src)\s*=\s*(?:'vbscript:[^']*'|"vbscript:[^"]*"|vbscript:[^\s>]+)/gi, '$1="#"')
+  while (clean !== prev) {
+    prev = clean
+    clean = clean
+      .replace(dangerousBlockRegex, "")
+      .replace(dangerousTagRegex, "")
+  }
+
+  // Iteratively remove on* event handlers and dangerous protocol schemes
+  prev = ""
+  while (clean !== prev) {
+    prev = clean
+    clean = clean
+      .replace(/\s+on[a-zA-Z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, "")
+      .replace(/(href|src)\s*=\s*(?:'javascript:[^']*'|"javascript:[^"]*"|javascript:[^\s>]+)/gi, '$1="#"')
+      .replace(/(href|src)\s*=\s*(?:'data:[^']*'|"data:[^"]*"|data:[^\s>]+)/gi, '$1="#"')
+      .replace(/(href|src)\s*=\s*(?:'vbscript:[^']*'|"vbscript:[^"]*"|vbscript:[^\s>]+)/gi, '$1="#"')
+  }
 
   return clean
 }
@@ -1445,9 +1452,18 @@ export default function PublicLivePage() {
                 {activeModal.type === "pdf" ? (
                   <iframe
                     src={
-                      activeModal.url.includes("drive.google.com") || activeModal.url.endsWith(".pdf")
-                        ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(getSafeUrl(activeModal.url))}`
-                        : getSafeUrl(activeModal.url)
+                      (() => {
+                        let isGoogleDrive = false
+                        try {
+                          const u = new URL(activeModal.url)
+                          isGoogleDrive = u.hostname === "drive.google.com" || u.hostname.endsWith(".google.com")
+                        } catch {
+                          isGoogleDrive = false
+                        }
+                        return isGoogleDrive || activeModal.url.endsWith(".pdf")
+                          ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(getSafeUrl(activeModal.url))}`
+                          : getSafeUrl(activeModal.url)
+                      })()
                     }
                     title={activeModal.title || "PDF Viewer"}
                     className="w-full h-[520px] rounded-lg border-0 bg-white"

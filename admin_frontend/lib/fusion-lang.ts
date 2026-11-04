@@ -212,7 +212,7 @@ export function fusionToBlocks(code: string): Block[] {
 
   // Match all top-level tags — self-closing and open/close pairs
   // Handles: <Tag attrs /> or <Tag attrs>content</Tag> or <div attrs>{Component}</div>
-  const tagRegex = /<(\w+)((?:\s+[\w-]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|\[[^\]]*\]|[^\s>]+))?)*)\s*(?:\/>|>([\s\S]*?)<\/\1>)/gi
+  const tagRegex = /<(\w+)([^>]*?)(?:\/>|>([\s\S]*?)<\/\1>)/gi
   let match: RegExpExecArray | null
 
   while ((match = tagRegex.exec(inner)) !== null) {
@@ -445,7 +445,7 @@ export function registerFusionLanguage(monaco: typeof import("monaco-editor")) {
       ],
 
       comment: [
-        [/-->/, "comment", "@pop"],
+        [/--!?>/, "comment", "@pop"],
         [/./, "comment"],
       ],
 

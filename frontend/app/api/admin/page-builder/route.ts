@@ -8,11 +8,14 @@ import { headers } from "next/headers"
 // Helper to normalize and sanitize slug
 export function normalizeSlug(raw?: string, titleFallback?: string): string {
   const source = (raw || "").trim() || (titleFallback || "").trim() || "custom-page"
-  const clean = source
+  let clean = source
     .toLowerCase()
     .replace(/^\/?p\//, "")
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+
+  while (clean.startsWith("-")) clean = clean.slice(1)
+  while (clean.endsWith("-")) clean = clean.slice(0, -1)
+
   return clean || "custom-page"
 }
 

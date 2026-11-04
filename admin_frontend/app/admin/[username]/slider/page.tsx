@@ -53,7 +53,24 @@ interface SliderImage {
 }
 
 function isS3Url(url: string) {
-  return url.includes("amazonaws.com") || url.includes("s3.") || url.includes("/sliders/")
+  if (!url) return false
+  if (url.includes("/sliders/")) return true
+  try {
+    const u = new URL(url)
+    return u.hostname === "amazonaws.com" || u.hostname.endsWith(".amazonaws.com")
+  } catch {
+    return false
+  }
+}
+
+function getSafeImageSrc(url?: string): string {
+  if (!url || typeof url !== "string") return ""
+  const trimmed = url.trim()
+  if (/^(javascript|data|vbscript):/i.test(trimmed)) return ""
+  if (trimmed.startsWith("/") || trimmed.startsWith("blob:") || trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed
+  }
+  return ""
 }
 
 interface SortableBannerItemProps {
@@ -134,7 +151,7 @@ function SortableBannerItem({
           <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-md border bg-muted">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={img.url}
+              src={getSafeImageSrc(img.url)}
               alt={img.title}
               className="h-full w-full object-cover select-none pointer-events-none"
             />
@@ -659,7 +676,7 @@ export default function SliderManagementPage() {
                         <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-background">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={previewUrl}
+                            src={getSafeImageSrc(previewUrl)}
                             alt="Upload preview"
                             className="h-full w-full object-cover"
                           />

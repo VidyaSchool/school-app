@@ -58,7 +58,16 @@ export async function GET(req: NextRequest) {
     await ensureTableExists()
     const { searchParams } = new URL(req.url)
     const rawCategory = searchParams.get("category")
-    const category = rawCategory ? rawCategory.replace(/<[^>]*>?/gm, "").trim().slice(0, 50) : null
+    let category: string | null = null
+    if (rawCategory) {
+      let clean = rawCategory
+      let prev = ""
+      while (clean !== prev) {
+        prev = clean
+        clean = clean.replace(/<[^>]*>/g, "")
+      }
+      category = clean.trim().slice(0, 50) || null
+    }
 
     let query = db.select().from(galleryImage)
 

@@ -25,6 +25,16 @@ export interface GalleryItem {
 
 const CHUNK_SIZE = 12
 
+function stripTags(val: any): string {
+  let clean = String(val || "")
+  let prev = ""
+  while (clean !== prev) {
+    prev = clean
+    clean = clean.replace(/<[^>]*>/g, "")
+  }
+  return clean
+}
+
 export function GalleryClient({ initialItems }: { initialItems: GalleryItem[] }) {
   const [galleryList, setGalleryList] = useState<GalleryItem[]>(initialItems)
   const [visibleCount, setVisibleCount] = useState<number>(CHUNK_SIZE)
@@ -49,13 +59,13 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItem[] })
           })
           .map((img: any) => ({
             id: String(img.id).replace(/[^a-zA-Z0-9_-]/g, ""),
-            title: String(img.title || "Campus Photograph").replace(/<[^>]*>?/gm, "").slice(0, 150),
+            title: stripTags(img.title || "Campus Photograph").slice(0, 150),
             category: img.category || "Campus & Life",
             src: img.src.trim(),
             aspectRatio: img.aspectRatio || "aspect-[4/3]",
-            description: String(img.description || "").replace(/<[^>]*>?/gm, "").slice(0, 1000),
-            location: String(img.location || "Main Campus, Gurugram").replace(/<[^>]*>?/gm, "").slice(0, 100),
-            date: String(img.date || "2026").replace(/<[^>]*>?/gm, "").slice(0, 50),
+            description: stripTags(img.description || "").slice(0, 1000),
+            location: stripTags(img.location || "Main Campus, Gurugram").slice(0, 100),
+            date: stripTags(img.date || "2026").slice(0, 50),
           }))
 
         setGalleryList(dbItems)

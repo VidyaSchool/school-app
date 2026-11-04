@@ -662,14 +662,17 @@ export default function AdminGalleryPage() {
                   </Button>
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-40 overflow-y-auto p-1 border rounded-xl">
-                  {filePreviews.map((src, i) => (
-                    <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden border bg-muted">
-                      <img src={src} alt="Preview" className="w-full h-full object-cover" />
-                      <span className="absolute bottom-1 left-1 right-1 text-[9px] font-medium text-white bg-black/70 px-1 py-0.5 rounded truncate">
-                        {selectedFiles[i]?.name}
-                      </span>
-                    </div>
-                  ))}
+                  {filePreviews.map((src, i) => {
+                    const safeSrc = typeof src === "string" && (src.startsWith("blob:") || src.startsWith("https://") || src.startsWith("/")) ? src : ""
+                    return (
+                      <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden border bg-muted">
+                        {safeSrc ? <img src={safeSrc} alt="Preview" className="w-full h-full object-cover" /> : null}
+                        <span className="absolute bottom-1 left-1 right-1 text-[9px] font-medium text-white bg-black/70 px-1 py-0.5 rounded truncate">
+                          {selectedFiles[i]?.name}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

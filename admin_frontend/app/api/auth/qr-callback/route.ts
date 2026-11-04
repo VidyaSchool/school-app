@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server"
+import { randomInt, randomUUID } from "crypto"
 import { db } from "@/lib/db"
 import { user as userTable, session as sessionTable, userProfile } from "@/lib/schema"
 import { eq } from "drizzle-orm"
@@ -62,10 +63,10 @@ export async function POST(req: NextRequest) {
         .then((res) => res[0])
 
       if (!existingProfile) {
-        const genUsername = name.toLowerCase().replace(/[^a-z0-9]/g, "") || `user${Math.floor(Math.random() * 1000)}`
-        const genAdmission = `VS-${Math.floor(100000 + Math.random() * 900000)}`
+        const genUsername = name.toLowerCase().replace(/[^a-z0-9]/g, "") || `user${randomInt(100, 1000)}`
+        const genAdmission = `VS-${randomInt(100000, 999999)}`
         await db.insert(userProfile).values({
-          id: crypto.randomUUID(),
+          id: randomUUID(),
           userId: userId,
           username: null,
           admissionNumber: null,
