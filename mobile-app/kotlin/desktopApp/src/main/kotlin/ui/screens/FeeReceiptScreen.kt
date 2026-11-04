@@ -100,7 +100,7 @@ fun FeeReceiptScreen(receiptNo: String, onBack: () -> Unit) {
                         Text("✅", fontSize = 22.sp)
                         Column {
                             Text("Payment Verified", fontWeight = FontWeight.Bold, color = Color(0xFF10B981), fontSize = 15.sp)
-                            Text("Vidya School — Official Fee Receipt", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                            Text("VIDYA School — Official Fee Receipt", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                         }
                     }
 
@@ -148,7 +148,7 @@ fun FeeReceiptScreen(receiptNo: String, onBack: () -> Unit) {
                     }
 
                     Text(
-                        "This receipt has been verified against the Vidya School database. No physical signature required.",
+                        "This receipt has been verified against the VIDYA School database. No physical signature required.",
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
                         modifier = Modifier.padding(horizontal = 4.dp)

@@ -231,7 +231,7 @@ fun LoginScreen(
         ) {
             // Header Logo & Title
             Text(
-                text = "Vidya School",
+                text = "VIDYA School",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

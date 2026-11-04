@@ -5480,7 +5480,7 @@ fun FeesTabContent(
                 val checkout = com.razorpay.Checkout()
                 checkout.setKeyID(order.keyId ?: "")
                 val options = org.json.JSONObject().apply {
-                    put("name", "Vidya School")
+                    put("name", "VIDYA School")
                     put("description", "Fee: ${inst.month} ${inst.year}")
                     put("amount", order.amount)
                     put("currency", order.currency ?: "INR")

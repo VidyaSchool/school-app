@@ -26,7 +26,7 @@ struct SplashView: View {
                         .foregroundColor(.white)
                 }
 
-                Text("Vidya School")
+                Text("VIDYA School")
                     .font(AppTheme.Font.title1)
                     .foregroundColor(.white)
 
@@ -117,7 +117,7 @@ struct WelcomeView: View {
                             .foregroundColor(.white)
                     }
 
-                    Text("Vidya School")
+                    Text("VIDYA School")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.white)
                         .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 4)

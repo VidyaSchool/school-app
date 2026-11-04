@@ -274,7 +274,7 @@ fun PaymentSuccessScreen(
                 Spacer(Modifier.height(20.dp))
 
                 Text(
-                    "Verified by Vidya School · No physical signature required",
+                    "Verified by VIDYA School · No physical signature required",
                     fontSize  = 10.sp,
                     color     = onSurface.copy(alpha = 0.3f),
                     textAlign = TextAlign.Center,

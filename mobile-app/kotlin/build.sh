@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🔨 Building Vidya School Android APK using Docker..."
+echo "🔨 Building VIDYA School Android APK using Docker..."
 echo ""
 
 # Check if Docker is installed

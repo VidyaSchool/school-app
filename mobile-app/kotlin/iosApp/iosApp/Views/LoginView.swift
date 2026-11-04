@@ -23,9 +23,9 @@ struct LoginView: View {
                 GlassBackground()
 
                 VStack(spacing: 0) {
-                    // Top Centered Branding (mirrors Android Vidya School title)
+                    // Top Centered Branding (mirrors Android VIDYA School title)
                     VStack(spacing: 6) {
-                        Text("Vidya School")
+                        Text("VIDYA School")
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(.white)
                             .shadow(color: AppTheme.Color.accent.opacity(0.4), radius: 12, x: 0, y: 4)
@@ -289,7 +289,7 @@ struct SignupView: View {
                             Text("Create Account")
                                 .font(AppTheme.Font.title1)
                                 .foregroundColor(.white)
-                            Text("Join Vidya School to access your dashboard")
+                            Text("Join VIDYA School to access your dashboard")
                                 .font(AppTheme.Font.subheadline)
                                 .foregroundColor(AppTheme.Color.darkSecondary)
                         }

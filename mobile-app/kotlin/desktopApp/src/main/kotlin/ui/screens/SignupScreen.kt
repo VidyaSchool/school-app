@@ -93,7 +93,7 @@ fun SignupScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Vidya School",
+                text = "VIDYA School",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.White

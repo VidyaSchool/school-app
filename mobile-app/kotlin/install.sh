@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🔨 Building and installing Vidya School on device..."
+echo "🔨 Building and installing VIDYA School on device..."
 echo ""
 
 # Check device
@@ -25,4 +25,4 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 echo ""
 echo "✅ App installed successfully!"
-echo "🚀 Launch 'Vidya School' from your phone"
+echo "🚀 Launch 'VIDYA School' from your phone"

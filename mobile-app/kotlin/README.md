@@ -1,4 +1,4 @@
-# Vidya School - Kotlin Android App
+# VIDYA School - Kotlin Android App
 
 ## Build APK (No Android Studio Required!)
 
