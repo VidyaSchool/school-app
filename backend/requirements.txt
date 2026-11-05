@@ -4,7 +4,7 @@ anyio>=4.14.2
 bidict==0.23.1
 certifi>=2026.10.18
 click==8.4.2
-fastapi==0.138.0
+fastapi==0.162.0
 greenlet==3.5.2
 h11==0.16.0
 idna==3.18
