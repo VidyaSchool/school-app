@@ -13,31 +13,40 @@ export function HeroVideo({
   src = "https://vidyaschool-886563671776-ap-south-1-an.s3.ap-south-1.amazonaws.com/gallery/hero-video/vidya_hero_video.mp4",
   className,
 }: HeroVideoProps) {
+  const containerRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isMuted, setIsMuted] = useState(true)
-  const [, setIsPlaying] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
 
-  // Start autoplay immediately on mount (muted is required by browser autoplay policies)
+  // Autoplay initialization with explicit DOM property assignment (essential for Safari & Chrome)
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
     video.muted = true
-    const playPromise = video.play()
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => setIsPlaying(true))
-        .catch(() => {
-          setIsPlaying(false)
-        })
-    }
-  }, [])
+    video.defaultMuted = true
+    video.playsInline = true
 
-  // Automatically pause video when scrolled out of view to save battery/bandwidth/GPU
+    const attemptPlay = () => {
+      video.play().catch(() => {
+        // Autoplay may be blocked by user-agent policy until interaction
+      })
+    }
+
+    attemptPlay()
+    video.addEventListener("canplay", attemptPlay, { once: true })
+    video.addEventListener("loadeddata", attemptPlay, { once: true })
+
+    return () => {
+      video.removeEventListener("canplay", attemptPlay)
+      video.removeEventListener("loadeddata", attemptPlay)
+    }
+  }, [src])
+
+  // Pause video only when container is 100% out of viewport to save resources
   useEffect(() => {
+    const container = containerRef.current
     const video = videoRef.current
-    if (!video) return
+    if (!container || !video) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -49,20 +58,24 @@ export function HeroVideo({
           }
         })
       },
-      { threshold: 0.1 }
+      { threshold: 0 }
     )
 
-    observer.observe(video)
+    observer.observe(container)
     return () => observer.disconnect()
   }, [])
 
-  const toggleMute = useCallback(() => {
+  const toggleMute = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
     const video = videoRef.current
     if (!video) return
 
     const nextMuted = !video.muted
     video.muted = nextMuted
     setIsMuted(nextMuted)
+    if (video.paused) {
+      video.play().catch(() => {})
+    }
   }, [])
 
   const scrollToHero = useCallback(() => {
@@ -72,43 +85,41 @@ export function HeroVideo({
     }
   }, [])
 
+  // Clicking the video resumes playback if autoplay was delayed or blocked
+  const handleContainerClick = useCallback(() => {
+    const video = videoRef.current
+    if (video && video.paused) {
+      video.play().catch(() => {})
+    }
+  }, [])
+
   return (
     <section
+      ref={containerRef}
       aria-label="Vidya School Showcase Video"
+      onClick={handleContainerClick}
       className={cn(
-        "relative w-full h-screen h-[100dvh] min-h-[100dvh] overflow-hidden bg-black select-none -mt-[66px] md:-mt-[72px]",
+        "relative w-full h-screen h-[100dvh] min-h-[100dvh] overflow-hidden bg-black select-none -mt-[66px] md:-mt-[72px] z-0",
         className
       )}
     >
-      {/* Full-bleed Background Video covering 100% width and height */}
+      {/* Full-screen Video Player */}
       <video
         ref={videoRef}
-        src={src}
         autoPlay
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
         controls={false}
         disablePictureInPicture
-        onLoadedData={() => setIsLoaded(true)}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        className={cn(
-          "absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
-          isLoaded ? "opacity-100" : "opacity-0"
-        )}
-      />
-
-      {/* Loading Skeleton Placeholder */}
-      {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black">
-          <div className="size-10 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-        </div>
-      )}
+        className="absolute inset-0 h-full w-full object-cover"
+      >
+        <source src={src} type="video/mp4" />
+      </video>
 
       {/* Subtle bottom gradient overlay for smooth transition to hero section */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/40 to-transparent z-10" />
 
       {/* Floating Monochrome Mute / Unmute Button (Icon only, Black & White) */}
       <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 z-30">
@@ -133,10 +144,13 @@ export function HeroVideo({
       </div>
 
       {/* Scroll Down Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center pointer-events-auto">
         <button
           type="button"
-          onClick={scrollToHero}
+          onClick={(e) => {
+            e.stopPropagation()
+            scrollToHero()
+          }}
           aria-label="Scroll to main content"
           className="group flex flex-col items-center text-white/70 hover:text-white transition-colors cursor-pointer"
         >
