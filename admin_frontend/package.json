@@ -23,7 +23,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@editorjs/checklist": "^1.6.0",
     "@editorjs/delimiter": "^1.4.2",
-    "@editorjs/editorjs": "^2.31.6",
+    "@editorjs/editorjs": "^2.31.7",
     "@editorjs/header": "^2.8.9",
     "@editorjs/list": "^2.0.9",
     "@editorjs/quote": "^2.7.6",
