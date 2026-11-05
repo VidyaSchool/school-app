@@ -1,5 +1,6 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { HeroVideo } from "@/components/hero-video"
 import { HeroSection } from "@/components/hero-section"
 import { SectionSeparator } from "@/components/section-separator"
 import { InViewRender } from "@/components/in-view-render"
@@ -27,7 +28,8 @@ export default function Home() {
       <Header />
       
       <main className="flex-1 flex flex-col">
-        <HeroSection />
+        <HeroVideo />
+        <HeroSection offsetHeader={false} />
         <SectionSeparator />
 
         {/* About Section with screen-width background and slight x-axis margin */}

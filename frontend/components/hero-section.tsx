@@ -227,7 +227,12 @@ const INITIAL_SLIDES: HeroSlide[] = [
   ...STATIC_FALLBACK_IMAGES.map((item, idx) => buildSlideFromApi(item, idx)),
 ]
 
-export function HeroSection() {
+export interface HeroSectionProps {
+  offsetHeader?: boolean
+  className?: string
+}
+
+export function HeroSection({ offsetHeader = true, className }: HeroSectionProps = {}) {
   // Slider state
   const [slides, setSlides] = useState<HeroSlide[]>(INITIAL_SLIDES)
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
@@ -390,7 +395,11 @@ export function HeroSection() {
       aria-label="Welcome to VidyaSchool"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="relative flex min-h-screen lg:h-[100dvh] lg:min-h-[100dvh] w-full flex-col justify-center items-center overflow-x-clip -mt-[66px] md:-mt-[72px] pt-[76px] sm:pt-[82px] lg:pt-[72px] pb-4 sm:pb-6 lg:pb-0"
+      className={cn(
+        "relative flex min-h-screen lg:h-[100dvh] lg:min-h-[100dvh] w-full flex-col justify-center items-center overflow-x-clip pb-4 sm:pb-6 lg:pb-0",
+        offsetHeader ? "-mt-[66px] md:-mt-[72px] pt-[76px] sm:pt-[82px] lg:pt-[72px]" : "pt-16 sm:pt-20 lg:pt-24",
+        className
+      )}
     >
 
       {/* Full Width Hero Carousel Track Container */}
