@@ -6,7 +6,7 @@ import { BlurImage } from "@/components/blur-image"
 import { Button } from "@/components/ui/button"
 import { Play, Pause } from "lucide-react"
 
-const LOGO_SRC = "/assets/vidyaschool/Logo/restored_no_bg_with_title.png"
+const LOGO_SRC = "/assets/vidyaschool/Logo/vidyaSG_no_.png"
 
 const LiquidMetal = dynamic(
   () => import("@paper-design/shaders-react").then((mod) => mod.LiquidMetal),
