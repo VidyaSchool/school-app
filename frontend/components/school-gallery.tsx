@@ -1,9 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { createPortal } from "react-dom"
-import { X, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
 import { BlurImg } from "@/components/blur-image"
+import { Button } from "@/components/ui/button"
 
 interface SchoolImage {
   src: string
@@ -133,6 +135,21 @@ export default function SchoolGallery() {
             </span>
           </div>
         ))}
+      </div>
+
+      {/* View Gallery Button */}
+      <div className="flex items-center justify-center mt-8 sm:mt-10 md:mt-12">
+        <Button
+          asChild
+          variant="default"
+          size="md"
+          className="rounded-2xl font-semibold text-sm px-6 py-2.5 shadow-md hover:shadow-lg transition-all"
+        >
+          <Link href="/gallery">
+            <span>View Gallery</span>
+            <ArrowRight className="w-4 h-4 ml-1.5" />
+          </Link>
+        </Button>
       </div>
 
       {/* Lightbox dialog — portaled to body for true viewport centering */}

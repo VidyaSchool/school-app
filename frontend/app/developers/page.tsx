@@ -65,7 +65,7 @@ export default function DevelopersPage() {
         </div>
 
         {/* ── Main Container ── */}
-        <div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-12 lg:py-20 flex flex-col gap-16 lg:gap-24">
+        <div className="relative w-full max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 flex flex-col gap-16 lg:gap-24">
           
           {/* ──────────────────────────────────────────────────────────
               CARD 1: Standard Profile Layout

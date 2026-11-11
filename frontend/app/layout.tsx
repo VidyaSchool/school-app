@@ -53,6 +53,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { PaperPlanesWrapper } from "@/components/paper-planes-wrapper"
 import { Analytics } from "@vercel/analytics/next"
 import { SessionProvider } from "@/contexts/session-context"
+import { SmoothScroll } from "@/components/smooth-scroll"
 
 export default async function RootLayout({
   children,
@@ -88,7 +89,9 @@ export default async function RootLayout({
               <SessionProvider>
                 <AlertBanner />
                 <PWARegister />
-                {children}
+                <SmoothScroll>
+                  {children}
+                </SmoothScroll>
                 <Analytics />
                 <Toaster richColors position="bottom-right" />
               </SessionProvider>

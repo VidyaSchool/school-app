@@ -20,6 +20,9 @@ export const metadata: Metadata = {
 const VideoModal = dynamic(() => import("@/components/video-modal"), {
   loading: () => <div className="w-full aspect-video rounded-2xl bg-muted/20 animate-pulse" />
 })
+const OurWings = dynamic(() => import("@/components/our-wings"), {
+  loading: () => <div className="w-full h-[440px] rounded-3xl bg-muted/20 animate-pulse" />
+})
 const SchoolGallery = dynamic(() => import("@/components/school-gallery"))
 
 export default function Home() {
@@ -32,52 +35,52 @@ export default function Home() {
         <HeroSection offsetHeader={false} />
         <SectionSeparator />
 
-        {/* About Section with screen-width background and slight x-axis margin */}
-        <div className="w-full px-2 sm:px-4 md:px-6">
-          <InViewRender minHeight="380px" rootMargin="200px 0px">
-            <section id="about" className="relative isolate w-full mt-16 md:mt-24 py-10 md:py-16 rounded-3xl border border-border/70 overflow-hidden bg-card/20 shadow-sm">
-              {/* Section Background: founder_bg.webp */}
-              <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-                <img
-                  src="/assets/illustrations/founder_bg.webp"
-                  alt="Founder Background"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover select-none pointer-events-none"
-                />
-                <div className="absolute inset-0 bg-background/55 dark:bg-background/70" />
-              </div>
+        {/* About Section with full screen-width background */}
+        <InViewRender minHeight="380px" rootMargin="200px 0px" className="w-full">
+          <section id="about" className="relative isolate w-full mt-16 md:mt-24 py-10 md:py-16 overflow-hidden bg-card/20 border-y border-border/70 shadow-sm">
+            {/* Section Background: founder_bg.webp */}
+            <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+              <img
+                src="/assets/illustrations/founder_bg.webp"
+                alt="Founder Background"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
+              <div className="absolute inset-0 bg-background/55 dark:bg-background/70" />
+            </div>
 
-              {/* Inner Content constrained to max-w-[1380px] */}
-              <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                  <div className="lg:col-span-7"><VideoModal /></div>
-                  <div className="lg:col-span-5 flex flex-col justify-center space-y-5 bg-background/85 dark:bg-background/90 max-sm:backdrop-blur-none sm:backdrop-blur-md sm:bg-background/80 sm:dark:bg-background/85 p-6 sm:p-8 rounded-2xl border border-border/50 shadow-md">
+            {/* Inner Content constrained to max-w-[1380px] */}
+            <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                <div className="lg:col-span-7"><VideoModal videoSrc="https://www.youtube.com/embed/i0-L5cNqhX4?si=az0znDqX31n4njps" /></div>
+                <div className="lg:col-span-5 flex flex-col justify-center space-y-5 bg-background/85 dark:bg-background/90 max-sm:backdrop-blur-none sm:backdrop-blur-md sm:bg-background/80 sm:dark:bg-background/85 p-6 sm:p-8 rounded-2xl border border-border/50 shadow-md">
 
-                    <p className="text-lg sm:text-xl font-semibold text-foreground leading-relaxed">
-                      "It's like a home to me. It's the place where I grow as a person, get exposed to new ideas, learn and reach for my dreams."
-                    </p>
+                  <p className="text-lg sm:text-xl font-semibold text-foreground leading-relaxed">
+                    &ldquo;It&apos;s like a home to me. It&apos;s the place where I grow as a person, get exposed to new ideas, learn and reach for my dreams.&rdquo;
+                  </p>
 
-                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                      Here's a short film with the students, teachers, and staff talking about what makes the VIDYA School different and what it means to them.
-                    </p>
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    Here&apos;s a short film with the students, teachers, and staff talking about what makes the VIDYA School different and what it means to them.
+                  </p>
 
-                    <div className="space-y-2.5 pt-1 text-sm text-muted-foreground">
-                      <p>✓ <span className="font-medium text-foreground">Holistic Growth</span> — Fostering personal development alongside academic excellence.</p>
-                      <p>✓ <span className="font-medium text-foreground">New Ideas & Exposure</span> — Broadening horizons through visual and physical digital learning.</p>
-                      <p>✓ <span className="font-medium text-foreground">A Nurturing Community</span> — A second home where students, teachers, and staff grow together.</p>
-                    </div>
-
+                  <div className="space-y-2.5 pt-1 text-sm text-muted-foreground">
+                    <p>✓ <span className="font-medium text-foreground">Holistic Growth</span> — Fostering personal development alongside academic excellence.</p>
+                    <p>✓ <span className="font-medium text-foreground">New Ideas & Exposure</span> — Broadening horizons through visual and physical digital learning.</p>
+                    <p>✓ <span className="font-medium text-foreground">A Nurturing Community</span> — A second home where students, teachers, and staff grow together.</p>
                   </div>
+
                 </div>
               </div>
-            </section>
-          </InViewRender>
-        </div>
+            </div>
+          </section>
+        </InViewRender>
 
         <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8">
-
-
+          {/* Our Wings Section */}
+          <InViewRender minHeight="450px" rootMargin="200px 0px">
+            <OurWings />
+          </InViewRender>
 
           {/* Separator — Our School */}
           <div className="w-full flex flex-col items-center justify-center pt-16 sm:pt-24 pb-6 select-none overflow-hidden my-4 gap-2">

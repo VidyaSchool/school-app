@@ -1199,7 +1199,7 @@ export function StaticPageRenderer({
       <Header />
 
       {shouldShowSideGallery ? (
-        <main className="flex-1 mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <main className="flex-1 mx-auto w-full max-w-[1480px] px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="flex justify-center items-start gap-6 2xl:gap-10">
             {/* Left Side Gallery Column */}
             <SideGalleryColumn

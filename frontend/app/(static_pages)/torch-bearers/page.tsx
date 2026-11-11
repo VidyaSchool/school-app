@@ -42,7 +42,7 @@ export default function TorchBearersPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
 
-      <main className="flex-1 py-12 px-4 sm:px-8 md:px-12 lg:px-24">
+      <main className="flex-1 mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero */}
         <div className="text-center space-y-4 mb-14">
           <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs font-semibold">
@@ -58,7 +58,7 @@ export default function TorchBearersPage() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
           {torchBearers.map((person) => (
             <Card key={person.name} className="bg-card/60 hover:bg-card hover:shadow-md transition-all duration-200">
               <CardContent className="p-6 flex flex-col items-center text-center gap-4">

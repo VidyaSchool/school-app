@@ -129,7 +129,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItem[] })
     <main className="min-h-screen bg-background text-foreground transition-colors duration-300 relative overflow-hidden font-sans">
 
       {/* ── Photo Grid Section ── */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-24">
+      <section className="mx-auto max-w-[1380px] px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-24">
         {visibleItems.length === 0 ? (
           <div className="text-center py-28 space-y-3 bg-card/40 rounded-2xl border border-dashed border-border/80 max-w-lg mx-auto">
             <ImageIcon className="h-10 w-10 text-muted-foreground/50 mx-auto" />
@@ -140,7 +140,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItem[] })
           </div>
         ) : (
           /* Gallery Masonry Layout — Zero Extra Space, Exact Image Dimensions */
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+          <div className="columns-1 sm:columns-2 md:columns-3 xl:columns-4 gap-6 space-y-6">
             {visibleItems.map((item, index) => (
               <div
                 key={item.id || item.src}

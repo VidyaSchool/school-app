@@ -7,7 +7,13 @@ import Image from "next/image"
 
 const emptySubscribe = () => () => {}
 
-export default function VideoModal() {
+interface VideoModalProps {
+  videoSrc?: string
+}
+
+export default function VideoModal({
+  videoSrc = "https://www.youtube.com/embed/i0-L5cNqhX4?si=az0znDqX31n4njps",
+}: VideoModalProps = {}) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const imageContainerRef = useRef<HTMLDivElement>(null)
   const badgeRef = useRef<HTMLDivElement>(null)
@@ -107,7 +113,11 @@ export default function VideoModal() {
               <X className="h-5 w-5" />
             </button>
             <iframe
-              src="https://www.youtube.com/embed/LxzeiY0BG1U?si=m2V7tJ-BuAWCP48f&autoplay=1"
+              src={
+                videoSrc.includes("autoplay=")
+                  ? videoSrc
+                  : `${videoSrc}${videoSrc.includes("?") ? "&" : "?"}autoplay=1`
+              }
               title="VIDYA Video"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

@@ -642,7 +642,7 @@ export function AccountsDashboard({ username }: { username: string }) {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0">
+    <main className="flex flex-1 flex-col gap-6 p-4 pt-0 md:p-6 md:pt-0 w-full max-w-[1536px] mx-auto">
       <Toaster />
 
       {/* Welcome & Global Actions Banner */}

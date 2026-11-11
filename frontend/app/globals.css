@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "fumadocs-ui/css/shadcn.css";
 @import "fumadocs-ui/css/preset.css";
+@import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -239,9 +240,31 @@
 }
 
 /* Shared layout primitives for consistent desktop scaling */
+:root {
+  --site-max-width: 1380px;
+  --site-card-max-width: 1480px;
+  --site-prose-max-width: 72ch;
+}
+
+.site-container {
+  width: 100%;
+  max-width: var(--site-max-width);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 2.5vw, 2rem);
+  min-width: 0;
+}
+
+.site-container-card {
+  width: 100%;
+  max-width: var(--site-card-max-width);
+  margin-inline: auto;
+  padding-inline: clamp(0.5rem, 1.5vw, 1.5rem);
+  min-width: 0;
+}
+
 .page-container {
   width: 100%;
-  max-width: 1600px;
+  max-width: 1536px;
   margin-inline: auto;
   padding-inline: clamp(1rem, 2vw, 2rem);
   min-width: 0;
@@ -253,5 +276,9 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.prose-readable {
+  max-width: var(--site-prose-max-width);
 }
 

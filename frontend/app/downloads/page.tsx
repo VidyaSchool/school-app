@@ -13,7 +13,7 @@ export default function DownloadsPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
 
-      <main className="flex-1 py-12 px-4 sm:px-8 md:px-12 lg:px-24">
+      <main className="flex-1 mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8 py-12">
         <DownloadsClient />
       </main>
 

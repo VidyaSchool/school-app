@@ -110,7 +110,7 @@ export function HeroVideo({
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         controls={false}
         disablePictureInPicture
         className="absolute inset-0 h-full w-full object-cover"

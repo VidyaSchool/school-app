@@ -40,7 +40,7 @@ export function DownloadsClient() {
   }, [])
 
   return (
-    <div className="max-w-6xl mx-auto space-y-16">
+    <div className="w-full max-w-5xl mx-auto space-y-16">
       {/* Hero Section */}
       <div className="text-center space-y-4">
         <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs font-semibold border-primary/30 bg-primary/5 text-primary">
