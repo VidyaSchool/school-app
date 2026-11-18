@@ -31,7 +31,7 @@
         "id": "faq_p_intro2",
         "type": "paragraph",
         "data": {
-          "text": "Should you have specific inquiries not covered below, our administrative office is at your service. Please write to <b>admissions@vidyaschool.com</b> or call our front desk at <b>+91 (0124) 404-9559</b> during school working hours (Monday through Friday, 8:00 AM – 3:30 PM)."
+          "text": "Should you have specific inquiries not covered below, our administrative office is at your service. Please write to <b>info.vidyaschool@vidya-india.org</b> or call our front desk at <b>+91-81306 72281</b> during school working hours (Monday through Friday, 8:00 AM – 3:30 PM)."
         }
       },
       {
@@ -381,7 +381,7 @@
         "id": "faq_a16",
         "type": "paragraph",
         "data": {
-          "text": "A: We welcome professionals and corporate partners through our VIDYA MITR mentorship program. Volunteers can conduct conversational English sessions, host career seminars, lead STEM and coding workshops, sponsor annual student educational kits, or organize workplace exposure visits. Please visit our <b>/p/get-involved</b> page or contact <b>volunteer@vidyaschool.com</b> to get started."
+          "text": "A: We welcome professionals and corporate partners through our VIDYA MITR mentorship program. Volunteers can conduct conversational English sessions, host career seminars, lead STEM and coding workshops, sponsor annual student educational kits, or organize workplace exposure visits. Please visit our <a href=\"https://beta.vidyaschool.com/p/get-involved\">Get Involved</a> page or contact <b>info.vidyaschool@vidya-india.org</b> to get started."
         }
       }
     ],

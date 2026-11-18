@@ -612,10 +612,7 @@ export default function MandatoryPublicDisclosurePage() {
                       <TableCell className="text-center font-medium">6</TableCell>
                       <TableCell className="font-semibold text-foreground">Details of Counsellor</TableCell>
                       <TableCell className="text-center font-mono font-medium">01</TableCell>
-                      <TableCell>
-                        <span className="font-medium text-foreground">Ms. Nikita Kulhari</span>
-                        <span className="text-muted-foreground text-xs block">M.A (Applied Psychology)</span>
-                      </TableCell>
+                      <TableCell className="text-center font-mono font-medium">Ms. Manisha Tiwari</TableCell>
                     </TableRow>
 
                     <TableRow>
@@ -640,11 +637,8 @@ export default function MandatoryPublicDisclosurePage() {
                     <TableRow>
                       <TableCell className="text-center font-medium">8</TableCell>
                       <TableCell className="font-semibold text-foreground">Details of Wellness Teacher</TableCell>
-                      <TableCell className="text-center font-mono font-medium">01</TableCell>
-                      <TableCell>
-                        <span className="font-medium text-foreground">Ms. Archana</span>
-                        <span className="text-muted-foreground text-xs block">B.A (Social Work)</span>
-                      </TableCell>
+                      <TableCell className="text-center font-mono text-muted-foreground">—</TableCell>
+                      <TableCell className="text-center font-mono text-muted-foreground">—</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
