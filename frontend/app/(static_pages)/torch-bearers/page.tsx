@@ -13,13 +13,13 @@ export const metadata: Metadata = {
 const torchBearers = [
   { name: "Mrs. Rashmi Misra", role: "Founder and Chairperson" },
   { name: "Mrs. Malvika Goyal", role: "Vice Chairperson" },
-  { name: "Ms. Dilruba Kalsi", role: "Executive Director Pan India" },
-  { name: "Ila Sarin", role: "VIDYA School – Principal" },
-  { name: "Mr. Yash Pal Syngal", role: "Mentor" },
+  { name: "Ms. Pratima Goyal", role: "Guide for Total Wellness" },
+  { name: "Ms. Uma Ramachandran", role: "School Manager" },
   { name: "Ms. Sarita Shahi", role: "Mentor" },
   { name: "Mr. Zal Daver", role: "Mentor" },
-  { name: "Pratima Goyal", role: "Guide for Total Wellness" },
-  { name: "Ms. Uma Ramachandran", role: "School Manager" }
+  { name: "Mr. Yash Pal Synyal", role: "Mentor" },
+  { name: "Ms. Geetanjali Pande", role: "Mentor" },
+  { name: "Ms. Ila Sarin", role: "VIDYA School – Principal" }
 ]
 
 function Avatar({ name }: { name: string }) {

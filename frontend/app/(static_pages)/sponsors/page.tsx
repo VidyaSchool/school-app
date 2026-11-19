@@ -4,7 +4,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Heart, Plus } from "lucide-react"
+import { Heart, Plus, RefreshCw } from "lucide-react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -29,58 +29,86 @@ const sponsors = [
 
 export default function SponsorsPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
       <Header />
 
-      <main className="flex-1 mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero */}
-        <div className="text-center space-y-4 mb-14">
-          <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs font-semibold">
-            <Heart className="h-3.5 w-3.5 text-rose-500" />
-            Our Sponsors & Partners
-          </Badge>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-            Backed by the Best
-          </h1>
-          <p className="max-w-xl mx-auto text-muted-foreground text-sm sm:text-base leading-relaxed">
-            These organizations believe in our mission to empower minds and shape futures. Their support makes VidyaSchool possible.
-          </p>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
-          {sponsors.map((sponsor) => (
-            <Card key={sponsor.name} className="bg-card/60 hover:bg-card hover:shadow-md transition-all duration-200">
-              <CardContent className="p-5 flex gap-4 items-start">
-                <div className="shrink-0 flex items-center justify-center bg-white rounded-lg p-2 shadow-xs w-16 h-16">
-                  <Image
-                    src={sponsor.logo}
-                    width={sponsor.width}
-                    height={sponsor.height}
-                    alt={`${sponsor.name} logo`}
-                    className="object-contain max-w-full max-h-full"
-                  />
-                </div>
-                <div className="flex-1 min-w-0 space-y-1">
-                  <p className="font-semibold text-foreground text-sm">{sponsor.name}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{sponsor.description}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          <Link
-            href="https://pages.razorpay.com/pl_CFFRr3HwNiFEwo/view"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/20 hover:bg-muted/40 hover:border-foreground/30 transition-all duration-200 min-h-[140px]"
-          >
-            <Plus className="h-5 w-5 text-muted-foreground" />
-            <span className="text-[10px] font-medium text-muted-foreground">Become a Sponsor</span>
-          </Link>
-        </div>
+      <main className="mx-auto flex w-full max-w-[1380px] flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-xl border-dashed bg-card/60">
+          <CardContent className="flex flex-col items-center p-10 text-center">
+            <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs font-semibold">
+              <RefreshCw className="h-3.5 w-3.5" />
+              Page Update
+            </Badge>
+            <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+              Content to be Updated
+            </h1>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+              This page is currently being updated. Updated sponsor and partner information will be added here soon.
+            </p>
+          </CardContent>
+        </Card>
       </main>
 
       <Footer />
     </div>
   )
 }
+
+
+// export default function SponsorsPage() {
+//   return (
+//     <div className="flex flex-col min-h-screen bg-background">
+//       <Header />
+
+//       <main className="flex-1 mx-auto w-full max-w-[1380px] px-4 sm:px-6 lg:px-8 py-12">
+//         {/* Hero */}
+//         <div className="text-center space-y-4 mb-14">
+//           <Badge variant="outline" className="gap-1.5 px-3 py-1 text-xs font-semibold">
+//             <Heart className="h-3.5 w-3.5 text-rose-500" />
+//             Our Sponsors & Partners
+//           </Badge>
+//           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+//             Backed by the Best
+//           </h1>
+//           <p className="max-w-xl mx-auto text-muted-foreground text-sm sm:text-base leading-relaxed">
+//             These organizations believe in our mission to empower minds and shape futures. Their support makes VidyaSchool possible.
+//           </p>
+//         </div>
+
+//         {/* Grid */}
+//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+//           {sponsors.map((sponsor) => (
+//             <Card key={sponsor.name} className="bg-card/60 hover:bg-card hover:shadow-md transition-all duration-200">
+//               <CardContent className="p-5 flex gap-4 items-start">
+//                 <div className="shrink-0 flex items-center justify-center bg-white rounded-lg p-2 shadow-xs w-16 h-16">
+//                   <Image
+//                     src={sponsor.logo}
+//                     width={sponsor.width}
+//                     height={sponsor.height}
+//                     alt={`${sponsor.name} logo`}
+//                     className="object-contain max-w-full max-h-full"
+//                   />
+//                 </div>
+//                 <div className="flex-1 min-w-0 space-y-1">
+//                   <p className="font-semibold text-foreground text-sm">{sponsor.name}</p>
+//                   <p className="text-xs text-muted-foreground leading-relaxed">{sponsor.description}</p>
+//                 </div>
+//               </CardContent>
+//             </Card>
+//           ))}
+//           <Link
+//             href="https://pages.razorpay.com/pl_CFFRr3HwNiFEwo/view"
+//             target="_blank"
+//             rel="noopener noreferrer"
+//             className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-muted/20 hover:bg-muted/40 hover:border-foreground/30 transition-all duration-200 min-h-[140px]"
+//           >
+//             <Plus className="h-5 w-5 text-muted-foreground" />
+//             <span className="text-[10px] font-medium text-muted-foreground">Become a Sponsor</span>
+//           </Link>
+//         </div>
+//       </main>
+
+//       <Footer />
+//     </div>
+//   )
+// }
