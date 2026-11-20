@@ -36,7 +36,7 @@ hpack==4.2.0
 httpcore==1.0.9
 httpx==0.28.1
 hyperframe==6.1.0
-apscheduler==3.10.4
+apscheduler==3.11.3
 pytz==2024.2
 requests>=2.33.0
 python-multipart>=0.0.32
