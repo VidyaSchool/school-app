@@ -39,6 +39,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      { source: "/p/school-management-committee", destination: "/school-management-committee", permanent: false},
       { source: '/about', destination: '/about-vidyaschool', permanent: false },
       { source: '/principal-message', destination: '/principals-message', permanent: false },
       { source: '/faculty-and-staff', destination: '/teachers-and-staff', permanent: false },
