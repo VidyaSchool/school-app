@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Volume2, VolumeX, ChevronDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface HeroVideoProps {
@@ -123,15 +124,12 @@ export function HeroVideo({
 
       {/* Floating Monochrome Mute / Unmute Button (Icon only, Black & White) */}
       <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 z-30">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon-lg"
           onClick={toggleMute}
-          className={cn(
-            "flex size-11 sm:size-12 items-center justify-center rounded-full cursor-pointer select-none",
-            "bg-black/70 hover:bg-black text-white backdrop-blur-md",
-            "border border-white/30 shadow-2xl transition-all duration-200",
-            "hover:scale-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          )}
+          className="rounded-full bg-black/70 hover:bg-black text-white border-white/30 backdrop-blur-md shadow-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer"
           aria-label={isMuted ? "Unmute video" : "Mute video"}
           title={isMuted ? "Unmute video" : "Mute video"}
         >
@@ -140,23 +138,24 @@ export function HeroVideo({
           ) : (
             <Volume2 className="size-5 text-white" />
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Scroll Down Indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center pointer-events-auto">
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={(e) => {
             e.stopPropagation()
             scrollToHero()
           }}
           aria-label="Scroll to main content"
-          className="group flex flex-col items-center text-white/70 hover:text-white transition-colors cursor-pointer"
+          className="group flex flex-col items-center text-white/70 hover:text-white hover:bg-transparent h-auto p-0 cursor-pointer"
         >
           <span className="text-[11px] font-medium tracking-wider uppercase drop-shadow">Scroll</span>
           <ChevronDown className="size-4 animate-bounce mt-1 text-white/70 group-hover:text-white transition-colors" />
-        </button>
+        </Button>
       </div>
     </section>
   )

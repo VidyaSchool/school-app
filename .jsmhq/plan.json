@@ -1,0 +1,11 @@
+{
+  "boards": [
+    {
+      "id": "B1",
+      "title": "Backlog",
+      "status": "active",
+      "order": 0
+    }
+  ],
+  "tasks": []
+}

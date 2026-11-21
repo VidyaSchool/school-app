@@ -139,15 +139,10 @@ export default function SchoolGallery() {
 
       {/* View Gallery Button */}
       <div className="flex items-center justify-center mt-8 sm:mt-10 md:mt-12">
-        <Button
-          asChild
-          variant="default"
-          size="md"
-          className="rounded-2xl font-semibold text-sm px-6 py-2.5 shadow-md hover:shadow-lg transition-all"
-        >
+        <Button asChild variant="default" size="md">
           <Link href="/gallery">
             <span>View Gallery</span>
-            <ArrowRight className="w-4 h-4 ml-1.5" />
+            <ArrowRight className="size-4" />
           </Link>
         </Button>
       </div>
@@ -177,35 +172,41 @@ export default function SchoolGallery() {
             </div>
 
             {/* Navigation Buttons */}
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={(e) => {
                 e.stopPropagation()
                 setActiveIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : images.length - 1))
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white p-2.5 transition-colors shadow-lg"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white shadow-lg cursor-pointer"
               aria-label="Previous image"
             >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
+              <ChevronLeft className="size-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={(e) => {
                 e.stopPropagation()
                 setActiveIndex((prev) => (prev !== null && prev < images.length - 1 ? prev + 1 : 0))
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white p-2.5 transition-colors shadow-lg"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white shadow-lg cursor-pointer"
               aria-label="Next image"
             >
-              <ChevronRight className="h-5 w-5" />
-            </button>
+              <ChevronRight className="size-5" />
+            </Button>
 
             {/* Close Button */}
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setActiveIndex(null)}
-              className="absolute top-4 right-4 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white p-2.5 transition-all duration-300 hover:rotate-90 shadow-lg"
+              className="absolute top-4 right-4 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white shadow-lg hover:rotate-90 transition-transform duration-300 cursor-pointer"
               aria-label="Close"
             >
-              <X className="h-5 w-5" />
-            </button>
+              <X className="size-5" />
+            </Button>
           </div>
         </div>,
         document.body

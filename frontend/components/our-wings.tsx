@@ -217,15 +217,10 @@ export function OurWings() {
 
       {/* Footer Link to Full Academic Curriculum */}
       <div className="flex items-center justify-center mt-6 sm:mt-8">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="rounded-xl font-semibold text-xs border-border/80 hover:bg-accent transition-colors shadow-sm"
-        >
+        <Button asChild variant="outline" size="md">
           <Link href="/curriculum">
-            Explore Full Academic Curriculum
-            <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+            <span>Explore Full Academic Curriculum</span>
+            <ArrowRight className="size-4" />
           </Link>
         </Button>
       </div>

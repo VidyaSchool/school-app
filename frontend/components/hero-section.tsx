@@ -445,10 +445,10 @@ export function HeroSection({ offsetHeader = true, className }: HeroSectionProps
                         </p>
 
                         <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
-                          <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5">
+                          <Button asChild variant="default" size="md" className="w-full sm:w-auto">
                             <Link href="/mandatory-public-disclosure">
                               <span>Mandatory Public Disclosure</span>
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                              <ArrowRight className="size-4" />
                             </Link>
                           </Button>
                         </div>
@@ -474,10 +474,10 @@ export function HeroSection({ offsetHeader = true, className }: HeroSectionProps
                         </p>
 
                         <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
-                          <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5">
+                          <Button asChild variant="default" size="md" className="w-full sm:w-auto">
                             <Link href="/mandatory-public-disclosure">
                               <span>Mandatory Public Disclosure</span>
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                              <ArrowRight className="size-4" />
                             </Link>
                           </Button>
                         </div>
@@ -513,14 +513,14 @@ export function HeroSection({ offsetHeader = true, className }: HeroSectionProps
                           </p>
 
                           <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center">
-                            <Button asChild variant="default" size="md" className="w-full sm:w-auto px-6 py-2.5">
+                            <Button asChild variant="default" size="md" className="w-full sm:w-auto">
                               <Link href={slide.primaryCta.href}>
                                 <span>{slide.primaryCta.text}</span>
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                                <ArrowRight className="size-4" />
                               </Link>
                             </Button>
                             {slide.secondaryCta && (
-                              <Button asChild variant="outline" size="md" className="w-full sm:w-auto px-6 py-2.5">
+                              <Button asChild variant="outline" size="md" className="w-full sm:w-auto">
                                 <Link href={slide.secondaryCta.href}>
                                   <span>{slide.secondaryCta.text}</span>
                                 </Link>
@@ -566,14 +566,14 @@ export function HeroSection({ offsetHeader = true, className }: HeroSectionProps
                         </p>
 
                         <div className="flex w-full flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center">
-                          <Button asChild size="md" className="w-full sm:w-auto px-6 py-2.5 bg-white text-zinc-950 hover:bg-zinc-100 shadow-md transition-all border-0">
+                          <Button asChild variant="secondary" size="md" className="w-full sm:w-auto">
                             <Link href={slide.primaryCta.href}>
                               <span>{slide.primaryCta.text}</span>
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                              <ArrowRight className="size-4" />
                             </Link>
                           </Button>
                           {slide.secondaryCta && (
-                            <Button asChild variant="outline" size="md" className="w-full sm:w-auto px-6 py-2.5 bg-white/15 hover:bg-white/25 text-white border-white/30 backdrop-blur-md transition-all">
+                            <Button asChild variant="outline" size="md" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/20 hover:text-white backdrop-blur-md">
                               <Link href={slide.secondaryCta.href}>
                                 <span>{slide.secondaryCta.text}</span>
                               </Link>

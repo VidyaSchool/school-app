@@ -387,12 +387,12 @@ export function Header() {
         <div className="hidden md:flex items-center gap-2">
           <SearchButton />
           <ThemeToggle />
-          <Button variant="ghost" size="sm" asChild className="rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/10">
+          <Button variant="ghost" size="sm" asChild className="text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/10">
             <Link id="header-student-portal-btn" href="/login">
               Login
             </Link>
           </Button>
-          <Button variant="default" size="sm" asChild className="rounded-full">
+          <Button variant="default" size="sm" asChild>
             <Link id="header-teacher-portal-btn" href="/signup">
               Signup
             </Link>

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useSyncExternalStore } from "react"
 import { createPortal } from "react-dom"
 import { Play, X } from "lucide-react"
 import Image from "next/image"
+import { Button } from "@/components/ui/button"
 
 const emptySubscribe = () => () => {}
 
@@ -71,13 +72,15 @@ export default function VideoModal({
           quality={85}
           sizes="(max-width: 1024px) 100vw, 58vw"
         />
-        <button
+        <Button
           type="button"
-          className="absolute left-1/2 top-1/2 z-20 flex h-18 w-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-white/20 text-white shadow-2xl backdrop-blur-md transition-transform hover:scale-110"
+          variant="outline"
+          size="icon-xl"
+          className="absolute left-1/2 top-1/2 z-20 flex size-18 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-white/20 text-white shadow-2xl backdrop-blur-md transition-transform hover:scale-110 hover:bg-white/30 cursor-pointer pointer-events-none"
           aria-label="Play video"
         >
-          <Play className="ml-1 h-7 w-7 fill-current" />
-        </button>
+          <Play className="ml-1 size-7 fill-current" />
+        </Button>
 
         {/* Floating cursor badge — purely GPU accelerated, zero React re-renders */}
         <div 
@@ -105,13 +108,16 @@ export default function VideoModal({
             onClick={(e) => e.stopPropagation()} 
             className="relative max-w-5xl w-full aspect-video rounded-2xl overflow-hidden border border-white/10 bg-black/95 shadow-2xl animate-zoom-in cursor-default"
           >
-            <button 
-              onClick={() => setIsModalOpen(false)} 
-              className="absolute top-4 right-4 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white p-2.5 transition-all hover:rotate-90 duration-300 shadow-lg" 
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 z-20 rounded-full bg-black/60 hover:bg-black/80 border border-white/10 hover:border-white/30 text-white transition-all hover:rotate-90 duration-300 shadow-lg cursor-pointer"
               aria-label="Close"
             >
-              <X className="h-5 w-5" />
-            </button>
+              <X className="size-5" />
+            </Button>
             <iframe
               src={
                 videoSrc.includes("autoplay=")
