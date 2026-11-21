@@ -1001,7 +1001,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className="px-2 pt-0 pb-1.5 group-data-[collapsible=icon]:hidden">
         <div className="flex items-center justify-start gap-1 text-[10px] text-muted-foreground/80 font-normal w-full pl-1.5">
-          <span>© {new Date().getFullYear()} VidyaSchool</span>
+          <span>© {new Date().getFullYear()} VIDYA School</span>
           <span>•</span>
           <a href="/docs/terms-of-service" className="hover:text-foreground hover:underline transition-colors">Terms</a>
           <span>•</span>
