@@ -531,7 +531,7 @@ export default function SignUpPage() {
                   {sendingOtp ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Sending OTP...
+                      Send Verification Code
                     </>
                   ) : (
                     <>
@@ -588,9 +588,10 @@ export default function SignUpPage() {
                   disabled={verifyingOtp || otp.length !== 6}
                 >
                   {verifyingOtp ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying...
-                    </>
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Verify & Continue
+                    </span>
                   ) : (
                     "Verify & Continue"
                   )}
@@ -929,10 +930,10 @@ export default function SignUpPage() {
                     className="flex-1 cursor-pointer font-normal"
                   >
                     {submitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating Account...
-                      </>
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Complete Registration
+                      </span>
                     ) : (
                       "Complete Registration"
                     )}

@@ -388,8 +388,19 @@ function LoginFormContent() {
                     </Field>
 
                     <Field>
-                      <Button type="submit" className="w-full font-semibold" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
+                      <Button
+                        type="submit"
+                        className="w-full font-semibold cursor-pointer"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Login
+                          </span>
+                        ) : (
+                          "Login"
+                        )}
                       </Button>
                     </Field>
                   </FieldGroup>
