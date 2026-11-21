@@ -41,12 +41,14 @@ export default function StudentDashboardLoading() {
       </div>
 
       {/* Calendar skeleton */}
-      <div className="mx-4 lg:mx-6 rounded-2xl bg-zinc-100 dark:bg-[#121212] p-5">
-        <div className="flex justify-between mb-5">
-          <Skeleton className="h-5 w-20 rounded-md" />
-          <Skeleton className="h-7 w-40 rounded-lg" />
+      <div className="px-4 lg:px-6">
+        <div className="rounded-2xl bg-zinc-100 dark:bg-[#121212] p-5">
+          <div className="flex justify-between mb-5">
+            <Skeleton className="h-5 w-20 rounded-md" />
+            <Skeleton className="h-7 w-40 rounded-lg" />
+          </div>
+          <Skeleton className="h-[190px] w-full rounded-xl" />
         </div>
-        <Skeleton className="h-[190px] w-full rounded-xl" />
       </div>
 
       {/* Widgets skeleton */}

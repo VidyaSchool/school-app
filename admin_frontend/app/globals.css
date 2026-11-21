@@ -241,8 +241,6 @@
 /* Shared layout primitives for consistent desktop scaling */
 .page-container {
   width: 100%;
-  max-width: 1600px;
-  margin-inline: auto;
   padding-inline: clamp(1rem, 2vw, 2rem);
   min-width: 0;
 }
