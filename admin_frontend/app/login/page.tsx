@@ -551,7 +551,7 @@ export default function LoginPage() {
                     <div className="flex flex-col gap-5 pt-6 mt-4">
                       <FieldSeparator>Or sign in with</FieldSeparator>
 
-                      <div className="grid grid-cols-3 gap-3 pt-1">
+                      <div className="grid grid-cols-2 gap-3 pt-1">
                         <Button
                           variant="outline"
                           type="button"
@@ -605,7 +605,7 @@ export default function LoginPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <div className="rounded-lg border border-border/60 bg-muted/40 p-2.5 text-center text-xs text-muted-foreground">
+                        <div className="rounded-lg border border-border/60 p-2.5 text-center text-xs text-muted-foreground">
                           Student, Teacher, or Staff member?{" "}
                           <a
                             href={`${MAIN_FRONTEND_URL}/login`}
