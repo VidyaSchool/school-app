@@ -605,7 +605,7 @@ export default function LoginPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <div className="rounded-lg border border-border/60 p-2.5 text-center text-xs text-muted-foreground">
+                        <div className="text-center text-xs text-muted-foreground">
                           Student, Teacher, or Staff member?{" "}
                           <a
                             href={`${MAIN_FRONTEND_URL}/login`}
