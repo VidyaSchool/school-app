@@ -608,7 +608,7 @@ export default function LoginPage() {
                         <div className="text-center text-xs text-muted-foreground">
                           Student, Teacher, or Staff member?{" "}
                           <a
-                            href={`${MAIN_FRONTEND_URL}/login`}
+                            href="http://vidyaschool.com/login"
                             className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors inline-flex items-center gap-0.5"
                           >
                             Main Portal &rarr;
