@@ -376,7 +376,7 @@ export default function LoginPage() {
           publicKey: {
             challenge: challengeBytes,
             rp: {
-              name: "VidyaSchool Administration",
+              name: "VIDYA School Administration",
               id: window.location.hostname,
             },
             user: {
@@ -473,12 +473,12 @@ export default function LoginPage() {
       <div className="mb-6 flex items-center gap-2.5 font-semibold text-lg tracking-tight">
         <Image
           src="/assets/vidyaschool/Logo/no_title.svg"
-          alt="VidyaSchool Logo"
+          alt="VIDYA School Logo"
           width={26}
           height={26}
           className="h-6 w-6 object-contain"
         />
-        VidyaSchool
+        VIDYA School
       </div>
 
       {/* Centered Form Container */}
@@ -792,7 +792,7 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-1.5 text-center">
                   <h1 className="text-2xl font-bold tracking-tight">Scan to Login</h1>
                   <p className="text-sm text-muted-foreground">
-                    Open the <strong>VidyaSchool app</strong> on your phone and tap <strong>QR Login</strong>
+                    Open the <strong>VIDYA School app</strong> on your phone and tap <strong>QR Login</strong>
                   </p>
                 </div>
 
