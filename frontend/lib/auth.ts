@@ -6,7 +6,7 @@ import * as schema from './schema'
 import { Resend } from 'resend'
 import { eq } from 'drizzle-orm'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_for_build")
 
 const usernameLoginPlugin = {
   id: 'username-login-resolver',
@@ -64,18 +64,34 @@ export const auth = betterAuth({
   plugins: [usernameLoginPlugin],
   trustedOrigins: [
     'https://vidyaschool.vercel.app',
-    'https://*.vercel.app',
     'https://dashboard.vidyaschool.com',
+    'https://auth.vidyaschool.com',
+    'https://erp.vidyaschool.com',
     'https://vidyaschool.com',
     'https://*.vidyaschool.com',
     'https://*.blazeneuro.com',
     ...(process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : []),
+    ...(process.env.NEXT_PUBLIC_AUTH_URL ? [process.env.NEXT_PUBLIC_AUTH_URL] : []),
+    ...(process.env.NEXT_PUBLIC_MAIN_URL ? [process.env.NEXT_PUBLIC_MAIN_URL] : []),
     ...(process.env.NEXT_PUBLIC_ADMIN_URL ? [process.env.NEXT_PUBLIC_ADMIN_URL] : []),
+    ...(process.env.NEXT_PUBLIC_ERP_URL ? [process.env.NEXT_PUBLIC_ERP_URL] : []),
     ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
+    'http://localhost:3003',
   ],
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: process.env.COOKIE_DOMAIN || (process.env.NODE_ENV === 'production' ? '.vidyaschool.com' : undefined),
+    },
+    defaultCookieAttributes: {
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    },
+  },
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema,
@@ -93,6 +109,10 @@ export const auth = betterAuth({
     autoSignIn: true,
     resetPasswordTokenExpiresIn: 300,
     sendResetPassword: async ({ user, url }) => {
+      if (!process.env.RESEND_API_KEY) {
+        console.warn('[auth] RESEND_API_KEY is not configured; skipping email dispatch')
+        return
+      }
       await resend.emails.send({
         from: 'VidyaSchool <noreply@blazeneuro.com>',
         to: user.email,
@@ -103,6 +123,10 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      if (!process.env.RESEND_API_KEY) {
+        console.warn('[auth] RESEND_API_KEY is not configured; skipping email dispatch')
+        return
+      }
       await resend.emails.send({
         from: 'VidyaSchool <noreply@blazeneuro.com>',
         to: user.email,

@@ -6,7 +6,7 @@ import * as schema from './schema'
 import { Resend } from 'resend'
 import { eq } from 'drizzle-orm'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_for_build")
 
 const usernameLoginPlugin = {
   id: 'username-login-resolver',
@@ -109,6 +109,10 @@ export const auth = betterAuth({
     autoSignIn: true,
     resetPasswordTokenExpiresIn: 300,
     sendResetPassword: async ({ user, url }) => {
+      if (!process.env.RESEND_API_KEY) {
+        console.warn('[auth] RESEND_API_KEY is not configured; skipping email dispatch')
+        return
+      }
       await resend.emails.send({
         from: 'VidyaSchool <noreply@blazeneuro.com>',
         to: user.email,
@@ -119,6 +123,10 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      if (!process.env.RESEND_API_KEY) {
+        console.warn('[auth] RESEND_API_KEY is not configured; skipping email dispatch')
+        return
+      }
       await resend.emails.send({
         from: 'VidyaSchool <noreply@blazeneuro.com>',
         to: user.email,
