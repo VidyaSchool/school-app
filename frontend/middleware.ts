@@ -2,57 +2,30 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { auth } from './lib/auth'
-import { db } from './lib/db'
-import { user as userTable, session as sessionTable, userProfile } from './lib/schema'
-import { eq } from 'drizzle-orm'
 import { checkRateLimit } from './lib/rate-limit'
 
-const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || (process.env.NODE_ENV === 'production' ? "https://dashboard.vidyaschool.com" : "http://localhost:3001")
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || (process.env.NODE_ENV === 'production' ? 'https://dashboard.vidyaschool.com' : 'http://localhost:3001')
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || (process.env.NODE_ENV === 'production' ? 'https://auth.vidyaschool.com' : 'http://localhost:3002')
+const ERP_URL = process.env.NEXT_PUBLIC_ERP_URL || (process.env.NODE_ENV === 'production' ? 'https://erp.vidyaschool.com' : 'http://localhost:3003')
 
-// Public routes - accessible without authentication
-const publicRoutes = ['/', '/login', '/signup', '/unauthorized', '/downloads']
+// Auth routes that live in the dedicated auth app
+const authRoutes = [
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/reset-password',
+  '/login-accounts',
+  '/auth',
+]
 
-// Role → destination mapping for /dashboard and /[role] redirect
-const roleDashboardMap: Record<string, string> = {
-  teacher: '/teacher',
-  librarian: '/librarian',
-  account: '/accounts',
-  student: '/student',
-}
-
-// FIREWALL: Protected routes with required roles
-const protectedRoutes = {
-  '/student': ['student'],
-  '/teacher': ['teacher', 'admin', 'librarian'],
-  '/librarian': ['librarian', 'admin'],
-  '/accounts': ['admin', 'account'],
-  '/login-accounts': ['student', 'teacher', 'admin', 'account', 'librarian'],
-}
-
-async function resolveUserDestination(user: any): Promise<string> {
-  try {
-    const profile = await db
-      .select()
-      .from(userProfile)
-      .where(eq(userProfile.userId, user.id))
-      .then(res => res[0])
-
-    if (user.role === 'admin') {
-      return profile?.username ? `${ADMIN_URL}/admin/${profile.username}` : `${ADMIN_URL}/admin`
-    }
-
-    if (profile?.username && profile?.onboardingCompleted) {
-      const rolePrefix = roleDashboardMap[user.role as string] ?? '/student'
-      return `${rolePrefix}/${profile.username}`
-    }
-    // If onboarding is not completed or profile/username is missing, direct to onboarding
-    return '/signup/onboarding'
-  } catch (e) {
-    console.error('[middleware] userProfile query error:', e)
-    return '/signup/onboarding'
-  }
-}
+// ERP routes that live in the dedicated erp_frontend app
+const erpRoutes = [
+  '/dashboard',
+  '/student',
+  '/teacher',
+  '/librarian',
+  '/accounts',
+]
 
 // Helper: Attach OWASP Top 10 Security Headers to all responses
 function applySecurityHeaders(res: NextResponse): NextResponse {
@@ -86,7 +59,7 @@ export async function middleware(request: NextRequest) {
     })
   }
 
-  // 1. INJECTION & PATH TRAVERSAL FILTER (Block malicious payload attempts)
+  // 1. INJECTION & PATH TRAVERSAL FILTER
   if (
     pathname.includes('..') ||
     pathname.includes('%2e%2e') ||
@@ -99,12 +72,22 @@ export async function middleware(request: NextRequest) {
     )
   }
 
-  // Redirect all admin UI routes to dedicated admin_frontend
+  // 2. REDIRECT ADMIN ROUTES TO ADMIN_FRONTEND
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, ADMIN_URL)))
   }
 
-  // 2. CSRF & ORIGIN INTEGRITY CHECK (State-changing API operations)
+  // 3. REDIRECT AUTH ROUTES TO AUTH APP
+  if (authRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, AUTH_URL)))
+  }
+
+  // 4. REDIRECT ERP ROUTES TO ERP_FRONTEND
+  if (erpRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, ERP_URL)))
+  }
+
+  // 5. CSRF & ORIGIN INTEGRITY CHECK for API routes
   const method = request.method
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && pathname.startsWith('/api/')) {
     const origin = request.headers.get('origin')
@@ -122,6 +105,7 @@ export async function middleware(request: NextRequest) {
         originHost === 'localhost' ||
         originHost === '127.0.0.1' ||
         originHost.endsWith('.vercel.app') ||
+        originHost.endsWith('.vidyaschool.com') ||
         originHost.endsWith('.blazeneuro.com')
 
       if (!isAllowedHost) {
@@ -132,9 +116,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. CATEGORIZED RATE LIMITING FOR NEXT.JS API ENDPOINTS (/api/*)
+  // 6. RATE LIMITING FOR PUBLIC API ENDPOINTS (/api/*)
   if (pathname.startsWith('/api')) {
-    // Exempt lightweight read endpoints and auth routes from strict rate limits
     const isExempt =
       pathname.startsWith('/api/auth/') ||
       pathname === '/api/profile/username' ||
@@ -146,18 +129,9 @@ export async function middleware(request: NextRequest) {
       const ip =
         request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
         request.headers.get('x-real-ip') ||
-        request.headers.get('cf-connecting-ip') ||
         '127.0.0.1'
 
-      const isSensitive =
-        pathname.startsWith('/api/auth') ||
-        pathname.startsWith('/api/admin') ||
-        pathname.startsWith('/api/profile/update')
-
-      const limit = isSensitive ? 120 : 300
-      const key = `next_api:${ip}:${isSensitive ? 'strict' : 'general'}`
-
-      const { allowed, remaining, reset } = checkRateLimit(key, limit, 60000)
+      const { allowed, remaining, reset } = checkRateLimit(`frontend_api:${ip}`, 300, 60000)
 
       if (!allowed) {
         return applySecurityHeaders(
@@ -167,7 +141,7 @@ export async function middleware(request: NextRequest) {
               status: 429,
               headers: {
                 'Retry-After': String(reset),
-                'X-RateLimit-Limit': String(limit),
+                'X-RateLimit-Limit': '300',
                 'X-RateLimit-Remaining': String(remaining),
                 'X-RateLimit-Reset': String(reset),
               },
@@ -178,160 +152,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Allow static assets, API auth, docs, well-known, and search endpoints
-  if (
-    pathname.startsWith('/api/auth/') ||
-    pathname.startsWith('/.well-known') ||
-    pathname.startsWith('/docs') ||
-    pathname.startsWith('/api/search')
-  ) {
-    return applySecurityHeaders(NextResponse.next())
-  }
-
-
-  const rawCookie = request.cookies.get('better-auth.session_token')?.value || 
-                    request.cookies.get('__Secure-better-auth.session_token')?.value
-
-  // Fast path: allow unauthenticated public routes without DB lookup
-  if (!rawCookie && publicRoutes.some(route => pathname === route)) {
-    return applySecurityHeaders(NextResponse.next())
-  }
-
-  // Get session (only when cookie is present)
-  let session: any = null
-  if (rawCookie) {
-    try {
-      session = await auth.api.getSession({
-        headers: request.headers
-      })
-    } catch (err) {
-      console.error('[middleware] getSession error:', err)
-    }
-
-    // Robust Fallback: If better-auth getSession returned null, check session token cookie
-    if (!session?.user) {
-      const cleanToken = rawCookie.split('.')[0]
-      try {
-        const dbSession = await db
-          .select()
-          .from(sessionTable)
-          .where(eq(sessionTable.token, cleanToken))
-          .then(res => res[0])
-
-        if (dbSession && new Date(dbSession.expiresAt) > new Date()) {
-          const dbUser = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.id, dbSession.userId))
-            .then(res => res[0])
-
-          if (dbUser) {
-            session = {
-              user: dbUser,
-              session: dbSession
-            }
-          }
-        }
-      } catch (e) {
-        console.error('[middleware] DB fallback session check error:', e)
-      }
-    }
-  }
-
-  // ONBOARDING ROUTE HANDLING: /signup/onboarding or /accounts/onboarding
-  if (pathname.startsWith('/signup/onboarding') || pathname.startsWith('/accounts/onboarding')) {
-    if (!session?.user) {
-      return applySecurityHeaders(NextResponse.redirect(new URL('/login', request.url)))
-    }
-    // If user has already completed onboarding, redirect directly to their dashboard
-    try {
-      const profile = await db
-        .select()
-        .from(userProfile)
-        .where(eq(userProfile.userId, session.user.id))
-        .then(res => res[0])
-
-      if (profile?.username && profile?.onboardingCompleted) {
-        const rolePrefix = roleDashboardMap[session.user.role as string] ?? '/student'
-        return applySecurityHeaders(NextResponse.redirect(new URL(`${rolePrefix}/${profile.username}`, request.url)))
-      }
-    } catch {}
-    return applySecurityHeaders(NextResponse.next())
-  }
-
-  // REDIRECT LOGGED-IN USERS AWAY FROM /login AND /signup
-  if ((pathname === '/login' || pathname === '/signup') && session?.user) {
-    const user = session.user as any
-    const destination = await resolveUserDestination(user)
-    if (destination && destination !== pathname) {
-      return applySecurityHeaders(NextResponse.redirect(new URL(destination, request.url)))
-    }
-    return applySecurityHeaders(NextResponse.next())
-  }
-
-  // Allow unauthenticated public routes ('/', '/login', '/signup', '/unauthorized', '/downloads')
-  if (publicRoutes.some(route => pathname === route)) {
-    return applySecurityHeaders(NextResponse.next())
-  }
-
-  // FAST /dashboard redirect — handled at edge with session & profile
-  if (pathname === '/dashboard') {
-    if (!session?.user) {
-      return applySecurityHeaders(NextResponse.redirect(new URL('/login', request.url)))
-    }
-    const user = session.user as any
-    const destination = await resolveUserDestination(user)
-    return applySecurityHeaders(NextResponse.redirect(new URL(destination, request.url)))
-  }
-
-  // FIREWALL CHECK: Is this a protected route?
-  const isProtectedRoute = Object.keys(protectedRoutes).some(route => 
-    pathname.startsWith(route)
-  )
-
-  // FIREWALL RULE 1: Block unauthenticated users from protected routes
-  if (isProtectedRoute && !session?.user) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', pathname)
-    return applySecurityHeaders(NextResponse.redirect(loginUrl))
-  }
-
-  // FIREWALL RULE 2: Check role permissions and ensure onboarding is completed
-  if (session?.user) {
-    const user = session.user as any
-    
-    // Special handling for teacher/librarian approval flow
-    if ((user.preferredRole === 'teacher' || user.preferredRole === 'librarian') && user.teacherApprovalStatus === 'pending') {
-      if (!pathname.startsWith('/auth/waiting-room') && !pathname.startsWith('/api')) {
-        return applySecurityHeaders(NextResponse.redirect(new URL('/auth/waiting-room', request.url)))
-      }
-      if (pathname.startsWith('/auth/waiting-room')) {
-        return applySecurityHeaders(NextResponse.next())
-      }
-    }
-    
-    const roleBasePaths = Object.values(roleDashboardMap)
-    const sortedRoutes = Object.entries(protectedRoutes).sort((a, b) => b[0].length - a[0].length)
-    for (const [route, allowedRoles] of sortedRoutes) {
-      if (pathname.startsWith(route)) {
-        if (allowedRoles.includes(user.role as string)) {
-          // If user hits root /[role] (e.g. /student, /teacher, /admin, /accounts, /librarian)
-          if (roleBasePaths.includes(pathname)) {
-            const destination = await resolveUserDestination(user)
-            return applySecurityHeaders(NextResponse.redirect(new URL(destination, request.url)))
-          }
-          return applySecurityHeaders(NextResponse.next())
-        } else {
-          return applySecurityHeaders(NextResponse.redirect(new URL('/unauthorized', request.url)))
-        }
-      }
-    }
-  }
-
   return applySecurityHeaders(NextResponse.next())
 }
 
 export const config = {
   matcher: ['/((?!monitoring|_next/static|_next/image|favicon.ico|assets).*)'],
 }
-

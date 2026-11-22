@@ -21,6 +21,7 @@ node_modules/
 .next/
 out/
 build/
+.jsmhq
 
 # IDE / OS
 .DS_Store

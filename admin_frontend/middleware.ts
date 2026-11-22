@@ -9,20 +9,30 @@ import { eq } from 'drizzle-orm'
 import { checkRateLimit } from './lib/rate-limit'
 
 const MAIN_URL = process.env.NEXT_PUBLIC_MAIN_URL || (process.env.NODE_ENV === 'production' ? 'https://vidyaschool.com' : 'http://localhost:3000')
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || (process.env.NODE_ENV === 'production' ? 'https://auth.vidyaschool.com' : 'http://localhost:3002')
+const ERP_URL = process.env.NEXT_PUBLIC_ERP_URL || (process.env.NODE_ENV === 'production' ? 'https://erp.vidyaschool.com' : 'http://localhost:3003')
 
 // Public routes on admin_frontend
 const publicRoutes = ['/login', '/unauthorized']
 
-// Main portal routes that should be redirected back to the primary frontend (port 3000)
-const mainPortalRoutes = [
+// ERP routes that belong to erp_frontend
+const erpRoutes = [
   '/student',
   '/teacher',
   '/librarian',
   '/accounts',
-  '/downloads',
+]
+
+// Auth routes that belong to auth app
+const authRoutes = [
   '/signup',
   '/forgot-password',
   '/reset-password',
+]
+
+// Main portal routes that should be redirected back to the primary frontend (port 3000)
+const mainPortalRoutes = [
+  '/downloads',
   '/fee',
   '/gallery',
   '/sponsors',
@@ -95,12 +105,22 @@ export async function middleware(request: NextRequest) {
     )
   }
 
-  // 2. Redirect non-admin routes to main frontend
+  // 2. Redirect non-admin routes to their respective apps
+  if (erpRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    const isRSC = request.nextUrl.searchParams.has('_rsc') || request.headers.get('rsc') === '1'
+    if (isRSC) return new NextResponse(null, { status: 204 })
+    return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, ERP_URL)))
+  }
+
+  if (authRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
+    const isRSC = request.nextUrl.searchParams.has('_rsc') || request.headers.get('rsc') === '1'
+    if (isRSC) return new NextResponse(null, { status: 204 })
+    return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, AUTH_URL)))
+  }
+
   if (mainPortalRoutes.some(route => pathname === route || pathname.startsWith(route + '/'))) {
     const isRSC = request.nextUrl.searchParams.has('_rsc') || request.headers.get('rsc') === '1'
-    if (isRSC) {
-      return new NextResponse(null, { status: 204 })
-    }
+    if (isRSC) return new NextResponse(null, { status: 204 })
     return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, MAIN_URL)))
   }
 

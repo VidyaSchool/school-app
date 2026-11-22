@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- App icon background -->
-    <color name="ic_launcher_background">#FFFFFF</color>
-
-    <!-- Splash screen background (light mode) -->
-    <color name="splash_background">#FFFFFF</color>
-</resources>

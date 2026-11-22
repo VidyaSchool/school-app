@@ -1,0 +1,75 @@
+<svg width="261" height="118" viewBox="0 0 261 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="chip-shadow" x="10" y="8" width="241" height="104" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Top Metallic Pins -->
+  <rect x="54.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+  <rect x="78.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+  <rect x="102.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+  <rect x="126.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+  <rect x="150.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+  <rect x="174.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+  <rect x="198.5" y="0" width="8" height="14" rx="2" fill="#71717a"/>
+
+  <!-- Bottom Metallic Pins -->
+  <rect id="chip-pin-1" x="54.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+  <rect id="chip-pin-2" x="78.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+  <rect id="chip-pin-3" x="102.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+  <rect id="chip-pin-4" x="126.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+  <rect id="chip-pin-5" x="150.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+  <rect id="chip-pin-6" x="174.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+  <rect id="chip-pin-7" x="198.5" y="98" width="8" height="14" rx="2" fill="#8e8e93"/>
+
+  <!-- Left Pins -->
+  <rect x="6" y="38" width="14" height="8" rx="2" fill="#71717a"/>
+  <rect x="6" y="66" width="14" height="8" rx="2" fill="#71717a"/>
+
+  <!-- Right Pins -->
+  <rect x="241" y="38" width="14" height="8" rx="2" fill="#71717a"/>
+  <rect x="241" y="66" width="14" height="8" rx="2" fill="#71717a"/>
+
+  <!-- Chip IC Body -->
+  <g filter="url(#chip-shadow)">
+    <rect x="20" y="14" width="221" height="84" rx="10" fill="#18181b" stroke="#3f3f46" stroke-width="1.5"/>
+  </g>
+
+  <!-- Pin 1 Orientation Marker -->
+  <circle cx="36" cy="30" r="3" fill="#3f3f46"/>
+
+  <!-- Chip Minimal Monospace Typography -->
+  <text x="130.5" y="53" text-anchor="middle" fill="#f4f4f5" font-size="12" font-weight="700" letter-spacing="2.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">VIDYA</text>
+  <text x="130.5" y="68" text-anchor="middle" fill="#71717a" font-size="8" font-weight="500" letter-spacing="1.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ROBOTICS &amp; STEM</text>
+
+  <!-- Circuit Test Traces with Hollow Circular Terminals (Extended Left & Right Further) -->
+  <g stroke="#71717a" stroke-width="2" fill="none">
+    <path d="M 58.5,0 L 58.5,-18 L 34,-18" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="29" cy="-18" r="4" fill="#18181b"/>
+
+    <path d="M 130.5,0 L 130.5,-26" stroke-linecap="round" stroke-opacity="0.65"/>
+    <circle cx="130.5" cy="-32" r="4" fill="#18181b"/>
+
+    <path d="M 150.5,0 L 150.5,-14 L 164,-14" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="169" cy="-14" r="4" fill="#18181b"/>
+
+    <path d="M 82.5,112 L 82.5,130 L 58,130" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="52" cy="130" r="4" fill="#18181b"/>
+
+    <path d="M 178.5,112 L 178.5,130 L 202,130" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="208" cy="130" r="4" fill="#18181b"/>
+
+    <path d="M 6,42 L -85,42 L -85,20" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="-85" cy="14" r="4.5" fill="#18181b"/>
+
+    <path d="M 6,70 L -70,70 L -70,92" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="-70" cy="98" r="4.5" fill="#18181b"/>
+
+    <path d="M 255,42 L 346,42 L 346,20" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="346" cy="14" r="4.5" fill="#18181b"/>
+
+    <path d="M 255,70 L 331,70 L 331,92" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.65"/>
+    <circle cx="331" cy="98" r="4.5" fill="#18181b"/>
+  </g>
+</svg>

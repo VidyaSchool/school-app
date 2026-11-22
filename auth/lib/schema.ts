@@ -1,0 +1,461 @@
+import { pgTable, text, timestamp, boolean, pgEnum, integer, date, smallint, varchar, doublePrecision } from 'drizzle-orm/pg-core'
+
+export const roleEnum = pgEnum('role', ['student', 'teacher', 'admin', 'account', 'librarian'])
+
+export const user = pgTable('user', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  emailVerified: boolean('email_verified').notNull().default(false),
+  image: text('image'),
+  role: roleEnum('role').notNull().default('student'),
+  preferredRole: text('preferred_role'),
+  teacherApprovalStatus: text('teacher_approval_status').default('pending'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const userProfile = pgTable('user_profile', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
+  admissionNumber: text('admission_number').unique(),
+  username: text('username').unique(),
+  designation: text('designation'),
+  phoneNumber: text('phone_number'),
+  parentName: text('parent_name'),
+  parentPhone: text('parent_phone'),
+  parentEmail: text('parent_email'),
+  address: text('address'),
+  city: text('city'),
+  state: text('state'),
+  pincode: text('pincode'),
+  class: text('class'),
+  section: text('section'),
+  classSectionLastUpdated: timestamp('class_section_last_updated'),
+  classSectionChanges: text('class_section_changes'),
+  secondaryRole: text('secondary_role'),
+  transportMode: text('transport_mode'),
+  teacherCategory: text('teacher_category'), // 'PRT', 'TGT', 'PGT'
+  activitySkills: text('activity_skills'), // JSON string e.g. ["Games / Sports", "Computer"]
+  isAvailableForSubstitution: boolean('is_available_for_substitution').notNull().default(true),
+  isMailEnabled: boolean('is_mail_enabled').notNull().default(true),
+  mailRedirectEmail: text('mail_redirect_email'),
+  onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const teacherProfiles = pgTable('teacher_profiles', {
+  id: varchar('id').primaryKey(),
+  userId: varchar('user_id').notNull().unique().references(() => user.id, { onDelete: 'cascade' }),
+  wingId: varchar('wing_id').default('General'),
+  weeklyProxyCount: integer('weekly_proxy_count').default(0),
+  dailyFreeCount: integer('daily_free_count').default(0),
+})
+
+export const session = pgTable('session', {
+  id: text('id').primaryKey(),
+  expiresAt: timestamp('expires_at').notNull(),
+  token: text('token').notNull().unique(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+})
+
+export const account = pgTable('account', {
+  id: text('id').primaryKey(),
+  accountId: text('account_id').notNull(),
+  providerId: text('provider_id').notNull(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const verification = pgTable('verification', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const feeInstallment = pgTable('fee_installment', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  month: text('month').notNull(),
+  year: text('year').notNull(),
+  amount: integer('amount').notNull(),
+  dueDate: date('due_date').notNull(),
+  status: text('status').notNull(), // 'paid', 'pending', 'overdue', 'upcoming'
+  paidDate: date('paid_date'),
+  receiptNo: text('receipt_no'),
+  paymentMethod: text('payment_method'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const feeStructure = pgTable('fee_structure', {
+  id: text('id').primaryKey(),
+  classNum: integer('class_num').notNull(),
+  className: text('class_name'),
+  components: text('components').notNull().default('[]'),
+  transportFee: integer('transport_fee').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const subjectClassRequest = pgTable('subject_class_request', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  class: text('class').notNull(),
+  section: text('section').notNull(),
+  subject: text('subject').notNull(),
+  status: text('status').notNull().default('pending'), // 'pending', 'approved', 'rejected'
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const subjectClassAssignment = pgTable('subject_class_assignment', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  class: text('class').notNull(),
+  section: text('section').notNull(),
+  subject: text('subject').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const exam = pgTable('exam', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  class: text('class').notNull(),
+  section: text('section').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const studentSubjectMarks = pgTable('student_subject_marks', {
+  id: text('id').primaryKey(),
+  studentId: text('student_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  examId: text('exam_id').notNull().references(() => exam.id, { onDelete: 'cascade' }),
+  subject: text('subject').notNull(),
+  score: integer('score').notNull(),
+  maxScore: integer('max_score').notNull().default(100),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const teacherRequest = pgTable('teacher_request', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  adminId: text('admin_id').references(() => user.id),
+  rejectionReason: text('rejection_reason'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const complaint = pgTable('complaint', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  recipient: text('recipient').notNull(),
+  taggedPeople: text('tagged_people'),
+  message: text('message').notNull(),
+  fileUrl: text('file_url'),
+  fileName: text('file_name'),
+  status: text('status').notNull().default('pending'), // 'pending', 'resolved'
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const notice = pgTable('notice', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  category: text('category').notNull().default('General'), // 'Academic', 'Exams', 'Events', 'General'
+  isUrgent: boolean('is_urgent').notNull().default(false),
+  senderId: text('sender_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  targetRole: text('target_role').notNull().default('all'), // 'all', 'teacher', 'student'
+  targetClass: text('target_class'),
+  targetSection: text('target_section'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const libraryBook = pgTable('library_book', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  author: text('author').notNull(),
+  isbn: text('isbn').notNull().unique(),
+  category: text('category').notNull().default('General'),
+  quantity: integer('quantity').notNull().default(1),
+  availableQuantity: integer('available_quantity').notNull().default(1),
+  location: text('location'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const libraryBookIssue = pgTable('library_book_issue', {
+  id: text('id').primaryKey(),
+  bookId: text('book_id').notNull().references(() => libraryBook.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  issueDate: timestamp('issue_date').notNull().defaultNow(),
+  dueDate: timestamp('due_date').notNull(),
+  returnDate: timestamp('return_date'),
+  renewalsCount: integer('renewals_count').notNull().default(0),
+  status: text('status').notNull().default('active'), // 'active', 'overdue', 'returned'
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const fcmToken = pgTable('fcm_token', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  token: text('token').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const teacherNote = pgTable('teacher_note', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  content: text('content').notNull().default(''),
+  color: text('color').notNull().default('default'),
+  class: text('class'),
+  section: text('section'),
+  subject: text('subject'),
+  pdfUrl: text('pdf_url'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const timetable = pgTable('timetable', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  class: text('class').notNull(),
+  section: text('section').notNull(),
+  subject: text('subject').notNull().default(''),
+  dayOfWeek: text('day_of_week').notNull(), // 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
+  periodNumber: smallint('period_number').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const userDocument = pgTable('user_document', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  docType: text('doc_type').notNull(),
+  docName: text('doc_name').notNull(),
+  fileUrl: text('file_url').notNull(),
+  fileName: text('file_name').notNull(),
+  fileType: text('file_type').notNull(),
+  fileSize: integer('file_size'),
+  fileKey: text('file_key'),
+  status: text('status').notNull().default('uploaded'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+
+export const teacherEmail = pgTable('teacher_email', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  // 'inbox' | 'sent' | 'draft' | 'trash'
+  folder: text('folder').notNull().default('inbox'),
+  // inbound: sender address; outbound: our address
+  fromAddress: text('from_address').notNull(),
+  // inbound: our address; outbound: recipient
+  toAddress: text('to_address').notNull(),
+  ccAddress: text('cc_address'),
+  subject: text('subject').notNull().default('(no subject)'),
+  bodyHtml: text('body_html'),
+  bodyText: text('body_text').notNull().default(''),
+  // Resend message ID for tracking
+  resendId: text('resend_id'),
+  isRead: boolean('is_read').notNull().default(false),
+  isStarred: boolean('is_starred').notNull().default(false),
+  // Raw inbound payload stored for debugging
+  rawPayload: text('raw_payload'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const customPage = pgTable('custom_page', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull().default('Responsive Elementor Page'),
+  slug: text('slug').notNull().unique(),
+  widgetsJson: text('widgets_json').notNull().default('[]'),
+  authorId: text('author_id'),
+  status: text('status').notNull().default('published'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const teacherAbsence = pgTable('teacher_absence', {
+  id: text('id').primaryKey(),
+  teacherId: text('teacher_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(), // YYYY-MM-DD
+  status: text('status').notNull().default('absent'), // 'absent', 'half_day', 'on_leave'
+  reason: text('reason').notNull().default('Sick Leave'),
+  duration: text('duration').notNull().default('Full Day'),
+  remarks: text('remarks'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const substitutionRecord = pgTable('substitution_record', {
+  id: varchar('id').primaryKey(),
+  date: date('date').notNull(),
+  absenceId: varchar('absence_id'),
+  timetableId: varchar('timetable_id').references(() => timetable.id),
+  class: varchar('class').notNull(),
+  section: varchar('section').notNull(),
+  subject: varchar('subject').notNull().default(''),
+  room: varchar('room'),
+  originalTeacherId: varchar('original_teacher_id').notNull().references(() => user.id),
+  substituteTeacherId: varchar('substitute_teacher_id').references(() => user.id),
+  status: varchar('status').notNull(), // 'AUTO_ASSIGNED', 'MANUAL_OVERRIDE', 'MERGED', 'UNASSIGNED'
+  isActivityFallback: boolean('is_activity_fallback').notNull().default(false),
+  activityName: varchar('activity_name'),
+  suitabilityScore: doublePrecision('suitability_score'),
+  scoreBreakdown: varchar('score_breakdown'),
+  notes: varchar('notes'),
+  periodNumber: smallint('period_number').notNull().default(0),
+  mergedWithTimetableId: varchar('merged_with_timetable_id').references(() => timetable.id),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export const substitutionSettings = pgTable('substitution_settings', {
+  id: text('id').primaryKey().default('default'),
+  sameSubjectScore: integer('same_subject_score').notNull().default(100),
+  sameCategoryScore: integer('same_category_score').notNull().default(50),
+  sameClassScore: integer('same_class_score').notNull().default(40),
+  sameSectionScore: integer('same_section_score').notNull().default(30),
+  matchingActivitySkillScore: integer('matching_activity_skill_score').notNull().default(25),
+  lowWorkloadBonus: integer('low_workload_bonus').notNull().default(10),
+  workloadPenaltyPerSub: integer('workload_penalty_per_sub').notNull().default(15),
+  highWorkloadPenalty: integer('high_workload_penalty').notNull().default(20),
+  highWorkloadThreshold: integer('high_workload_threshold').notNull().default(2),
+  activityFallbackThreshold: integer('activity_fallback_threshold').notNull().default(35),
+  enabledActivities: text('enabled_activities').notNull().default('["Games / Sports", "Arts", "Music", "Library", "Computer"]'),
+  allowCrossCategory: boolean('allow_cross_category').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// ── Hybrid CMS Architecture Tables ──────────────────────────────────────────
+
+export const cmsPages = pgTable('cms_pages', {
+  id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  type: text('type').notNull().default('page_builder'), // 'page_builder' | 'custom_developer'
+  status: text('status').notNull().default('draft'), // 'draft' | 'published' | 'archived'
+  
+  // SEO Metadata
+  seoTitle: text('seo_title'),
+  seoDescription: text('seo_description'),
+  ogImage: text('og_image'),
+  canonicalUrl: text('canonical_url'),
+  noIndex: boolean('no_index').notNull().default(false),
+
+  // Authorship & Timestamps
+  authorId: text('author_id'),
+  updatedById: text('updated_by_id'),
+  publishedAt: timestamp('published_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const cmsPageSections = pgTable('cms_page_sections', {
+  id: text('id').primaryKey(),
+  pageId: text('page_id').notNull().references(() => cmsPages.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // 'hero', 'richText', 'table', 'cards', 'faculty', etc.
+  order: integer('order').notNull().default(0),
+  props: text('props').notNull().default('{}'), // JSON-serialized section props
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const cmsMedia = pgTable('cms_media', {
+  id: text('id').primaryKey(),
+  filename: text('filename').notNull(),
+  url: text('url').notNull(),
+  altText: text('alt_text'),
+  fileSize: integer('file_size'),
+  mimeType: text('mime_type'),
+  width: integer('width'),
+  height: integer('height'),
+  uploadedById: text('uploaded_by_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const cmsPageVersions = pgTable('cms_page_versions', {
+  id: text('id').primaryKey(),
+  pageId: text('page_id').notNull().references(() => cmsPages.id, { onDelete: 'cascade' }),
+  versionNumber: integer('version_number').notNull(),
+  snapshot: text('snapshot').notNull(), // Full JSON dump of page + sections
+  createdById: text('created_by_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const galleryImage = pgTable('gallery_image', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull().default('Gallery Photo'),
+  description: text('description').default(''),
+  category: text('category').notNull().default('Campus & Life'),
+  src: text('src').notNull(),
+  aspectRatio: text('aspect_ratio').notNull().default('aspect-[4/3]'),
+  location: text('location').default('Main Campus, Gurugram'),
+  date: text('date').default('2026'),
+  order: integer('order').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const deviceAuthRequest = pgTable('device_auth_request', {
+  id: text('id').primaryKey(),
+  userCode: text('user_code').notNull().unique(),
+  deviceToken: text('device_token').notNull().unique(),
+  status: text('status').notNull().default('pending'),
+  userId: text('user_id'),
+  name: text('name'),
+  email: text('email'),
+  role: text('role'),
+  sessionToken: text('session_token'),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const rolePermission = pgTable('role_permission', {
+  id: text('id').primaryKey(),
+  role: text('role').notNull(),
+  permission: text('permission').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const userPermission = pgTable('user_permission', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
+  permission: text('permission').notNull(),
+  granted: boolean('granted').notNull().default(true),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+

@@ -73,6 +73,12 @@ const SearchButton = React.memo(function SearchButton({ onSearchClick }: { onSea
   )
 })
 
+const isLocal = typeof window !== 'undefined'
+  ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  : process.env.NODE_ENV === 'development'
+
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || (isLocal ? 'http://localhost:3002' : 'https://auth.vidyaschool.com')
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
 
@@ -388,12 +394,12 @@ export function Header() {
           <SearchButton />
           <ThemeToggle />
           <Button variant="ghost" size="sm" asChild className="text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/10">
-            <Link id="header-student-portal-btn" href="/login">
+            <Link id="header-student-portal-btn" href={`${AUTH_URL}/login`}>
               Login
             </Link>
           </Button>
           <Button variant="default" size="sm" asChild>
-            <Link id="header-teacher-portal-btn" href="/signup">
+            <Link id="header-teacher-portal-btn" href={`${AUTH_URL}/signup`}>
               Signup
             </Link>
           </Button>
@@ -582,12 +588,12 @@ export function Header() {
           {/* Action Buttons Panel */}
           <div className="border-t border-border pt-3 grid grid-cols-2 gap-2">
             <Button variant="outline" asChild className="w-full">
-              <Link id="mobile-login-btn" href="/login" onClick={() => setMobileMenuOpen(false)}>
+              <Link id="mobile-login-btn" href={`${AUTH_URL}/login`} onClick={() => setMobileMenuOpen(false)}>
                 Login
               </Link>
             </Button>
             <Button variant="default" asChild className="w-full">
-              <Link id="mobile-signup-btn" href="/signup" onClick={() => setMobileMenuOpen(false)}>
+              <Link id="mobile-signup-btn" href={`${AUTH_URL}/signup`} onClick={() => setMobileMenuOpen(false)}>
                 Signup
               </Link>
             </Button>
