@@ -50,7 +50,6 @@ import { RootProvider } from "fumadocs-ui/provider/next"
 import { PWARegister } from "@/components/pwa-register"
 import { CustomSearchDialog } from "@/components/custom-search-dialog"
 import { Toaster } from "@/components/ui/sonner"
-import { Analytics } from "@vercel/analytics/next"
 import { SessionProvider } from "@/contexts/session-context"
 
 export default async function RootLayout({
@@ -87,7 +86,6 @@ export default async function RootLayout({
                 <AlertBanner />
                 <PWARegister />
                 {children}
-                <Analytics />
                 <Toaster richColors position="top-right" />
               </SessionProvider>
             </RootProvider>

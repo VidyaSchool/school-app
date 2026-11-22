@@ -95,20 +95,25 @@ export async function middleware(request: NextRequest) {
     )
   }
 
+  const isRSC = request.nextUrl.searchParams.has('_rsc') || request.headers.get('rsc') === '1'
+
   // 2. REDIRECT ADMIN ROUTES TO ADMIN_FRONTEND
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    if (isRSC) return new NextResponse(null, { status: 204 })
     return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, ADMIN_URL)))
   }
 
   // 3. REDIRECT PUBLIC MARKETING ROUTES TO MAIN_URL
   const publicWebsiteRoutes = ['/about', '/contact', '/docs', '/downloads', '/notices', '/gallery', '/mandatory-public-disclosure', '/circulars']
   if (publicWebsiteRoutes.some(r => pathname === r || pathname.startsWith(r + '/'))) {
+    if (isRSC) return new NextResponse(null, { status: 204 })
     return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, MAIN_URL)))
   }
 
   // 4. REDIRECT AUTH ROUTES TO AUTH_URL
   const authRoutes = ['/login', '/signup', '/forgot-password', '/reset-password', '/login-accounts']
   if (authRoutes.some(r => pathname === r || pathname.startsWith(r + '/'))) {
+    if (isRSC) return new NextResponse(null, { status: 204 })
     return applySecurityHeaders(NextResponse.redirect(new URL(pathname + search, AUTH_URL)))
   }
 
@@ -187,6 +192,7 @@ export async function middleware(request: NextRequest) {
   // ROOT / REDIRECT
   if (pathname === '/') {
     if (!session?.user) {
+      if (isRSC) return new NextResponse(null, { status: 204 })
       const loginUrl = new URL('/login', AUTH_URL)
       loginUrl.searchParams.set('from', request.url)
       return applySecurityHeaders(NextResponse.redirect(loginUrl))
@@ -198,6 +204,7 @@ export async function middleware(request: NextRequest) {
   // DASHBOARD REDIRECT
   if (pathname === '/dashboard') {
     if (!session?.user) {
+      if (isRSC) return new NextResponse(null, { status: 204 })
       const loginUrl = new URL('/login', AUTH_URL)
       loginUrl.searchParams.set('from', request.url)
       return applySecurityHeaders(NextResponse.redirect(loginUrl))
@@ -210,6 +217,7 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = Object.keys(protectedRoutes).some(route => pathname.startsWith(route))
   if (isProtectedRoute) {
     if (!session?.user) {
+      if (isRSC) return new NextResponse(null, { status: 204 })
       const loginUrl = new URL('/login', AUTH_URL)
       loginUrl.searchParams.set('from', request.url)
       return applySecurityHeaders(NextResponse.redirect(loginUrl))

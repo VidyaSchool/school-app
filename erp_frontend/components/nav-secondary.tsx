@@ -38,6 +38,7 @@ export function NavSecondary({
               >
                 <Link 
                   href={item.url} 
+                  prefetch={item.url.startsWith('/')}
                   onClick={(e) => {
                     if (item.onClick) {
                       item.onClick(e)

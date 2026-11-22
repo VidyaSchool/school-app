@@ -33,6 +33,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+
+const isLocal = typeof window !== 'undefined'
+  ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  : process.env.NODE_ENV === 'development'
+
+const MAIN_URL = process.env.NEXT_PUBLIC_MAIN_URL || (isLocal ? 'http://localhost:3000' : 'https://vidyaschool.com')
+const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || (isLocal ? 'http://localhost:3002' : 'https://auth.vidyaschool.com')
 import { Widget2Icon } from "@solar-icons/react/bold-duotone/widget-2"
 import { UsersGroupTwoRoundedIcon } from "@solar-icons/react/bold-duotone/users-group-two-rounded"
 import { CalendarIcon } from "@solar-icons/react/bold-duotone/calendar"
@@ -246,12 +253,12 @@ const data = {
   navSecondary: [
     {
       title: "Sessions",
-      url: "/login-accounts",
+      url: `${AUTH_URL}/login-accounts`,
       icon: <SettingsMinimalisticIcon className="size-5 shrink-0" />,
     },
     {
       title: "Get Help",
-      url: "/docs",
+      url: `${MAIN_URL}/docs`,
       icon: <QuestionCircleIcon className="size-5 shrink-0" />,
     },
   ],
@@ -761,7 +768,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ...baseNavMain,
     {
       title: "Mobile App",
-      url: "/downloads",
+      url: `${MAIN_URL}/downloads`,
       icon: <SmartphoneIcon className="size-5 shrink-0" />,
     },
     ...(isTeacher
@@ -1003,9 +1010,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <div className="flex items-center justify-start gap-1 text-[10px] text-muted-foreground/80 font-normal w-full pl-1.5">
           <span>© {new Date().getFullYear()} VIDYA School</span>
           <span>•</span>
-          <a href="/docs/terms-of-service" className="hover:text-foreground hover:underline transition-colors">Terms</a>
+          <a href={`${MAIN_URL}/docs/terms-of-service`} className="hover:text-foreground hover:underline transition-colors">Terms</a>
           <span>•</span>
-          <a href="/docs/privacy-policy" className="hover:text-foreground hover:underline transition-colors">Privacy</a>
+          <a href={`${MAIN_URL}/docs/privacy-policy`} className="hover:text-foreground hover:underline transition-colors">Privacy</a>
         </div>
       </SidebarFooter>
 

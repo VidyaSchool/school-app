@@ -112,6 +112,9 @@ export async function middleware(request: NextRequest) {
       request.cookies.get('__Secure-better-auth.session_token')?.value
 
     if (rawCookie) {
+      const isRSC = request.nextUrl.searchParams.has('_rsc') || request.headers.get('rsc') === '1'
+      if (isRSC) return new NextResponse(null, { status: 204 })
+
       try {
         const session = await auth.api.getSession({ headers: request.headers })
         if (session?.user) {
