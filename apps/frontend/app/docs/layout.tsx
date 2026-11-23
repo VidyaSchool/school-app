@@ -3,7 +3,20 @@
 import * as React from "react"
 import { DocsLayout } from "fumadocs-ui/layouts/docs"
 import type * as PageTree from "fumadocs-core/page-tree"
-import { BookOpen, Sun, Moon } from "lucide-react"
+import {
+  BookOpen,
+  Sun,
+  Moon,
+  ShieldCheck,
+  GraduationCap,
+  HelpCircle,
+  Code2,
+  FileText,
+  UserCheck,
+  Sparkles,
+  School,
+  Lock,
+} from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 
@@ -13,6 +26,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Getting Started",
+      icon: <Sparkles className="h-4 w-4 text-sky-500" />,
       children: [
         { type: "page", name: "Platform Overview", url: "/docs/getting-started/overview" },
         { type: "page", name: "Quick Start by Role", url: "/docs/getting-started/quickstart" },
@@ -22,6 +36,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Account & Authentication",
+      icon: <Lock className="h-4 w-4 text-emerald-500" />,
       children: [
         { type: "page", name: "1. Account Registration", url: "/docs/auth/signup" },
         { type: "page", name: "2. Portal Login Streams", url: "/docs/auth/login" },
@@ -34,6 +49,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Student Guide",
+      icon: <GraduationCap className="h-4 w-4 text-indigo-500" />,
       children: [
         { type: "page", name: "1. Profile Onboarding", url: "/docs/student/onboarding" },
         { type: "page", name: "2. Fees & Payments", url: "/docs/student/fees" },
@@ -46,6 +62,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Teacher Guide",
+      icon: <UserCheck className="h-4 w-4 text-amber-500" />,
       children: [
         { type: "page", name: "1. Class Roster", url: "/docs/teacher/roster" },
         { type: "page", name: "2. Marks Submission", url: "/docs/teacher/grading" },
@@ -57,6 +74,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Institutional Compliance",
+      icon: <ShieldCheck className="h-4 w-4 text-rose-500" />,
       children: [
         { type: "page", name: "Mandatory Public Disclosure", url: "/docs/compliance/mandatory-disclosure" },
         { type: "page", name: "CBSE Affiliation Status", url: "/docs/compliance/affiliation" },
@@ -69,6 +87,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Academics & Rules",
+      icon: <School className="h-4 w-4 text-purple-500" />,
       children: [
         { type: "page", name: "Fee Structure & Payment", url: "/docs/academics/fee-structure" },
         { type: "page", name: "Academic Calendar 2026–27", url: "/docs/academics/academic-calendar" },
@@ -82,6 +101,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Admissions",
+      icon: <FileText className="h-4 w-4 text-teal-500" />,
       children: [
         { type: "page", name: "Admissions Overview", url: "/docs/admissions/overview" },
         { type: "page", name: "Admission Process & Stages", url: "/docs/admissions/process" },
@@ -91,6 +111,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Frequently Asked Questions",
+      icon: <HelpCircle className="h-4 w-4 text-blue-500" />,
       children: [
         { type: "page", name: "All FAQs Directory", url: "/docs/faqs" },
       ],
@@ -98,6 +119,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Co-Curricular Activities",
+      icon: <Sparkles className="h-4 w-4 text-pink-500" />,
       children: [
         { type: "page", name: "Programs Overview", url: "/docs/co-curriculars/overview" },
         { type: "page", name: "Performing Arts", url: "/docs/co-curriculars/arts" },
@@ -108,6 +130,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Developers Guide",
+      icon: <Code2 className="h-4 w-4 text-emerald-500" />,
       children: [
         { type: "page", name: "1. Architecture & Stack", url: "/docs/developers/architecture" },
         { type: "page", name: "2. Frontend & UI System", url: "/docs/developers/frontend" },
@@ -120,6 +143,7 @@ const tree: PageTree.Root = {
     {
       type: "folder",
       name: "Legal Policies",
+      icon: <FileText className="h-4 w-4 text-zinc-500" />,
       children: [
         { type: "page", name: "Terms of Service", url: "/docs/terms-of-service" },
         { type: "page", name: "Privacy Policy", url: "/docs/privacy-policy" },
@@ -179,11 +203,22 @@ export default function DocsPageLayout({ children }: { children: React.ReactNode
         tree={tree}
         nav={{
           title: (
-            <div className="flex items-center gap-2 font-bold text-sm">
+            <div className="flex items-center gap-2 font-bold text-sm tracking-tight">
               <BookOpen className="h-4 w-4 text-primary" />
               <span>VIDYA SCHOOL</span>
             </div>
           ),
+        }}
+        links={[
+          { text: "Overview", url: "/docs/getting-started/overview" },
+          { text: "Compliance", url: "/docs/compliance/mandatory-disclosure" },
+          { text: "Academics", url: "/docs/academics/fee-structure" },
+          { text: "ERP Portal", url: "/login-accounts" },
+        ]}
+        githubUrl="https://github.com/VidyaSchool/school-app"
+        sidebar={{
+          collapsible: true,
+          defaultOpenLevel: 1,
         }}
         slots={{
           themeSwitch: DocsThemeToggle,

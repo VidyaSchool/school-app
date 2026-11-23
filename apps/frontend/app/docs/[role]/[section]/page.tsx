@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Lightbulb, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react"
-import { DocsPage, DocsBody } from "fumadocs-ui/layouts/docs/page"
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page"
 import { getStaticPage } from "@/lib/static-pages"
 import { DocsStaticRenderer } from "@/components/docs-static-renderer"
 
@@ -1414,16 +1414,16 @@ export default async function DocArticlePage({
     <DocsPage toc={toc}>
       <DocsBody>
         {/* Header */}
-        <div className="space-y-3" id="overview">
+        <div className="space-y-3 pb-4 border-b border-border/40" id="overview">
           <Badge variant="outline" className="bg-primary/5 text-primary text-[10px] font-semibold border-primary/20">
             {article.badge}
           </Badge>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+          <DocsTitle className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
             {article.title}
-          </h1>
-          <p className="text-base text-muted-foreground leading-relaxed">
+          </DocsTitle>
+          <DocsDescription className="text-base text-muted-foreground leading-relaxed">
             {article.description}
-          </p>
+          </DocsDescription>
         </div>
 
         {/* Info banner */}

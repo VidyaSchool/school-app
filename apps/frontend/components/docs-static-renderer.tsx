@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DocsPage, DocsBody } from "fumadocs-ui/layouts/docs/page"
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page"
 import { PublicEditorJsBlockRenderer } from "@/components/static-page-renderer"
 import type { StaticPageData, EditorJsBlock } from "@/lib/static-pages"
 
@@ -32,13 +32,13 @@ export function DocsStaticRenderer({ page }: { page: StaticPageData }) {
     <DocsPage toc={toc}>
       <DocsBody>
         <div className="space-y-3 pb-4 border-b border-border/40">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl" id="overview">
+          <DocsTitle className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl" id="overview">
             {page.title}
-          </h1>
+          </DocsTitle>
           {page.description && (
-            <p className="text-base text-muted-foreground leading-relaxed">
+            <DocsDescription className="text-base text-muted-foreground leading-relaxed">
               {page.description}
-            </p>
+            </DocsDescription>
           )}
         </div>
 
