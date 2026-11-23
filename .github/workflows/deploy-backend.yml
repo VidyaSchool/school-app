@@ -46,12 +46,25 @@ jobs:
             git reset --hard origin/main
             git pull origin main
 
-            echo "🔧 Activating virtualenv..."
-            if [ -d "/home/ubuntu/vidyaschool/apps/backend" ]; then
-              cd /home/ubuntu/vidyaschool/apps/backend
-            else
-              cd /home/ubuntu/vidyaschool/backend
+            echo "🔧 Setting up backend directory and virtualenv..."
+            # If old backend directory exists and is a real folder (not yet a symlink), migrate untracked files
+            if [ -d "/home/ubuntu/vidyaschool/backend" ] && [ ! -L "/home/ubuntu/vidyaschool/backend" ]; then
+              echo "Migrating server untracked files (.venv, .env, firebase-credentials.json) to apps/backend..."
+              cp -rn /home/ubuntu/vidyaschool/backend/.* /home/ubuntu/vidyaschool/apps/backend/ 2>/dev/null || true
+              cp -rn /home/ubuntu/vidyaschool/backend/* /home/ubuntu/vidyaschool/apps/backend/ 2>/dev/null || true
+              rm -rf /home/ubuntu/vidyaschool/backend
             fi
+
+            # Ensure backward-compatible symlink so systemd service vidyaschool-backend continues to work seamlessly
+            ln -sfn /home/ubuntu/vidyaschool/apps/backend /home/ubuntu/vidyaschool/backend
+
+            cd /home/ubuntu/vidyaschool/apps/backend
+
+            if [ ! -f ".venv/bin/activate" ]; then
+              echo "Creating fresh virtualenv in apps/backend..."
+              python3 -m venv .venv
+            fi
+
             source .venv/bin/activate
 
             echo "📥 Installing/updating dependencies..."
