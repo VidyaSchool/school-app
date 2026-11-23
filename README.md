@@ -32,24 +32,80 @@ The platform features a web application (Next.js 16), a backend REST & WebSocket
 
 ---
 
-## 💻 Sub-System Breakdown
+## 💻 Monorepo Workspace Breakdown (Turborepo + pnpm)
 
-### 1. 🌐 Web Portals
-- **Main Portal (`/frontend` - Port 3000)**:
-  - **Audience**: Students, Teachers, Librarians, Accountants, and Public Visitors.
-  - **Stack**: Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4.
-  - **Auth & Routing**: Better-Auth authentication, role-based edge middleware redirecting `/admin` requests to Port 3001.
-  - **Integrations**: Drizzle ORM (Neon DB), TanStack Table, Recharts, KaTeX, Monaco Editor, Socket.IO Client, Resend, AWS S3.
-- **Admin Portal (`/admin_frontend` - Port 3001)**:
+```
+vidyaschool/
+├── apps/
+│   ├── auth/          # @vidyaschool/auth (Port 3002: Central SSO, Login, Device Pairing)
+│   ├── erp/           # @vidyaschool/erp (Port 3003: Student, Teacher, Parent & Librarian ERP)
+│   ├── admin/         # @vidyaschool/admin (Port 3001: School Governance & Master Control)
+│   ├── frontend/      # @vidyaschool/frontend (Port 3000: Marketing & Public Portal)
+│   └── backend/       # FastAPI REST & WebSocket Service (Port 8000)
+│
+├── packages/
+│   ├── ui/            # @vidyaschool/ui (Shared shadcn/Tailwind UI Component Library)
+│   └── auth-client/   # @vidyaschool/auth-client (Shared Better-Auth Client & Session SDK)
+│
+├── pnpm-workspace.yaml# Workspace definition
+├── turbo.json         # Turborepo task pipeline & cache graph
+└── package.json       # Root scripts (pnpm dev, pnpm build, etc.)
+```
+
+### 1. 🌐 Web Applications (`apps/`)
+- **Central Auth & SSO (`apps/auth` - Port 3002)**:
+  - **Stack**: Next.js 16 + React 19 + Better Auth + Drizzle ORM (Neon DB).
+  - **Features**: Centralized authentication, QR code cross-device pairing, OTP verification, onboarding, and unified session management.
+- **School ERP (`apps/erp` - Port 3003)**:
+  - **Audience**: Students, Teachers, Librarians, Accountants, and Parents.
+  - **Features**: Timetables, fee ledger, library borrowing, gradebooks, attendance, and student notes.
+- **Admin Portal (`apps/admin` - Port 3001)**:
   - **Audience**: School Administrators and Governance.
   - **Features**: Student & Teacher Management, Fee Control, School Slider CMS, Broadcast Notices, AI Page Builder.
-  - **Isolation**: Strict administrative role guard, dedicated Admin Login experience, and isolated UI workspace.
+- **Public Portal (`apps/frontend` - Port 3000)**:
+  - **Audience**: Public Visitors, Prospective Students, and General Information.
+  - **Features**: Marketing site, faculty showcases, fee structure disclosures, and admissions.
+- **Backend Service (`apps/backend` - Port 8000)**:
+  - **Stack**: Python FastAPI + Uvicorn + SQLModel / SQLAlchemy + Socket.IO.
+  - **Features**: Real-time events, background schedulers (APScheduler), Firebase Admin, and S3 file processing.
 
-### 2. ⚡ Backend Service (`/backend`)
-- **Framework**: Python FastAPI + Uvicorn + SQLModel / SQLAlchemy
-- **Real-Time Communication**: Python Socket.IO (WebSockets engine for real-time messaging)
-- **Scheduler & Background Tasks**: APScheduler (Automated notices, background processing)
-- **Cloud & Auth Services**: Firebase Admin SDK, Amazon S3 (`boto3`), Sentry SDK, PDFPlumber, QR Code Generator (`qrcode`).
+### 2. 📦 Shared Packages (`packages/`)
+- **`@vidyaschool/ui`**: Shared design system containing all 41 shadcn/Tailwind components (`Button`, `Dialog`, `Calendar`, `Card`, etc.). Edit once, update everywhere.
+- **`@vidyaschool/auth-client`**: Single source of truth for Better Auth client initialization, cookies across `.vidyaschool.com`, and session cleanup helpers.
+
+---
+
+## 🛠️ Developer Workflow
+
+### Quick Start
+```bash
+# 1. Install all dependencies across the monorepo
+pnpm install
+
+# 2. Start all services concurrently with Turbo
+pnpm dev
+
+# 3. Or start individual services:
+pnpm dev:auth      # Auth Portal on :3002
+pnpm dev:erp       # ERP Portal on :3003
+pnpm dev:admin     # Admin Dashboard on :3001
+pnpm dev:frontend  # Public Web on :3000
+pnpm dev:backend   # FastAPI Backend on :8000
+
+# 4. Build all apps with FULL TURBO caching:
+pnpm build
+```
+
+---
+
+## 🌿 Branching Strategy (How Big Tech Does It)
+
+In this Monorepo layout, branching is **atomic**:
+1. Create a feature branch: `git checkout -b feat/sso-login-sync`
+2. Make coordinated changes across `apps/auth`, `apps/erp`, and `packages/ui`.
+3. Commit and open **one Pull Request**.
+4. CI runs via Turborepo caching: only apps and packages that were actually modified get re-built and tested.
+5. Merge once: zero risk of version mismatch or broken inter-service communication.
 
 ### 3. 🖥️ Desktop Application (`/desktop`)
 - **Language & GUI**: C++ 17 with GTK+ 3.0 UI Framework
