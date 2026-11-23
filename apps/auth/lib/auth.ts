@@ -61,6 +61,7 @@ const usernameLoginPlugin = {
 }
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET || "vidyaschool_better_auth_secret_key_change_in_production",
   plugins: [usernameLoginPlugin],
   trustedOrigins: [
     'https://vidyaschool.vercel.app',

@@ -8,6 +8,7 @@ import { eq } from 'drizzle-orm'
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_for_build")
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET || "vidyaschool_better_auth_secret_key_change_in_production",
   trustedOrigins: [
     'https://vidyaschool.vercel.app',
     'https://*.vercel.app',
