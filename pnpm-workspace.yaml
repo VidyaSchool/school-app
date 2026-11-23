@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  '@sentry/cli': true
+  core-js: true
+  esbuild: true

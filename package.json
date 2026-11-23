@@ -1,0 +1,18 @@
+{
+  "name": "vidyaschool",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:auth": "turbo run dev --filter=@vidyaschool/auth",
+    "dev:erp": "turbo run dev --filter=@vidyaschool/erp",
+    "dev:admin": "turbo run dev --filter=@vidyaschool/admin",
+    "dev:frontend": "turbo run dev --filter=@vidyaschool/frontend",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4"
+  },
+  "packageManager": "pnpm@12.21.0"
+}

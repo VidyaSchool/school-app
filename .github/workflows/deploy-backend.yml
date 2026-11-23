@@ -6,7 +6,8 @@ on:
     branches:
       - main
     paths:
-      - "backend/**"          # only runs when backend files change
+      - "apps/backend/**"     # only runs when backend files change
+      - "backend/**"          # legacy fallback
       - ".github/workflows/deploy-backend.yml"
 
 concurrency:
@@ -46,7 +47,11 @@ jobs:
             git pull origin main
 
             echo "🔧 Activating virtualenv..."
-            cd /home/ubuntu/vidyaschool/backend
+            if [ -d "/home/ubuntu/vidyaschool/apps/backend" ]; then
+              cd /home/ubuntu/vidyaschool/apps/backend
+            else
+              cd /home/ubuntu/vidyaschool/backend
+            fi
             source .venv/bin/activate
 
             echo "📥 Installing/updating dependencies..."

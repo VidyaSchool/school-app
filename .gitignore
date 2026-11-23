@@ -21,6 +21,7 @@ node_modules/
 .next/
 out/
 build/
+.turbo/
 .jsmhq
 
 # IDE / OS
