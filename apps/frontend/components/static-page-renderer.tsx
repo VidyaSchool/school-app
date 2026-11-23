@@ -637,10 +637,15 @@ export function PublicEditorJsBlockRenderer({
   if (block.type === "header") {
     const level = block.data?.level || 2
     const text = sanitizeHtml(block.data?.text || "")
+    const rawText = block.data?.text || ""
+    const cleanText = rawText.replace(/<[^>]*>/g, "").trim()
+    const slug = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+
     if (level === 1) {
       return (
         <h1
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground my-4 leading-tight"
+          id={slug}
+          className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground my-4 leading-tight scroll-mt-20"
           dangerouslySetInnerHTML={{ __html: text }}
         />
       )
@@ -648,7 +653,8 @@ export function PublicEditorJsBlockRenderer({
     if (level === 2) {
       return (
         <h2
-          className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground my-3"
+          id={slug}
+          className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground my-3 scroll-mt-20"
           dangerouslySetInnerHTML={{ __html: text }}
         />
       )
@@ -656,14 +662,16 @@ export function PublicEditorJsBlockRenderer({
     if (level === 3) {
       return (
         <h3
-          className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground my-2"
+          id={slug}
+          className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground my-2 scroll-mt-20"
           dangerouslySetInnerHTML={{ __html: text }}
         />
       )
     }
     return (
       <h4
-        className="text-lg font-semibold tracking-tight text-foreground my-2"
+        id={slug}
+        className="text-lg font-semibold tracking-tight text-foreground my-2 scroll-mt-20"
         dangerouslySetInnerHTML={{ __html: text }}
       />
     )

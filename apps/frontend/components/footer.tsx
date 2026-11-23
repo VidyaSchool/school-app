@@ -109,28 +109,28 @@ export function Footer() {
                 <Link href="/p/syllabus" className="hover:text-foreground transition-colors">Curriculum Syllabus</Link>
               </li>
               <li>
-                <Link href="/p/textbooks" className="hover:text-foreground transition-colors">Prescribed Textbooks</Link>
+                <Link href="/docs/academics/textbooks" className="hover:text-foreground transition-colors">Prescribed Textbooks</Link>
               </li>
               <li>
-                <Link href="/p/examinations" className="hover:text-foreground transition-colors">Examinations &amp; Evaluations</Link>
+                <Link href="/docs/academics/examinations" className="hover:text-foreground transition-colors">Examinations &amp; Evaluations</Link>
               </li>
               <li>
-                <Link href="/p/academic-calendar" className="hover:text-foreground transition-colors">Academic Calendar</Link>
+                <Link href="/docs/academics/academic-calendar" className="hover:text-foreground transition-colors">Academic Calendar</Link>
               </li>
               <li>
-                <Link href="/p/results" className="hover:text-foreground transition-colors">Board Exam Results</Link>
+                <Link href="/docs/academics/results" className="hover:text-foreground transition-colors">Board Exam Results</Link>
               </li>
               <li>
-                <Link href="/p/admission-process" className="hover:text-foreground transition-colors">Admission Process</Link>
+                <Link href="/docs/admissions/process" className="hover:text-foreground transition-colors">Admission Process</Link>
               </li>
               <li>
-                <Link href="/p/eligibility" className="hover:text-foreground transition-colors">Eligibility Criteria</Link>
+                <Link href="/docs/admissions/eligibility" className="hover:text-foreground transition-colors">Eligibility Criteria</Link>
               </li>
               <li>
-                <Link href="/p/fee-structure" className="hover:text-foreground transition-colors">Fee Structure &amp; Scholarships</Link>
+                <Link href="/docs/academics/fee-structure" className="hover:text-foreground transition-colors">Fee Structure &amp; Scholarships</Link>
               </li>
               <li>
-                <Link href="/p/faqs" className="hover:text-foreground transition-colors">Admission FAQs</Link>
+                <Link href="/docs/faqs" className="hover:text-foreground transition-colors">Admission FAQs</Link>
               </li>
             </ul>
           </div>
@@ -177,22 +177,22 @@ export function Footer() {
             <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-4">Disclosures &amp; Portals</h3>
             <ul className="space-y-2.5 text-xs text-muted-foreground">
               <li>
-                <Link href="/p/mandatory-public-disclosure" className="hover:text-foreground transition-colors">Mandatory Public Disclosure</Link>
+                <Link href="/docs/compliance/mandatory-disclosure" className="hover:text-foreground transition-colors">Mandatory Public Disclosure</Link>
               </li>
               <li>
-                <Link href="/p/affiliation" className="hover:text-foreground transition-colors">CBSE Affiliation Status</Link>
+                <Link href="/docs/compliance/affiliation" className="hover:text-foreground transition-colors">CBSE Affiliation Status</Link>
               </li>
               <li>
-                <Link href="/p/certificates" className="hover:text-foreground transition-colors">Compliance Certificates</Link>
+                <Link href="/docs/compliance/certificates" className="hover:text-foreground transition-colors">Compliance Certificates</Link>
               </li>
               <li>
-                <Link href="/p/annual-report" className="hover:text-foreground transition-colors">Annual Reports</Link>
+                <Link href="/docs/compliance/annual-report" className="hover:text-foreground transition-colors">Annual Reports</Link>
               </li>
               <li>
-                <Link href="/p/school-management-committee" className="hover:text-foreground transition-colors">School Management (SMC)</Link>
+                <Link href="/docs/compliance/smc" className="hover:text-foreground transition-colors">School Management (SMC)</Link>
               </li>
               <li>
-                <Link href="/p/pta" className="hover:text-foreground transition-colors">Parents Teachers Assoc. (PTA)</Link>
+                <Link href="/docs/compliance/pta" className="hover:text-foreground transition-colors">Parents Teachers Assoc. (PTA)</Link>
               </li>
               <li>
                 <Link href="/p/faculty-details" className="hover:text-foreground transition-colors">Faculty Details (OASIS)</Link>

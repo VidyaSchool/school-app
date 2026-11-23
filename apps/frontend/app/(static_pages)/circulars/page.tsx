@@ -1,1 +1,5 @@
-export { default, metadata } from "../mandatory-public-disclosure/page"
+import { redirect } from "next/navigation"
+
+export default function CircularsPage() {
+  redirect("/notices")
+}

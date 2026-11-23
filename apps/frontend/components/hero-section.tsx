@@ -53,7 +53,7 @@ const DEFAULT_HERO_SLIDE: HeroSlide = {
     "Welcome to VidyaSchool, where academic excellence meets holistic development. Discover our wings, modern labs, arts programs, and vibrant student community.",
   primaryCta: {
     text: "Mandatory Public Disclosure",
-    href: "/mandatory-public-disclosure",
+    href: "/docs/compliance/mandatory-disclosure",
   },
 }
 
@@ -174,14 +174,14 @@ function buildSlideFromApi(item: ApiSliderImage, index: number): HeroSlide {
   let description =
     "Empowering students with quality education, modern facilities, and a supportive community dedicated to excellence."
   let primaryCta = { text: "Explore Campus", href: "#students" }
-  let secondaryCta = { text: "Mandatory Public Disclosure", href: "/mandatory-public-disclosure" }
+  let secondaryCta = { text: "Mandatory Public Disclosure", href: "/docs/compliance/mandatory-disclosure" }
 
   if (lowerTitle.includes("online")) {
     title = "Vidya is Now Online"
     description =
       "Access digital classroom resources, attendance, fee portals, and academic progress reports all in one connected platform."
     primaryCta = { text: "Student Portal", href: "/login" }
-    secondaryCta = { text: "Mandatory Public Disclosure", href: "/mandatory-public-disclosure" }
+    secondaryCta = { text: "Mandatory Public Disclosure", href: "/docs/compliance/mandatory-disclosure" }
   } else if (lowerTitle.includes("leader") || lowerTitle.includes("future")) {
     description =
       "Developing ethical leadership, creative thinking, and innovation in every child for tomorrow's challenges."
@@ -446,7 +446,7 @@ export function HeroSection({ offsetHeader = true, className }: HeroSectionProps
 
                         <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
                           <Button asChild variant="default" size="md" className="w-full sm:w-auto">
-                            <Link href="/mandatory-public-disclosure">
+                            <Link href="/docs/compliance/mandatory-disclosure">
                               <span>Mandatory Public Disclosure</span>
                               <ArrowRight className="size-4" />
                             </Link>
@@ -475,7 +475,7 @@ export function HeroSection({ offsetHeader = true, className }: HeroSectionProps
 
                         <div className="flex w-full flex-col items-stretch gap-3 pt-1 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
                           <Button asChild variant="default" size="md" className="w-full sm:w-auto">
-                            <Link href="/mandatory-public-disclosure">
+                            <Link href="/docs/compliance/mandatory-disclosure">
                               <span>Mandatory Public Disclosure</span>
                               <ArrowRight className="size-4" />
                             </Link>

@@ -1,20 +1,5 @@
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
-import { getStaticPage } from "@/lib/static-pages"
-import { StaticPageRenderer } from "@/components/static-page-renderer"
+import { redirect } from "next/navigation"
 
-export const metadata: Metadata = {
-  title: `${"Board Results & Academic Performance"} | VidyaSchool`,
-  description: "Board Results & Academic Performance - The VIDYA School, Sector 24, DLF Phase-3, Gurugram.",
-}
-
-export default function ResultsStaticPage() {
-  const page = getStaticPage("results")
-  if (!page) notFound()
-
-  return (
-    <StaticPageRenderer
-      page={page}
-    />
-  )
+export default function ResultsPage() {
+  redirect("/docs/academics/results")
 }

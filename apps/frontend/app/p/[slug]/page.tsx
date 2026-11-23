@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import { getAllStaticSlugs, getStaticPage } from "@/lib/static-pages"
 import { StaticPageRenderer } from "@/components/static-page-renderer"
 import { DynamicPublicPageFallback } from "./dynamic-fallback"
@@ -34,6 +35,30 @@ export default async function PublicPageSlugRoute({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+
+  const docsRedirectMap: Record<string, string> = {
+    "mandatory-public-disclosure": "/docs/compliance/mandatory-disclosure",
+    "affiliation": "/docs/compliance/affiliation",
+    "annual-report": "/docs/compliance/annual-report",
+    "school-management-committee": "/docs/compliance/smc",
+    "pta": "/docs/compliance/pta",
+    "certificates": "/docs/compliance/certificates",
+    "fee-structure": "/docs/academics/fee-structure",
+    "academic-calendar": "/docs/academics/academic-calendar",
+    "curriculum": "/docs/academics/curriculum",
+    "syllabus": "/docs/academics/syllabus",
+    "textbooks": "/docs/academics/textbooks",
+    "examinations": "/docs/academics/examinations",
+    "results": "/docs/academics/results",
+    "admission-process": "/docs/admissions/process",
+    "eligibility": "/docs/admissions/eligibility",
+    "faqs": "/docs/faqs",
+  }
+
+  if (docsRedirectMap[slug]) {
+    redirect(docsRedirectMap[slug])
+  }
+
   const staticPage = getStaticPage(slug)
 
   if (staticPage) {

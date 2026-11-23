@@ -238,25 +238,25 @@ export function Header() {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[640px]">
-                    <ListItem href="/p/curriculum" title="Curriculum Overview">
+                    <ListItem href="/docs/academics/curriculum" title="Curriculum Overview">
                       Holistic CBSE curriculum framework and continuous evaluations.
                     </ListItem>
                     <ListItem href="/p/subjects" title="Academic Subjects">
                       Core and skill subjects from Primary to Senior Secondary levels.
                     </ListItem>
-                    <ListItem href="/p/syllabus" title="Curriculum Syllabus">
+                    <ListItem href="/docs/academics/syllabus" title="Curriculum Syllabus">
                       Unit-wise competency syllabus aligned with NCERT and NEP.
                     </ListItem>
-                    <ListItem href="/p/textbooks" title="Prescribed Textbooks">
+                    <ListItem href="/docs/academics/textbooks" title="Prescribed Textbooks">
                       Authentic NCERT and CBSE learning materials provided to students.
                     </ListItem>
-                    <ListItem href="/p/examinations" title="Examinations & Assessments">
+                    <ListItem href="/docs/academics/examinations" title="Examinations & Assessments">
                       Periodic reviews, term-end exams, and pre-board simulations.
                     </ListItem>
-                    <ListItem href="/p/academic-calendar" title="Academic Calendar">
+                    <ListItem href="/docs/academics/academic-calendar" title="Academic Calendar">
                       Term schedules, holidays, examinations, and annual milestone dates.
                     </ListItem>
-                    <ListItem href="/p/results" title="Board Results & Honors">
+                    <ListItem href="/docs/academics/results" title="Board Results & Honors">
                       100% board pass percentage and academic distinction awards.
                     </ListItem>
                   </ul>
@@ -305,16 +305,16 @@ export function Header() {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/p/admission-process" title="Admission Process">
+                    <ListItem href="/docs/admissions/process" title="Admission Process">
                       Step-by-step registration guidelines and document verification.
                     </ListItem>
-                    <ListItem href="/p/eligibility" title="Eligibility Criteria">
+                    <ListItem href="/docs/admissions/eligibility" title="Eligibility Criteria">
                       Age requirements and prerequisites across Nursery to Class XI.
                     </ListItem>
-                    <ListItem href="/p/fee-structure" title="Fee Structure & Scholarships">
+                    <ListItem href="/docs/academics/fee-structure" title="Fee Structure & Scholarships">
                       Subsidized community tuition and 100% full sponsorship opportunities.
                     </ListItem>
-                    <ListItem href="/p/faqs" title="Admissions FAQs">
+                    <ListItem href="/docs/faqs" title="Admissions FAQs">
                       Frequently asked questions regarding admissions, timings, and buses.
                     </ListItem>
                   </ul>
@@ -328,22 +328,22 @@ export function Header() {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[640px]">
-                    <ListItem href="/p/mandatory-public-disclosure" title="Mandatory Public Disclosure">
+                    <ListItem href="/docs/compliance/mandatory-disclosure" title="Mandatory Public Disclosure">
                       CBSE Appendix IX compliance, SARAS credentials, and disclosures.
                     </ListItem>
-                    <ListItem href="/p/affiliation" title="CBSE Affiliation Status">
+                    <ListItem href="/docs/compliance/affiliation" title="CBSE Affiliation Status">
                       Senior Secondary English-medium CBSE affiliation status details.
                     </ListItem>
-                    <ListItem href="/p/certificates" title="Compliance Certificates">
+                    <ListItem href="/docs/compliance/certificates" title="Compliance Certificates">
                       Building safety, fire safety, water hygiene, and recognition NOCs.
                     </ListItem>
-                    <ListItem href="/p/annual-report" title="Annual Reports">
+                    <ListItem href="/docs/compliance/annual-report" title="Annual Reports">
                       Annual review of institutional operations, academics, and activities.
                     </ListItem>
-                    <ListItem href="/p/school-management-committee" title="School Management (SMC)">
+                    <ListItem href="/docs/compliance/smc" title="School Management (SMC)">
                       Governing committee composition, executive members, and roles.
                     </ListItem>
-                    <ListItem href="/p/pta" title="Parents Teachers Assoc. (PTA)">
+                    <ListItem href="/docs/compliance/pta" title="Parents Teachers Assoc. (PTA)">
                       Collaborative parent-teacher engagement, forums, and PTM schedules.
                     </ListItem>
                     <ListItem href="/p/faculty-details" title="Faculty Details (OASIS)">
@@ -452,25 +452,25 @@ export function Header() {
           <div>
             <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Academics</div>
             <div className="grid gap-1">
-              <Link href="/p/curriculum" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/curriculum" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Curriculum Overview
               </Link>
               <Link href="/p/subjects" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Academic Subjects
               </Link>
-              <Link href="/p/syllabus" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/syllabus" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Curriculum Syllabus
               </Link>
-              <Link href="/p/textbooks" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/textbooks" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Prescribed Textbooks
               </Link>
-              <Link href="/p/examinations" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/examinations" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Examinations &amp; Evaluations
               </Link>
-              <Link href="/p/academic-calendar" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/academic-calendar" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Academic Calendar
               </Link>
-              <Link href="/p/results" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/results" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Board Exam Results
               </Link>
             </div>
@@ -514,16 +514,16 @@ export function Header() {
           <div>
             <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Admissions</div>
             <div className="grid gap-1">
-              <Link href="/p/admission-process" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/admissions/process" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Admission Process
               </Link>
-              <Link href="/p/eligibility" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/admissions/eligibility" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Eligibility Criteria
               </Link>
-              <Link href="/p/fee-structure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/academics/fee-structure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Fee Structure &amp; Scholarships
               </Link>
-              <Link href="/p/faqs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/faqs" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Admissions FAQs
               </Link>
             </div>
@@ -533,22 +533,22 @@ export function Header() {
           <div>
             <div className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Disclosures</div>
             <div className="grid gap-1">
-              <Link href="/p/mandatory-public-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/compliance/mandatory-disclosure" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Mandatory Public Disclosure
               </Link>
-              <Link href="/p/affiliation" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/compliance/affiliation" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 CBSE Affiliation Status
               </Link>
-              <Link href="/p/certificates" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/compliance/certificates" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Compliance Certificates
               </Link>
-              <Link href="/p/annual-report" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/compliance/annual-report" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Annual Reports
               </Link>
-              <Link href="/p/school-management-committee" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/compliance/smc" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 School Management (SMC)
               </Link>
-              <Link href="/p/pta" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+              <Link href="/docs/compliance/pta" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Parents Teachers Assoc. (PTA)
               </Link>
               <Link href="/p/faculty-details" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">

@@ -56,11 +56,43 @@ const tree: PageTree.Root = {
     },
     {
       type: "folder",
+      name: "Institutional Compliance",
+      children: [
+        { type: "page", name: "Mandatory Public Disclosure", url: "/docs/compliance/mandatory-disclosure" },
+        { type: "page", name: "CBSE Affiliation Status", url: "/docs/compliance/affiliation" },
+        { type: "page", name: "Annual Report & Audit", url: "/docs/compliance/annual-report" },
+        { type: "page", name: "School Management Committee (SMC)", url: "/docs/compliance/smc" },
+        { type: "page", name: "Parents Teachers Association (PTA)", url: "/docs/compliance/pta" },
+        { type: "page", name: "Statutory Certificates", url: "/docs/compliance/certificates" },
+      ],
+    },
+    {
+      type: "folder",
+      name: "Academics & Rules",
+      children: [
+        { type: "page", name: "Fee Structure & Payment", url: "/docs/academics/fee-structure" },
+        { type: "page", name: "Academic Calendar 2026–27", url: "/docs/academics/academic-calendar" },
+        { type: "page", name: "Curriculum Overview", url: "/docs/academics/curriculum" },
+        { type: "page", name: "Class Syllabus (I–XII)", url: "/docs/academics/syllabus" },
+        { type: "page", name: "Prescribed Textbooks", url: "/docs/academics/textbooks" },
+        { type: "page", name: "Examinations & Assessments", url: "/docs/academics/examinations" },
+        { type: "page", name: "Board Exam Results (3-Yr)", url: "/docs/academics/results" },
+      ],
+    },
+    {
+      type: "folder",
       name: "Admissions",
       children: [
         { type: "page", name: "Admissions Overview", url: "/docs/admissions/overview" },
-        { type: "page", name: "Document Requirements", url: "/docs/admissions/documents" },
-        { type: "page", name: "Fee Structure", url: "/docs/admissions/fees" },
+        { type: "page", name: "Admission Process & Stages", url: "/docs/admissions/process" },
+        { type: "page", name: "Eligibility Criteria", url: "/docs/admissions/eligibility" },
+      ],
+    },
+    {
+      type: "folder",
+      name: "Frequently Asked Questions",
+      children: [
+        { type: "page", name: "All FAQs Directory", url: "/docs/faqs" },
       ],
     },
     {

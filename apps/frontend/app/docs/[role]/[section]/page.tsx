@@ -1,6 +1,41 @@
+import type { Metadata } from "next"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Lightbulb, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react"
 import { DocsPage, DocsBody } from "fumadocs-ui/page"
+import { getStaticPage } from "@/lib/static-pages"
+import { DocsStaticRenderer } from "@/components/docs-static-renderer"
+
+const DOC_SLUG_MAP: Record<string, Record<string, string>> = {
+  compliance: {
+    "mandatory-disclosure": "mandatory-public-disclosure",
+    "mandatory-public-disclosure": "mandatory-public-disclosure",
+    "affiliation": "affiliation",
+    "annual-report": "annual-report",
+    "smc": "school-management-committee",
+    "school-management-committee": "school-management-committee",
+    "pta": "pta",
+    "certificates": "certificates",
+  },
+  academics: {
+    "academic-calendar": "academic-calendar",
+    "calendar": "academic-calendar",
+    "fee-structure": "fee-structure",
+    "fees": "fee-structure",
+    "curriculum": "curriculum",
+    "syllabus": "syllabus",
+    "textbooks": "textbooks",
+    "examinations": "examinations",
+    "results": "results",
+  },
+  admissions: {
+    "process": "admission-process",
+    "admission-process": "admission-process",
+    "eligibility": "eligibility",
+    "overview": "admission",
+    "documents": "certificates",
+    "fees": "fee-structure",
+  },
+}
 
 interface Step {
   step: string
@@ -1303,6 +1338,34 @@ const ARTICLES: Record<string, Record<string, GuideArticle>> = {
   }
 }
 
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ role: string; section: string }>
+}): Promise<Metadata> {
+  const { role, section } = await params
+  const article = ARTICLES[role]?.[section]
+  if (article) {
+    return {
+      title: `${article.title} | VIDYA SCHOOL`,
+      description: article.description,
+    }
+  }
+
+  const mappedSlug = DOC_SLUG_MAP[role]?.[section] || section
+  const staticPage = getStaticPage(mappedSlug)
+  if (staticPage) {
+    return {
+      title: `${staticPage.title} | VIDYA SCHOOL`,
+      description: staticPage.description,
+    }
+  }
+
+  return {
+    title: "Documentation | VIDYA SCHOOL",
+  }
+}
+
 export default async function DocArticlePage({
   params
 }: {
@@ -1312,6 +1375,12 @@ export default async function DocArticlePage({
   const article = ARTICLES[role]?.[section]
 
   if (!article) {
+    const mappedSlug = DOC_SLUG_MAP[role]?.[section] || section
+    const staticPage = getStaticPage(mappedSlug)
+    if (staticPage) {
+      return <DocsStaticRenderer page={staticPage} />
+    }
+
     return (
       <div className="p-8 md:p-12 text-center text-muted-foreground text-sm">
         Documentation page not found.
