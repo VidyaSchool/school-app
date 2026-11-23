@@ -1,0 +1,13 @@
+{
+  "name": "@vidyaschool/auth-client",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "better-auth": "^1.6.20"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}
