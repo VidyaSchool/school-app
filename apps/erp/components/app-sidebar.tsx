@@ -64,7 +64,6 @@ import { Sun2Icon } from "@solar-icons/react/bold-duotone/sun-2"
 import { MoonIcon } from "@solar-icons/react/bold-duotone/moon"
 import { LaptopIcon } from "@solar-icons/react/bold-duotone/laptop"
 import { Logout2Icon } from "@solar-icons/react/bold-duotone/logout-2"
-import { AddCircleIcon } from "@solar-icons/react/bold-duotone/add-circle"
 import { DownloadMinimalisticIcon } from "@solar-icons/react/bold-duotone/download-minimalistic"
 import { ChevronsUpDownIcon } from "@solar-icons/react/bold-duotone/chevrons-up-down"
 import { DatabaseIcon } from "@solar-icons/react/bold-duotone/database"
@@ -904,15 +903,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                 </div>
 
-                {/* Divider + Add Account + Log Out */}
+                {/* Divider + Log Out */}
                 <div className="border-t border-zinc-100 dark:border-zinc-800/60 p-1.5 space-y-0.5">
-                  <button
-                    onClick={() => { setIsCommandOpen(false); window.location.href = "/login" }}
-                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-sm text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:text-foreground transition-colors cursor-pointer"
-                  >
-                    <AddCircleIcon className="size-4 shrink-0" />
-                    Add Account
-                  </button>
                   <Button
                     variant="destructive"
                     className="w-full justify-start gap-2.5 px-2.5"
