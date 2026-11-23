@@ -8,6 +8,7 @@
     "dev:erp": "turbo run dev --filter=@vidyaschool/erp",
     "dev:admin": "turbo run dev --filter=@vidyaschool/admin",
     "dev:frontend": "turbo run dev --filter=@vidyaschool/frontend",
+    "dev:backend": "cd apps/backend && (source .venv/bin/activate && uvicorn main:app --reload --port 8000)",
     "build": "turbo run build",
     "lint": "turbo run lint"
   },
