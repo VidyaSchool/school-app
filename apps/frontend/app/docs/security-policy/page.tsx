@@ -1,4 +1,4 @@
-import { DocsPage, DocsBody } from "fumadocs-ui/page"
+import { DocsPage, DocsBody } from "fumadocs-ui/layouts/docs/page"
 
 export default function SecurityPolicyPage() {
   const toc = [

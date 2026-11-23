@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DocsPage, DocsBody } from "fumadocs-ui/page"
+import { DocsPage, DocsBody } from "fumadocs-ui/layouts/docs/page"
 import { PublicEditorJsBlockRenderer } from "@/components/static-page-renderer"
 import type { StaticPageData, EditorJsBlock } from "@/lib/static-pages"
 
