@@ -141,21 +141,24 @@ function DocsThemeToggle() {
 
 export default function DocsPageLayout({ children }: { children: React.ReactNode }) {
   return (
-    <DocsLayout
-      tree={tree}
-      nav={{
-        title: (
-          <div className="flex items-center gap-2 font-bold text-sm">
-            <BookOpen className="h-4 w-4 text-primary" />
-            <span>VidyaSchool Docs</span>
-          </div>
-        ),
-      }}
-      slots={{
-        themeSwitch: DocsThemeToggle,
-      }}
-    >
-      {children}
-    </DocsLayout>
+    <>
+      <title>VIDYA SCHOOL</title>
+      <DocsLayout
+        tree={tree}
+        nav={{
+          title: (
+            <div className="flex items-center gap-2 font-bold text-sm">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span>VIDYA SCHOOL</span>
+            </div>
+          ),
+        }}
+        slots={{
+          themeSwitch: DocsThemeToggle,
+        }}
+      >
+        {children}
+      </DocsLayout>
+    </>
   )
 }
