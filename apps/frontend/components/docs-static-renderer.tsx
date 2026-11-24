@@ -2,10 +2,15 @@
 
 import * as React from "react"
 import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page"
-import { PublicEditorJsBlockRenderer } from "@/components/static-page-renderer"
+import {
+  PublicEditorJsBlockRenderer,
+  DocumentPreviewDialog,
+  type MediaModalData,
+} from "@/components/static-page-renderer"
 import type { StaticPageData, EditorJsBlock } from "@/lib/static-pages"
 
 export function DocsStaticRenderer({ page }: { page: StaticPageData }) {
+  const [activeModal, setActiveModal] = React.useState<MediaModalData | null>(null)
   const raw = page.widgets
   let blocks: EditorJsBlock[] = []
   if (raw && typeof raw === "object" && !Array.isArray(raw) && Array.isArray(raw.blocks)) {
@@ -29,25 +34,36 @@ export function DocsStaticRenderer({ page }: { page: StaticPageData }) {
     })
 
   return (
-    <DocsPage toc={toc}>
-      <DocsBody>
-        <div className="space-y-3 pb-4 border-b border-border/40">
-          <DocsTitle className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl" id="overview">
-            {page.title}
-          </DocsTitle>
-          {page.description && (
-            <DocsDescription className="text-base text-muted-foreground leading-relaxed">
-              {page.description}
-            </DocsDescription>
-          )}
-        </div>
+    <>
+      <DocsPage toc={toc}>
+        <DocsBody>
+          <div className="space-y-3 pb-4 border-b border-border/40">
+            <DocsTitle className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl" id="overview">
+              {page.title}
+            </DocsTitle>
+            {page.description && (
+              <DocsDescription className="text-base text-muted-foreground leading-relaxed">
+                {page.description}
+              </DocsDescription>
+            )}
+          </div>
 
-        <div className="space-y-4 pt-4">
-          {blocks.map((block, idx) => (
-            <PublicEditorJsBlockRenderer key={block.id || idx} block={block} />
-          ))}
-        </div>
-      </DocsBody>
-    </DocsPage>
+          <div className="space-y-4 pt-4">
+            {blocks.map((block, idx) => (
+              <PublicEditorJsBlockRenderer
+                key={block.id || idx}
+                block={block}
+                onTriggerModal={(m) => setActiveModal(m)}
+              />
+            ))}
+          </div>
+        </DocsBody>
+      </DocsPage>
+
+      <DocumentPreviewDialog
+        modal={activeModal}
+        onClose={() => setActiveModal(null)}
+      />
+    </>
   )
 }

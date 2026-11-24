@@ -625,6 +625,135 @@ function PublicWidgetRenderer({ widget }: { widget: ElementorWidget }) {
   return <div className="py-2 text-xs text-muted-foreground">{widget.name}</div>
 }
 
+export interface MediaModalData {
+  type: "pdf" | "video"
+  url: string
+  title: string
+}
+
+export function DocumentPreviewDialog({
+  modal,
+  onClose,
+}: {
+  modal: MediaModalData | null
+  onClose: () => void
+}) {
+  if (!modal) return null
+  const safeUrl = getSafeUrl(modal.url)
+
+  let embedPdfUrl = safeUrl
+  try {
+    const u = new URL(safeUrl)
+    if (u.hostname === "drive.google.com" || u.hostname.endsWith(".google.com")) {
+      embedPdfUrl = safeUrl.replace(/\/view(\?.*)?$/, "/preview$1")
+    }
+  } catch {}
+
+  return (
+    <Dialog open={Boolean(modal)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-4xl p-0 overflow-hidden sm:max-w-4xl w-[95vw]">
+        <div className="flex flex-col h-full max-h-[90vh]">
+          <DialogHeader className="p-4 border-b border-border flex flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0 pr-2">
+              {modal.type === "pdf" ? (
+                <FileText className="size-5 text-rose-500 shrink-0" />
+              ) : (
+                <Video className="size-5 text-purple-500 shrink-0" />
+              )}
+              <DialogTitle className="text-base font-bold truncate">
+                {modal.title || (modal.type === "pdf" ? "PDF Document" : "Video Player")}
+              </DialogTitle>
+            </div>
+            {modal.type === "pdf" && modal.url && (
+              <div className="flex items-center gap-2 shrink-0 mr-6">
+                <a
+                  href={safeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex"
+                >
+                  <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 cursor-pointer">
+                    <ExternalLink className="size-3.5" />
+                    <span className="hidden sm:inline">Open in New Tab</span>
+                    <span className="sm:hidden">Open</span>
+                  </Button>
+                </a>
+                <a
+                  href={safeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="inline-flex"
+                >
+                  <Button variant="default" size="sm" className="h-8 text-xs gap-1.5 cursor-pointer">
+                    <Download className="size-3.5" />
+                    <span className="hidden sm:inline">Download</span>
+                  </Button>
+                </a>
+              </div>
+            )}
+          </DialogHeader>
+
+          <div className="p-2 flex-1 min-h-[480px] bg-muted/20 flex flex-col">
+            {modal.type === "pdf" ? (
+              <>
+                <iframe
+                  src={embedPdfUrl}
+                  title={modal.title || "PDF Viewer"}
+                  className="w-full flex-1 min-h-[550px] rounded-lg border-0 bg-white shadow-xs"
+                />
+                <div className="mt-2 px-2 py-1 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Having trouble viewing the preview?</span>
+                  <a
+                    href={safeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary font-medium hover:underline flex items-center gap-1"
+                  >
+                    Open directly in browser <ExternalLink className="size-3" />
+                  </a>
+                </div>
+              </>
+            ) : (
+              <div className="aspect-video w-full rounded-lg overflow-hidden bg-black flex items-center justify-center">
+                {(() => {
+                  const safeEmbed = getSafeVideoEmbedUrl(modal.url)
+                  if (safeEmbed) {
+                    return (
+                      <iframe
+                        src={safeEmbed}
+                        title={modal.title || "Video"}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    )
+                  }
+                  if (safeUrl.endsWith(".mp4") || safeUrl.endsWith(".webm")) {
+                    return (
+                      <video
+                        src={safeUrl}
+                        controls
+                        autoPlay
+                        className="w-full h-full object-contain"
+                      />
+                    )
+                  }
+                  return (
+                    <div className="text-center p-6 text-xs text-white/80">
+                      Unsupported video source. Only verified YouTube, Vimeo, or direct MP4 videos can be played.
+                    </div>
+                  )
+                })()}
+              </div>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 // ── Public Editor.js Block Renderer ──────────────────────────────────────────
 
 export function PublicEditorJsBlockRenderer({
@@ -632,7 +761,7 @@ export function PublicEditorJsBlockRenderer({
   onTriggerModal,
 }: {
   block: EditorJsBlock
-  onTriggerModal?: (modal: { type: "pdf" | "video"; url: string; title: string }) => void
+  onTriggerModal?: (modal: MediaModalData) => void
 }) {
   if (block.type === "header") {
     const level = block.data?.level || 2
@@ -1041,12 +1170,21 @@ export function PublicEditorJsBlockRenderer({
                                 variant={parsed.btn.variant || "default"}
                                 className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
                                 onClick={() => {
+                                  const docTitle =
+                                    (typeof row[1] === "string" ? row[1].replace(/<[^>]+>/g, "").trim() : "") ||
+                                    parsed.btn?.label ||
+                                    "Document"
                                   if (parsed.btn && onTriggerModal) {
                                     onTriggerModal({
                                       type: parsed.btn.actionType === "view_video" ? "video" : "pdf",
                                       url: parsed.btn.url,
-                                      title: parsed.btn.label,
+                                      title: docTitle,
                                     })
+                                  } else if (parsed.btn) {
+                                    const safe = getSafeUrl(parsed.btn.url)
+                                    if (safe && safe !== "#") {
+                                      window.open(safe, "_blank", "noopener,noreferrer")
+                                    }
                                   }
                                 }}
                               >
@@ -1257,95 +1395,10 @@ export function StaticPageRenderer({
       )}
 
       {/* Modal Dialog for Table Button actions */}
-      <Dialog open={Boolean(activeModal)} onOpenChange={(open) => !open && setActiveModal(null)}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden sm:max-w-3xl">
-          {activeModal && (
-            <div className="flex flex-col h-full max-h-[85vh]">
-              <DialogHeader className="p-4 border-b border-border flex flex-row items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {activeModal.type === "pdf" ? (
-                    <FileText className="size-5 text-rose-500" />
-                  ) : (
-                    <Video className="size-5 text-purple-500" />
-                  )}
-                  <DialogTitle className="text-base font-bold truncate">
-                    {activeModal.title || (activeModal.type === "pdf" ? "PDF Document" : "Video Player")}
-                  </DialogTitle>
-                </div>
-                {activeModal.type === "pdf" && activeModal.url && (
-                  <a
-                    href={getSafeUrl(activeModal.url)}
-                    target="_blank"
-                    rel="noreferrer"
-                    download
-                    className="mr-6"
-                  >
-                    <Button variant="outline" size="sm" className="h-7 text-xs gap-1 cursor-pointer">
-                      <Download className="size-3.5" /> Download
-                    </Button>
-                  </a>
-                )}
-              </DialogHeader>
-
-              <div className="p-2 flex-1 min-h-[420px] bg-muted/20">
-                {activeModal.type === "pdf" ? (
-                  <iframe
-                    src={
-                      (() => {
-                        let isGoogleDrive = false
-                        try {
-                          const u = new URL(activeModal.url)
-                          isGoogleDrive = u.hostname === "drive.google.com" || u.hostname.endsWith(".google.com")
-                        } catch {
-                          isGoogleDrive = false
-                        }
-                        return isGoogleDrive || activeModal.url.endsWith(".pdf")
-                          ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(getSafeUrl(activeModal.url))}`
-                          : getSafeUrl(activeModal.url)
-                      })()
-                    }
-                    title={activeModal.title || "PDF Viewer"}
-                    className="w-full h-[520px] rounded-lg border-0 bg-white"
-                  />
-                ) : (
-                  <div className="aspect-video w-full rounded-lg overflow-hidden bg-black flex items-center justify-center">
-                    {(() => {
-                      const safeEmbed = getSafeVideoEmbedUrl(activeModal.url)
-                      if (safeEmbed) {
-                        return (
-                          <iframe
-                            src={safeEmbed}
-                            title={activeModal.title || "Video"}
-                            className="w-full h-full border-0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        )
-                      }
-                      const safeDirect = getSafeUrl(activeModal.url)
-                      if (safeDirect.endsWith(".mp4") || safeDirect.endsWith(".webm")) {
-                        return (
-                          <video
-                            src={safeDirect}
-                            controls
-                            autoPlay
-                            className="w-full h-full object-contain"
-                          />
-                        )
-                      }
-                      return (
-                        <div className="text-center p-6 text-xs text-white/80">
-                          Unsupported video source. Only verified YouTube, Vimeo, or direct MP4 videos can be played.
-                        </div>
-                      )
-                    })()}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <DocumentPreviewDialog
+        modal={activeModal}
+        onClose={() => setActiveModal(null)}
+      />
 
       <Footer />
     </div>

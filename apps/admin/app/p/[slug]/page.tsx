@@ -1121,12 +1121,21 @@ function PublicEditorJsBlockRenderer({
                               variant={parsed.btn.variant || "default"}
                               size="sm"
                               onClick={() => {
+                                const docTitle =
+                                  (typeof row[1] === "string" ? row[1].replace(/<[^>]+>/g, "").trim() : "") ||
+                                  parsed.btn?.label ||
+                                  "Document"
                                 if (onTriggerModal && parsed.btn) {
                                   onTriggerModal({
                                     type: parsed.btn.actionType === "view_video" ? "video" : "pdf",
                                     url: getSafeUrl(parsed.btn.url),
-                                    title: parsed.btn.label,
+                                    title: docTitle,
                                   })
+                                } else if (parsed.btn) {
+                                  const safe = getSafeUrl(parsed.btn.url)
+                                  if (safe && safe !== "#") {
+                                    window.open(safe, "_blank", "noopener,noreferrer")
+                                  }
                                 }
                               }}
                               className="h-8 gap-1.5 text-xs font-semibold cursor-pointer shadow-xs"
@@ -1444,40 +1453,63 @@ export default function PublicLivePage() {
                   </DialogTitle>
                 </div>
                 {activeModal.type === "pdf" && activeModal.url && (
-                  <a
-                    href={getSafeUrl(activeModal.url)}
-                    target="_blank"
-                    rel="noreferrer"
-                    download
-                    className="mr-6"
-                  >
-                    <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-                      <Download className="size-3.5" /> Download
-                    </Button>
-                  </a>
+                  <div className="flex items-center gap-2 mr-6">
+                    <a
+                      href={getSafeUrl(activeModal.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex"
+                    >
+                      <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                        <ExternalLink className="size-3.5" /> Open in New Tab
+                      </Button>
+                    </a>
+                    <a
+                      href={getSafeUrl(activeModal.url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="inline-flex"
+                    >
+                      <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                        <Download className="size-3.5" /> Download
+                      </Button>
+                    </a>
+                  </div>
                 )}
               </DialogHeader>
 
-              <div className="p-2 flex-1 min-h-[420px] bg-muted/20">
+              <div className="p-2 flex-1 min-h-[420px] bg-muted/20 flex flex-col">
                 {activeModal.type === "pdf" ? (
-                  <iframe
-                    src={
-                      (() => {
-                        let isGoogleDrive = false
-                        try {
-                          const u = new URL(activeModal.url)
-                          isGoogleDrive = u.hostname === "drive.google.com" || u.hostname.endsWith(".google.com")
-                        } catch {
-                          isGoogleDrive = false
-                        }
-                        return isGoogleDrive || activeModal.url.endsWith(".pdf")
-                          ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(getSafeUrl(activeModal.url))}`
-                          : getSafeUrl(activeModal.url)
-                      })()
-                    }
-                    title={activeModal.title || "PDF Viewer"}
-                    className="w-full h-[520px] rounded-lg border-0 bg-white"
-                  />
+                  <>
+                    <iframe
+                      src={
+                        (() => {
+                          const safe = getSafeUrl(activeModal.url)
+                          try {
+                            const u = new URL(safe)
+                            if (u.hostname === "drive.google.com" || u.hostname.endsWith(".google.com")) {
+                              return safe.replace(/\/view(\?.*)?$/, "/preview$1")
+                            }
+                          } catch {}
+                          return safe
+                        })()
+                      }
+                      title={activeModal.title || "PDF Viewer"}
+                      className="w-full flex-1 min-h-[520px] rounded-lg border-0 bg-white"
+                    />
+                    <div className="mt-2 px-2 py-1 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Having trouble viewing preview?</span>
+                      <a
+                        href={getSafeUrl(activeModal.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary font-medium hover:underline flex items-center gap-1"
+                      >
+                        Open directly <ExternalLink className="size-3" />
+                      </a>
+                    </div>
+                  </>
                 ) : (
                   <div className="aspect-video w-full rounded-lg overflow-hidden bg-black flex items-center justify-center">
                     {(() => {
