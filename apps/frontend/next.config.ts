@@ -84,6 +84,32 @@ const nextConfig: NextConfig = {
       { source: '/p/eligibility', destination: '/docs/admissions/eligibility', permanent: false },
       { source: '/faqs', destination: '/docs/faqs', permanent: false },
       { source: '/p/faqs', destination: '/docs/faqs', permanent: false },
+
+      // Docs category index redirects
+      { source: '/docs/compliance', destination: '/docs/compliance/mandatory-disclosure', permanent: false },
+      { source: '/docs/academics', destination: '/docs/academics/fee-structure', permanent: false },
+      { source: '/docs/getting-started', destination: '/docs/getting-started/overview', permanent: false },
+      { source: '/docs/auth', destination: '/docs/auth/signup', permanent: false },
+      { source: '/docs/student', destination: '/docs/student/onboarding', permanent: false },
+      { source: '/docs/teacher', destination: '/docs/teacher/roster', permanent: false },
+      { source: '/docs/admissions', destination: '/docs/admissions/overview', permanent: false },
+      { source: '/docs/co-curriculars', destination: '/docs/co-curriculars/overview', permanent: false },
+      { source: '/docs/developers', destination: '/docs/developers/architecture', permanent: false },
+      { source: '/docs/legal', destination: '/docs/legal/terms-of-service', permanent: false },
+
+      // Docs legal legacy path redirects
+      { source: '/docs/terms-of-service', destination: '/docs/legal/terms-of-service', permanent: false },
+      { source: '/docs/privacy-policy', destination: '/docs/legal/privacy-policy', permanent: false },
+      { source: '/docs/acceptable-use', destination: '/docs/legal/acceptable-use', permanent: false },
+      { source: '/docs/cookie-policy', destination: '/docs/legal/cookie-policy', permanent: false },
+      { source: '/docs/refund-policy', destination: '/docs/legal/refund-policy', permanent: false },
+      { source: '/docs/security-policy', destination: '/docs/legal/security-policy', permanent: false },
+      { source: '/docs/dmca-policy', destination: '/docs/legal/dmca-policy', permanent: false },
+      { source: '/docs/ai-disclaimer', destination: '/docs/legal/ai-disclaimer', permanent: false },
+
+      // ERP and Auth Portal redirects
+      { source: '/erp', destination: process.env.NEXT_PUBLIC_ERP_URL || 'https://erp.vidyaschool.com', permanent: false },
+      { source: '/login-accounts', destination: `${process.env.NEXT_PUBLIC_AUTH_URL || 'https://auth.vidyaschool.com'}/login-accounts`, permanent: false },
     ];
   },
   async rewrites() {

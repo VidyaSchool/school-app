@@ -20,6 +20,7 @@ const authRoutes = [
 
 // ERP routes that live in the dedicated erp_frontend app
 const erpRoutes = [
+  '/erp',
   '/dashboard',
   '/student',
   '/teacher',
