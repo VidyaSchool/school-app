@@ -1,6 +1,7 @@
 import * as React from 'react';
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { BookOpen } from 'lucide-react';
+import { DocsThemeToggle } from '@/components/docs-theme-toggle';
 
 const isLocal = typeof window !== 'undefined'
   ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -32,6 +33,9 @@ export function baseOptions(): BaseLayoutProps {
       { text: "Academics", url: "/docs/academics/fee-structure" },
       { text: "ERP Portal", url: ERP_URL, external: true },
     ],
+    themeSwitch: {
+      component: <DocsThemeToggle />,
+    },
     githubUrl: "https://github.com/VidyaSchool/school-app",
   };
 }

@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button"
 
 // Memoized — does not re-render on header scroll state changes
 const ThemeToggle = React.memo(function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
@@ -32,11 +32,13 @@ const ThemeToggle = React.memo(function ThemeToggle() {
     return <div className="h-8 w-8 rounded-full bg-muted/20 border border-border" />
   }
 
+  const isDark = (resolvedTheme || theme) === "dark"
+
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
       className="cursor-pointer rounded-full text-foreground dark:text-white hover:bg-muted/70 dark:hover:bg-white/15"
       aria-label="Toggle theme"
     >

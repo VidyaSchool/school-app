@@ -295,10 +295,95 @@
 
 #nd-sidebar [data-radix-scroll-area-viewport],
 #nd-sidebar-mobile [data-radix-scroll-area-viewport],
-#nd-toc [data-radix-scroll-area-viewport] {
+#nd-toc [data-radix-scroll-area-viewport],
+[data-radix-scroll-area-viewport] {
   overscroll-behavior: contain !important;
   overflow-y: auto !important;
-  scrollbar-width: thin;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
+
+#nd-sidebar [data-radix-scroll-area-viewport]::-webkit-scrollbar,
+#nd-sidebar-mobile [data-radix-scroll-area-viewport]::-webkit-scrollbar,
+#nd-toc [data-radix-scroll-area-viewport]::-webkit-scrollbar,
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* shadcn ScrollBar styles applied to Radix ScrollArea (Docs Sidebar, TOC, Dialogs) */
+[data-radix-scroll-area-scrollbar],
+[data-slot="scroll-area-scrollbar"] {
+  display: flex !important;
+  touch-action: none;
+  user-select: none;
+  transition: opacity 150ms ease-out, background-color 150ms ease-out;
+  padding: 1px !important;
+  z-index: 40;
+}
+
+[data-radix-scroll-area-scrollbar][data-orientation="vertical"],
+[data-slot="scroll-area-scrollbar"][data-orientation="vertical"] {
+  width: 9px !important;
+  right: 0 !important;
+  top: 0 !important;
+  height: 100% !important;
+  border-left: 1px solid transparent !important;
+}
+
+[data-radix-scroll-area-scrollbar][data-orientation="horizontal"],
+[data-slot="scroll-area-scrollbar"][data-orientation="horizontal"] {
+  height: 9px !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  border-top: 1px solid transparent !important;
+}
+
+[data-radix-scroll-area-thumb],
+[data-slot="scroll-area-thumb"] {
+  position: relative;
+  flex: 1 1 0%;
+  border-radius: 9999px !important;
+  background-color: hsl(var(--muted-foreground) / 0.3) !important;
+  transition: background-color 150ms ease-out;
+}
+
+[data-radix-scroll-area-thumb]:hover,
+[data-slot="scroll-area-thumb"]:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5) !important;
+}
+
+/* Global elegant thin scrollbar matching shadcn theme */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 150ms ease-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 
 
