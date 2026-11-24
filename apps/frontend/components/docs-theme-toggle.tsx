@@ -17,7 +17,7 @@ export function DocsThemeToggle({ className }: { className?: string }) {
     return (
       <div
         className={cn(
-          "inline-flex h-8 items-center rounded-full border border-border/60 bg-muted/20 p-0.5 gap-1",
+          "ms-auto inline-flex h-8 items-center rounded-full border border-border/60 bg-muted/20 p-0.5 gap-1",
           className
         )}
       >
@@ -32,7 +32,7 @@ export function DocsThemeToggle({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-full border border-border/80 bg-muted/40 p-0.5 text-muted-foreground",
+        "ms-auto inline-flex items-center rounded-full border border-border/80 bg-muted/40 p-0.5 text-muted-foreground",
         className
       )}
       data-slot="theme-switch"

@@ -34,7 +34,7 @@ export function baseOptions(): BaseLayoutProps {
       { text: "ERP Portal", url: ERP_URL, external: true },
     ],
     themeSwitch: {
-      component: <DocsThemeToggle />,
+      component: <DocsThemeToggle className="ms-auto" />,
     },
     githubUrl: "https://github.com/VidyaSchool/school-app",
   };
