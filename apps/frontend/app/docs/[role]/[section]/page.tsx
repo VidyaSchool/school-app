@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Lightbulb, AlertTriangle, HelpCircle, CheckCircle2 } from "lucide-react"
-import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page"
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/page"
 import { getStaticPage } from "@/lib/static-pages"
 import { DocsStaticRenderer } from "@/components/docs-static-renderer"
 

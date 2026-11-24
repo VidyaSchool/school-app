@@ -1,4 +1,4 @@
-import { DocsPage, DocsBody } from "fumadocs-ui/layouts/docs/page"
+import { DocsPage, DocsBody } from "fumadocs-ui/page"
 
 export default function TermsOfServicePage() {
   const toc = [

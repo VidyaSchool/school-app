@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import { createMDX } from "fumadocs-mdx/next";
+
+const withMDX = createMDX();
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [
@@ -138,7 +141,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withMDX(nextConfig), {
   org: process.env.SENTRY_ORG || "vidya-school",
   project: process.env.SENTRY_PROJECT || "javascript-nextjs",
   authToken: process.env.SENTRY_AUTH_TOKEN,

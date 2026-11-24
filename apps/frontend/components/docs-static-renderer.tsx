@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/layouts/docs/page"
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from "fumadocs-ui/page"
 import {
   PublicEditorJsBlockRenderer,
   DocumentPreviewDialog,
