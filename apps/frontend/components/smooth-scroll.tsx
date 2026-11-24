@@ -18,6 +18,19 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     if (prefersReducedMotion) return
 
+    // Documentation and dashboard pages have independent nested scroll areas (sidebar, TOC, content)
+    // Lenis should not run on /docs routes to ensure smooth native scrolling compatibility
+    const isDocs = pathname?.startsWith("/docs")
+    if (isDocs) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy()
+        lenisRef.current = null
+      }
+      return
+    }
+
+    if (lenisRef.current) return
+
     // Initialize Lenis for smooth momentum scrolling
     const lenis = new Lenis({
       duration: 1.15,
@@ -28,6 +41,16 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
       wheelMultiplier: 1.05,
       touchMultiplier: 1.2,
       autoResize: true,
+      prevent: (node) => {
+        if (!node || typeof (node as HTMLElement).closest !== "function") return false
+        return Boolean(
+          (node as HTMLElement).closest("[data-lenis-prevent]") ||
+          (node as HTMLElement).closest("#nd-sidebar") ||
+          (node as HTMLElement).closest("#nd-sidebar-mobile") ||
+          (node as HTMLElement).closest("#nd-toc") ||
+          (node as HTMLElement).closest("[data-radix-scroll-area-viewport]")
+        )
+      },
     })
 
     lenisRef.current = lenis
@@ -46,7 +69,7 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
       lenis.destroy()
       lenisRef.current = null
     }
-  }, [])
+  }, [pathname])
 
   // Reset scroll position on route changes
   useEffect(() => {

@@ -280,3 +280,25 @@
   max-width: var(--site-prose-max-width);
 }
 
+/* Fumadocs Docs Sidebar & TOC scrolling enhancements */
+#nd-sidebar,
+#nd-sidebar-mobile {
+  overscroll-behavior: contain;
+}
+
+#nd-sidebar > div[data-radix-scroll-area-root],
+#nd-sidebar-mobile > div[data-radix-scroll-area-root] {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+#nd-sidebar [data-radix-scroll-area-viewport],
+#nd-sidebar-mobile [data-radix-scroll-area-viewport],
+#nd-toc [data-radix-scroll-area-viewport] {
+  overscroll-behavior: contain !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+}
+
+
