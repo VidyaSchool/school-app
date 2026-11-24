@@ -232,6 +232,7 @@ export function Footer() {
             <Link href="/docs/refund-policy" className="hover:text-foreground transition-colors">Refunds</Link>
             <Link href="/docs/cookie-policy" className="hover:text-foreground transition-colors">Cookies</Link>
             <Link href="/docs/security-policy" className="hover:text-foreground transition-colors">Security</Link>
+            <Link href="/sitemap" className="hover:text-foreground transition-colors">Sitemap</Link>
           </div>
         </div>
       </div>
