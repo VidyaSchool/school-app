@@ -375,6 +375,9 @@ export function Header() {
                     <ListItem href="/p/contact" title="Contact Us">
                       Campus coordinates, phone lines, visiting hours, and inquiry form.
                     </ListItem>
+                    <ListItem href="/developers" title="Developer Support">
+                      Connect with the developer team and access technical support.
+                    </ListItem>
                     <ListItem href="/student" title="Student Portal">
                       Access homework, attendance, fee desk, and academic notices.
                     </ListItem>
@@ -575,6 +578,9 @@ export function Header() {
               </Link>
               <Link href="/p/contact" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Contact Us
+              </Link>
+              <Link href="/developers" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
+                Developer Support
               </Link>
               <Link href="/student" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md">
                 Student Portal
