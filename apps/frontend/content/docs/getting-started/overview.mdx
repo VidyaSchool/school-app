@@ -1,0 +1,38 @@
+---
+title: "Platform Overview"
+description: "VidyaSchool is a comprehensive school management portal that connects students, teachers, administrators, and accounts clerks in a unified digital workspace. This guide introduces you to the platform's key modules and how they work together."
+---
+
+VidyaSchool is a comprehensive school management portal that connects students, teachers, administrators, and accounts clerks in a unified digital workspace. This guide introduces you to the platform's key modules and how they work together.
+
+## Tips
+
+- Install the VidyaSchool PWA on your mobile device from the Downloads page for the best mobile experience.
+- Use the keyboard shortcut ⌘F (Cmd+F) to quickly search through the documentation.
+- Each module has a dedicated help section — look for the '?' icon in your dashboard sidebar.
+
+## What is VidyaSchool?
+
+VidyaSchool is an integrated school management system designed to digitize every aspect of academic operations — from student enrollment and fee collection, to mark submission and library management. The platform is role-based, meaning each user type (student, teacher, accounts clerk, administrator) sees a personalized portal with tools relevant to their role.
+
+## Core Modules
+
+The platform is built around six core modules:
+• Authentication & Onboarding — Secure multi-role login, email verification, and step-by-step profile setup.
+• Academic Records — Teacher grade submission, student report cards, weighted GPA calculations, and performance tracking.
+• Fee Management — Itemized fee ledgers, online Razorpay payments, PDF receipt downloads, and waiver tracking.
+• Library System — Digital catalog, book issuance tracking, return deadlines, and fine accumulation.
+• Communication Hub — Class-level notice boards, circulars, announcements, and direct messaging.
+• Complaint & Support Desk — Structured ticket submission, routing to appropriate staff, and reference tracking.
+
+## Portal Access URLs
+
+Each role has a dedicated dashboard path:
+• Students: /student/[username] — Academic dashboard with marks, fees, notices, and library access.
+• Teachers: /teacher/[username] — Classroom workspace with grade entry, notice publishing, and roster management.
+• Accounts Clerks: /accounts/[username] — Fee management, ledger administration, and payment tracking.
+• Administrators: /admin/[username] — Full system control including user management, approvals, and reports.
+
+## Technology & Security
+
+VidyaSchool is built on Next.js 16 with server-side rendering for fast, SEO-friendly pages. Authentication is powered by BetterAuth with JWT sessions and optional OAuth (Google/GitHub). All data is stored in a PostgreSQL database via Neon serverless with Drizzle ORM. The platform supports Progressive Web App (PWA) installation for mobile access, and all API endpoints are protected by role-based access control (RBAC) middleware.

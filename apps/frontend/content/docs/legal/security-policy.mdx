@@ -1,0 +1,134 @@
+---
+title: "Security & Vulnerability Disclosure Policy"
+description: "Security & Vulnerability Disclosure Policy for VIDYA SCHOOL platform and services."
+---
+
+# 
+            Security & Vulnerability Disclosure Policy
+          
+
+          
+            **Effective Date:** August 18, 2026  |  **Last Updated:** August 18, 2026
+          
+
+          
+
+            **SECURITY FIRST PHILOSOPHY:** VidyaSchool and BlazeNeuro implement enterprise defense-in-depth security standards to protect student records, teacher registers, and payment transactions. We actively welcome responsible vulnerability reports from ethical cybersecurity researchers.
+          
+
+        
+
+        {/* Section 1 */}
+        
+
+          ## 
+            1. Security Architecture & Commitments
+          
+
+          
+            Our infrastructure is engineered using hardened serverless cloud runtimes, containerized microservices, encrypted database clusters (PostgreSQL on Neon Serverless), edge web application firewalls (WAF), and automated continuous integration vulnerability scans.
+          
+
+        
+
+        {/* Section 2 */}
+        
+
+          ## 
+            2. Cryptography & Data Protection
+          
+
+          
+
+            
+
+              - **Transport Layer Security:** All web and mobile API communications are enforced strictly over HTTPS using modern TLS 1.3 with Perfect Forward Secrecy (PFS).
+              - **Storage Encryption:** All persistent database tables, document blobs, and backup snapshots are encrypted at rest using AES-256 keys.
+              - **Credential Hashing:** User passwords are encrypted using adaptive salt rounds with industry-standard bcrypt/Argon2 algorithms.
+            
+
+          
+
+        
+
+        {/* Section 3 */}
+        
+
+          ## 
+            3. Identity, Sessions & Edge Rate Limiting
+          
+
+          
+            Authentication is secured via signed HTTPOnly session cookies and multi-device session identifiers. Real-time rate limiters deployed on edge proxies defend against brute-force credential stuffing and distributed denial-of-service (DDoS) attempts.
+          
+
+        
+
+        {/* Section 4 */}
+        
+
+          ## 
+            4. Vulnerability Disclosure & Researcher Safe Harbor
+          
+
+          
+
+            
+              We believe in coordinated, responsible vulnerability disclosure. If you discover a potential security flaw in our platform:
+            
+
+            
+              **Safe Harbor Guarantee:** VidyaSchool will not initiate legal action against ethical security researchers who discover and report vulnerabilities in good faith in strict compliance with this policy.
+            
+
+          
+
+        
+
+        {/* Section 5 */}
+        
+
+          ## 
+            5. Scope of Testing & Responsible Ground Rules
+          
+
+          
+
+            When conducting security assessments, you must strictly avoid:
+
+            
+
+              - Accessing, modifying, exfiltrating, or destroying student or educator personal data.
+              - Executing Denial of Service (DoS/DDoS) attacks that degrade portal performance for active students.
+              - Conducting social engineering, spear-phishing, or physical attacks against school staff or facilities.
+              - Publicly disclosing vulnerabilities before giving our security team a minimum of **30 days** to remediate the issue.
+            
+
+          
+
+        
+
+        {/* Section 6 */}
+        
+
+          ## 
+            6. Reporting Security Bugs & PGP Contact
+          
+
+          
+
+            Please submit detailed vulnerability reports (including proof-of-concept steps, affected endpoints, and severity ratings) to our Security Response Team:
+
+            
+
+              
+**VidyaSchool Security Incident Response Team (SIRT)**
+
+              
+Direct Security Email: [security@vidyaschool.com](mailto:security@vidyaschool.com)
+
+              
+Corporate Security: [security@blazeneuro.com](mailto:security@blazeneuro.com)
+
+              
+Response SLA: Initial acknowledgement within 24 hours

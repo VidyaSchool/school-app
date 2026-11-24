@@ -1,0 +1,11 @@
+{
+  "title": "Account & Authentication",
+  "pages": [
+    "signup",
+    "login",
+    "approval",
+    "password-reset",
+    "qr-login",
+    "session-security"
+  ]
+}

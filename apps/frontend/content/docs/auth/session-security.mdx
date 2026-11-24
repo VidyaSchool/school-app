@@ -1,0 +1,38 @@
+---
+title: "Session Revocation & Safety"
+description: "User guide for auditing active logged-in devices, revoking suspicious sessions, and maintaining account security."
+---
+
+User guide for auditing active logged-in devices, revoking suspicious sessions, and maintaining account security.
+
+## Steps
+
+### Step 01: Access Account Settings
+Log into your portal and navigate to My Account (/account or /student/[username]/account).
+
+### Step 02: Inspect Active Sessions
+Scroll to the 'Active Devices & Sessions' section. This panel lists every browser, computer, and mobile phone currently signed into your account, including IP address, user-agent, creation date, and current session indicators.
+
+### Step 03: Revoke Specific Session
+If you recognize a device you no longer use (or a public library computer you forgot to log out of), click the 'Revoke' button next to that device. The session token is immediately deleted from the database.
+
+### Step 04: Revoke All Other Devices
+To instantly log out all other laptops, tablets, and phones while keeping your current browser active, click 'Log Out All Other Devices'.
+
+## Tips
+
+- Periodically check your Active Sessions list, especially after using shared school computers or cyber cafés.
+- Click 'Log Out All Other Devices' immediately if you suspect someone knows your password or if your smartphone was lost.
+
+## Important Warnings
+
+> [!WARNING]
+> Session revocation takes effect instantly across Next.js edge middleware and FastAPI backend — any subsequent request from a revoked device will return an HTTP 401 Unauthorized error.
+
+## Frequently Asked Questions
+
+### What happens when I revoke a session?
+The session token is permanently purged from the PostgreSQL database. The revoked device is immediately logged out on its next request.
+
+### How long do sessions stay active?
+Standard sessions remain active for 30 days unless manually revoked or logged out.

@@ -1,0 +1,37 @@
+---
+title: "Security, Auth & Rate Limiting"
+description: "Comprehensive security architecture, session token verification, dual-layer sliding window rate limiters, and RBAC firewall."
+---
+
+Comprehensive security architecture, session token verification, dual-layer sliding window rate limiters, and RBAC firewall.
+
+## Tips
+
+- Rate limiters use in-memory sliding windows with automated 5-minute cleanup cycles.
+- Always forward request cookie and authorization headers when making server-to-server proxy calls.
+
+## Dual-Layer Sliding Window Rate Limiter
+
+To protect against DDoS and brute-force attacks, rate limiters are active on both tiers:
+1. Next.js Edge Rate Limiter (frontend/lib/rate-limit.ts & middleware.ts):
+   - Strict endpoints (/api/auth/*, /api/profile/*, /api/admin/*): 60 requests per minute per IP.
+   - General API endpoints (/api/*): 180 requests per minute per IP.
+2. FastAPI Rate Limiter (backend/app/core/rate_limit.py):
+   - Auth & session endpoints: 60 requests per minute per IP.
+   - Health checks: 300 requests per minute per IP.
+   - Standard API endpoints: 180 requests per minute per IP.
+Exceeded limits trigger an HTTP 429 Too Many Requests response with Retry-After and X-RateLimit-* headers.
+
+## Session Authentication & Token Parsing
+
+Session verification workflow:
+• Session Token Cookie: Stored as better-auth.session_token.
+• Token Decoding: Strips signature prefixes (split by '.') and unquotes URL-encoded tokens.
+• DB Verification: Checks expiration date (expires_at > UTC now) against PostgreSQL session records.
+
+## Role-Based Access Control (RBAC)
+
+Multi-layered authorization enforcement:
+• Middleware Firewall: Enforces role permissions per path prefix (/student, /teacher, /admin, /accounts, /librarian).
+• Server Helper: requireRole(['role']) verifies active session role in server components.
+• Layout Security: Validates that requested profile usernames match the authenticated user.

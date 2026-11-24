@@ -1,0 +1,51 @@
+---
+title: "Deployment, CI/CD & Environment Setup"
+description: "Complete guide for local developer onboarding, environment variable configuration, testing, and production deployment."
+---
+
+Complete guide for local developer onboarding, environment variable configuration, testing, and production deployment.
+
+## Tips
+
+- Use 'git status' to verify all modified files before pushing changes to origin main.
+- Keep .env files out of source control; use .env.example for template reference.
+
+## Local Development Setup
+
+Follow these steps to run the full application locally:
+
+1. Frontend (Next.js):
+   $ cd frontend
+   $ npm install
+   $ npm run dev
+   (App running at http://localhost:3000)
+
+2. Backend (FastAPI):
+   $ cd backend
+   $ python3 -m venv .venv
+   $ source .venv/bin/activate
+   $ pip install -r requirements.txt
+   $ uvicorn main:app --reload --port 8000
+   (API running at http://localhost:8000)
+
+## Environment Variable Configuration
+
+Required configuration parameters:
+• DATABASE_URL: PostgreSQL connection string (postgresql://user:pass@host/dbname).
+• BACKEND_URL / NEXT_PUBLIC_BACKEND_URL: FastAPI backend address (http://localhost:8000 in dev).
+• BETTER_AUTH_SECRET: Secret key for session encryption.
+• SENTRY_DSN: Telemetry DSN for client/server error monitoring.
+• FIREBASE_CREDENTIALS_JSON: Firebase Admin SDK credentials for push notifications.
+
+## Production Deployment
+
+Deployment target configuration:
+• Frontend: Vercel / Docker container running Next.js build (npm run build).
+• Backend: Render / Railway / AWS ECS running FastAPI uvicorn worker.
+• Database: Neon Serverless PostgreSQL with SSL connection mode.
+
+## Code Validation Commands
+
+Always run code quality checks before submitting pull requests:
+• Frontend TypeScript Validation: npx tsc --noEmit
+• Backend Python Compilation: python3 -m py_compile app/core/auth.py app/routes/fees.py main.py

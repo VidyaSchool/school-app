@@ -1,0 +1,50 @@
+---
+title: "Portal Login Streams"
+description: "Step-by-step walkthrough for signing into VidyaSchool, understanding the automatic dashboard routing, and troubleshooting common login failures."
+---
+
+Step-by-step walkthrough for signing into VidyaSchool, understanding the automatic dashboard routing, and troubleshooting common login failures.
+
+## Steps
+
+### Step 01: Visit the Login Page
+Click 'Login' in the header navigation, or go to /login. The login page supports both credential login (email + password) and social OAuth (Google/GitHub). Choose the same method you used during registration for the fastest authentication.
+
+### Step 02: Enter your Credentials
+Type your registered email address and password. The 'Remember me' checkbox extends your session for 30 days, so you don't need to log in daily. Leave it unchecked on shared or public devices.
+
+### Step 03: Automatic Dashboard Redirect
+After successful authentication, the gateway middleware reads your role and redirects you to your designated workspace:
+• Students → /student/[username]
+• Teachers → /teacher/[username]
+• Accounts Clerks → /accounts/[username]
+• Administrators → /admin/[username]
+This redirect happens automatically — you don't need to navigate manually.
+
+### Step 04: Onboarding Check
+If your profile onboarding is incomplete, you'll be intercepted by the Onboarding Dialog before reaching your dashboard. Complete all required fields to proceed. You cannot skip mandatory onboarding steps.
+
+## Tips
+
+- Use the social login button that matches your registration method for instant access.
+- If you've forgotten your password, click 'Forgot Password' on the login page to receive a reset link.
+- Sessions expire after 30 days by default. If you're auto-logged-out, simply log in again.
+
+## Important Warnings
+
+> [!WARNING]
+> Never log in on public computers without unchecking 'Remember me'. Always sign out when finished.
+
+> [!WARNING]
+> Three consecutive failed login attempts will temporarily lock your account for 15 minutes.
+
+## Frequently Asked Questions
+
+### I entered the correct password but login fails. What's happening?
+First, check that Caps Lock is off. If you registered with a social provider (Google/GitHub), you cannot use password login — use the corresponding social button instead. If you're still locked out, use Forgot Password.
+
+### Why am I redirected to /unauthorized after login?
+This happens when your account role doesn't match the route you're trying to access, or your account is suspended. Contact your administrator.
+
+### Can I be logged into multiple roles at the same time?
+No — one session corresponds to one account and one role. You would need a different browser or incognito window for a second account.

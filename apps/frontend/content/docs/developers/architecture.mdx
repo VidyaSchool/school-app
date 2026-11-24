@@ -1,0 +1,53 @@
+---
+title: "System Architecture & Core Stack"
+description: "Comprehensive technical blueprint of VidyaSchool's dual-engine hybrid architecture, tech stack components, repository anatomy, and communication contracts."
+---
+
+Comprehensive technical blueprint of VidyaSchool's dual-engine hybrid architecture, tech stack components, repository anatomy, and communication contracts.
+
+## Tips
+
+- Refer to /frontend/lib/schema.ts and /backend/models.py whenever adding or modifying database fields.
+- Use /api/backend/[...path] as the proxy route when triggering FastAPI endpoints from Next.js client components.
+
+## Core Technology Stack
+
+VidyaSchool is built using a modern, resilient technology stack:
+• Frontend Framework: Next.js 16 (React 19, App Router) with Server Components & Edge Middleware.
+• Design System: Custom Vanilla CSS tokens + Tailwind CSS with Glassmorphism aesthetic and automatic dark mode.
+• Documentation: Fumadocs UI with PageTree navigation and custom Markdown theme overrides.
+• Primary Database: PostgreSQL (Neon Serverless / Docker Postgres) shared by Node.js and Python runtimes.
+• Frontend ORM: Drizzle ORM for type-safe database queries and migrations.
+• Python Backend: FastAPI (Python 3.12+) running an ASGI server with SQLModel / SQLAlchemy ORM.
+• Realtime Gateway: Socket.IO AsyncServer for instant notifications, online presence, and administrative alerts.
+• Authentication: Better-Auth with session token cookie synchronization across Node.js & Python.
+• Telemetry & Monitoring: Sentry SDK for client and server error tracing.
+
+## Dual-Engine Hybrid Proxy Architecture
+
+The platform operates on a high-throughput hybrid proxy model:
+1. Edge Interception: Next.js Middleware (middleware.ts) intercepts incoming requests, verifies session tokens, enforces rate limits, and performs zero-waterfall redirects from /[role] to /[role]/[username].
+2. SSR UI & Local APIs: Next.js Server Components handle UI rendering and light CRUD operations.
+3. FastAPI Microservices: Requests to /api/backend/* or proxied account/profile routes are forwarded directly to the Python FastAPI backend (running on port 8000) for complex business logic, fee calculations, and AI page generation.
+
+## Repository Directory Anatomy
+
+The codebase is organized into two primary root modules:
+• /frontend:
+  - app/: Next.js App Router pages (admin, student, teacher, accounts, librarian, docs, login, signup).
+  - components/: Reusable UI components (buttons, badges, sidebar, dialogs, avatar uploaders).
+  - lib/: Core utilities, database schema (schema.ts), Better-Auth client/server helpers, and rate-limit.ts.
+  - middleware.ts: Edge firewall, rate limiter, and fast role router.
+• /backend:
+  - main.py: FastAPI entry point, ASGI server initialization, CORS regex, and exception handlers.
+  - app/core/: Security auth helpers (auth.py), database connection (database.py), and rate limit middleware (rate_limit.py).
+  - app/routes/: Specialized domain routers (fees.py, teacher.py, chats.py, library.py, page_builder_ai.py).
+  - models.py: SQLModel database entities matching PostgreSQL schema.
+
+## Frequently Asked Questions
+
+### Why does the application use both Next.js and FastAPI?
+Next.js delivers fast Server-Side Rendering (SSR), SEO, and edge routing for the web UI, while FastAPI provides high-performance asynchronous Python processing for heavy computations, data analytics, AI element generation, and Socket.IO realtime events.
+
+### How do Next.js and FastAPI share user sessions?
+Both services query the same PostgreSQL database. Next.js sets session tokens in HTTP cookies; FastAPI decodes the token from the request cookie or Bearer header and validates it against the shared 'session' database table.

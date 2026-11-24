@@ -1,0 +1,11 @@
+{
+  "title": "Developers Guide",
+  "pages": [
+    "architecture",
+    "frontend",
+    "backend",
+    "database",
+    "security",
+    "deployment"
+  ]
+}

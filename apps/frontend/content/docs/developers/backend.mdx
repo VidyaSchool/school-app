@@ -1,0 +1,33 @@
+---
+title: "FastAPI Backend Engine"
+description: "Technical documentation for the Python 3.12+ FastAPI backend, domain routers, exception handlers, and Socket.IO realtime server."
+---
+
+Technical documentation for the Python 3.12+ FastAPI backend, domain routers, exception handlers, and Socket.IO realtime server.
+
+## Tips
+
+- Run 'python3 -m py_compile main.py app/routes/fees.py' to validate Python syntax before committing.
+- Always use Depends(get_db) for thread-safe database session management in FastAPI routes.
+
+## FastAPI Application Structure
+
+The Python backend (backend/main.py) is built on FastAPI and Uvicorn:
+• ASGI Application: Mounted with Socket.IO AsyncServer for realtime websockets.
+• CORS Middleware: Configured with strict regex matching localhost, Vercel deployments, and production domains.
+• Global Exception Handler: Custom StarletteHTTPException handler guarantees all error responses return a standardized JSON body containing both 'detail' and 'error' keys.
+
+## Domain Routers & Modules
+
+The backend is partitioned into dedicated domain routers:
+• app/routes/fees.py: Fee calculation engine, itemized installment ledgers, Razorpay payment webhooks, and account profile CRUD.
+• app/routes/chats.py: AI chat assistance, leaderboard engine, and class marks processing.
+• app/routes/page_builder_ai.py: Streaming AI page builder with elementor templates.
+• app/routes/teacher.py: Faculty rosters, subject assignments, and leave requests.
+
+## Realtime Socket.IO Events
+
+The realtime server broadcasts live events:
+• join: Client establishes active presence and room connectivity.
+• approval_status & request_updated: Broadcasts teacher approval status updates to admin rooms.
+• substitution_updated: Emits real-time faculty substitution updates.

@@ -1,0 +1,41 @@
+---
+title: "QR Code Mobile Login"
+description: "How to use VidyaSchool's high-entropy QR Code login stream to instantly sign into desktop web browsers without typing passwords."
+---
+
+How to use VidyaSchool's high-entropy QR Code login stream to instantly sign into desktop web browsers without typing passwords.
+
+## Steps
+
+### Step 01: Open Login Page on Desktop
+Navigate to the VidyaSchool login page (/login) on your desktop or laptop browser and select the 'QR Code Login' tab. A unique 256-bit QR code will be generated on screen.
+
+### Step 02: Open VidyaSchool Mobile App
+Launch the authenticated VidyaSchool mobile app on your smartphone where you are already signed in.
+
+### Step 03: Scan the Desktop QR Code
+Tap the QR Scanner icon in the mobile app header navigation and align your phone camera with the QR code displayed on your desktop screen.
+
+### Step 04: Confirm & Automatic Sign-In
+The mobile app validates the QR token with your active session. Within milliseconds, a Socket.IO confirmation signal is sent to the desktop browser, automatically logging you in and opening your dashboard (/student/[username] or /teacher/[username]).
+
+## Tips
+
+- QR codes expire after 180 seconds (3 minutes) for security. Click 'Refresh QR Code' on screen if expired.
+- Never scan QR codes sent via email, social media, or chat messages — QR codes must only be scanned directly from the official portal desktop screen.
+
+## Important Warnings
+
+> [!WARNING]
+> Only scan QR codes displayed on your official school portal desktop screen (localhost or vidyaschool.vercel.app).
+
+> [!WARNING]
+> If your phone reports 'Invalid or expired QR token', click 'Refresh QR Code' on your browser to generate a fresh token.
+
+## Frequently Asked Questions
+
+### What if the QR code isn't scanning?
+Ensure your computer screen brightness is turned up and hold your phone camera 6-12 inches away from the monitor. If it still doesn't scan, click 'Refresh QR Code' to render a fresh code.
+
+### Is QR code login secure?
+Yes! Each QR code contains a single-use 256-bit entropy token backed by a 3-minute TTL and cryptographically bound to your mobile session.

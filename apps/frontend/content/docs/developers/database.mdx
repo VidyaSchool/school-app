@@ -1,0 +1,32 @@
+---
+title: "Database & ORM Schema Sync"
+description: "Unified database architecture, Drizzle ORM (TypeScript) and SQLModel (Python) parity, and database migration guidelines."
+---
+
+Unified database architecture, Drizzle ORM (TypeScript) and SQLModel (Python) parity, and database migration guidelines.
+
+## Tips
+
+- In Python SQLModel, use Field(alias='...') for columns named after Python reserved keywords (e.g. class_ alias 'class').
+- Verify date field formats: Drizzle uses JavaScript Date objects, while FastAPI serializes ISO 8601 strings.
+
+## Unified PostgreSQL Database
+
+Both frontend and backend services connect to the same PostgreSQL database instance:
+• Host: Serverless Neon PostgreSQL or local PostgreSQL container.
+• Connection Pooling: Configured with pool_pre_ping=True and pool_recycle=300 in Python, and connection pooling in Drizzle ORM.
+
+## TypeScript (Drizzle) & Python (SQLModel) Parity
+
+Database entities are mapped 1:1 across languages:
+• user ↔ User: id, name, email, role, preferred_role, teacher_approval_status.
+• user_profile ↔ UserProfile: user_id, admission_number, username, phone_number, parent_name, class (class_), section, transport_mode, onboarding_completed.
+• session ↔ SessionModel: token, user_id, expires_at, ip_address, user_agent.
+• fee_installment ↔ FeeInstallment: user_id, month, year, amount, due_date, status, paid_date, receipt_no.
+
+## Migration Workflow
+
+When modifying database tables:
+1. Update frontend/lib/schema.ts (Drizzle schema).
+2. Update backend/models.py (SQLModel schema).
+3. Run 'npx drizzle-kit generate' or migration SQL scripts to apply changes to PostgreSQL.

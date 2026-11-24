@@ -1,0 +1,32 @@
+---
+title: "Frontend Framework & UI System"
+description: "Technical guide to Next.js 16 App Router usage, server component rendering, custom CSS design system, and Fumadocs integration."
+---
+
+Technical guide to Next.js 16 App Router usage, server component rendering, custom CSS design system, and Fumadocs integration.
+
+## Tips
+
+- Always use requireRole(['role']) in server components to enforce role authorization.
+- Keep client components localized at the leaf level to maximize server rendering performance.
+
+## Server vs Client Component Strategy
+
+VidyaSchool follows a strict React Server Component (RSC) architecture:
+• Server Components: All page layouts (app/[role]/[username]/layout.tsx) and root route redirect handlers (app/student/page.tsx) run purely on the server to prevent client loading state waterfalls.
+• Client Components ('use client'): Used strictly for interactive forms, real-time charts, tab interfaces, socket listeners, and avatar uploaders.
+
+## Design System & Aesthetics
+
+The UI design prioritizes visual excellence and responsiveness:
+• Curated HSL Color Tokens: CSS variables in globals.css provide harmonious dark/light mode themes.
+• Modern Typography: Inter/Roboto/Outfit Google fonts instead of browser defaults.
+• Interactive Glassmorphism: Smooth backdrop blurs, dynamic gradients, subtle micro-animations, and custom hover states.
+• Dark Mode System: Synced via ThemeProvider and customized in Fumadocs UI.
+
+## Fast Role Redirection Engine
+
+When users visit a root role URL (e.g., /student or /teacher):
+• Middleware (middleware.ts) immediately checks session credentials and resolves the user's username.
+• The request is redirected at the Edge layer to /[role]/[username] before any client-side JavaScript bundle executes.
+• Page layouts enforce role ownership so users can only access their own dashboard.
