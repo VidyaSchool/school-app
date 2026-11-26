@@ -328,7 +328,9 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
 
           {/* Quick Search Button */}
           <button
-            onClick={() => {
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
               if (typeof window !== "undefined") {
                 window.dispatchEvent(new CustomEvent("open-vidya-search"))
               }

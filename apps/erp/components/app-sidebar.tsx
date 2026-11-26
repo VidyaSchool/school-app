@@ -829,9 +829,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="p-3 group-data-[collapsible=icon]:p-1.5 flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
-        {isHeaderLoading ? (
-          <div className="flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
-            {/* Avatar row: h-8 avatar + name + chevron icon */}
+        <div className="flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
+          {isHeaderLoading ? (
+            /* Avatar row skeleton: h-8 avatar + name + chevron icon */
             <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center px-1 py-1.5 w-full">
               <div className="flex items-center gap-2.5 flex-1 min-w-0 group-data-[collapsible=icon]:justify-center">
                 <Skeleton className="h-8 w-8 rounded-lg shrink-0 bg-muted-foreground/15" />
@@ -839,16 +839,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
               <Skeleton className="size-4 rounded shrink-0 bg-muted-foreground/10 group-data-[collapsible=icon]:hidden" />
             </div>
-            {/* Quick Search button placeholder: h-9, full width, rounded-xl */}
-            <Skeleton className="h-9 w-full group-data-[collapsible=icon]:size-9! rounded-xl bg-muted-foreground/10" />
-            <div className="h-px bg-sidebar-border/60 w-full group-data-[collapsible=icon]:hidden" />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
-            {/* User Card Dropdown */}
+          ) : (
+            /* User Card Dropdown */
             <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
               <PopoverTrigger asChild>
                 <button
+                  type="button"
                   onClick={() => setIsCommandOpen(true)}
                   className="group w-full flex items-center justify-start group-data-[collapsible=icon]:justify-center gap-2.5 px-2 group-data-[collapsible=icon]:px-0 py-1.5 rounded-lg cursor-pointer focus:outline-none"
                 >
@@ -896,6 +892,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {/* Menu items */}
                 <div className="p-1.5 space-y-0.5">
                   <button
+                    type="button"
                     onClick={() => { setIsCommandOpen(false); router.push(accountUrl) }}
                     className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-sm text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
                   >
@@ -903,6 +900,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     Account Settings
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       setIsCommandOpen(false)
                       const noticeUrl = isAdmin
@@ -933,6 +931,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       { label: "System",value: "system" as const,icon: <LaptopIcon className="size-3.5" /> },
                     ].map(({ label, value, icon }) => (
                       <button
+                        type="button"
                         key={value}
                         onClick={() => { setTheme(value); setIsCommandOpen(false); toast.success(`Theme: ${label}`) }}
                         className="flex flex-col items-center gap-1 py-2 rounded-lg text-[11px] font-medium text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800/60 hover:text-foreground transition-colors cursor-pointer"
@@ -947,6 +946,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {/* Divider + Log Out */}
                 <div className="border-t border-zinc-100 dark:border-zinc-800/60 p-1.5 space-y-0.5">
                   <Button
+                    type="button"
                     variant="destructive"
                     className="w-full justify-start gap-2.5 px-2.5"
                     onClick={async () => {
@@ -960,30 +960,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
               </PopoverContent>
             </Popover>
+          )}
 
-            {/* Quick Search Button */}
-            <button
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.dispatchEvent(new CustomEvent("open-vidya-search"))
-                }
-                if (isMobile) {
-                  setOpenMobile(false)
-                }
-              }}
-              className="w-full h-9 flex items-center justify-between group-data-[collapsible=icon]:justify-center px-3 group-data-[collapsible=icon]:px-0 rounded-xl border border-border/80 bg-sidebar-foreground/5 hover:bg-sidebar-foreground/10 text-muted-foreground transition-all duration-150 text-xs cursor-pointer focus:outline-none"
-            >
-              <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
-                <MagnifierIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
-                <span className="text-muted-foreground/80 font-normal group-data-[collapsible=icon]:hidden">Quick Search</span>
-              </div>
-              <kbd className="pointer-events-none inline-flex group-data-[collapsible=icon]:hidden h-5 select-none items-center gap-0.5 rounded-md border border-border bg-transparent dark:bg-transparent px-1.5 font-mono text-[9px] font-medium text-muted-foreground/60 shadow-none">
-                <span>⌘</span><span>F</span>
-              </kbd>
-            </button>
-            <div className="h-px bg-sidebar-border/60 w-full group-data-[collapsible=icon]:hidden" />
-          </div>
-        )}
+          {/* Quick Search Button — always rendered immediately without waiting on session */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault()
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("open-vidya-search"))
+              }
+              if (isMobile) {
+                setOpenMobile(false)
+              }
+            }}
+            className="w-full h-9 flex items-center justify-between group-data-[collapsible=icon]:justify-center px-3 group-data-[collapsible=icon]:px-0 rounded-xl border border-border/80 bg-sidebar-foreground/5 hover:bg-sidebar-foreground/10 text-muted-foreground transition-all duration-150 text-xs cursor-pointer focus:outline-none"
+          >
+            <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
+              <MagnifierIcon className="size-4.5 shrink-0 text-muted-foreground/80" />
+              <span className="text-muted-foreground/80 font-normal group-data-[collapsible=icon]:hidden">Quick Search</span>
+            </div>
+            <kbd className="pointer-events-none inline-flex group-data-[collapsible=icon]:hidden h-5 select-none items-center gap-0.5 rounded-md border border-border bg-transparent dark:bg-transparent px-1.5 font-mono text-[9px] font-medium text-muted-foreground/60 shadow-none">
+              <span>⌘</span><span>F</span>
+            </kbd>
+          </button>
+          <div className="h-px bg-sidebar-border/60 w-full group-data-[collapsible=icon]:hidden" />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         {isNavLoading ? (
