@@ -10,6 +10,7 @@ import React, {
   useRef,
   type ReactNode,
 } from "react"
+import { usePathname } from "next/navigation"
 
 export interface UserSession {
   id: string
@@ -139,6 +140,7 @@ export function SessionProvider({ children, initialSession }: SessionProviderPro
   const [isLoading, setIsLoading] = useState<boolean>(!initialSession)
 
   const hasLoadedRef = useRef(Boolean(initialSession))
+  const pathname = usePathname()
 
   const loadSession = useCallback(async (isRefresh = false) => {
     if (!isRefresh && hasLoadedRef.current) {
@@ -193,50 +195,71 @@ export function SessionProvider({ children, initialSession }: SessionProviderPro
     window.addEventListener("auth:refresh", handleAuthRefresh)
     window.addEventListener("auth:logout", handleAuthLogout)
 
-    // Real-time WebSocket push invalidation
-    let socket: any = null
-    if (typeof window !== "undefined" && user?.id) {
-      import("socket.io-client")
-        .then(({ io }) => {
-          const backendUrl =
-            process.env.NEXT_PUBLIC_BACKEND_URL ||
-            (window.location.hostname !== "localhost"
-              ? "https://api.vidyaschool.com"
-              : "http://localhost:8000")
-          socket = io(backendUrl, {
-            transports: ["polling", "websocket"],
-            reconnectionAttempts: 3,
-          })
-
-          socket.on("connect", () => {
-            socket.emit("join", {
-              userId: user.id,
-              name: user.name,
-              role: user.role,
-            })
-          })
-
-          socket.on("session:invalidated", (payload: any) => {
-            if (
-              !payload?.userId ||
-              payload.userId === user.id ||
-              (payload.role && payload.role === role)
-            ) {
-              refreshSession()
-            }
-          })
-        })
-        .catch(() => {})
-    }
-
     return () => {
       window.removeEventListener("auth:refresh", handleAuthRefresh)
       window.removeEventListener("auth:logout", handleAuthLogout)
+    }
+  }, [loadSession, refreshSession])
+
+  // Real-time WebSocket push invalidation for role/permission updates.
+  // Skipped on student/public/feature routes (e.g. marks, library, notice, account)
+  // where a live socket connection is unnecessary.
+  useEffect(() => {
+    if (typeof window === "undefined" || !user?.id) return
+
+    const isSkippedPath =
+      !pathname ||
+      pathname.startsWith("/student") ||
+      /\/(marks|library|fees|leaderboard|notes|notice|account)(\/|$)/.test(pathname)
+
+    const isStudentRole =
+      role?.toLowerCase() === "student" && !pathname?.startsWith("/auth/waiting-room")
+
+    if (isSkippedPath || isStudentRole) return
+
+    let cancelled = false
+    let socket: import("socket.io-client").Socket | null = null
+
+    import("socket.io-client")
+      .then(({ io }) => {
+        if (cancelled) return
+        const backendUrl =
+          process.env.NEXT_PUBLIC_BACKEND_URL ||
+          (window.location.hostname !== "localhost"
+            ? "https://api.vidyaschool.com"
+            : "http://localhost:8000")
+        socket = io(backendUrl, {
+          transports: ["polling", "websocket"],
+          reconnectionAttempts: 3,
+        })
+
+        socket.on("connect", () => {
+          socket?.emit("join", {
+            userId: user.id,
+            name: user.name,
+            role: user.role,
+          })
+        })
+
+        socket.on("session:invalidated", (payload?: { userId?: string; role?: string }) => {
+          if (
+            !payload?.userId ||
+            payload.userId === user.id ||
+            (payload.role && payload.role === role)
+          ) {
+            refreshSession()
+          }
+        })
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
       if (socket) {
         socket.disconnect()
       }
     }
-  }, [loadSession, refreshSession, user?.id, role])
+  }, [user?.id, user?.name, user?.role, role, pathname, refreshSession])
 
   const hasPermission = useCallback(
     (permission: string): boolean => {

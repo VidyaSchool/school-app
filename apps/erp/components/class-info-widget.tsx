@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { GraduationCapIcon, BookOpenIcon, UserIcon } from "lucide-react"
+import { UserIcon } from "lucide-react"
 import { useSWRFetch } from "@/hooks/use-swr-fetch"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -21,10 +21,9 @@ export function ClassInfoWidget({ className }: { className?: string } = {}) {
 
   return (
     <div className={cn("w-full", className)}>
-      <Card className="@container/card">
+      <Card className="@container/card border-0 ring-0 shadow-none">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="font-medium text-base text-foreground flex items-center gap-2">
-            <GraduationCapIcon className="h-4 w-4 text-primary" />
+          <CardTitle className="font-medium text-base text-foreground">
             My Class
           </CardTitle>
           {info?.class ? (
@@ -36,15 +35,9 @@ export function ClassInfoWidget({ className }: { className?: string } = {}) {
 
         <CardContent>
           <Tabs defaultValue="subjects" className="w-full">
-            <TabsList className="w-full mb-4 grid grid-cols-2">
-              <TabsTrigger value="subjects" className="gap-1.5 text-xs font-semibold">
-                <BookOpenIcon className="h-3.5 w-3.5" />
-                Subject Teachers
-              </TabsTrigger>
-              <TabsTrigger value="classteacher" className="gap-1.5 text-xs font-semibold">
-                <UserIcon className="h-3.5 w-3.5" />
-                Class Teacher
-              </TabsTrigger>
+            <TabsList className="mb-2">
+              <TabsTrigger value="subjects">Subject Teachers</TabsTrigger>
+              <TabsTrigger value="classteacher">Class Teacher</TabsTrigger>
             </TabsList>
 
             {/* Subject Teachers Tab */}

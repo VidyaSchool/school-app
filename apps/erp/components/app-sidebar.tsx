@@ -85,7 +85,35 @@ import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
 import { toast } from "sonner"
 
-// Module-level username cache — fetched once per page load, shared across all hooks
+type PortalRole = "student" | "teacher" | "admin" | "librarian" | "account"
+
+const RESERVED_PORTAL_SEGMENTS = new Set(["waiting-room", "onboarding"])
+
+function parsePortalFromPathname(pathname: string | null): {
+  portal: PortalRole | null
+  username: string | null
+} {
+  if (!pathname) return { portal: null, username: null }
+  const parts = pathname.split("/").filter(Boolean)
+  const segment = parts[0]
+  let portal: PortalRole | null = null
+  if (
+    segment === "student" ||
+    segment === "teacher" ||
+    segment === "admin" ||
+    segment === "librarian"
+  ) {
+    portal = segment
+  } else if (segment === "accounts") {
+    portal = "account"
+  }
+  const candidate = portal && parts.length >= 2 ? parts[1] : null
+  const username =
+    candidate && !RESERVED_PORTAL_SEGMENTS.has(candidate) ? candidate : null
+  return { portal, username }
+}
+
+// Module-level username cache — only fetched when the URL has no [username]
 let _cachedUsername: string | null = null
 let _usernameFetchPromise: Promise<string | null> | null = null
 
@@ -102,30 +130,25 @@ function fetchUsernameOnce(): Promise<string | null> {
   return _usernameFetchPromise
 }
 
-// Single shared hook — extracts username from URL or fetches from API
-function useProfileUsername(): string | null {
-  const pathname = usePathname()
-  const [username, setUsername] = React.useState<string | null>(() => {
-    if (_cachedUsername) return _cachedUsername
-    if (pathname) {
-      const parts = pathname.split('/').filter(Boolean)
-      if (parts.length >= 2 && ['student', 'teacher', 'admin', 'librarian', 'accounts'].includes(parts[0])) {
-        return parts[1]
-      }
-    }
-    return null
-  })
+// Uses URL [username] directly when present; falls back to API only when missing
+function useProfileUsername(urlUsername: string | null): string | null {
+  const [fallbackUsername, setFallbackUsername] = React.useState<string | null>(() => _cachedUsername)
 
   React.useEffect(() => {
+    if (urlUsername) return
+    let cancelled = false
     fetchUsernameOnce().then(u => {
-      if (u) {
+      if (!cancelled && u) {
         _cachedUsername = u
-        setUsername(u)
+        setFallbackUsername(u)
       }
     })
-  }, [pathname])
+    return () => {
+      cancelled = true
+    }
+  }, [urlUsername])
 
-  return username
+  return urlUsername ?? fallbackUsername
 }
 
 // Derived URL builders — computed from the single username value
@@ -285,7 +308,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
   const { user: sessionUser, isPending } = useSession()
   const { isMobile, setOpenMobile, setOpen } = useSidebar()
-  const [profileLoading, setProfileLoading] = React.useState(true)
   const [isQrOpen, setIsQrOpen] = React.useState(false)
   const [appVersion, setAppVersion] = React.useState<string>("v1.0.52")
   const [downloadUrl, setDownloadUrl] = React.useState<string>(
@@ -293,10 +315,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   )
 
   React.useEffect(() => {
-    fetch('/api/profile/username')
-      .then(() => setProfileLoading(false))
-      .catch(() => setProfileLoading(false))
-
     fetch('https://api.github.com/repos/VidyaSchool/school-app/releases')
       .then(res => {
         if (!res.ok) return []
@@ -318,16 +336,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [])
 
   const userToDisplay = sessionUser
-  const isLoading = isPending || profileLoading
   const userRole = userToDisplay?.role
-  
-  const isLibrarian = userRole === "librarian" || (userRole === undefined && pathname?.startsWith("/librarian"))
-  const isTeacher = userRole === "teacher" || (userRole === undefined && pathname?.startsWith("/teacher"))
-  const isAdmin = userRole === "admin" || (userRole === undefined && pathname?.startsWith("/admin"))
-  const isAccount = userRole === "account" || (userRole === undefined && pathname?.startsWith("/accounts"))
-  
-  // Single fetch — shared by all URL builders via module-level cache
-  const profileUsername = useProfileUsername()
+  const { portal: urlPortal, username: urlUsername } = React.useMemo(
+    () => parsePortalFromPathname(pathname),
+    [pathname]
+  )
+
+  // Derive UI portal from URL first (for instant nav rendering), falling back to session role.
+  // Privileged client fetches/sockets below still check the verified session role.
+  const activePortal: PortalRole =
+    urlPortal ??
+    (userRole === "librarian" ||
+    userRole === "teacher" ||
+    userRole === "admin" ||
+    userRole === "account"
+      ? userRole
+      : "student")
+
+  const isLibrarian = activePortal === "librarian"
+  const isTeacher = activePortal === "teacher"
+  const isAdmin = activePortal === "admin"
+  const isAccount = activePortal === "account"
+
+  const isVerifiedLibrarian = userRole === "librarian"
+  const isVerifiedTeacher = userRole === "teacher"
+  const isVerifiedAdmin = userRole === "admin"
+
+  const isHeaderLoading = isPending
+  const isNavLoading = !urlPortal && isPending
+
+  // Derived from URL [username] immediately when present; falls back to API only if missing
+  const profileUsername = useProfileUsername(urlUsername)
 
   const adminUrls = React.useMemo(() => buildAdminUrls(profileUsername), [profileUsername])
   const accountUrls = React.useMemo(() => buildAccountUrls(profileUsername), [profileUsername])
@@ -397,7 +436,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [])
 
   React.useEffect(() => {
-    if (!isTeacher) return
+    if (!isVerifiedTeacher) return
     loadTeacherChats()
 
     // Listen for chat changes
@@ -405,7 +444,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => {
       window.removeEventListener("vidya_chats_updated", loadTeacherChats)
     }
-  }, [isTeacher, loadTeacherChats])
+  }, [isVerifiedTeacher, loadTeacherChats])
 
   // Clear notifications when visiting pages
   React.useEffect(() => {
@@ -426,13 +465,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathnameRef = React.useRef(pathname)
   React.useEffect(() => { pathnameRef.current = pathname }, [pathname])
 
-  // Fetch initial pending status on mount and connect to Socket.IO
-  // Deps: session + role flags only — NOT pathname, so socket stays alive across navigations
+  // Fetch initial pending status on mount and connect to Socket.IO (verified staff roles only)
+  // Deps: session + verified role flags only — NOT pathname, so socket stays alive across navigations
   React.useEffect(() => {
     if (!sessionUser) return
 
     // 1. Fetch complaints status
-    const roleParam = isTeacher || isLibrarian ? "teacher" : isAdmin ? "admin" : ""
+    const roleParam = isVerifiedTeacher || isVerifiedLibrarian ? "teacher" : isVerifiedAdmin ? "admin" : ""
     if (roleParam) {
       fetch(`/api/complaints?role=${roleParam}`)
         .then(res => res.json())
@@ -446,7 +485,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     // 2. Fetch admin requests status
-    if (isAdmin) {
+    if (isVerifiedAdmin) {
       fetch('/api/admin/requests')
         .then(res => res.json())
         .then(data => {
@@ -458,20 +497,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .catch(() => {})
     }
 
-    // 3. Setup Socket.IO — single persistent connection, reads pathname via ref
+    // 3. Setup Socket.IO — only needed for verified admins/teachers (requests & complaints badges)
+    if (!isVerifiedAdmin && !isVerifiedTeacher) return
+
     const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://api.vidyaschool.com' : 'http://localhost:8000'), {
       transports: ["polling", "websocket"],
       reconnectionAttempts: 3,
     })
 
     socket.on("teacher_request_created", () => {
-      if (isAdmin && !pathnameRef.current?.includes("/requests")) {
+      if (isVerifiedAdmin && !pathnameRef.current?.includes("/requests")) {
         setUnreadRequests(true)
       }
     })
 
     socket.on("complaint_created", () => {
-      if ((isAdmin || isTeacher) && !pathnameRef.current?.includes("/complaints")) {
+      if ((isVerifiedAdmin || isVerifiedTeacher) && !pathnameRef.current?.includes("/complaints")) {
         setUnreadComplaints(true)
       }
     })
@@ -480,7 +521,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       socket.disconnect()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionUser?.id, isTeacher, isAdmin, isLibrarian])
+  }, [sessionUser?.id, isVerifiedTeacher, isVerifiedAdmin, isVerifiedLibrarian])
 
   // Trigger simulated new notice dot
   React.useEffect(() => {
@@ -788,7 +829,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="p-3 group-data-[collapsible=icon]:p-1.5 flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
-        {isLoading ? (
+        {isHeaderLoading ? (
           <div className="flex flex-col gap-5 group-data-[collapsible=icon]:gap-3">
             {/* Avatar row: h-8 avatar + name + chevron icon */}
             <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center px-1 py-1.5 w-full">
@@ -945,7 +986,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
       </SidebarHeader>
       <SidebarContent>
-        {isLoading ? (
+        {isNavLoading ? (
           <SidebarGroup>
             <SidebarGroupContent className="flex flex-col gap-1">
               {/* 6 main nav items: Dashboard / Fees / Library / Marks / Notices / Mobile App */}
@@ -978,7 +1019,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             )}
           </>
         )}
-        {isLoading ? (
+        {isNavLoading ? (
           <SidebarGroup className="mt-auto">
             <SidebarGroupContent>
               <SidebarMenu>

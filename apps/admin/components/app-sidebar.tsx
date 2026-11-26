@@ -75,15 +75,15 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const [isCommandOpen, setIsCommandOpen] = React.useState(false)
   const { setTheme } = useTheme()
 
-  // Extract username synchronously: prioritizes user prop, then URL pathname
+  // Extract username synchronously: prioritizes URL pathname [username], then user prop
   const username = React.useMemo(() => {
-    if (user?.username) return user.username
-    if (!pathname) return ""
-    const parts = pathname.split("/").filter(Boolean)
-    if (parts[0] === "admin" && parts[1] && !RESERVED_ADMIN_ROUTES.has(parts[1])) {
-      return parts[1]
+    if (pathname) {
+      const parts = pathname.split("/").filter(Boolean)
+      if (parts[0] === "admin" && parts[1] && !RESERVED_ADMIN_ROUTES.has(parts[1])) {
+        return parts[1]
+      }
     }
-    return ""
+    return user?.username || ""
   }, [pathname, user?.username])
 
   const base = username ? `/admin/${username}` : "/admin"

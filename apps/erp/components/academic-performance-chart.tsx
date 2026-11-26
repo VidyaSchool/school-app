@@ -161,7 +161,7 @@ export function AcademicPerformanceChart({ className }: { className?: string } =
   if (loading) {
     return (
       <div className={cn("w-full py-1.5", className)}>
-        <Card className="@container/card">
+        <Card className="@container/card border-0 ring-0 shadow-none">
           <CardHeader>
             <CardTitle>Academic Performance</CardTitle>
             <CardDescription>Overall score trend across exams</CardDescription>
@@ -180,7 +180,7 @@ export function AcademicPerformanceChart({ className }: { className?: string } =
   if (error || chartData.length === 0) {
     return (
       <div className={cn("w-full py-1.5", className)}>
-        <Card className="@container/card">
+        <Card className="@container/card border-0 ring-0 shadow-none">
           <CardHeader>
             <CardTitle>Academic Performance</CardTitle>
             <CardDescription>Overall score trend across exams</CardDescription>
@@ -202,7 +202,7 @@ export function AcademicPerformanceChart({ className }: { className?: string } =
 
   return (
     <div className={cn("w-full py-1.5", className)}>
-      <Card className="@container/card">
+      <Card className="@container/card border-0 ring-0 shadow-none">
         <CardHeader>
           <CardTitle>Academic Performance</CardTitle>
           <CardDescription>
